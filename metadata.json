@@ -1,0 +1,9 @@
+{
+  "name": "Rent Easy",
+  "description": "Nigerian real estate rental, sale, and land marketplace powered by Supabase and Google Maps.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera",
+    "microphone"
+  ]
+}
