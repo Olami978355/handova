@@ -1,23 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Search, 
-  Filter, 
-  MoreVertical, 
-  UserCog, 
-  Shield, 
-  ShieldAlert, 
-  User,
-  Loader2,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Mail,
-  Phone,
-  Calendar
-} from 'lucide-react';
+import { Search, MoreVertical, Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { useAdmin } from '../../hooks/useAdmin';
 import { UserRole } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 export default function UserManagement() {
   const { users, loading, fetchUsers, updateUserRole, isAdmin } = useAdmin();
@@ -25,7 +12,7 @@ export default function UserManagement() {
   const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -33,45 +20,40 @@ export default function UserManagement() {
   };
 
   useEffect(() => {
+    fetchUsers();
     const timer = setTimeout(() => {
-      if (loading && users.length === 0) {
-        setError('Taking too long. Please refresh.');
-      }
+      if (loading && users.length === 0) setError('Taking too long. Please refresh.');
     }, 5000);
     return () => clearTimeout(timer);
-  }, [loading, users.length]);
-
-  useEffect(() => {
-    fetchUsers();
   }, []);
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    return matchesSearch && matchesRole;
+  const filtered = users.filter(u => {
+    const matchSearch = u.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchRole = roleFilter === 'all' || u.role === roleFilter;
+    return matchSearch && matchRole;
   });
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     const result = await updateUserRole(userId, newRole);
-    if (result.success) {
-      setSelectedUser(null);
-      showToast(`User role updated to ${newRole}`, 'success');
-    } else {
-      showToast(result.error || 'Failed to update role', 'error');
-    }
+    if (result.success) { setSelectedUser(null); showToast(`Role updated to ${newRole}`, 'success'); }
+    else showToast(result.error || 'Failed to update role', 'error');
+  };
+
+  const roleStyle = (role: string) => {
+    if (role === 'admin') return 'bg-[#f0c040]/15 text-[#f0c040]';
+    if (role === 'moderator') return 'bg-[#1a6b3c]/15 text-[#1a6b3c]';
+    if (role === 'agent') return 'bg-white/8 text-white/60';
+    if (role === 'landlord') return 'bg-white/8 text-white/60';
+    return 'bg-white/5 text-white/30';
   };
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[40px] border border-zinc-100 shadow-sm text-center px-6">
-        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h3 className="text-xl font-bold text-zinc-900 mb-2">Failed to load users</h3>
-        <p className="text-zinc-500 mb-6 max-w-md">{error}</p>
-        <button 
-          onClick={() => { setError(null); fetchUsers(); }}
-          className="bg-[#1a6b3c] text-white px-8 py-3 rounded-2xl font-bold hover:bg-[#14522e] transition-colors shadow-lg shadow-[#1a6b3c]/20"
-        >
+      <div className="flex flex-col items-center justify-center py-20 bg-[#0a1f11] border border-white/6 rounded-2xl text-center" style={font}>
+        <AlertCircle className="w-10 h-10 text-red-400 mb-4" />
+        <h3 className="text-[16px] font-bold text-white mb-2">Failed to load users</h3>
+        <p className="text-[12px] text-white/35 mb-5">{error}</p>
+        <button onClick={() => { setError(null); fetchUsers(); }} className="bg-[#1a6b3c] text-white px-6 py-2.5 rounded-xl font-bold text-[13px] hover:bg-[#0f4a2a] transition-colors">
           Try Again
         </button>
       </div>
@@ -80,147 +62,108 @@ export default function UserManagement() {
 
   if (loading && users.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="w-10 h-10 text-[#1a6b3c] animate-spin mb-4" />
-        <p className="text-zinc-500 font-bold">Loading users...</p>
+      <div className="flex flex-col items-center justify-center py-20 gap-3" style={font}>
+        <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-white/30">Loading users...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Toast UI fixed at bottom right */}
+    <div className="space-y-5" style={font}>
       <AnimatePresence>
         {toast && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20, x: 20 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: 20, x: 20 }}
-            className={`fixed bottom-4 right-4 z-50 px-6 py-3 
-              rounded-lg text-white font-medium shadow-lg
-              ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+            className={`fixed bottom-4 right-4 z-50 px-5 py-3 rounded-xl text-[13px] font-bold shadow-xl ${
+              toast.type === 'success' ? 'bg-[#1a6b3c] text-white' : 'bg-red-500 text-white'
+            }`}
           >
             {toast.message}
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
-          <input 
-            type="text" 
-            placeholder="Search users by name or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#1a6b3c]/20 text-sm"
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
+          <input
+            type="text" placeholder="Search by name or email..."
+            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
           />
         </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="hidden xl:block text-right">
-            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Testing Note</p>
-            <p className="text-[10px] text-zinc-500 font-bold max-w-[200px]">
-              To test as tenant or landlord, open an incognito window and sign up with a different email.
-            </p>
-          </div>
-          <select 
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value as any)}
-            className="px-4 py-3 bg-white border border-zinc-200 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#1a6b3c]/20"
-          >
-            <option value="all">All Roles</option>
-            <option value="tenant">Tenants</option>
-            <option value="landlord">Landlords</option>
-            <option value="agent">Agents</option>
-            <option value="moderator">Moderators</option>
-            <option value="admin">Admins</option>
-          </select>
-        </div>
+        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as UserRole | 'all')}
+          className="px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#1a6b3c]/50 transition-colors">
+          <option value="all" className="bg-[#0a1f11]">All Roles</option>
+          {(['tenant', 'landlord', 'agent', 'moderator', 'admin'] as UserRole[]).map(r => (
+            <option key={r} value={r} className="bg-[#0a1f11] capitalize">{r.charAt(0).toUpperCase() + r.slice(1)}s</option>
+          ))}
+        </select>
       </div>
 
-      <div className="bg-white rounded-[40px] border border-zinc-100 shadow-sm overflow-hidden">
+      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full">
             <thead>
-              <tr className="bg-zinc-50 border-b border-zinc-100">
-                <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">User</th>
-                <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Role</th>
-                <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Status</th>
-                <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Joined</th>
-                <th className="px-8 py-5 text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right">Actions</th>
+              <tr className="border-b border-white/5">
+                {['User', 'Role', 'Status', 'Joined', 'Actions'].map((h, i) => (
+                  <th key={h} className={`px-5 py-4 text-[10px] font-bold text-white/30 uppercase tracking-wider ${i === 4 ? 'text-right' : 'text-left'}`}>{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-50">
-              {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-zinc-50/50 transition-colors group">
-                  <td className="px-8 py-5">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-full bg-zinc-100 overflow-hidden border-2 border-white shadow-sm">
-                        <img src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.full_name}`} alt="" className="w-full h-full object-cover" />
+            <tbody className="divide-y divide-white/4">
+              {filtered.map((u) => (
+                <tr key={u.id} className="hover:bg-white/4 transition-colors">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 bg-[#1a6b3c]/20 rounded-xl overflow-hidden flex items-center justify-center text-[#1a6b3c] text-[12px] font-bold flex-shrink-0">
+                        {u.avatar_url ? <img src={u.avatar_url} alt="" className="w-full h-full object-cover" /> : u.full_name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-zinc-900">{user.full_name}</p>
-                        <p className="text-xs text-zinc-500">{user.email}</p>
+                        <p className="text-[13px] font-bold text-white">{u.full_name}</p>
+                        <p className="text-[11px] text-white/35">{u.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-5">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                      user.role === 'admin' ? 'bg-purple-50 text-purple-600' :
-                      user.role === 'moderator' ? 'bg-blue-50 text-blue-600' :
-                      user.role === 'agent' ? 'bg-amber-50 text-amber-600' :
-                      'bg-zinc-100 text-zinc-600'
-                    }`}>
-                      {user.role}
-                    </span>
+                  <td className="px-5 py-4">
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider ${roleStyle(u.role)}`}>{u.role}</span>
                   </td>
-                  <td className="px-8 py-5">
-                    <div className="flex items-center space-x-2">
-                      {user.verification_status === 'verified' ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-zinc-300" />
-                      )}
-                      <span className={`text-xs font-bold ${user.verification_status === 'verified' ? 'text-emerald-600' : 'text-zinc-500'}`}>
-                        {user.verification_status}
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-1.5">
+                      {u.verification_status === 'verified'
+                        ? <CheckCircle2 className="w-3.5 h-3.5 text-[#1a6b3c]" />
+                        : <XCircle className="w-3.5 h-3.5 text-white/20" />
+                      }
+                      <span className={`text-[11px] font-semibold ${u.verification_status === 'verified' ? 'text-[#1a6b3c]' : 'text-white/30'}`}>
+                        {u.verification_status}
                       </span>
                     </div>
                   </td>
-                  <td className="px-8 py-5">
-                    <p className="text-xs font-bold text-zinc-500">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </p>
+                  <td className="px-5 py-4">
+                    <p className="text-[11px] text-white/35">{new Date(u.created_at).toLocaleDateString()}</p>
                   </td>
-                  <td className="px-8 py-5 text-right relative">
-                    <button 
-                      onClick={() => setSelectedUser(selectedUser === user.id ? null : user.id)}
-                      className="p-2 hover:bg-zinc-100 rounded-xl transition-colors"
-                    >
-                      <MoreVertical className="w-5 h-5 text-zinc-400" />
+                  <td className="px-5 py-4 text-right relative">
+                    <button onClick={() => setSelectedUser(selectedUser === u.id ? null : u.id)}
+                      className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors ml-auto">
+                      <MoreVertical className="w-4 h-4" />
                     </button>
-
                     <AnimatePresence>
-                      {selectedUser === user.id && (
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      {selectedUser === u.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: 6 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                          className="absolute right-8 top-16 w-48 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-20 p-2"
+                          exit={{ opacity: 0, scale: 0.95, y: 6 }}
+                          className="absolute right-5 top-14 w-44 bg-[#111a14] border border-white/10 rounded-xl shadow-2xl z-20 p-1.5"
                         >
-                          <p className="px-4 py-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest">Change Role</p>
+                          <p className="px-3 py-2 text-[10px] font-bold text-white/25 uppercase tracking-wider">Change Role</p>
                           {(['tenant', 'landlord', 'agent', 'moderator', 'admin'] as UserRole[]).map((role) => (
-                            <button
-                              key={role}
-                              disabled={!isAdmin}
-                              onClick={() => handleRoleChange(user.id, role)}
-                              className={`w-full flex items-center px-4 py-2 text-xs font-bold rounded-xl transition-colors ${
-                                user.role === role 
-                                  ? 'bg-[#1a6b3c]/10 text-[#1a6b3c]' 
-                                  : 'text-zinc-600 hover:bg-zinc-50'
-                              } ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            <button key={role} disabled={!isAdmin} onClick={() => handleRoleChange(u.id, role)}
+                              className={`w-full flex items-center gap-2 px-3 py-2.5 text-[12px] font-bold rounded-lg transition-colors ${
+                                u.role === role ? 'bg-[#1a6b3c]/15 text-[#1a6b3c]' : 'text-white/50 hover:bg-white/5 hover:text-white'
+                              } ${!isAdmin ? 'opacity-40 cursor-not-allowed' : ''}`}
                             >
-                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                              {u.role === role && <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />}
+                              <span className="capitalize">{role}</span>
                             </button>
                           ))}
                         </motion.div>
@@ -229,6 +172,9 @@ export default function UserManagement() {
                   </td>
                 </tr>
               ))}
+              {filtered.length === 0 && (
+                <tr><td colSpan={5} className="text-center py-12 text-[13px] text-white/25">No users found.</td></tr>
+              )}
             </tbody>
           </table>
         </div>

@@ -7,48 +7,69 @@ export const useMessages = (conversationId?: string) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  }, []);
+
+  const markAsRead = useCallback(async (convId: string) => {
+    if (!user) return;
+    try {
+      await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('conversation_id', convId)
+        .neq('sender_id', user.id)
+        .eq('read', false);
+    } catch (err) {
+      console.error('Error marking messages as read:', err);
+    }
+  }, [user]);
 
   const fetchMessages = useCallback(async () => {
     if (!conversationId || !user) return;
-
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          sender:profiles (*)
-        `)
+        .select('*, sender:profiles(id, full_name, avatar_url, role)')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
-      
-      // Mark messages as read
-      const { error: markError } = await supabase
-        .from('messages')
-        .update({ read: true })
-        .eq('conversation_id', conversationId)
-        .neq('sender_id', user.id)
-        .eq('read', false);
-        
-      if (markError) console.error('Error marking messages as read:', markError);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
+      setMessages((data as Message[]) || []);
+      scrollToBottom();
+      await markAsRead(conversationId);
+    } catch (err) {
+      console.error('Error fetching messages:', err);
     } finally {
       setLoading(false);
     }
-  }, [conversationId, user]);
+  }, [conversationId, user, scrollToBottom, markAsRead]);
 
+  // Keep a stable ref so realtime callback never causes re-subscription
+  const fetchRef = useRef(fetchMessages);
+  useEffect(() => { fetchRef.current = fetchMessages; }, [fetchMessages]);
+
+  // Subscription — depends only on conversationId, not fetchMessages
   useEffect(() => {
-    fetchMessages();
-
     if (!conversationId || !user) return;
 
-    const channelId = Math.random().toString(36).substring(7);
+    fetchRef.current();
+
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
     const channel = supabase
-      .channel(`messages:${conversationId}-${channelId}`)
+      .channel(`messages-${conversationId}`)
       .on(
         'postgres_changes',
         {
@@ -58,66 +79,69 @@ export const useMessages = (conversationId?: string) => {
           filter: `conversation_id=eq.${conversationId}`,
         },
         async (payload) => {
-          const newMessage = payload.new as Message;
-          
-          // Check if message already exists (to avoid duplicates from optimistic updates)
+          const newMsg = payload.new as Message;
+
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, role')
+            .eq('id', newMsg.sender_id)
+            .single();
+
+          const enriched: Message = {
+            ...newMsg,
+            sender: senderProfile || undefined,
+          };
+
           setMessages(prev => {
-            if (prev.some(m => m.id === newMessage.id)) return prev;
-            
-            // Fetch sender profile for the new message
-            const fetchSender = async () => {
-              const { data: senderProfile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', newMessage.sender_id)
-                .single();
-                
-              const enrichedMessage = {
-                ...newMessage,
-                sender: senderProfile,
-              };
-              
-              setMessages(current => {
-                if (current.some(m => m.id === newMessage.id)) return current;
-                return [...current, enrichedMessage];
-              });
-            };
-            
-            fetchSender();
-            return prev;
+            const withoutOptimistic = prev.filter(m => !m.id.startsWith('temp-'));
+            if (withoutOptimistic.some(m => m.id === newMsg.id)) return withoutOptimistic;
+            return [...withoutOptimistic, enriched];
           });
-          
-          // Mark as read if not from current user
-          if (newMessage.sender_id !== user.id) {
+
+          scrollToBottom();
+
+          if (newMsg.sender_id !== user.id) {
             await supabase
               .from('messages')
               .update({ read: true })
-              .eq('id', newMessage.id);
+              .eq('id', newMsg.id);
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`Messages channel status: ${status} for ${conversationId}`);
+      });
+
+    channelRef.current = channel;
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
-  }, [conversationId, user, fetchMessages]);
+  }, [conversationId, user?.id]); // ← stable deps only
 
-  const sendMessage = async (content: string) => {
-    if (!conversationId || !user || !content.trim()) return;
+  const sendMessage = async (content: string): Promise<void> => {
+    if (!conversationId || !user || !content.trim() || sending) return;
 
-    const optimisticMessage: Message = {
-      id: `temp-${Date.now()}`,
+    setSending(true);
+    setSendError(null);
+
+    const tempId = `temp-${Date.now()}`;
+    const optimistic: Message = {
+      id: tempId,
       conversation_id: conversationId,
       sender_id: user.id,
       content: content.trim(),
+      message_type: 'text',
       read: false,
       created_at: new Date().toISOString(),
       sender: {
         id: user.id,
-        full_name: 'You', // Placeholder
-        email: user.email || '',
-        role: 'tenant', // Placeholder
+        full_name: 'You',
+        email: '',
+        role: 'tenant',
         verification_status: 'unverified',
         nin_verified: false,
         created_at: '',
@@ -125,43 +149,60 @@ export const useMessages = (conversationId?: string) => {
       },
     };
 
-    setMessages(prev => [...prev, optimisticMessage]);
+    setMessages(prev => [...prev, optimistic]);
+    scrollToBottom();
 
     try {
-      // 1. Insert message
-      const { data: sentMessage, error: sendError } = await supabase
+      const { data: sent, error } = await supabase
         .from('messages')
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
           content: content.trim(),
+          message_type: 'text',
         })
-        .select()
+        .select('*, sender:profiles(id, full_name, avatar_url, role)')
         .single();
 
-      if (sendError) {
-        console.error('Supabase send error:', sendError);
-        throw sendError;
+      if (error) {
+        console.error('Insert error:', error);
+        throw new Error(error.message);
       }
-      
-      if (!sentMessage) {
-        throw new Error('No message returned from server');
-      }
-      
-      // Replace optimistic message with actual one
-      setMessages(prev => prev.map(m => m.id === optimisticMessage.id ? { ...sentMessage, sender: optimisticMessage.sender } : m));
-    } catch (error) {
-      console.error('Error sending message:', error);
-      // Remove optimistic message on error
-      setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
-      throw error;
+
+      // Replace optimistic with confirmed message
+      setMessages(prev =>
+        prev.map(m => m.id === tempId ? sent as Message : m)
+      );
+
+      // Update conversation preview
+      await supabase
+        .from('conversations')
+        .update({
+          last_message: content.trim(),
+          last_message_at: new Date().toISOString(),
+        })
+        .eq('id', conversationId);
+
+      scrollToBottom();
+    } catch (err) {
+      console.error('Error sending message:', err);
+      // Remove optimistic message on failure
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+      const msg = err instanceof Error ? err.message : 'Failed to send message';
+      setSendError(msg);
+      throw err;
+    } finally {
+      setSending(false);
     }
   };
 
   return {
     messages,
     loading,
+    sending,
+    sendError,
     sendMessage,
     messagesEndRef,
+    refresh: fetchMessages,
   };
 };

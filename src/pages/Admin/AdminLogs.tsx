@@ -1,47 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  History, 
-  User, 
-  Calendar, 
-  Clock, 
-  Search, 
-  Filter,
-  Loader2,
-  AlertCircle,
-  ArrowRight,
-  Shield,
-  Activity,
-  X
-} from 'lucide-react';
+import { History, Calendar, Clock, Search, Loader2, Shield, Activity, X } from 'lucide-react';
 import { useAdmin } from '../../hooks/useAdmin';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
+import { AdminLog } from '../../types';
+
+const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 export default function AdminLogs() {
   const { logs, setLogs, loading, fetchLogs, isAdmin } = useAdmin();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLog, setSelectedLog] = useState<any>(null);
-  const [showModal, setShowModal] = useState(false);
+  const [selectedLog, setSelectedLog] = useState<AdminLog | null>(null);
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
+  useEffect(() => { fetchLogs(); }, []);
 
   const handleSearch = async (term: string) => {
     setSearchTerm(term);
-    if (!term) {
-      fetchLogs();
-      return;
-    }
-
+    if (!term) { fetchLogs(); return; }
     try {
       const { data, error } = await supabase
         .from('admin_logs')
         .select('*, actor:actor_id (*)')
-        .ilike('actor.full_name', `%${term}%`)
+        .ilike('action', `%${term}%`)
         .order('created_at', { ascending: false })
         .limit(100);
-      
       if (error) throw error;
       setLogs(data || []);
     } catch (err) {
@@ -49,184 +31,147 @@ export default function AdminLogs() {
     }
   };
 
-  const filteredLogs = logs; // We use server-side search now
-
   if (!isAdmin) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[40px] border border-zinc-100 shadow-sm">
-        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
-          <Shield className="w-10 h-10 text-red-500" />
+      <div className="flex flex-col items-center justify-center py-20 bg-[#0a1f11] border border-white/6 rounded-2xl text-center" style={font}>
+        <div className="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center mb-4">
+          <Shield className="w-7 h-7 text-red-400" />
         </div>
-        <h3 className="text-2xl font-black text-zinc-900 mb-2">Access Restricted</h3>
-        <p className="text-zinc-500 font-bold">Only administrators can view system logs.</p>
+        <h3 className="text-[16px] font-bold text-white mb-2">Access Restricted</h3>
+        <p className="text-[13px] text-white/35">Only administrators can view system logs.</p>
       </div>
     );
   }
 
   if (loading && logs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="w-10 h-10 text-[#1a6b3c] animate-spin mb-4" />
-        <p className="text-zinc-500 font-bold">Loading system logs...</p>
+      <div className="flex flex-col items-center justify-center py-20 gap-3" style={font}>
+        <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-white/30">Loading system logs...</p>
       </div>
     );
   }
 
+  const actionColor = (action: string) => {
+    if (action.includes('approve')) return 'bg-[#1a6b3c]/15 text-[#1a6b3c]';
+    if (action.includes('reject')) return 'bg-red-500/15 text-red-400';
+    if (action.includes('suspend') || action.includes('flag')) return 'bg-[#f0c040]/15 text-[#f0c040]';
+    return 'bg-white/5 text-white/40';
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
-          <input 
-            type="text" 
-            placeholder="Search by moderator or admin name..."
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#1a6b3c]/20 text-sm"
-          />
-        </div>
+    <div className="space-y-5" style={font}>
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
+        <input
+          type="text"
+          placeholder="Search by action..."
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
+        />
       </div>
 
-      <div className="bg-white rounded-[40px] border border-zinc-100 shadow-sm overflow-hidden">
-        <div className="p-8 border-b border-zinc-50 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-[#1a6b3c]/10 rounded-xl flex items-center justify-center">
-              <Activity className="w-5 h-5 text-[#1a6b3c]" />
-            </div>
-            <h3 className="text-lg font-bold text-zinc-900">System Activity</h3>
+      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Activity className="w-4 h-4 text-[#1a6b3c]" />
+            <h3 className="text-[14px] font-bold text-white">System Activity</h3>
           </div>
-          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Showing last 100 actions</p>
+          <span className="text-[11px] text-white/25">Last 100 actions</span>
         </div>
 
-        <div className="divide-y divide-zinc-50">
-          {filteredLogs.map((log) => (
-            <div key={log.id} className="p-6 hover:bg-zinc-50 transition-colors flex items-center gap-6">
-              <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-400 shrink-0">
-                <History className="w-6 h-6" />
+        <div className="divide-y divide-white/4">
+          {logs.map((log) => (
+            <div key={log.id} className="px-5 py-4 hover:bg-white/4 transition-colors flex items-center gap-4">
+              <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
+                <History className="w-4 h-4 text-white/30" />
               </div>
-              
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${
-                    log.action.includes('approve') ? 'bg-emerald-50 text-emerald-600' :
-                    log.action.includes('reject') ? 'bg-red-50 text-red-600' :
-                    log.action.includes('moderate') ? 'bg-amber-50 text-amber-600' :
-                    'bg-zinc-100 text-zinc-600'
-                  }`}>
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider ${actionColor(log.action)}`}>
                     {log.action.replace(/_/g, ' ')}
                   </span>
-                  <span className="text-zinc-300">•</span>
-                  <p className="text-sm font-bold text-zinc-900 truncate">
-                    {log.actor?.full_name} <span className="text-zinc-400 font-medium">performed action on</span> {log.target_id || 'system'}
-                  </p>
+                  <span className="text-[12px] text-white/50 truncate">
+                    by <span className="font-semibold text-white/70">{log.actor?.full_name || 'System'}</span>
+                  </span>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-zinc-500 font-medium">
-                  <div className="flex items-center">
-                    <Calendar className="w-3 h-3 mr-1" />
-                    {new Date(log.created_at).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
+                <div className="flex items-center gap-3 text-[10px] text-white/25">
+                  <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(log.created_at).toLocaleDateString()}</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
               </div>
-
-              <div className="hidden md:block text-right shrink-0">
-                <button 
-                  onClick={() => {
-                    setSelectedLog(log);
-                    setShowModal(true);
-                  }}
-                  className="text-[#1a6b3c] hover:underline text-xs font-bold"
-                >
-                  Details
-                </button>
-              </div>
+              <button
+                onClick={() => setSelectedLog(log)}
+                className="text-[11px] font-bold text-[#f0c040]/50 hover:text-[#f0c040] transition-colors flex-shrink-0"
+              >
+                Details
+              </button>
             </div>
           ))}
-
-          {filteredLogs.length === 0 && (
-            <div className="py-20 text-center">
-              <p className="text-zinc-400 font-bold">No logs found matching your search.</p>
-            </div>
+          {logs.length === 0 && (
+            <p className="text-center py-12 text-[13px] text-white/25">No logs found.</p>
           )}
         </div>
       </div>
 
-      {/* Log Details Modal */}
+      {/* Log detail modal */}
       <AnimatePresence>
-        {showModal && selectedLog && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/50 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-full max-w-2xl rounded-[32px] overflow-hidden shadow-2xl"
+        {selectedLog && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSelectedLog(null)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 m-auto w-full max-w-lg h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl"
+              style={font}
             >
-              <div className="p-8 border-b border-zinc-100 flex items-center justify-between">
-                <h3 className="text-xl font-black text-zinc-900">Log Details</h3>
-                <button 
-                  onClick={() => setShowModal(false)}
-                  className="p-2 hover:bg-zinc-100 rounded-xl transition-colors"
-                >
-                  <X className="w-6 h-6 text-zinc-400" />
+              <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
+                <h3 className="text-[15px] font-bold text-white">Log Details</h3>
+                <button onClick={() => setSelectedLog(null)} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-              
-              <div className="p-8 space-y-6">
-                <div className="grid grid-cols-2 gap-8">
-                  <div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Actor</p>
-                    <p className="font-bold text-zinc-900">{selectedLog.actor?.full_name}</p>
-                    <p className="text-xs text-[#1a6b3c] font-bold uppercase tracking-wider">{selectedLog.actor?.role}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Timestamp</p>
-                    <p className="font-bold text-zinc-900">
-                      {new Date(selectedLog.created_at).toLocaleString('en-NG', {
-                        day: 'numeric', month: 'short', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Action</p>
-                    <p className="font-bold text-zinc-900 capitalize">{selectedLog.action.replace(/_/g, ' ')}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Target ID</p>
-                    <p className="font-mono text-xs text-zinc-500">{selectedLog.target_id || 'N/A'}</p>
-                  </div>
+              <div className="p-5 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: 'Actor', value: selectedLog.actor?.full_name || 'System', sub: selectedLog.actor?.role },
+                    { label: 'Timestamp', value: new Date(selectedLog.created_at).toLocaleString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
+                    { label: 'Action', value: selectedLog.action.replace(/_/g, ' ') },
+                    { label: 'Target ID', value: selectedLog.target_id ? selectedLog.target_id.slice(0, 16) + '...' : 'N/A' },
+                  ].map((item) => (
+                    <div key={item.label} className="p-3 bg-white/4 rounded-xl">
+                      <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">{item.label}</p>
+                      <p className="text-[13px] font-bold text-white capitalize">{item.value}</p>
+                      {item.sub && <p className="text-[10px] text-[#f0c040] font-bold uppercase">{item.sub}</p>}
+                    </div>
+                  ))}
                 </div>
-
-                <div>
-                  <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Parameters Logged</p>
-                  <div className="bg-zinc-50 rounded-2xl border border-zinc-100 overflow-hidden">
-                    <table className="w-full text-left text-sm">
-                      <tbody className="divide-y divide-zinc-200">
-                        {Object.entries(selectedLog.details).map(([key, value]) => (
-                          <tr key={key}>
-                            <td className="px-4 py-3 font-bold text-zinc-600 bg-zinc-100/50 w-1/3 capitalize">{key.replace(/_/g, ' ')}</td>
-                            <td className="px-4 py-3 text-zinc-900 font-medium">{String(value)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                {selectedLog.details && Object.keys(selectedLog.details).length > 0 && (
+                  <div>
+                    <p className="text-[11px] text-white/30 uppercase tracking-wider mb-2">Details</p>
+                    <div className="bg-white/4 rounded-xl overflow-hidden divide-y divide-white/5">
+                      {Object.entries(selectedLog.details).map(([key, value]) => (
+                        <div key={key} className="flex items-center px-4 py-2.5">
+                          <span className="text-[11px] font-bold text-white/40 capitalize w-1/3">{key.replace(/_/g, ' ')}</span>
+                          <span className="text-[11px] text-white/70 flex-1">{String(value)}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
-
-              <div className="p-8 bg-zinc-50 border-t border-zinc-100 flex justify-end">
-                <button 
-                  onClick={() => setShowModal(false)}
-                  className="px-8 py-3 bg-zinc-900 text-white rounded-2xl font-bold hover:bg-zinc-800 transition-colors"
-                >
+              <div className="px-5 py-4 border-t border-white/5">
+                <button onClick={() => setSelectedLog(null)} className="w-full py-3 bg-white/5 text-white/60 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors">
                   Close
                 </button>
               </div>
             </motion.div>
-          </div>
+          </>
         )}
       </AnimatePresence>
     </div>

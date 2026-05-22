@@ -7,7 +7,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { NotificationBell } from './notifications/NotificationBell';
-import { useConversations } from '../hooks/useConversations';
+import { useConversationsContext } from '../context/ConversationsContext';
+import { useNotifications } from '../hooks/useNotifications';
 
 const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
@@ -31,7 +32,10 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
-  const { totalUnreadCount } = useConversations();
+const { totalUnreadCount } = useConversationsContext();
+
+  // ← single instance for both desktop and mobile bells
+  const notificationProps = useNotifications();
 
   const isLandingPage = location.pathname === '/';
   const isAuthPage = ['/login', '/signup', '/onboarding'].includes(location.pathname);
@@ -120,7 +124,10 @@ export default function Navbar() {
                   <LayoutDashboard className="w-4 h-4" />
                   Dashboard
                 </Link>
-                <NotificationBell />
+
+                {/* Desktop bell — shared notificationProps */}
+                <NotificationBell {...notificationProps} />
+
                 <Link to="/messages" className="relative p-2 text-white/60 hover:text-white transition-colors">
                   <MessageSquare className="w-5 h-5" />
                   {totalUnreadCount > 0 && (
@@ -162,7 +169,8 @@ export default function Navbar() {
 
           {/* Mobile right */}
           <div className="lg:hidden flex items-center gap-2">
-            {user && <NotificationBell />}
+            {/* Mobile bell — same shared notificationProps */}
+            {user && <NotificationBell {...notificationProps} />}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="w-9 h-9 flex items-center justify-center text-white hover:bg-white/5 rounded-xl transition-colors"
