@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { useConversationsContext } from '../../context/ConversationsContext';
@@ -7,12 +7,16 @@ import { Property } from '../../types';
 
 interface ChatButtonProps {
   property: Property;
+  buttonLabel?: string;
 }
 
-export const ChatButton: React.FC<ChatButtonProps> = ({ property }) => {
+export const ChatButton: React.FC<ChatButtonProps> = ({
+  property,
+  buttonLabel,
+}) => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const { findOrCreateConversation, conversations } = useConversationsContext();
+  const { conversations } = useConversationsContext();
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -21,32 +25,60 @@ export const ChatButton: React.FC<ChatButtonProps> = ({ property }) => {
 
   useEffect(() => {
     if (!user || isOwner) return;
-    const conv = conversations.find(
-      (c) => c.property_id === property.id && c.participant_ids.includes(user.id)
+    const existing = conversations.find(
+      c => c.property_id === property.id &&
+        c.participant_ids.includes(user.id)
     );
-    setUnreadCount(conv?.unread_count || 0);
+    setUnreadCount(existing?.unread_count || 0);
   }, [conversations, property.id, user, isOwner]);
 
   const handleMessage = async () => {
     if (!user) { navigate('/login'); return; }
+    if (loading) return;
     setLoading(true);
     try {
-      const conversationId = await findOrCreateConversation(
-        property.id,
-        user.id,
-        property.owner_id
+      // Do NOT create conversation here
+      // Just navigate to messages with property context
+      // Conversation is only created when first message is sent
+      const existing = conversations.find(
+        c => c.property_id === property.id &&
+          c.participant_ids.includes(user.id)
       );
-      navigate(`/messages?id=${conversationId}`);
+
+      if (existing) {
+        // Conversation already exists — go to it
+        navigate(`/messages?id=${existing.id}`);
+      } else {
+        // No conversation yet — go to messages with property info
+        // ChatWindow will create conversation on first message send
+        navigate(
+          `/messages?property=${property.id}&recipient=${property.owner_id}`
+        );
+      }
     } catch (err) {
-      console.error('Failed to start conversation:', err);
+      console.error('Failed to navigate to messages:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (isOwner || !isTenant || property.status === 'rented' || property.status === 'sold') {
+  // Hide for owner, non-tenant, or unavailable property
+  if (
+    isOwner ||
+    !isTenant ||
+    property.status === 'rented' ||
+    property.status === 'sold'
+  ) {
     return null;
   }
+
+  // Determine correct label
+  const label = buttonLabel ||
+    (profile?.role === 'agent' || profile?.role === 'landlord'
+      ? 'Message Agent'
+      : property.agent_id
+      ? 'Message Agent'
+      : 'Message Landlord');
 
   return (
     <button
@@ -59,7 +91,7 @@ export const ChatButton: React.FC<ChatButtonProps> = ({ property }) => {
       ) : (
         <>
           <MessageCircle className="w-5 h-5" />
-          Message {property.listing_type === 'land' ? 'Agent' : 'Landlord'}
+          {label}
         </>
       )}
       {unreadCount > 0 && (

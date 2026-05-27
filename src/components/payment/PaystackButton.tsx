@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { usePaystackPayment } from 'react-paystack';
-import { Loader2, CreditCard } from 'lucide-react';
+import { CreditCard, Loader2 } from 'lucide-react';
 
 interface PaystackButtonProps {
-  amount: number; // in Naira
+  amount: number;
   email: string;
   reference: string;
-  onSuccess: (reference: string) => void;
+  onSuccess: (reference: string) => void | Promise<void>;
   onClose: () => void;
   label: string;
   disabled?: boolean;
@@ -14,53 +14,63 @@ interface PaystackButtonProps {
 }
 
 export const PaystackButton: React.FC<PaystackButtonProps> = ({
-  amount,
-  email,
-  reference,
-  onSuccess,
-  onClose,
-  label,
-  disabled = false,
-  className = '',
+  amount, email, reference, onSuccess, onClose,
+  label, disabled = false, className = '',
 }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const config = {
     reference,
     email,
-    amount: Math.round(amount * 100), // convert to kobo
-    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+    amount: Math.round(amount * 100), // Convert to kobo
+    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
   };
 
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    if (disabled) return;
+    if (disabled || isProcessing || !import.meta.env.VITE_PAYSTACK_PUBLIC_KEY) return;
+    
+    setIsProcessing(true);
+
     initializePayment({
-      onSuccess: (response: any) => {
-        // response.reference is the transaction reference
-        onSuccess(response.reference);
+      onSuccess: async (response: { reference: string }) => {
+        try {
+          await onSuccess(response.reference);
+        } catch (err) {
+          console.error('Payment success callback error:', err);
+        } finally {
+          setIsProcessing(false);
+        }
       },
       onClose: () => {
+        setIsProcessing(false);
         onClose();
       },
     });
   };
 
   const formattedAmount = new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
-    minimumFractionDigits: 0,
+    style: 'currency', currency: 'NGN', minimumFractionDigits: 0,
   }).format(amount);
 
   return (
     <button
       onClick={handlePayment}
-      disabled={disabled || !import.meta.env.VITE_PAYSTACK_PUBLIC_KEY}
-      className={`flex items-center justify-center gap-2 bg-[#1a6b3c] text-white py-4 px-8 rounded-2xl font-black text-lg hover:bg-[#14522e] transition-all shadow-xl shadow-[#1a6b3c]/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] ${className}`}
+      disabled={disabled || isProcessing || !import.meta.env.VITE_PAYSTACK_PUBLIC_KEY}
+      className={`flex items-center justify-center gap-2 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] ${className}`}
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <CreditCard className="w-6 h-6" />
-      <span>{label} ({formattedAmount})</span>
-      {!import.meta.env.VITE_PAYSTACK_PUBLIC_KEY && (
-        <span className="text-[10px] block opacity-70">Key Missing</span>
+      {isProcessing ? (
+        <>
+          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+          <span>Processing...</span>
+        </>
+      ) : (
+        <>
+          <CreditCard className="w-4 h-4 flex-shrink-0" />
+          <span>{label} — {formattedAmount}</span>
+        </>
       )}
     </button>
   );

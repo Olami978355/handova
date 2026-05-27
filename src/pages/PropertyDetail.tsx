@@ -6,7 +6,7 @@ import {
   Share2, Heart, AlertCircle, Maximize, FileText,
   Clock, ScrollText, Tag, Video, ChevronLeft, ChevronRight,
   Eye, Layers, MessageCircle, Twitter, Copy, Check,
-  Download, QrCode, X
+  Download, QrCode, X, Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
@@ -339,32 +339,55 @@ export default function PropertyDetail() {
   const [error, setError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [saved, setSaved] = useState(false);
+  const [savingProperty, setSavingProperty] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
 
   useEffect(() => { if (id) fetchProperty(); }, [id]);
 
-  const fetchProperty = async () => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const { data, error: fetchError } = await supabase
-  .from('properties')
-  .select('*, profiles(id, full_name, avatar_url, role, verification_status)')
-  .eq('id', id)
-  .single();
-      if (fetchError) throw fetchError;
-      if (!data) throw new Error('Property not found');
-      setProperty(data);
-      setOwner(data.profiles as Profile);
-      supabase.from('properties').update({ view_count: (data.view_count || 0) + 1 }).eq('id', id).then(() => {});
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to load property');
-    } finally {
-      setLoading(false);
+const fetchProperty = async () => {
+  if (!id) return;
+  setLoading(true);
+  setError(null);
+  try {
+    const { data, error: fetchError } = await supabase
+      .from('properties')
+      .select('*, profiles(id, full_name, avatar_url, role, verification_status)')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
+    if (!data) throw new Error('Property not found');
+    setProperty(data);
+    setOwner(data.profiles as Profile);
+
+    // Increment view count — debounced via localStorage
+    const viewKey = `viewed_${id}`;
+    const lastViewed = localStorage.getItem(viewKey);
+    const now = Date.now();
+    if (!lastViewed || now - parseInt(lastViewed) > 3600000) {
+      localStorage.setItem(viewKey, now.toString());
+      supabase.from('properties')
+        .update({ view_count: (data.view_count || 0) + 1 })
+        .eq('id', id)
+        .then(() => {});
     }
-  };
+
+    // Check if saved
+    if (user) {
+      const { data: savedData } = await supabase
+        .from('saved_properties')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('property_id', id)
+        .maybeSingle();
+      setSaved(!!savedData);
+    }
+  } catch (err: unknown) {
+    setError(err instanceof Error ? err.message : 'Failed to load property');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const allMedia = [
     ...(property?.images || []).map(url => ({ type: 'image' as const, url })),
@@ -433,11 +456,29 @@ export default function PropertyDetail() {
             </button>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setSaved(!saved)}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${saved ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/8'}`}
-              >
-                <Heart className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} />
-              </button>
+  onClick={async () => {
+    if (!user) { navigate('/login'); return; }
+    setSavingProperty(true);
+    try {
+      if (saved) {
+        await supabase.from('saved_properties').delete().eq('user_id', user.id).eq('property_id', property.id);
+        setSaved(false);
+      } else {
+        await supabase.from('saved_properties').insert({ user_id: user.id, property_id: property.id });
+        setSaved(true);
+      }
+    } catch { /* silent */ }
+    finally { setSavingProperty(false); }
+  }}
+  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+    saved ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/8'
+  }`}
+>
+  {savingProperty
+    ? <Loader2 className="w-4 h-4 animate-spin" />
+    : <Heart className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} />
+  }
+</button>
               <button
                 onClick={() => setShowSharePanel(true)}
                 className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-all"
@@ -709,41 +750,65 @@ export default function PropertyDetail() {
             <div className="space-y-4">
 
               {/* Owner card */}
-              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-                <h3 className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">Listed by</h3>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 bg-[#1a6b3c] rounded-xl overflow-hidden flex items-center justify-center text-white font-bold text-[16px] flex-shrink-0">
-                    {owner?.avatar_url ? <img src={owner.avatar_url} alt="" className="w-full h-full object-cover" /> : (owner?.full_name || 'U').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[14px] font-bold text-white truncate">{owner?.full_name}</span>
-                      {owner?.verification_status === 'verified' && <Shield className="w-3.5 h-3.5 text-[#1a6b3c] flex-shrink-0" />}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[11px] text-white/35 capitalize font-medium">{owner?.role}</span>
-                      {(owner?.agent_id || owner?.landlord_id) && (
-                        <span className="text-[10px] text-white/25 font-mono">{owner.agent_id || owner.landlord_id}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {!isOwner ? <ChatButton property={property} /> : (
-                  <div className="text-[12px] text-white/30 text-center py-2">This is your listing</div>
-                )}
-              </div>
+<div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+  <h3 className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">
+    Listed by
+  </h3>
 
-              {/* Status banners */}
-              {(property.status === 'rented' || property.status === 'sold') && (
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                  <div className="text-[13px] font-bold text-white/50">
-                    {property.status === 'rented' ? '🏠 This property has been rented' : '✅ This property has been sold'}
-                  </div>
-                  <Link to="/listings" className="text-[12px] text-[#f0c040]/60 hover:text-[#f0c040] transition-colors mt-2 block">
-                    Browse similar properties →
-                  </Link>
-                </div>
-              )}
+  <div className="flex items-center gap-3 mb-5">
+    <div className="w-12 h-12 bg-[#1a6b3c] rounded-xl overflow-hidden flex items-center justify-center text-white font-bold text-[16px] flex-shrink-0">
+      {owner?.avatar_url ? (
+        <img src={owner.avatar_url} alt="" className="w-full h-full object-cover" />
+      ) : (
+        (owner?.full_name || 'U').charAt(0).toUpperCase()
+      )}
+    </div>
+    <div className="min-w-0">
+      <div className="flex items-center gap-1.5">
+        <span className="text-[14px] font-bold text-white truncate">
+          {owner?.full_name}
+        </span>
+        {owner?.verification_status === 'verified' && (
+          <Shield className="w-3.5 h-3.5 text-[#1a6b3c] flex-shrink-0" />
+        )}
+      </div>
+      <div className="flex items-center gap-2 mt-0.5">
+        {/* Show correct role label */}
+        <span className="text-[11px] text-white/35 capitalize font-medium">
+          {owner?.role === 'agent'
+            ? 'Verified Agent'
+            : owner?.role === 'landlord'
+            ? 'Landlord'
+            : owner?.role}
+        </span>
+        {/* Show correct RE ID */}
+        {(owner?.agent_id || owner?.landlord_id) && (
+          <span className="text-[10px] text-white/25 font-mono">
+            {owner.agent_id || owner.landlord_id}
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* Chat button label — shows correct party */}
+  {!isOwner && (
+    <ChatButton
+      property={property}
+      buttonLabel={
+        owner?.role === 'agent'
+          ? 'Message Agent'
+          : 'Message Landlord'
+      }
+    />
+  )}
+
+  {isOwner && (
+    <div className="text-[12px] text-white/30 text-center py-2">
+      This is your listing
+    </div>
+  )}
+</div>
 
               {/* Inspection fee */}
               {property.status === 'active' && !isOwner && <InspectionFeeDisplay property={property} />}

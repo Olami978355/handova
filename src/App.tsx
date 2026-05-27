@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ConversationsProvider } from './context/ConversationsContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { HelmetProvider } from 'react-helmet-async';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -19,16 +20,6 @@ import { ListingSuccess } from './pages/ListingSuccess';
 import MapSearch from './pages/MapSearch';
 import Admin from './pages/Admin';
 import DealDetail from './pages/DealDetail';
-import { HelmetProvider } from 'react-helmet-async';
-
-// In your App return:
-<HelmetProvider>
-  <ErrorBoundary>
-    <AuthProvider>
-      ...
-    </AuthProvider>
-  </ErrorBoundary>
-</HelmetProvider>
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, profile, loading } = useAuth();
@@ -56,7 +47,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
-// Inner app — has access to AuthContext, wrapped with ConversationsProvider always
 function AppInner() {
   return (
     <ConversationsProvider>
@@ -91,10 +81,12 @@ function AppInner() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <AppInner />
-      </AuthProvider>
-    </ErrorBoundary>
+    <HelmetProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <AppInner />
+        </AuthProvider>
+      </ErrorBoundary>
+    </HelmetProvider>
   );
 }

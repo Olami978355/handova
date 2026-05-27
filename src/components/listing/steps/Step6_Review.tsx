@@ -1,141 +1,179 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ListingFormData } from '../../../hooks/useListingForm';
-import { MapPin, Home, Map as LandIcon, Tag, Calendar, CheckCircle2, AlertCircle, Video } from 'lucide-react';
-import { COLORS } from '../../../constants';
+import {
+  MapPin, Home, Map as LandIcon, Shield,
+  CheckCircle, AlertCircle, Video, Image as ImageIcon
+} from 'lucide-react';
 
 interface StepProps {
   form: UseFormReturn<ListingFormData>;
 }
 
+const formatNaira = (amount: number) =>
+  new Intl.NumberFormat('en-NG', {
+    style: 'currency', currency: 'NGN', maximumFractionDigits: 0
+  }).format(amount);
+
 export const Step6_Review: React.FC<StepProps> = ({ form }) => {
   const { watch } = form;
-  const values = watch();
+  const v = watch();
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      maximumFractionDigits: 0
-    }).format(amount);
+  const getPeriodLabel = () => {
+    if (v.transaction_type === 'sell') return 'Outright price';
+    const map: Record<string, string> = {
+      yearly: '/ year', monthly: '/ month', nightly: '/ night'
+    };
+    return v.price_period ? map[v.price_period] || '' : '';
   };
 
-  const getPriceLabel = () => {
-    if (values.transaction_type === 'sell') return 'Outright Price';
-    switch (values.price_period) {
-      case 'yearly': return 'per year';
-      case 'monthly': return 'per month';
-      case 'nightly': return 'per night';
-      default: return '';
-    }
-  };
+  const Row = ({ label, value }: { label: string; value?: string | number }) => (
+    <div className="flex items-start justify-between gap-4 py-2.5 border-b border-white/5 last:border-0">
+      <span className="text-[12px] text-white/40 flex-shrink-0">{label}</span>
+      <span className="text-[13px] font-semibold text-white text-right">{value || '—'}</span>
+    </div>
+  );
 
   return (
-    <div className="space-y-8">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Review & Submit</h2>
-        <p className="text-gray-500 mt-2">Please double-check your listing details</p>
+    <div
+      className="space-y-5"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    >
+      {/* Header */}
+      <div className="text-center">
+        <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">
+          Step 6 of 6
+        </div>
+        <h2 className="text-[22px] font-black text-white tracking-tight mb-2">
+          Review & Submit
+        </h2>
+        <p className="text-[13px] text-white/45">
+          Double-check your listing before submitting
+        </p>
       </div>
 
-      <div className="space-y-6">
-        {/* Main Info Card */}
-        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#1a6b3c] text-white flex items-center justify-center">
-                {values.listing_type === 'house' ? <Home size={24} /> : <LandIcon size={24} />}
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">{values.title}</h3>
-                <p className="text-sm text-gray-500">{values.category} • {values.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}</p>
-              </div>
+      {/* Main info */}
+      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+        {/* Top bar */}
+        <div className="flex items-start justify-between gap-4 p-5 border-b border-white/5">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              {v.listing_type === 'house'
+                ? <Home className="w-5 h-5 text-[#1a6b3c]" />
+                : <LandIcon className="w-5 h-5 text-[#1a6b3c]" />
+              }
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-black text-[#1a6b3c]">{formatCurrency(values.price || 0)}</p>
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{getPriceLabel()}</p>
+            <div className="min-w-0">
+              <h3 className="text-[15px] font-bold text-white truncate">{v.title || 'Untitled listing'}</h3>
+              <p className="text-[12px] text-white/40">
+                {v.category} · {v.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
+              </p>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-200/50">
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <MapPin className="text-gray-400 shrink-0" size={18} />
-                <div className="text-sm">
-                  <p className="font-bold text-gray-700">Location</p>
-                  <p className="text-gray-600">{values.address}, {values.lga}, {values.state} State</p>
-                </div>
-              </div>
-              
-              {values.listing_type === 'house' ? (
-                <div className="flex items-start gap-3">
-                  <Home className="text-gray-400 shrink-0" size={18} />
-                  <div className="text-sm">
-                    <p className="font-bold text-gray-700">Property Details</p>
-                    <p className="text-gray-600">{values.bedrooms} Bedrooms • {values.bathrooms} Bathrooms</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-start gap-3">
-                  <LandIcon className="text-gray-400 shrink-0" size={18} />
-                  <div className="text-sm">
-                    <p className="font-bold text-gray-700">Land Details</p>
-                    <p className="text-gray-600">{values.land_size_value} {values.land_size_unit} • {values.land_title} Title</p>
-                  </div>
-                </div>
-              )}
+          <div className="text-right flex-shrink-0">
+            <div className="text-[20px] font-black text-[#f0c040]">
+              {v.price ? formatNaira(v.price) : '—'}
             </div>
-
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Tag className="text-gray-400 shrink-0" size={18} />
-                <div className="text-sm">
-                  <p className="font-bold text-gray-700">Amenities / Features</p>
-                  <div className="flex flex-wrap gap-1.5 mt-1">
-                    {values.amenities?.length ? values.amenities.map(a => (
-                      <span key={a} className="px-2 py-0.5 rounded bg-gray-200 text-gray-600 text-[10px] font-bold uppercase tracking-tight">{a}</span>
-                    )) : <span className="text-gray-400 italic">None specified</span>}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <p className="text-[11px] text-white/35">{getPeriodLabel()}</p>
           </div>
         </div>
 
-        {/* Media Preview */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-bold text-gray-700 px-1">
-            Media Preview ({values.images?.length || 0} photos {values.videos?.length ? `· ${values.videos.length} videos` : ''})
-          </h4>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {values.images?.map((url, idx) => (
-              <div key={idx} className="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 shrink-0 shadow-sm">
-                <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
-              </div>
-            ))}
-            {values.videos?.map((url, idx) => (
-              <div key={`v-${idx}`} className="w-24 h-24 rounded-lg overflow-hidden border border-gray-100 shrink-0 shadow-sm bg-black flex items-center justify-center relative">
-                <Video className="text-white/50" size={20} />
-                <div className="absolute bottom-0.5 right-1 text-[8px] font-bold text-white uppercase tracking-widest">Video</div>
-              </div>
+        {/* Details */}
+        <div className="p-5 space-y-0">
+          <Row label="Location" value={[v.address, v.lga, v.state].filter(Boolean).join(', ')} />
+          {v.listing_type === 'house' ? (
+            <>
+              <Row label="Bedrooms" value={v.bedrooms} />
+              <Row label="Bathrooms" value={v.bathrooms} />
+            </>
+          ) : (
+            <>
+              <Row label="Land Size" value={v.land_size_value ? `${v.land_size_value} ${v.land_size_unit}` : undefined} />
+              <Row label="Land Title" value={v.land_title} />
+            </>
+          )}
+          {v.min_rental_duration && (
+            <Row label="Min Duration" value={v.min_rental_duration} />
+          )}
+          {v.house_rules && (
+            <Row label="House Rules" value={v.house_rules.substring(0, 60) + (v.house_rules.length > 60 ? '...' : '')} />
+          )}
+        </div>
+      </div>
+
+      {/* Amenities */}
+      {v.amenities && v.amenities.length > 0 && (
+        <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+          <p className="text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-3">
+            Amenities ({v.amenities.length})
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {v.amenities.map(a => (
+              <span
+                key={a}
+                className="px-2.5 py-1 bg-[#1a6b3c]/15 border border-[#1a6b3c]/20 rounded-lg text-[11px] text-[#4ade80] font-medium"
+              >
+                {a}
+              </span>
             ))}
           </div>
         </div>
+      )}
 
-        {/* Submission Notice */}
-        <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 flex items-start gap-3">
-          <AlertCircle className="text-amber-500 shrink-0" size={20} />
-          <div className="text-xs text-amber-800 leading-relaxed">
-            <p className="font-bold mb-1">Verification Required</p>
-            <p>Your listing will be reviewed by our moderators before it goes live. This typically takes 2-4 hours. You will receive a notification once it's approved.</p>
-          </div>
+      {/* Media preview */}
+      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+        <p className="text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-3">
+          Media — {v.images?.length || 0} photo{(v.images?.length || 0) !== 1 ? 's' : ''}
+          {v.videos?.length ? ` · ${v.videos.length} video${v.videos.length > 1 ? 's' : ''}` : ''}
+        </p>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {v.images?.map((url, i) => (
+            <div
+              key={i}
+              className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border border-white/8"
+            >
+              <img src={url} alt="" className="w-full h-full object-cover" />
+            </div>
+          ))}
+          {v.videos?.map((_, i) => (
+            <div
+              key={`v-${i}`}
+              className="w-16 h-16 rounded-xl flex-shrink-0 bg-black border border-white/8 flex flex-col items-center justify-center gap-1"
+            >
+              <Video className="w-5 h-5 text-white/40" />
+              <span className="text-[8px] text-white/25 font-bold uppercase">Video</span>
+            </div>
+          ))}
+          {(!v.images || v.images.length === 0) && (
+            <div className="flex items-center gap-2 text-white/25">
+              <ImageIcon className="w-5 h-5" />
+              <span className="text-[12px]">No photos uploaded yet</span>
+            </div>
+          )}
         </div>
+      </div>
 
-        <div className="p-4 rounded-xl bg-green-50 border border-green-100 flex items-start gap-3">
-          <CheckCircle2 className="text-green-500 shrink-0" size={20} />
-          <div className="text-xs text-green-800 leading-relaxed">
-            <p className="font-bold mb-1">Escrow Enabled</p>
-            <p>By submitting this listing, you agree to use the Rent Easy Escrow system for all transactions initiated through this platform.</p>
-          </div>
+      {/* Notices */}
+      <div className="flex items-start gap-3 p-4 bg-[#f0c040]/5 border border-[#f0c040]/15 rounded-xl">
+        <AlertCircle className="w-4 h-4 text-[#f0c040] flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-[12px] font-bold text-[#f0c040] mb-0.5">Verification notice</p>
+          <p className="text-[11px] text-white/45 leading-relaxed">
+            {v.listing_type === 'house'
+              ? 'Verified accounts go live immediately. Unverified listings wait for moderator review (2-4 hours).'
+              : 'Land listings require moderator review regardless of verification status.'
+            }
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3 p-4 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl">
+        <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-[12px] font-bold text-[#4ade80] mb-0.5">Escrow enabled</p>
+          <p className="text-[11px] text-white/45 leading-relaxed">
+            By submitting this listing you agree to use the Rent Easy escrow system for all transactions. You receive funds after move-in is confirmed.
+          </p>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, User } from 'lucide-react';
 import { ChatList } from '../components/chat/ChatList';
 import { ChatWindow } from '../components/chat/ChatWindow';
@@ -39,6 +39,14 @@ export default function MessagesPage() {
     setSearchParams({});
   };
 
+  // Shared props for ChatWindow
+  const chatWindowProps = {
+    conversationId: conversationId || undefined,
+    otherParticipantName: selectedConversation?.participants?.[0]?.full_name,
+    propertyId: selectedConversation?.property_id,
+    otherParticipantId: selectedConversation?.participants?.[0]?.id,
+  };
+
   if (!user) {
     return (
       <div
@@ -52,7 +60,10 @@ export default function MessagesPage() {
         <p className="text-[13px] text-white/40 mb-6 max-w-xs">
           You need to be logged in to access your conversations.
         </p>
-        <Link to="/login" className="bg-[#1a6b3c] text-white px-8 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors">
+        <Link
+          to="/login"
+          className="bg-[#1a6b3c] text-white px-8 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+        >
           Sign In
         </Link>
       </div>
@@ -68,6 +79,7 @@ export default function MessagesPage() {
         <div className="flex-1 flex flex-col w-full h-full">
           {conversationId ? (
             <div className="flex-1 flex flex-col h-full">
+              {/* Mobile chat header */}
               <div className="px-4 py-3 bg-[#0a1f11] border-b border-white/5 flex items-center gap-3 flex-shrink-0">
                 <button
                   onClick={handleBack}
@@ -84,10 +96,7 @@ export default function MessagesPage() {
                   </p>
                 </div>
               </div>
-              <ChatWindow
-                conversationId={conversationId}
-                otherParticipantName={selectedConversation?.participants?.[0]?.full_name}
-              />
+              <ChatWindow {...chatWindowProps} />
             </div>
           ) : (
             <div className="flex-1 flex flex-col h-full">
@@ -103,12 +112,16 @@ export default function MessagesPage() {
         </div>
       ) : (
         <div className="flex-1 flex h-full max-w-7xl mx-auto w-full my-4 px-5 gap-4 overflow-hidden">
+
           {/* Left panel */}
           <div className="w-80 flex-shrink-0 flex flex-col bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-white/5 flex-shrink-0">
               <h2 className="text-[16px] font-bold text-white">Messages</h2>
               <p className="text-[12px] text-white/35 mt-0.5">
-                {loading ? 'Loading...' : `${conversations.length} conversation${conversations.length !== 1 ? 's' : ''}`}
+                {loading
+                  ? 'Loading...'
+                  : `${conversations.length} conversation${conversations.length !== 1 ? 's' : ''}`
+                }
               </p>
             </div>
             <div className="flex-1 overflow-hidden">
@@ -120,6 +133,7 @@ export default function MessagesPage() {
           <div className="flex-1 flex flex-col bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
             {conversationId ? (
               <>
+                {/* Desktop chat header */}
                 <div className="px-5 py-3.5 border-b border-white/5 flex items-center gap-3 flex-shrink-0">
                   <div className="w-8 h-8 bg-[#1a6b3c] rounded-xl flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
                     {(selectedConversation?.participants?.[0]?.full_name || 'U').charAt(0).toUpperCase()}
@@ -133,10 +147,7 @@ export default function MessagesPage() {
                     </p>
                   </div>
                 </div>
-                <ChatWindow
-                  conversationId={conversationId}
-                  otherParticipantName={selectedConversation?.participants?.[0]?.full_name}
-                />
+                <ChatWindow {...chatWindowProps} />
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">

@@ -9,6 +9,7 @@ export const useConversations = () => {
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const mountedRef = useRef(true);
 
   const fetchConversations = useCallback(async () => {
     if (!user) return;
@@ -22,9 +23,8 @@ export const useConversations = () => {
 
       if (error) throw error;
 
-      // Enrich with other participant profile + unread count
       const enriched = await Promise.all(
-        (data || []).map(async (conv) => {
+        (data || []).map(async conv => {
           const otherParticipantId = conv.participant_ids.find(
             (id: string) => id !== user.id
           );
@@ -49,34 +49,44 @@ export const useConversations = () => {
           return {
             ...conv,
             participants: otherProfile ? [otherProfile] : [],
-            unread_count: count || 0,
+            // Only set unread_count if greater than 0
+            unread_count: count && count > 0 ? count : undefined,
           };
         })
       );
 
-      setConversations(enriched);
-      const total = enriched.reduce((acc, c) => acc + (c.unread_count || 0), 0);
-      setTotalUnreadCount(total);
+      if (mountedRef.current) {
+        setConversations(enriched);
+        const total = enriched.reduce(
+          (acc, c) => acc + (c.unread_count || 0), 0
+        );
+        setTotalUnreadCount(total);
+      }
     } catch (err) {
       console.error('Error fetching conversations:', err);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }, [user]);
 
   useEffect(() => {
-    if (!user) return;
+    mountedRef.current = true;
+
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     fetchConversations();
 
-    // Clean up previous channel
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
     }
 
-    // Subscribe to messages and conversations changes
+    // ALL listeners before subscribe
     const channel = supabase
-      .channel(`user-conversations-${user.id}`)
+      .channel(`conversations-${user.id}-${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -84,7 +94,7 @@ export const useConversations = () => {
           schema: 'public',
           table: 'messages',
         },
-        () => { fetchConversations(); }
+        () => { if (mountedRef.current) fetchConversations(); }
       )
       .on(
         'postgres_changes',
@@ -93,7 +103,7 @@ export const useConversations = () => {
           schema: 'public',
           table: 'messages',
         },
-        () => { fetchConversations(); }
+        () => { if (mountedRef.current) fetchConversations(); }
       )
       .on(
         'postgres_changes',
@@ -102,7 +112,7 @@ export const useConversations = () => {
           schema: 'public',
           table: 'conversations',
         },
-        () => { fetchConversations(); }
+        () => { if (mountedRef.current) fetchConversations(); }
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -113,12 +123,13 @@ export const useConversations = () => {
     channelRef.current = channel;
 
     return () => {
+      mountedRef.current = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
     };
-  }, [user, fetchConversations]);
+  }, [user?.id]);
 
   const findOrCreateConversation = async (
     propertyId: string,
@@ -127,34 +138,27 @@ export const useConversations = () => {
   ): Promise<string> => {
     if (!user) throw new Error('Not authenticated');
 
-    try {
-      // Check if conversation already exists
-      const { data: existing } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('property_id', propertyId)
-        .contains('participant_ids', [tenantId, landlordId])
-        .maybeSingle();
+    const { data: existing } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('property_id', propertyId)
+      .contains('participant_ids', [tenantId, landlordId])
+      .maybeSingle();
 
-      if (existing) return existing.id;
+    if (existing) return existing.id;
 
-      // Create new conversation
-      const { data: created, error: createError } = await supabase
-        .from('conversations')
-        .insert({
-          property_id: propertyId,
-          participant_ids: [tenantId, landlordId],
-          last_message_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+    const { data: created, error } = await supabase
+      .from('conversations')
+      .insert({
+        property_id: propertyId,
+        participant_ids: [tenantId, landlordId],
+        last_message_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
 
-      if (createError) throw createError;
-      return created.id;
-    } catch (err) {
-      console.error('Error finding/creating conversation:', err);
-      throw err;
-    }
+    if (error) throw error;
+    return created.id;
   };
 
   return {

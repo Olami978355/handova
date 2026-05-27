@@ -7,20 +7,19 @@ import { Step3_Location } from './steps/Step3_Location';
 import { Step4_MediaUpload } from './steps/Step4_MediaUpload';
 import { Step5_Pricing } from './steps/Step5_Pricing';
 import { Step6_Review } from './steps/Step6_Review';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
-import { COLORS } from '../../constants';
+import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react';
+
+const steps = [
+  { id: 1, title: 'Type' },
+  { id: 2, title: 'Details' },
+  { id: 3, title: 'Location' },
+  { id: 4, title: 'Media' },
+  { id: 5, title: 'Pricing' },
+  { id: 6, title: 'Review' },
+];
 
 export const ListingWizard: React.FC = () => {
   const { form, step, nextStep, prevStep, isSubmitting, onSubmit } = useListingForm();
-
-  const steps = [
-    { id: 1, title: 'Type' },
-    { id: 2, title: 'Details' },
-    { id: 3, title: 'Location' },
-    { id: 4, title: 'Media' },
-    { id: 5, title: 'Pricing' },
-    { id: 6, title: 'Review' },
-  ];
 
   const renderStep = () => {
     switch (step) {
@@ -35,62 +34,75 @@ export const ListingWizard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Progress Bar */}
+    <div
+      className="max-w-3xl mx-auto px-5 py-8"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    >
+      {/* Step progress */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          {steps.map((s) => (
-            <div key={s.id} className="flex flex-col items-center flex-1 relative">
-              <div 
-                className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors z-10 bg-white ${
-                  step >= s.id ? 'border-[#1a6b3c] text-[#1a6b3c]' : 'border-gray-300 text-gray-400'
-                } ${step > s.id ? 'bg-[#1a6b3c] text-white' : ''}`}
-              >
-                {step > s.id ? <Check size={20} /> : s.id}
+        <div className="flex items-center justify-between relative">
+          {/* Progress line background */}
+          <div className="absolute top-4 left-0 right-0 h-px bg-white/8 z-0" />
+          {/* Progress line filled */}
+          <div
+            className="absolute top-4 left-0 h-px bg-[#1a6b3c] z-0 transition-all duration-500"
+            style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+          />
+
+          {steps.map(s => {
+            const done = step > s.id;
+            const active = step === s.id;
+            return (
+              <div key={s.id} className="flex flex-col items-center gap-2 z-10">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-all ${
+                  done
+                    ? 'bg-[#1a6b3c] text-white'
+                    : active
+                    ? 'bg-[#f0c040] text-black'
+                    : 'bg-[#0a1f11] border border-white/15 text-white/30'
+                }`}>
+                  {done ? <Check className="w-4 h-4" /> : s.id}
+                </div>
+                <span className={`text-[10px] font-semibold uppercase tracking-wider hidden sm:block ${
+                  active ? 'text-[#f0c040]' : done ? 'text-white/50' : 'text-white/25'
+                }`}>
+                  {s.title}
+                </span>
               </div>
-              <span className={`text-xs mt-2 font-medium ${step >= s.id ? 'text-[#1a6b3c]' : 'text-gray-400'}`}>
-                {s.title}
-              </span>
-              {s.id < steps.length && (
-                <div 
-                  className={`absolute top-5 left-1/2 w-full h-0.5 -z-0 ${
-                    step > s.id ? 'bg-[#1a6b3c]' : 'bg-gray-200'
-                  }`}
-                />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* Form Content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 min-h-[500px] flex flex-col">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="flex-1"
-          >
-            {renderStep()}
-          </motion.div>
-        </AnimatePresence>
+      {/* Form card */}
+      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+        <div className="p-5 lg:p-8 min-h-[480px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.2 }}
+            >
+              {renderStep()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
+        {/* Navigation */}
+        <div className="flex items-center justify-between px-5 lg:px-8 py-5 border-t border-white/5">
           <button
             type="button"
             onClick={prevStep}
             disabled={step === 1 || isSubmitting}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-colors ${
-              step === 1 
-                ? 'text-gray-300 cursor-not-allowed' 
-                : 'text-gray-600 hover:bg-gray-50'
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-all ${
+              step === 1
+                ? 'text-white/20 cursor-not-allowed'
+                : 'text-white/55 hover:bg-white/5 hover:text-white'
             }`}
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft className="w-4 h-4" />
             Back
           </button>
 
@@ -98,26 +110,38 @@ export const ListingWizard: React.FC = () => {
             <button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 px-8 py-2.5 rounded-lg font-medium text-white transition-all shadow-md hover:shadow-lg active:scale-95"
-              style={{ backgroundColor: COLORS.primary }}
+              className="flex items-center gap-2 bg-[#f0c040] text-black px-8 py-2.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors active:scale-95"
             >
-              Next
-              <ChevronRight size={20} />
+              Continue
+              <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
             <button
               type="button"
               onClick={onSubmit}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-8 py-2.5 rounded-lg font-medium text-white transition-all shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: COLORS.primary }}
+              className="flex items-center gap-2 bg-[#1a6b3c] text-white px-8 py-2.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Listing'}
-              {!isSubmitting && <Check size={20} />}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  Submit Listing
+                </>
+              )}
             </button>
           )}
         </div>
       </div>
+
+      {/* Draft note */}
+      <p className="text-[11px] text-white/20 text-center mt-4">
+        Your progress is saved automatically as you go
+      </p>
     </div>
   );
 };

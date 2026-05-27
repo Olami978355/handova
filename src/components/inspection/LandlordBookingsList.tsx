@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, Clock, User, Shield, CheckCircle, 
-  Loader2, AlertCircle, MessageSquare, ArrowRight,
-  Home, ChevronDown, ChevronUp, Info
+import {
+  Calendar, Clock, Shield, CheckCircle,
+  Loader2, MessageSquare, ChevronDown, ChevronUp,
+  Home, AlertCircle, User
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionBooking, Property } from '../../types';
@@ -10,21 +10,24 @@ import { useInspectionBooking } from '../../hooks/useInspectionBooking';
 import { supabase } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatFee } from '../../utils/inspectionFee';
+import { useNavigate } from 'react-router-dom';
 
 export const LandlordBookingsList: React.FC = () => {
   const { fetchBookingsForProperty } = useInspectionBooking();
+  const navigate = useNavigate();
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookingsByProperty, setBookingsByProperty] = useState<Record<string, InspectionBooking[]>>({});
   const [loading, setLoading] = useState(true);
   const [expandedProperty, setExpandedProperty] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<string | null>(null);
   const [startingEscrow, setStartingEscrow] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchLandlordProperties();
+    fetchData();
   }, []);
 
-  const fetchLandlordProperties = async () => {
+  const fetchData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -38,7 +41,6 @@ export const LandlordBookingsList: React.FC = () => {
       if (error) throw error;
       setProperties(data || []);
 
-      // Fetch bookings for each property
       const bookingsMap: Record<string, InspectionBooking[]> = {};
       for (const prop of data || []) {
         const bookings = await fetchBookingsForProperty(prop.id);
@@ -54,33 +56,39 @@ export const LandlordBookingsList: React.FC = () => {
     }
   };
 
-  const handleConfirmDate = async (bookingId: string, date: string, time: string) => {
+  const handleConfirmDate = async (
+    bookingId: string,
+    date: string,
+    time: string
+  ) => {
     setConfirming(bookingId);
+    setActionError(null);
     try {
-      const { error } = await supabase.functions.invoke('confirm-inspection-date', {
-        body: { bookingId, confirmedDate: date, confirmedTime: time }
-      });
+      const { error } = await supabase.functions.invoke(
+        'confirm-inspection-date',
+        { body: { bookingId, confirmedDate: date, confirmedTime: time } }
+      );
       if (error) throw error;
-      await fetchLandlordProperties();
-    } catch (err: any) {
-      alert(err.message || 'Failed to confirm inspection date');
+      await fetchData();
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : 'Failed to confirm date');
     } finally {
       setConfirming(null);
     }
   };
 
   const handleStartEscrow = async (bookingId: string) => {
-    if (!window.confirm('Are you sure you want to start escrow with this tenant? This will refund all other interested tenants 100%.')) return;
-    
     setStartingEscrow(bookingId);
+    setActionError(null);
     try {
-      const { error } = await supabase.functions.invoke('start-escrow-from-booking', {
-        body: { bookingId }
-      });
+      const { error } = await supabase.functions.invoke(
+        'start-escrow-from-booking',
+        { body: { bookingId } }
+      );
       if (error) throw error;
-      await fetchLandlordProperties();
-    } catch (err: any) {
-      alert(err.message || 'Failed to start escrow');
+      await fetchData();
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : 'Failed to start escrow');
     } finally {
       setStartingEscrow(null);
     }
@@ -88,9 +96,9 @@ export const LandlordBookingsList: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="w-10 h-10 text-[#1a6b3c] animate-spin mb-4" />
-        <p className="text-zinc-500 font-bold">Loading your bookings...</p>
+      <div className="flex flex-col items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 text-[#1a6b3c] animate-spin mb-3" />
+        <p className="text-[13px] text-white/40">Loading bookings...</p>
       </div>
     );
   }
@@ -99,129 +107,229 @@ export const LandlordBookingsList: React.FC = () => {
 
   if (propertiesWithBookings.length === 0) {
     return (
-      <div className="text-center py-20 bg-white rounded-[40px] border border-zinc-100 shadow-sm">
-        <div className="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Calendar size={40} className="text-zinc-300" />
+      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-14 text-center">
+        <div className="w-14 h-14 bg-white/4 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <Calendar className="w-7 h-7 text-white/15" />
         </div>
-        <h3 className="text-2xl font-bold text-zinc-900 mb-2">No Inspection Bookings</h3>
-        <p className="text-zinc-500 max-w-xs mx-auto">
-          When tenants book inspections for your properties, they will appear here.
+        <h3 className="text-[16px] font-bold text-white mb-2">
+          No inspection bookings yet
+        </h3>
+        <p className="text-[13px] text-white/35 max-w-xs mx-auto">
+          When tenants book inspections for your properties they will appear here.
         </p>
       </div>
     );
   }
 
+  const bookingStatusColor: Record<string, string> = {
+    payment_confirmed: '#f0c040',
+    inspection_scheduled: '#60a5fa',
+    inspection_done: '#a78bfa',
+    tenant_interested: '#4ade80',
+    tenant_declined: '#f87171',
+    escrow_started: '#4ade80',
+    refunded: '#9ca3af',
+    dispute_raised: '#fb923c',
+  };
+
   return (
-    <div className="space-y-6">
-      {propertiesWithBookings.map(property => (
-        <div key={property.id} className="bg-white rounded-[40px] border border-zinc-100 overflow-hidden shadow-sm">
-          <button 
-            onClick={() => setExpandedProperty(expandedProperty === property.id ? null : property.id)}
-            className="w-full px-8 py-6 flex items-center justify-between hover:bg-zinc-50 transition-colors"
+    <div
+      className="space-y-4"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    >
+      {actionError && (
+        <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-[13px] text-red-400">{actionError}</p>
+        </div>
+      )}
+
+      {propertiesWithBookings.map(property => {
+        const bookings = bookingsByProperty[property.id];
+        const isExpanded = expandedProperty === property.id;
+        const pendingCount = bookings.filter(
+          b => b.status === 'payment_confirmed' || b.status === 'tenant_interested'
+        ).length;
+
+        return (
+          <div
+            key={property.id}
+            className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden"
           >
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-zinc-100 rounded-2xl overflow-hidden border border-zinc-200">
-                <img src={property.images[0]} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-              </div>
-              <div className="text-left">
-                <h3 className="text-xl font-bold text-zinc-900">{property.title}</h3>
-                <div className="flex items-center gap-4 mt-1">
-                  <p className="text-sm text-zinc-500 flex items-center gap-1">
-                    <Calendar size={14} />
-                    {bookingsByProperty[property.id].length} Bookings
-                  </p>
-                  {property.has_active_deal && (
-                    <span className="px-2 py-0.5 bg-[#1a6b3c] text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
-                      Deal In Progress
-                    </span>
+            {/* Property header */}
+            <button
+              onClick={() => setExpandedProperty(isExpanded ? null : property.id)}
+              className="w-full px-5 py-4 flex items-center justify-between hover:bg-white/2 transition-colors"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 bg-[#111a14] rounded-xl overflow-hidden border border-white/6 flex-shrink-0">
+                  {property.images?.[0] ? (
+                    <img
+                      src={property.images[0]}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Home className="w-5 h-5 text-white/15" />
+                    </div>
                   )}
                 </div>
+                <div className="text-left min-w-0">
+                  <h3 className="text-[14px] font-bold text-white truncate">
+                    {property.title}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[11px] text-white/35">
+                      {bookings.length} booking{bookings.length !== 1 ? 's' : ''}
+                    </span>
+                    {pendingCount > 0 && (
+                      <span className="text-[10px] font-bold text-black bg-[#f0c040] px-2 py-0.5 rounded-full">
+                        {pendingCount} needs action
+                      </span>
+                    )}
+                    {property.has_active_deal && (
+                      <span className="text-[10px] font-bold text-[#4ade80] bg-[#1a6b3c]/20 px-2 py-0.5 rounded-full border border-[#1a6b3c]/30">
+                        Deal active
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-            {expandedProperty === property.id ? <ChevronUp size={24} className="text-zinc-400" /> : <ChevronDown size={24} className="text-zinc-400" />}
-          </button>
+              {isExpanded
+                ? <ChevronUp className="w-5 h-5 text-white/30 flex-shrink-0" />
+                : <ChevronDown className="w-5 h-5 text-white/30 flex-shrink-0" />
+              }
+            </button>
 
-          <AnimatePresence>
-            {expandedProperty === property.id && (
-              <motion.div 
-                initial={{ height: 0 }}
-                animate={{ height: 'auto' }}
-                exit={{ height: 0 }}
-                className="overflow-hidden border-t border-zinc-50"
-              >
-                <div className="p-8 space-y-4">
-                  {bookingsByProperty[property.id].map(booking => (
-                    <div key={booking.id} className="bg-zinc-50 rounded-3xl p-6 border border-zinc-100">
-                      <div className="flex flex-col md:flex-row justify-between gap-6">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-bold text-[#1a6b3c] border border-zinc-100">
-                            {booking.profiles?.full_name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-bold text-zinc-900">{booking.profiles?.full_name}</h4>
-                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest border ${
-                                booking.status === 'tenant_interested' ? 'bg-[#1a6b3c] text-white' : 'bg-white text-zinc-400 border-zinc-200'
-                              }`}>
-                                {booking.status.replace('_', ' ')}
-                              </span>
+            {/* Bookings list */}
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: 'auto' }}
+                  exit={{ height: 0 }}
+                  className="overflow-hidden border-t border-white/5"
+                >
+                  <div className="p-4 space-y-3">
+                    {bookings.map(booking => (
+                      <div
+                        key={booking.id}
+                        className="bg-[#111a14] border border-white/6 rounded-xl p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          {/* Tenant info */}
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-white text-[13px] font-bold flex-shrink-0">
+                              {booking.profiles?.full_name
+                                ? booking.profiles.full_name.charAt(0).toUpperCase()
+                                : <User className="w-4 h-4 text-white/40" />
+                              }
                             </div>
-                            <div className="flex flex-wrap gap-4 text-xs text-zinc-500">
-                              <span className="flex items-center gap-1">
-                                <Calendar size={14} />
-                                Preferred: {booking.preferred_date}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock size={14} />
-                                {booking.preferred_time}
-                              </span>
+                            <div className="min-w-0">
+                              <p className="text-[13px] font-bold text-white truncate">
+                                {booking.profiles?.full_name || 'Tenant'}
+                              </p>
+                              <p className="text-[10px] text-white/35">
+                                {formatFee(booking.inspection_fee)} fee paid
+                              </p>
                             </div>
                           </div>
+
+                          {/* Status badge */}
+                          <span
+                            className="text-[10px] font-bold px-2.5 py-1 rounded-lg flex-shrink-0"
+                            style={{
+                              color: bookingStatusColor[booking.status] || '#9ca3af',
+                              background: `${bookingStatusColor[booking.status] || '#9ca3af'}15`
+                            }}
+                          >
+                            {booking.status.replace(/_/g, ' ')}
+                          </span>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3">
+                        {/* Date info */}
+                        <div className="flex items-center gap-4 mb-3">
+                          {booking.preferred_date && (
+                            <div className="flex items-center gap-1.5 text-white/35">
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span className="text-[11px]">
+                                {booking.confirmed_date ? 'Confirmed:' : 'Preferred:'}{' '}
+                                {format(
+                                  new Date(booking.confirmed_date || booking.preferred_date),
+                                  'MMM d, yyyy'
+                                )}
+                              </span>
+                            </div>
+                          )}
+                          {booking.preferred_time && (
+                            <div className="flex items-center gap-1.5 text-white/35">
+                              <Clock className="w-3.5 h-3.5" />
+                              <span className="text-[11px]">{booking.preferred_time}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2">
                           {booking.status === 'payment_confirmed' && (
-                            <button 
-                              onClick={() => handleConfirmDate(booking.id, booking.preferred_date!, booking.preferred_time!)}
+                            <button
+                              onClick={() => handleConfirmDate(
+                                booking.id,
+                                booking.preferred_date!,
+                                booking.preferred_time!
+                              )}
                               disabled={confirming === booking.id}
-                              className="bg-[#1a6b3c] text-white px-6 py-3 rounded-2xl text-xs font-bold hover:bg-[#14522e] transition-all flex items-center gap-2"
+                              className="flex-1 bg-[#1a6b3c] text-white py-2.5 rounded-xl text-[12px] font-bold hover:bg-[#0f4a2a] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                             >
-                              {confirming === booking.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                              {confirming === booking.id
+                                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                : <CheckCircle className="w-3.5 h-3.5" />
+                              }
                               Confirm Date
                             </button>
                           )}
 
-                          {booking.status === 'tenant_interested' && !property.has_active_deal && (
-                            <button 
+                          {booking.status === 'tenant_interested' &&
+                            !property.has_active_deal && (
+                            <button
                               onClick={() => handleStartEscrow(booking.id)}
                               disabled={startingEscrow === booking.id}
-                              className="bg-[#1a6b3c] text-white px-6 py-3 rounded-2xl text-xs font-bold hover:bg-[#14522e] transition-all flex items-center gap-2 shadow-lg shadow-[#1a6b3c]/20"
+                              className="flex-1 bg-[#f0c040] text-black py-2.5 rounded-xl text-[12px] font-bold hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                             >
-                              {startingEscrow === booking.id ? <Loader2 size={16} className="animate-spin" /> : <Shield size={16} />}
+                              {startingEscrow === booking.id
+                                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                : <Shield className="w-3.5 h-3.5" />
+                              }
                               Start Escrow
                             </button>
                           )}
 
-                          <button className="p-3 bg-white border border-zinc-200 rounded-2xl text-zinc-400 hover:text-[#1a6b3c] transition-colors">
-                            <MessageSquare size={18} />
+                          <button
+                            onClick={() => navigate(`/messages`)}
+                            className="w-10 h-10 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-all flex-shrink-0"
+                          >
+                            <MessageSquare className="w-4 h-4" />
                           </button>
                         </div>
-                      </div>
 
-                      {booking.status === 'escrow_started' && (
-                        <div className="mt-4 p-4 bg-[#1a6b3c]/5 rounded-2xl border border-[#1a6b3c]/10 flex items-center gap-3 text-[#1a6b3c]">
-                          <Shield size={18} />
-                          <p className="text-xs font-bold">Escrow deal is active with this tenant.</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      ))}
+                        {booking.status === 'escrow_started' && (
+                          <div className="flex items-center gap-2 mt-3 p-3 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl">
+                            <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0" />
+                            <p className="text-[11px] text-[#4ade80] font-semibold">
+                              Escrow deal is active with this tenant
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
     </div>
   );
 };

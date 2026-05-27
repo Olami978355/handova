@@ -2,23 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Notification } from '../../types';
+import { useNotifications } from '../../hooks/useNotifications';
 
-interface NotificationBellProps {
-  unreadCount: number;
-  notifications: Notification[];
-  loading: boolean;
-  markAsRead: (id: string) => Promise<void>;
-  markAllAsRead: () => Promise<void>;
-}
+export const NotificationBell: React.FC = () => {
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications();
 
-export const NotificationBell: React.FC<NotificationBellProps> = ({
-  unreadCount,
-  notifications,
-  loading,
-  markAsRead,
-  markAllAsRead,
-}) => {
   const [isOpen, setIsOpen] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
 
@@ -32,15 +26,24 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleOpen = () => {
+    const opening = !isOpen;
+    setIsOpen(opening);
+    if (opening && unreadCount > 0) {
+      setTimeout(() => markAllAsRead(), 1500);
+    }
+  };
+
   return (
     <div className="relative" ref={bellRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleOpen}
         className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
           isOpen
             ? 'bg-[#1a6b3c]/20 text-[#f0c040]'
             : 'text-white/50 hover:text-white hover:bg-white/8'
         }`}
+        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
         <Bell className="w-5 h-5" />
         <AnimatePresence>

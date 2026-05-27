@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { NotificationBell } from './notifications/NotificationBell';
 import { useConversationsContext } from '../context/ConversationsContext';
-import { useNotifications } from '../hooks/useNotifications';
 
 const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
@@ -32,10 +31,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
-const { totalUnreadCount } = useConversationsContext();
-
-  // ← single instance for both desktop and mobile bells
-  const notificationProps = useNotifications();
+  const { totalUnreadCount } = useConversationsContext();
 
   const isLandingPage = location.pathname === '/';
   const isAuthPage = ['/login', '/signup', '/onboarding'].includes(location.pathname);
@@ -79,7 +75,6 @@ const { totalUnreadCount } = useConversationsContext();
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
             <RentEasyLogo size={34} />
             <span className="text-[20px] font-extrabold tracking-tight text-white leading-none">
@@ -87,9 +82,8 @@ const { totalUnreadCount } = useConversationsContext();
             </span>
           </Link>
 
-          {/* Desktop links */}
           <div className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {navLinks.map(link => (
               <Link
                 key={link.name}
                 to={link.path}
@@ -104,7 +98,6 @@ const { totalUnreadCount } = useConversationsContext();
             ))}
           </div>
 
-          {/* Desktop auth */}
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <div className="flex items-center gap-3">
@@ -125,10 +118,13 @@ const { totalUnreadCount } = useConversationsContext();
                   Dashboard
                 </Link>
 
-                {/* Desktop bell — shared notificationProps */}
-                <NotificationBell {...notificationProps} />
+                {/* NotificationBell owns its own hook — no props */}
+                <NotificationBell />
 
-                <Link to="/messages" className="relative p-2 text-white/60 hover:text-white transition-colors">
+                <Link
+                  to="/messages"
+                  className="relative p-2 text-white/60 hover:text-white transition-colors"
+                >
                   <MessageSquare className="w-5 h-5" />
                   {totalUnreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-4 h-4 bg-[#f0c040] text-black text-[9px] font-black rounded-full flex items-center justify-center">
@@ -136,7 +132,9 @@ const { totalUnreadCount } = useConversationsContext();
                     </span>
                   )}
                 </Link>
+
                 <div className="w-px h-6 bg-white/10" />
+
                 <Link
                   to="/profile"
                   className="w-8 h-8 bg-[#1a6b3c] rounded-xl flex items-center justify-center font-bold text-sm text-white overflow-hidden hover:ring-2 hover:ring-[#f0c040]/40 transition-all"
@@ -147,6 +145,7 @@ const { totalUnreadCount } = useConversationsContext();
                     (profile?.full_name || user.email || 'U').charAt(0).toUpperCase()
                   )}
                 </Link>
+
                 <button
                   onClick={handleLogout}
                   className="p-2 text-white/35 hover:text-red-400 transition-colors"
@@ -157,20 +156,24 @@ const { totalUnreadCount } = useConversationsContext();
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link to="/login" className="text-[13px] font-semibold text-white/65 hover:text-white px-4 py-2 transition-colors">
+                <Link
+                  to="/login"
+                  className="text-[13px] font-semibold text-white/65 hover:text-white px-4 py-2 transition-colors"
+                >
                   Sign In
                 </Link>
-                <Link to="/signup" className="bg-[#f0c040] text-black px-5 py-2.5 rounded-xl font-bold text-[13px] hover:bg-[#e0b030] transition-all active:scale-95">
+                <Link
+                  to="/signup"
+                  className="bg-[#f0c040] text-black px-5 py-2.5 rounded-xl font-bold text-[13px] hover:bg-[#e0b030] transition-all active:scale-95"
+                >
                   Get Started
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile right */}
           <div className="lg:hidden flex items-center gap-2">
-            {/* Mobile bell — same shared notificationProps */}
-            {user && <NotificationBell {...notificationProps} />}
+            {user && <NotificationBell />}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="w-9 h-9 flex items-center justify-center text-white hover:bg-white/5 rounded-xl transition-colors"
@@ -181,7 +184,6 @@ const { totalUnreadCount } = useConversationsContext();
         </div>
       </div>
 
-      {/* Mobile drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -192,7 +194,7 @@ const { totalUnreadCount } = useConversationsContext();
             className="lg:hidden bg-[#0a1f11] border-t border-white/5 overflow-hidden"
           >
             <div className="px-5 py-5 space-y-1">
-              {navLinks.map((link) => (
+              {navLinks.map(link => (
                 <Link
                   key={link.name}
                   to={link.path}
@@ -213,14 +215,26 @@ const { totalUnreadCount } = useConversationsContext();
               {user ? (
                 <>
                   {(profile?.role === 'admin' || profile?.role === 'moderator') && (
-                    <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-[#f0c040] hover:bg-[#f0c040]/5 transition-colors">
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-[#f0c040] hover:bg-[#f0c040]/5 transition-colors"
+                    >
                       <Shield className="w-5 h-5" /> Admin Panel
                     </Link>
                   )}
-                  <Link to={getDashboardPath()} onClick={() => setIsOpen(false)} className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors">
+                  <Link
+                    to={getDashboardPath()}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors"
+                  >
                     <LayoutDashboard className="w-5 h-5 text-[#1a6b3c]" /> Dashboard
                   </Link>
-                  <Link to="/messages" onClick={() => setIsOpen(false)} className="flex items-center justify-between py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors">
+                  <Link
+                    to="/messages"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-between py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <MessageSquare className="w-5 h-5 text-[#1a6b3c]" /> Messages
                     </div>
@@ -230,7 +244,11 @@ const { totalUnreadCount } = useConversationsContext();
                       </span>
                     )}
                   </Link>
-                  <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors"
+                  >
                     <div className="w-5 h-5 bg-[#1a6b3c] rounded-lg flex items-center justify-center text-white text-[10px] font-bold overflow-hidden flex-shrink-0">
                       {profile?.avatar_url
                         ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -240,12 +258,19 @@ const { totalUnreadCount } = useConversationsContext();
                     Profile
                   </Link>
                   {(profile?.role === 'landlord' || profile?.role === 'agent') && (
-                    <Link to="/add-property" onClick={() => setIsOpen(false)} className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors">
+                    <Link
+                      to="/add-property"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors"
+                    >
                       <Plus className="w-5 h-5 text-[#1a6b3c]" /> List Property
                     </Link>
                   )}
                   <div className="h-px bg-white/5 my-2" />
-                  <button onClick={handleLogout} className="w-full flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-red-400 hover:bg-red-500/5 transition-colors">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-red-400 hover:bg-red-500/5 transition-colors"
+                  >
                     <LogOut className="w-5 h-5" /> Sign Out
                   </button>
                   {profile && (
@@ -258,7 +283,9 @@ const { totalUnreadCount } = useConversationsContext();
                           }
                         </div>
                         <div className="min-w-0">
-                          <div className="text-[13px] font-semibold text-white truncate">{profile.full_name}</div>
+                          <div className="text-[13px] font-semibold text-white truncate">
+                            {profile.full_name}
+                          </div>
                           <div className="text-[11px] text-white/35 capitalize">
                             {profile.role} · {profile.verification_status === 'verified' ? '✓ Verified' : 'Unverified'}
                           </div>
@@ -269,10 +296,18 @@ const { totalUnreadCount } = useConversationsContext();
                 </>
               ) : (
                 <div className="space-y-2 pt-2">
-                  <Link to="/signup" onClick={() => setIsOpen(false)} className="block w-full bg-[#f0c040] text-black text-center py-3.5 rounded-xl font-bold text-[14px]">
+                  <Link
+                    to="/signup"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full bg-[#f0c040] text-black text-center py-3.5 rounded-xl font-bold text-[14px]"
+                  >
                     Get Started — It's Free
                   </Link>
-                  <Link to="/login" onClick={() => setIsOpen(false)} className="block w-full bg-white/5 text-white text-center py-3.5 rounded-xl font-semibold text-[14px] border border-white/8">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full bg-white/5 text-white text-center py-3.5 rounded-xl font-semibold text-[14px] border border-white/8"
+                  >
                     Sign In
                   </Link>
                 </div>

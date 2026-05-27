@@ -9,6 +9,7 @@ export const useNotifications = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const mountedRef = useRef(true);
 
   const fetchNotifications = useCallback(async () => {
     if (!user) return;
@@ -21,41 +22,39 @@ export const useNotifications = () => {
         .limit(20);
 
       if (error) throw error;
-      setNotifications(data || []);
 
-      const { count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('read', false);
-
-      setUnreadCount(count || 0);
+      if (mountedRef.current) {
+        setNotifications(data || []);
+        setUnreadCount((data || []).filter((n: Notification) => !n.read).length);
+      }
     } catch (err) {
       console.error('Error fetching notifications:', err);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
-  }, [user]);
-
-  const fetchRef = useRef(fetchNotifications);
-  useEffect(() => {
-    fetchRef.current = fetchNotifications;
-  }, [fetchNotifications]);
+  }, [user?.id]);
 
   useEffect(() => {
-    if (!user) return;
+    mountedRef.current = true;
 
-    fetchRef.current();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    fetchNotifications();
 
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
 
+    const channelName = `notif-${user.id}-${Date.now()}`;
+
     const channel = supabase
-      .channel(`notifications-${user.id}`)
+      .channel(channelName)
       .on(
-        'postgres_changes',
+        'postgres_changes' as const,
         {
           event: 'INSERT',
           schema: 'public',
@@ -63,28 +62,53 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
+          if (!mountedRef.current) return;
           const newNotif = payload.new as Notification;
           setNotifications(prev => [newNotif, ...prev]);
           setUnreadCount(prev => prev + 1);
         }
       )
       .on(
-        'postgres_changes',
+        'postgres_changes' as const,
         {
           event: 'UPDATE',
           schema: 'public',
           table: 'notifications',
           filter: `user_id=eq.${user.id}`,
         },
-        () => {
-          fetchRef.current();
+        (payload) => {
+          if (!mountedRef.current) return;
+          const updated = payload.new as Notification;
+          // Recalculate from full list rather than increment/decrement
+          setNotifications(prev => {
+            const newList = prev.map(n =>
+              n.id === updated.id ? updated : n
+            );
+            setUnreadCount(newList.filter(n => !n.read).length);
+            return newList;
+          });
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Notifications realtime connected');
+        }
+        if (status === 'CHANNEL_ERROR') {
+          // Transient network issue — does not crash the app
+          console.warn(
+            'Notification channel error:',
+            err?.message || 'unknown'
+          );
+        }
+        if (status === 'TIMED_OUT') {
+          console.warn('Notification channel timed out — will retry');
+        }
+      });
 
     channelRef.current = channel;
 
     return () => {
+      mountedRef.current = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
@@ -92,37 +116,45 @@ export const useNotifications = () => {
     };
   }, [user?.id]);
 
-  const markAsRead = async (notificationId: string) => {
+  const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      await supabase
+      const { error } = await supabase
         .from('notifications')
         .update({ read: true })
         .eq('id', notificationId);
 
-      setNotifications(prev =>
-        prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-      );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      if (error) throw error;
+
+      if (mountedRef.current) {
+        setNotifications(prev =>
+          prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+        );
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
     } catch (err) {
       console.error('Error marking notification as read:', err);
     }
-  };
+  }, []);
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     if (!user) return;
     try {
-      await supabase
+      const { error } = await supabase
         .from('notifications')
         .update({ read: true })
         .eq('user_id', user.id)
         .eq('read', false);
 
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      setUnreadCount(0);
+      if (error) throw error;
+
+      if (mountedRef.current) {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        setUnreadCount(0);
+      }
     } catch (err) {
       console.error('Error marking all as read:', err);
     }
-  };
+  }, [user?.id]);
 
   return {
     notifications,

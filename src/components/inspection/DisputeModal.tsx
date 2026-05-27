@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, AlertCircle, Upload, Loader2, CheckCircle, 
-  Shield, Info, Camera, Video, FileText 
+import {
+  X, AlertCircle, Upload, Loader2,
+  Shield, Camera, Video
 } from 'lucide-react';
 import { useInspectionBooking } from '../../hooks/useInspectionBooking';
 import { InspectionBooking } from '../../types';
@@ -14,11 +14,20 @@ interface DisputeModalProps {
   onSuccess?: () => void;
 }
 
-export const DisputeModal: React.FC<DisputeModalProps> = ({ 
-  booking, 
-  isOpen, 
+const disputeReasons = [
+  'Landlord did not show up',
+  'Property does not match description',
+  'Property is already occupied',
+  'Landlord was unprofessional',
+  'Property has major structural issues',
+  'Other',
+];
+
+export const DisputeModal: React.FC<DisputeModalProps> = ({
+  booking,
+  isOpen,
   onClose,
-  onSuccess 
+  onSuccess,
 }) => {
   const { raiseDispute, loading } = useInspectionBooking();
   const [reason, setReason] = useState('');
@@ -27,204 +36,208 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
-  const disputeReasons = [
-    'Landlord did not show up',
-    'Property does not match description',
-    'Property is already occupied',
-    'Landlord was unprofessional',
-    'Property has major structural issues',
-    'Other'
-  ];
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setFiles(prev => [...prev, ...newFiles]);
+      setFiles(prev => [...prev, ...Array.from(e.target.files!)]);
     }
-  };
-
-  const removeFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reason || description.length < 50) {
-      setError('Please provide a reason and at least 50 characters of description.');
+    if (!reason) { setError('Please select a reason.'); return; }
+    if (description.length < 50) {
+      setError('Please provide at least 50 characters of description.');
       return;
     }
-
     try {
       await raiseDispute(booking.id, `${reason}: ${description}`, files);
-      setStep(2); // Success step
+      setStep(2);
       if (onSuccess) onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Failed to raise dispute');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to raise dispute');
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Raise Dispute">
-      <div className="p-8">
-        <AnimatePresence mode="wait">
-          {step === 1 && (
-            <motion.form 
-              key="form"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              onSubmit={handleSubmit}
-              className="space-y-6"
-            >
-              <div className="bg-red-50 p-6 rounded-3xl border border-red-100 flex gap-4">
-                <AlertCircle className="text-red-600 flex-shrink-0" size={24} />
-                <div className="space-y-2">
-                  <h3 className="font-bold text-red-900">Important Notice</h3>
-                  <p className="text-xs text-red-700 leading-relaxed">
-                    Raising a dispute will freeze the inspection fee. A moderator will review your evidence and the landlord's response. False disputes may lead to account suspension.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-zinc-700 mb-2">Reason for Dispute</label>
-                  <select 
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-red-500"
-                  >
-                    <option value="">Select a reason</option>
-                    {disputeReasons.map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-zinc-700 mb-2">
-                    Description (Min 50 chars)
-                    <span className="ml-2 text-xs font-normal text-zinc-400">{description.length}/50</span>
-                  </label>
-                  <textarea 
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                    rows={4}
-                    placeholder="Provide detailed evidence of what happened..."
-                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-zinc-700 mb-2">Evidence (Photos/Videos)</label>
-                  <div className="grid grid-cols-4 gap-3">
-                    {files.map((file, index) => (
-                      <div key={index} className="relative aspect-square bg-zinc-100 rounded-xl overflow-hidden border border-zinc-200">
-                        <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                          {file.type.startsWith('image') ? <Camera size={20} /> : <Video size={20} />}
-                        </div>
-                        <button 
-                          type="button"
-                          onClick={() => removeFile(index)}
-                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full shadow-lg"
-                        >
-                          <X size={10} />
-                        </button>
-                      </div>
-                    ))}
-                    <label className="aspect-square bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-xl flex flex-col items-center justify-center text-zinc-400 hover:border-red-500 hover:text-red-500 transition-all cursor-pointer">
-                      <Upload size={20} />
-                      <span className="text-[10px] font-bold mt-1">Add</span>
-                      <input type="file" multiple className="hidden" onChange={handleFileChange} accept="image/*,video/*" />
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {error && (
-                <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm flex items-center gap-2">
-                  <AlertCircle size={16} />
-                  {error}
-                </div>
-              )}
-
-              <div className="flex gap-4">
-                <button 
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 py-4 rounded-2xl font-bold text-zinc-500 hover:bg-zinc-50"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 bg-red-600 text-white py-4 rounded-2xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-600/20 flex items-center justify-center gap-2"
-                >
-                  {loading ? <Loader2 size={20} className="animate-spin" /> : 'Submit Dispute'}
-                </button>
-              </div>
-            </motion.form>
-          )}
-
-          {step === 2 && (
-            <motion.div 
-              key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-8"
-            >
-              <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-red-600/20">
-                <Shield size={40} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-zinc-900 mb-2">Dispute Raised</h3>
-              <p className="text-zinc-500 mb-8 max-w-xs mx-auto">
-                Our moderation team has been notified. We will review your evidence and get back to you within 24-48 hours.
-              </p>
-              <button 
-                onClick={onClose}
-                className="w-full bg-zinc-900 text-white py-4 rounded-2xl font-bold hover:bg-zinc-800 transition-colors"
-              >
-                Close
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </Modal>
-  );
-};
-
-const Modal: React.FC<{ 
-  isOpen: boolean; 
-  onClose: () => void; 
-  title: string; 
-  children: React.ReactNode 
-}> = ({ isOpen, onClose, title, children }) => {
-  return (
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[150]"
+            className="fixed inset-0 bg-black z-[150]"
           />
-          <motion.div 
-            initial={{ opacity: 0, y: 100, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.95 }}
-            className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-lg h-fit bg-white rounded-[40px] z-[160] overflow-hidden shadow-2xl"
+          <motion.div
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 60 }}
+            className="fixed inset-x-4 bottom-4 sm:inset-0 sm:m-auto sm:w-full sm:max-w-lg sm:h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[160] overflow-hidden shadow-2xl"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
-            <div className="px-8 py-6 border-b border-zinc-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-zinc-900">{title}</h2>
-              <button onClick={onClose} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
-                <X size={20} className="text-zinc-400" />
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+              <h2 className="text-[16px] font-bold text-white">Raise a Dispute</h2>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
-            {children}
+
+            <AnimatePresence mode="wait">
+              {step === 1 ? (
+                <motion.form
+                  key="form"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onSubmit={handleSubmit}
+                  className="p-5 space-y-4 max-h-[70vh] overflow-y-auto"
+                >
+                  {/* Warning */}
+                  <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[12px] font-bold text-red-400 mb-1">
+                        Important
+                      </p>
+                      <p className="text-[11px] text-red-400/70 leading-relaxed">
+                        Raising a dispute freezes the inspection fee. A moderator will review your evidence within 24-48 hours. False disputes may lead to account suspension.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Reason */}
+                  <div>
+                    <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                      Reason <span className="text-red-400">*</span>
+                    </label>
+                    <select
+                      value={reason}
+                      onChange={e => { setReason(e.target.value); setError(null); }}
+                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-red-500/50 transition-colors appearance-none cursor-pointer"
+                    >
+                      <option value="" className="bg-[#0a1f11]">Select a reason</option>
+                      {disputeReasons.map(r => (
+                        <option key={r} value={r} className="bg-[#0a1f11]">{r}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-[12px] font-semibold text-white/40 uppercase tracking-wider">
+                        Description <span className="text-red-400">*</span>
+                      </label>
+                      <span className={`text-[11px] font-medium ${
+                        description.length >= 50 ? 'text-[#4ade80]' : 'text-white/25'
+                      }`}>
+                        {description.length}/50 min
+                      </span>
+                    </div>
+                    <textarea
+                      value={description}
+                      onChange={e => { setDescription(e.target.value); setError(null); }}
+                      rows={4}
+                      placeholder="Describe in detail what happened and how the property differed from the listing..."
+                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/50 transition-colors resize-none"
+                    />
+                  </div>
+
+                  {/* Evidence */}
+                  <div>
+                    <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                      Evidence Photos/Videos <span className="text-white/20 font-normal normal-case">(optional but recommended)</span>
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {files.map((file, i) => (
+                        <div
+                          key={i}
+                          className="relative aspect-square bg-white/5 border border-white/8 rounded-xl overflow-hidden flex items-center justify-center"
+                        >
+                          {file.type.startsWith('image')
+                            ? <Camera className="w-5 h-5 text-white/30" />
+                            : <Video className="w-5 h-5 text-white/30" />
+                          }
+                          <button
+                            type="button"
+                            onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))}
+                            className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                      <label className="aspect-square bg-white/4 border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-white/25 hover:border-white/20 hover:text-white/40 transition-all cursor-pointer">
+                        <Upload className="w-5 h-5 mb-1" />
+                        <span className="text-[9px] font-bold uppercase">Add</span>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*,video/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                      <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                      <p className="text-[12px] text-red-400">{error}</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="flex-1 py-3.5 rounded-xl font-semibold text-[13px] text-white/50 bg-white/5 hover:bg-white/8 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 py-3.5 rounded-xl font-bold text-[13px] text-white bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {loading
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : 'Submit Dispute'
+                      }
+                    </button>
+                  </div>
+                </motion.form>
+              ) : (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-8 text-center"
+                >
+                  <div className="w-16 h-16 bg-red-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Shield className="w-8 h-8 text-red-400" />
+                  </div>
+                  <h3 className="text-[18px] font-black text-white mb-2">
+                    Dispute Raised
+                  </h3>
+                  <p className="text-[13px] text-white/45 leading-relaxed mb-6 max-w-xs mx-auto">
+                    Our moderation team has been notified and will review your evidence within 24-48 hours.
+                  </p>
+                  <button
+                    onClick={onClose}
+                    className="w-full bg-white/5 border border-white/8 text-white py-3.5 rounded-xl font-semibold text-[14px] hover:bg-white/8 transition-colors"
+                  >
+                    Close
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </>
       )}

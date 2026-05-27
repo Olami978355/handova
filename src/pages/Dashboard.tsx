@@ -4,37 +4,18 @@ import {
   Home, Shield, MessageSquare, Plus, Loader2,
   AlertCircle, CheckCircle, Clock, ArrowRight,
   User, CreditCard, Calendar, Search, Settings,
-  MapPin, RefreshCw, FileText, TrendingUp, Eye
+  MapPin, RefreshCw, Eye, Heart
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Property, Deal, InspectionBooking } from '../types';
 
-// ─── Logo ─────────────────────────────────────────────────────────
-const RentEasyLogo = ({ size = 28 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#1a6b3c" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
-    <path d="M32 54 L32 50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M36 54 L36 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
-    <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#f0c040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-// ─── Format Naira ─────────────────────────────────────────────────
 const formatNaira = (amount: number) =>
   new Intl.NumberFormat('en-NG', {
     style: 'currency', currency: 'NGN', maximumFractionDigits: 0
   }).format(amount);
 
-// ─── Relative time ────────────────────────────────────────────────
 const timeAgo = (date: string) => {
   const diff = Date.now() - new Date(date).getTime();
   const mins = Math.floor(diff / 60000);
@@ -47,7 +28,6 @@ const timeAgo = (date: string) => {
   return new Date(date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' });
 };
 
-// ─── Stat Card (square) ───────────────────────────────────────────
 const StatCard = ({
   icon: Icon, value, label, color = '#f0c040', onClick
 }: {
@@ -76,55 +56,61 @@ const StatCard = ({
   </motion.div>
 );
 
-// ─── Deal status badge ────────────────────────────────────────────
 const DealBadge = ({ status }: { status: string }) => {
   const map: Record<string, { label: string; color: string; bg: string }> = {
-    pending_payment:   { label: 'Pending Payment', color: '#f0c040', bg: 'rgba(240,192,64,0.1)' },
-    payment_received:  { label: 'Payment Received', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    agreement_sent:    { label: 'Agreement Sent', color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
-    agreement_signed:  { label: 'Agreement Signed', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
+    pending_payment:   { label: 'Pending Payment',   color: '#f0c040', bg: 'rgba(240,192,64,0.1)' },
+    payment_received:  { label: 'Payment Received',  color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    agreement_sent:    { label: 'Agreement Ready',   color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
+    agreement_signed:  { label: 'Agreement Signed',  color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
     move_in_confirmed: { label: 'Move-in Confirmed', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    funds_released:    { label: 'Completed', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    disputed:          { label: 'Disputed', color: '#f87171', bg: 'rgba(248,113,113,0.1)' },
+    funds_released:    { label: 'Completed ✓',       color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    disputed:          { label: 'Disputed',           color: '#f87171', bg: 'rgba(248,113,113,0.1)' },
   };
-  const style = map[status] || { label: status, color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' };
+  const s = map[status] || {
+    label: status.replace(/_/g, ' '),
+    color: '#9ca3af',
+    bg: 'rgba(156,163,175,0.1)',
+  };
   return (
     <span
       className="text-[10px] font-bold px-2.5 py-1 rounded-lg capitalize"
-      style={{ color: style.color, background: style.bg }}
+      style={{ color: s.color, background: s.bg }}
     >
-      {style.label}
+      {s.label}
     </span>
   );
 };
 
-// ─── Booking status badge ─────────────────────────────────────────
 const BookingBadge = ({ status }: { status: string }) => {
   const map: Record<string, { label: string; color: string; bg: string }> = {
-    pending_payment:     { label: 'Pending Payment', color: '#f0c040', bg: 'rgba(240,192,64,0.1)' },
-    payment_confirmed:   { label: 'Confirmed', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    inspection_scheduled:{ label: 'Scheduled', color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
-    inspection_done:     { label: 'Inspection Done', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
-    tenant_interested:   { label: 'Interested', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    tenant_declined:     { label: 'Declined', color: '#f87171', bg: 'rgba(248,113,113,0.1)' },
-    escrow_started:      { label: 'Escrow Started', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    refunded:            { label: 'Refunded', color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
-    dispute_raised:      { label: 'Dispute Raised', color: '#fb923c', bg: 'rgba(251,146,60,0.1)' },
+    pending_payment:      { label: 'Awaiting Payment',          color: '#f0c040', bg: 'rgba(240,192,64,0.1)' },
+    payment_confirmed:    { label: 'Paid — Awaiting Confirmation', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    inspection_scheduled: { label: 'Visit Scheduled',           color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
+    inspection_done:      { label: 'Visit Completed',           color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
+    tenant_interested:    { label: 'Interested',                color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    tenant_declined:      { label: 'Declined',                  color: '#f87171', bg: 'rgba(248,113,113,0.1)' },
+    escrow_started:       { label: 'Deal In Progress',          color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    refunded:             { label: 'Refunded',                  color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
+    dispute_raised:       { label: 'Dispute Open',              color: '#fb923c', bg: 'rgba(251,146,60,0.1)' },
+    dispute_resolved:     { label: 'Dispute Resolved',          color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
   };
-  const style = map[status] || { label: status, color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' };
+  const s = map[status] || {
+    label: status.replace(/_/g, ' '),
+    color: '#9ca3af',
+    bg: 'rgba(156,163,175,0.1)',
+  };
   return (
     <span
       className="text-[10px] font-bold px-2.5 py-1 rounded-lg"
-      style={{ color: style.color, background: style.bg }}
+      style={{ color: s.color, background: s.bg }}
     >
-      {style.label}
+      {s.label}
     </span>
   );
 };
 
-// ─── Empty state ──────────────────────────────────────────────────
 const EmptyState = ({
-  icon: Icon, title, desc, action, actionLabel
+  icon: Icon, title, desc, action, actionLabel,
 }: {
   icon: React.ElementType;
   title: string;
@@ -149,22 +135,172 @@ const EmptyState = ({
   </div>
 );
 
-// ─── Skeleton loader ──────────────────────────────────────────────
 const DashboardSkeleton = () => (
   <div className="space-y-6">
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="bg-[#0a1f11] rounded-2xl aspect-square skeleton" />
+        <div key={i} className="bg-[#0a1f11] rounded-2xl aspect-square animate-pulse" />
       ))}
     </div>
-    <div className="bg-[#0a1f11] rounded-2xl h-64 skeleton" />
-    <div className="bg-[#0a1f11] rounded-2xl h-48 skeleton" />
+    <div className="bg-[#0a1f11] rounded-2xl h-64 animate-pulse" />
+    <div className="bg-[#0a1f11] rounded-2xl h-48 animate-pulse" />
   </div>
 );
 
-// ═══════════════════════════════════════════════════════════════
-// MAIN DASHBOARD
-// ═══════════════════════════════════════════════════════════════
+// ── Landlord booking card ──────────────────────────────────────
+const LandlordBookingCard = ({
+  booking,
+  onConfirm,
+}: {
+  booking: InspectionBooking & { profiles?: { full_name: string; avatar_url?: string } };
+  onConfirm: (bookingId: string) => void;
+}) => {
+  const [confirmedDate, setConfirmedDate] = useState('');
+  const [confirmedTime, setConfirmedTime] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+
+  const handleConfirm = async () => {
+    if (!confirmedDate || !confirmedTime) return;
+    setConfirming(true);
+    try {
+      const { error } = await supabase
+        .from('inspection_bookings')
+        .update({
+          status: 'inspection_scheduled',
+          confirmed_date: confirmedDate,
+          confirmed_time: confirmedTime,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', booking.id);
+
+      if (error) throw error;
+
+      await supabase.from('notifications').insert({
+        user_id: booking.tenant_id,
+        title: 'Inspection Date Confirmed!',
+        message: `Your inspection for ${booking.properties?.title} has been confirmed for ${
+          new Date(confirmedDate).toLocaleDateString('en-NG', {
+            weekday: 'long', day: 'numeric', month: 'long',
+          })
+        } ${confirmedTime}.`,
+        type: 'inspection_confirmed',
+        link: '/dashboard',
+      });
+
+      onConfirm(booking.id);
+    } catch (err) {
+      console.error('Failed to confirm inspection:', err);
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  return (
+    <div className="p-4 border border-[#f0c040]/20 bg-[#f0c040]/4 rounded-xl space-y-3">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0">
+          {booking.profiles?.full_name?.charAt(0)?.toUpperCase() || 'T'}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-bold text-white">
+            {booking.profiles?.full_name || 'Tenant'}
+          </p>
+          <p className="text-[11px] text-white/40 truncate">{booking.properties?.title}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <BookingBadge status={booking.status} />
+            <span className="text-[10px] text-white/30">{timeAgo(booking.created_at)}</span>
+          </div>
+        </div>
+        <div className="text-right flex-shrink-0">
+          <p className="text-[12px] font-black text-[#f0c040]">
+            {formatNaira(booking.inspection_fee)}
+          </p>
+          <p className="text-[10px] text-white/25">fee paid</p>
+        </div>
+      </div>
+
+      {booking.preferred_date && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-white/4 rounded-xl">
+          <Calendar className="w-3.5 h-3.5 text-white/30" />
+          <span className="text-[11px] text-white/50">
+            Requested:{' '}
+            {new Date(booking.preferred_date).toLocaleDateString('en-NG', {
+              day: 'numeric', month: 'short',
+            })}
+            {booking.preferred_time && ` · ${booking.preferred_time}`}
+          </span>
+        </div>
+      )}
+
+      {booking.status === 'payment_confirmed' && (
+        <>
+          {!showForm ? (
+            <button
+              onClick={() => setShowForm(true)}
+              className="w-full bg-[#f0c040] text-black py-2.5 rounded-xl font-bold text-[13px] hover:bg-[#e0b030] transition-colors"
+            >
+              Confirm Inspection Date
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <input
+                type="date"
+                min={new Date().toISOString().split('T')[0]}
+                value={confirmedDate}
+                onChange={e => setConfirmedDate(e.target.value)}
+                className="w-full px-3 py-2.5 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50"
+              />
+              <select
+                value={confirmedTime}
+                onChange={e => setConfirmedTime(e.target.value)}
+                className="w-full px-3 py-2.5 bg-[#0a1f11] border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50"
+              >
+                <option value="" className="bg-[#0a1f11]">Select time</option>
+                <option value="Morning (9AM - 12PM)" className="bg-[#0a1f11]">Morning (9AM – 12PM)</option>
+                <option value="Afternoon (12PM - 3PM)" className="bg-[#0a1f11]">Afternoon (12PM – 3PM)</option>
+                <option value="Late Afternoon (3PM - 6PM)" className="bg-[#0a1f11]">Late Afternoon (3PM – 6PM)</option>
+              </select>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="flex-1 py-2.5 text-[13px] text-white/40 hover:bg-white/5 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  disabled={!confirmedDate || !confirmedTime || confirming}
+                  className="flex-[2] bg-[#f0c040] text-black py-2.5 rounded-xl font-bold text-[13px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                >
+                  {confirming
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : 'Confirm Date'
+                  }
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {booking.status === 'inspection_scheduled' && booking.confirmed_date && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl">
+          <CheckCircle className="w-3.5 h-3.5 text-[#4ade80]" />
+          <span className="text-[11px] text-[#4ade80] font-semibold">
+            Confirmed:{' '}
+            {new Date(booking.confirmed_date).toLocaleDateString('en-NG', {
+              day: 'numeric', month: 'short',
+            })}
+            {booking.confirmed_time && ` · ${booking.confirmed_time}`}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Main Dashboard ─────────────────────────────────────────────
 export default function Dashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -172,6 +308,7 @@ export default function Dashboard() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [bookings, setBookings] = useState<InspectionBooking[]>([]);
+  const [savedProperties, setSavedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -182,113 +319,195 @@ export default function Dashboard() {
 
     try {
       if (profile.role === 'tenant') {
-        const [dealsRes, bookingsRes] = await Promise.all([
-          supabase
+        // ── Tenant fetch ──────────────────────────────────────
+        // Deals — separate try/catch so one failure
+        // does not kill the entire dashboard
+        try {
+          const { data, error: err } = await supabase
             .from('deals')
-            .select('*, properties(id, title, images, address, state)')
+            .select('*, properties(id, title, images, address, state, lga)')
             .eq('tenant_id', user.id)
             .order('created_at', { ascending: false })
-            .limit(5),
-          supabase
+            .limit(10);
+          if (err) console.error('Deals error:', err.message);
+          else setDeals(data || []);
+        } catch (e) {
+          console.error('Deals fetch failed:', e);
+        }
+
+        // Bookings — separate try/catch
+        try {
+          const { data, error: err } = await supabase
             .from('inspection_bookings')
-            .select('*, properties(id, title, images, address, state)')
+            .select('*, properties(id, title, images, address, state, lga)')
             .eq('tenant_id', user.id)
             .order('created_at', { ascending: false })
-            .limit(5),
-        ]);
-        setDeals(dealsRes.data || []);
-        setBookings(bookingsRes.data || []);
+            .limit(10);
+          if (err) console.error('Bookings error:', err.message);
+          else setBookings(data || []);
+        } catch (e) {
+          console.error('Bookings fetch failed:', e);
+        }
+
+        // Saved properties — completely optional
+        try {
+          const { data, error: err } = await supabase
+            .from('saved_properties')
+            .select('*, properties(id, title, images, address, lga, state, price, price_period, transaction_type)')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(6);
+          if (!err && data) {
+            setSavedProperties(
+              data
+                .map((s: { properties: Property | null }) => s.properties)
+                .filter(Boolean) as Property[]
+            );
+          }
+        } catch {
+          // Table may not exist — silent fail
+        }
 
       } else {
-        // landlord or agent
-        const propsRes = await supabase
-          .from('properties')
-          .select('*')
-          .eq('owner_id', user.id)
-          .order('created_at', { ascending: false });
+        // ── Landlord / Agent fetch ────────────────────────────
+        try {
+          const { data, error: err } = await supabase
+            .from('properties')
+            .select('*')
+            .eq('owner_id', user.id)
+            .order('created_at', { ascending: false });
+          if (err) throw err;
+          setProperties(data || []);
 
-        const propIds = (propsRes.data || []).map(p => p.id);
-        setProperties(propsRes.data || []);
+          // Deals
+         const { data: dealsData, error: dealsErr } = await supabase
+  .from('deals')
+  .select('*, properties(id, title, images, address, state, lga)')
+  .or(`landlord_id.eq.${user.id},agent_id.eq.${user.id}`)
+  .order('created_at', { ascending: false })
+  .limit(10);
+if (dealsErr) console.error('Deals error:', dealsErr.message);
+else setDeals(dealsData || []);
 
-        const [dealsRes, bookingsRes] = await Promise.all([
-          supabase
-            .from('deals')
-            .select('*, properties(id, title, images, address, state), profiles!deals_tenant_id_fkey(full_name, avatar_url)')
-            .or(`landlord_id.eq.${user.id},agent_id.eq.${user.id}`)
-            .order('created_at', { ascending: false })
-            .limit(5),
-          propIds.length > 0
-            ? supabase
-                .from('inspection_bookings')
-                .select('*, properties(id, title, images), profiles!inspection_bookings_tenant_id_fkey(full_name, avatar_url)')
-                .in('property_id', propIds)
-                .eq('status', 'payment_confirmed')
-                .order('created_at', { ascending: false })
-                .limit(5)
-            : Promise.resolve({ data: [] }),
-        ]);
-        setDeals(dealsRes.data || []);
-        setBookings((bookingsRes as { data: InspectionBooking[] | null }).data || []);
+// Bookings for landlord's properties
+const propIds = (data || []).map(p => p.id);
+if (propIds.length > 0) {
+  const { data: bookingsData, error: bookingsErr } = await supabase
+    .from('inspection_bookings')
+    .select('*, properties(id, title, images)')
+    .in('property_id', propIds)
+    .in('status', [
+      'payment_confirmed',
+      'inspection_scheduled',
+      'inspection_done',
+      'tenant_interested',
+    ])
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (bookingsErr) {
+    console.error('Bookings error:', bookingsErr.message);
+  } else {
+    // Fetch tenant profiles separately to avoid FK join 403
+    const tenantIds = [
+      ...new Set((bookingsData || []).map(b => b.tenant_id).filter(Boolean))
+    ] as string[];
+
+    let tenantMap: Record<string, { full_name: string; avatar_url?: string }> = {};
+
+    if (tenantIds.length > 0) {
+      const { data: tenantProfiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', tenantIds);
+
+      if (tenantProfiles) {
+        tenantMap = Object.fromEntries(
+          tenantProfiles.map(p => [p.id, { full_name: p.full_name, avatar_url: p.avatar_url }])
+        );
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to load dashboard';
-      setError(msg);
-    } finally {
-      setLoading(false);
     }
-  }, [user, profile]);
 
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) { navigate('/login'); return; }
-      if (!profile?.role) { navigate('/onboarding'); return; }
-      fetchData();
-    }
-  }, [authLoading, user, profile]);
+    const enrichedBookings = (bookingsData || []).map(b => ({
+      ...b,
+      profiles: tenantMap[b.tenant_id] || null,
+    }));
 
-  // ── Error state ──
-  if (error) {
-    return (
-      <div
-        className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-      >
-        <AlertCircle className="w-10 h-10 text-red-400 mb-4" />
-        <h2 className="text-[18px] font-bold text-white mb-2">Something went wrong</h2>
-        <p className="text-[13px] text-white/45 mb-6 max-w-xs">{error}</p>
-        <button
-          onClick={fetchData}
-          className="flex items-center gap-2 bg-[#1a6b3c] text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" /> Try Again
-        </button>
-      </div>
-    );
+    setBookings(enrichedBookings);
   }
+}
+} catch (err: unknown) {
+  throw err;
+}
+}
+} catch (err: unknown) {
+const msg = err instanceof Error ? err.message : 'Failed to load dashboard';
+setError(msg);
+} finally {
+setLoading(false);
+}
+}, [user?.id, profile?.role]);
+
+useEffect(() => {
+if (!authLoading) {
+  if (!user) { navigate('/login'); return; }
+  if (!profile?.role) { navigate('/onboarding'); return; }
+  fetchData();
+}
+}, [authLoading, user?.id, profile?.role]);
+
+const handleBookingConfirmed = (bookingId: string) => {
+setBookings(prev =>
+  prev.map(b =>
+    b.id === bookingId
+      ? { ...b, status: 'inspection_scheduled' as const }
+      : b
+  )
+);
+};
+
+if (error) {
+return (
+  <div
+    className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center"
+    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+  >
+    <AlertCircle className="w-10 h-10 text-red-400 mb-4" />
+    <h2 className="text-[18px] font-bold text-white mb-2">Something went wrong</h2>
+    <p className="text-[13px] text-white/45 mb-6 max-w-xs">{error}</p>
+    <button
+      onClick={fetchData}
+      className="flex items-center gap-2 bg-[#1a6b3c] text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+    >
+      <RefreshCw className="w-4 h-4" /> Try Again
+    </button>
+  </div>
+);
+}
 
   const isTenant = profile?.role === 'tenant';
-  const isLandlordOrAgent = profile?.role === 'landlord' || profile?.role === 'agent';
+  const isLandlordOrAgent =
+    profile?.role === 'landlord' || profile?.role === 'agent';
   const firstName = profile?.full_name?.split(' ')[0] || 'there';
   const activeListings = properties.filter(p => p.status === 'active').length;
   const pendingListings = properties.filter(p => p.status === 'pending_review').length;
+  const newBookings = bookings.filter(b => b.status === 'payment_confirmed').length;
 
   return (
     <div
       className="min-h-screen bg-[#0a0a0a] page-with-tabs"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      {/* ── Hero header ── */}
+      {/* Header */}
       <div className="bg-[#0a1f11] border-b border-white/5">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 pt-8 pb-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
-              {/* Avatar */}
               <div className="w-14 h-14 bg-[#1a6b3c] rounded-2xl overflow-hidden flex items-center justify-center text-white text-[18px] font-black flex-shrink-0">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  (profile?.full_name || 'U').charAt(0).toUpperCase()
-                )}
+                {profile?.avatar_url
+                  ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                  : (profile?.full_name || 'U').charAt(0).toUpperCase()
+                }
               </div>
               <div>
                 <h1 className="text-[22px] font-black text-white tracking-tight leading-tight">
@@ -318,8 +537,6 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-
-            {/* Actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
               {isLandlordOrAgent && (
                 <Link
@@ -342,12 +559,10 @@ export default function Dashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-5 lg:px-8 py-6">
-        {loading ? (
-          <DashboardSkeleton />
-        ) : (
+        {loading ? <DashboardSkeleton /> : (
           <div className="space-y-6">
 
-            {/* ── Verification nudge ── */}
+            {/* Verification nudge */}
             {profile?.verification_status === 'unverified' && isLandlordOrAgent && (
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -359,10 +574,10 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-bold text-white mb-1">
-                    Get verified to go live instantly
+                    Get verified to list instantly
                   </p>
                   <p className="text-[12px] text-white/45 mb-3">
-                    Verified listings go live immediately. Unverified listings wait for moderator review.
+                    Verified accounts go live immediately. Unverified listings wait for moderator review.
                   </p>
                   <Link
                     to="/verification"
@@ -374,27 +589,86 @@ export default function Dashboard() {
               </motion.div>
             )}
 
-            {/* ── Stat cards (square grid) ── */}
+            {/* New booking alert */}
+            {isLandlordOrAgent && newBookings > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-[#f0c040]/8 border border-[#f0c040]/25 rounded-2xl p-4 flex items-center gap-3"
+              >
+                <div className="w-9 h-9 bg-[#f0c040]/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Calendar className="w-4 h-4 text-[#f0c040]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[13px] font-bold text-white">
+                    {newBookings} new inspection booking{newBookings > 1 ? 's' : ''}{' '}
+                    need{newBookings === 1 ? 's' : ''} your confirmation
+                  </p>
+                  <p className="text-[11px] text-white/40">
+                    Confirm the date and time for each tenant below
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Stat cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {isTenant ? (
                 <>
-                  <StatCard icon={Calendar} value={bookings.length} label="Inspection bookings" color="#f0c040" />
-                  <StatCard icon={CreditCard} value={deals.length} label="Escrow deals" color="#4ade80" />
                   <StatCard
-                    icon={MessageSquare}
-                    value={0}
-                    label="Unread messages"
-                    color="#60a5fa"
-                    onClick={() => navigate('/messages')}
+                    icon={Calendar}
+                    value={bookings.length}
+                    label="Inspections"
+                    color="#f0c040"
                   />
-                  <StatCard icon={Heart} value={0} label="Saved properties" color="#f87171" onClick={() => navigate('/listings')} />
+                  <StatCard
+                    icon={CreditCard}
+                    value={deals.length}
+                    label="Escrow deals"
+                    color="#4ade80"
+                  />
+                  <StatCard
+                    icon={Heart}
+                    value={savedProperties.length}
+                    label="Saved"
+                    color="#f87171"
+                    onClick={() => navigate('/listings')}
+                  />
+                  <StatCard
+                    icon={Search}
+                    value="→"
+                    label="Browse"
+                    color="#a78bfa"
+                    onClick={() => navigate('/listings')}
+                  />
                 </>
               ) : (
                 <>
-                  <StatCard icon={Home} value={activeListings} label="Active listings" color="#4ade80" onClick={() => navigate('/listings')} />
-                  <StatCard icon={Clock} value={pendingListings} label="Pending review" color="#f0c040" />
-                  <StatCard icon={CreditCard} value={deals.length} label="Escrow deals" color="#a78bfa" />
-                  <StatCard icon={Calendar} value={bookings.length} label="New bookings" color="#f0c040" onClick={() => navigate('/messages')} />
+                  <StatCard
+                    icon={Home}
+                    value={activeListings}
+                    label="Active listings"
+                    color="#4ade80"
+                    onClick={() => navigate('/listings')}
+                  />
+                  <StatCard
+                    icon={Clock}
+                    value={pendingListings}
+                    label="Pending review"
+                    color="#f0c040"
+                  />
+                  <StatCard
+                    icon={CreditCard}
+                    value={deals.length}
+                    label="Escrow deals"
+                    color="#a78bfa"
+                  />
+                  <StatCard
+                    icon={Calendar}
+                    value={newBookings}
+                    label="New bookings"
+                    color={newBookings > 0 ? '#f0c040' : '#4ade80'}
+                  />
                 </>
               )}
             </div>
@@ -402,23 +676,229 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
 
-                {/* ── Escrow deals ── */}
+                {/* Landlord: Inspection Requests */}
+                {isLandlordOrAgent && (
+                  <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                      <div>
+                        <h2 className="text-[15px] font-bold text-white">Inspection Requests</h2>
+                        <p className="text-[11px] text-white/35 mt-0.5">
+                          Tenants who paid to view your properties
+                        </p>
+                      </div>
+                      {newBookings > 0 && (
+                        <span className="text-[11px] font-bold text-[#f0c040] bg-[#f0c040]/10 px-2.5 py-1 rounded-xl">
+                          {newBookings} new
+                        </span>
+                      )}
+                    </div>
+                    {bookings.length === 0 ? (
+                      <EmptyState
+                        icon={Calendar}
+                        title="No inspection requests yet"
+                        desc="When tenants pay inspection fees for your properties they will appear here."
+                      />
+                    ) : (
+                      <div className="p-4 space-y-3">
+                        {bookings.map(booking => (
+                          <LandlordBookingCard
+                            key={booking.id}
+                            booking={
+                              booking as InspectionBooking & {
+                                profiles?: { full_name: string; avatar_url?: string };
+                              }
+                            }
+                            onConfirm={handleBookingConfirmed}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Tenant: My Inspection Bookings */}
+                {isTenant && (
+                  <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                      <div>
+                        <h2 className="text-[15px] font-bold text-white">My Inspection Bookings</h2>
+                        <p className="text-[11px] text-white/35 mt-0.5">Properties you have booked to view</p>
+                      </div>
+                      <Calendar className="w-4 h-4 text-[#1a6b3c]" />
+                    </div>
+                    {bookings.length === 0 ? (
+                      <EmptyState
+                        icon={Calendar}
+                        title="No inspections booked yet"
+                        desc="Find a property you like and book an inspection to get started"
+                        action={() => navigate('/listings')}
+                        actionLabel="Browse properties"
+                      />
+                    ) : (
+                      <div className="divide-y divide-white/4">
+                        {bookings.map(booking => (
+                          <div key={booking.id} className="px-5 py-4">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-12 h-12 bg-[#111a14] rounded-xl overflow-hidden flex-shrink-0">
+                                {booking.properties?.images?.[0] ? (
+                                  <img
+                                    src={booking.properties.images[0]}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <Home className="w-5 h-5 text-white/15" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-semibold text-white truncate">
+                                  {booking.properties?.title || 'Property'}
+                                </p>
+                                <p className="text-[11px] text-white/35">
+                                  {booking.properties?.lga}, {booking.properties?.state}
+                                </p>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <p className="text-[12px] font-black text-[#f0c040]">
+                                  {formatNaira(booking.inspection_fee)}
+                                </p>
+                                <p className="text-[10px] text-white/25">paid</p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <BookingBadge status={booking.status} />
+                              <span className="text-[11px] text-white/30">
+                                {timeAgo(booking.created_at)}
+                              </span>
+                            </div>
+
+                            {booking.confirmed_date && (
+                              <div className="flex items-center gap-2 mt-2 p-2.5 bg-[#1a6b3c]/8 border border-[#1a6b3c]/15 rounded-xl">
+                                <CheckCircle className="w-3.5 h-3.5 text-[#4ade80]" />
+                                <span className="text-[11px] font-semibold text-[#4ade80]">
+                                  Visit confirmed:{' '}
+                                  {new Date(booking.confirmed_date).toLocaleDateString('en-NG', {
+                                    weekday: 'short', day: 'numeric', month: 'short',
+                                  })}
+                                  {booking.confirmed_time && ` · ${booking.confirmed_time}`}
+                                </span>
+                              </div>
+                            )}
+
+                            {booking.status === 'inspection_done' && (
+                              <div className="mt-2 p-3 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl">
+                                <p className="text-[11px] text-[#f0c040] font-semibold mb-1">
+                                  Did you like the property?
+                                </p>
+                                <p className="text-[10px] text-white/35">
+                                  Contact the landlord or agent to proceed. They can send you a deal offer in chat.
+                                </p>
+                              </div>
+                            )}
+
+                            {booking.status === 'escrow_started' && (
+                              <Link
+                                to="/dashboard"
+                                className="mt-2 flex items-center justify-center gap-2 py-2.5 bg-[#1a6b3c] text-white rounded-xl font-bold text-[12px] hover:bg-[#0f4a2a] transition-colors"
+                              >
+                                Complete your deal <ArrowRight className="w-3.5 h-3.5" />
+                              </Link>
+                            )}
+
+                            {(booking.status === 'tenant_declined' || booking.status === 'refunded') &&
+                              booking.refund_amount && (
+                                <div className="mt-2 flex items-center gap-2 p-2.5 bg-white/4 border border-white/6 rounded-xl">
+                                  <CheckCircle className="w-3.5 h-3.5 text-[#4ade80]" />
+                                  <span className="text-[11px] text-white/45">
+                                    Refund of {formatNaira(booking.refund_amount)} processed
+                                  </span>
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Tenant: Saved Properties */}
+                {isTenant && (
+                  <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                      <div>
+                        <h2 className="text-[15px] font-bold text-white">Saved Properties</h2>
+                        <p className="text-[11px] text-white/35 mt-0.5">Properties you hearted</p>
+                      </div>
+                      <Heart className="w-4 h-4 text-red-400" />
+                    </div>
+                    {savedProperties.length === 0 ? (
+                      <EmptyState
+                        icon={Heart}
+                        title="No saved properties yet"
+                        desc="Tap the heart icon on any property to save it here"
+                        action={() => navigate('/listings')}
+                        actionLabel="Browse properties"
+                      />
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3 p-4">
+                        {savedProperties.map(property => property && (
+                          <Link
+                            key={property.id}
+                            to={`/property/${property.id}`}
+                            className="bg-[#111a14] border border-white/6 rounded-xl overflow-hidden hover:border-[#f0c040]/20 transition-all"
+                          >
+                            <div className="h-24 overflow-hidden">
+                              {property.images?.[0] ? (
+                                <img
+                                  src={property.images[0]}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-[#0a1f11]">
+                                  <Home className="w-5 h-5 text-white/15" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="p-2.5">
+                              <p className="text-[11px] font-bold text-white truncate">
+                                {property.title}
+                              </p>
+                              <p className="text-[12px] font-black text-[#f0c040] mt-0.5">
+                                ₦{(property.price / 1000000).toFixed(1)}M
+                                {property.price_period === 'yearly' && '/yr'}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Escrow Deals */}
                 <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-                    <h2 className="text-[15px] font-bold text-white">Escrow Deals</h2>
+                    <div>
+                      <h2 className="text-[15px] font-bold text-white">Escrow Deals</h2>
+                      <p className="text-[11px] text-white/35 mt-0.5">Active and completed transactions</p>
+                    </div>
                     <Shield className="w-4 h-4 text-[#1a6b3c]" />
                   </div>
-
                   {deals.length === 0 ? (
                     <EmptyState
                       icon={CreditCard}
-                      title="No active deals"
-                      desc={isTenant
-                        ? "Book an inspection to start your first deal"
-                        : "Deals will appear here when tenants pay inspection fees"
+                      title="No escrow deals yet"
+                      desc={
+                        isTenant
+                          ? 'Book an inspection first, then proceed to escrow'
+                          : 'Deals appear here once tenants start escrow'
                       }
                       action={isTenant ? () => navigate('/listings') : undefined}
-                      actionLabel={isTenant ? "Browse properties" : undefined}
+                      actionLabel={isTenant ? 'Browse properties' : undefined}
                     />
                   ) : (
                     <div className="divide-y divide-white/4">
@@ -428,7 +908,6 @@ export default function Dashboard() {
                           to={`/deals/${deal.id}`}
                           className="flex items-center gap-4 px-5 py-4 hover:bg-white/2 transition-colors group"
                         >
-                          {/* Property image */}
                           <div className="w-12 h-12 bg-[#111a14] rounded-xl overflow-hidden flex-shrink-0">
                             {deal.properties?.images?.[0] ? (
                               <img
@@ -442,7 +921,6 @@ export default function Dashboard() {
                               </div>
                             )}
                           </div>
-
                           <div className="flex-1 min-w-0">
                             <p className="text-[13px] font-semibold text-white truncate">
                               {deal.properties?.title || 'Property'}
@@ -454,7 +932,6 @@ export default function Dashboard() {
                               </span>
                             </div>
                           </div>
-
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className="text-[11px] text-white/30">
                               {timeAgo(deal.created_at)}
@@ -467,69 +944,7 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* ── Inspection bookings ── */}
-                <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-                    <h2 className="text-[15px] font-bold text-white">
-                      {isTenant ? 'My Inspection Bookings' : 'Pending Inspection Requests'}
-                    </h2>
-                    <Calendar className="w-4 h-4 text-[#1a6b3c]" />
-                  </div>
-
-                  {bookings.length === 0 ? (
-                    <EmptyState
-                      icon={Calendar}
-                      title={isTenant ? "No inspection bookings yet" : "No pending inspections"}
-                      desc={isTenant
-                        ? "Find a property and book an inspection to get started"
-                        : "Inspection requests from tenants will appear here"
-                      }
-                      action={isTenant ? () => navigate('/listings') : undefined}
-                      actionLabel={isTenant ? "Find properties" : undefined}
-                    />
-                  ) : (
-                    <div className="divide-y divide-white/4">
-                      {bookings.map(booking => (
-                        <div
-                          key={booking.id}
-                          className="flex items-center gap-4 px-5 py-4"
-                        >
-                          <div className="w-12 h-12 bg-[#111a14] rounded-xl overflow-hidden flex-shrink-0">
-                            {booking.properties?.images?.[0] ? (
-                              <img
-                                src={booking.properties.images[0]}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Home className="w-5 h-5 text-white/15" />
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-semibold text-white truncate">
-                              {booking.properties?.title || 'Property'}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <BookingBadge status={booking.status} />
-                              <span className="text-[12px] text-white/40">
-                                {formatNaira(booking.inspection_fee)} fee
-                              </span>
-                            </div>
-                          </div>
-
-                          <span className="text-[11px] text-white/30 flex-shrink-0">
-                            {timeAgo(booking.created_at)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* ── Landlord: My listings ── */}
+                {/* Landlord: My Listings */}
                 {isLandlordOrAgent && properties.length > 0 && (
                   <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
@@ -541,7 +956,6 @@ export default function Dashboard() {
                         <Plus className="w-3 h-3" /> Add new
                       </Link>
                     </div>
-
                     <div className="divide-y divide-white/4">
                       {properties.slice(0, 5).map(property => (
                         <div
@@ -561,17 +975,17 @@ export default function Dashboard() {
                               </div>
                             )}
                           </div>
-
                           <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-semibold text-white truncate">{property.title}</p>
-                            <div className="flex items-center gap-1.5 mt-1">
+                            <p className="text-[13px] font-semibold text-white truncate">
+                              {property.title}
+                            </p>
+                            <div className="flex items-center gap-1 mt-0.5">
                               <MapPin className="w-3 h-3 text-white/25" />
                               <span className="text-[11px] text-white/35 truncate">
                                 {property.lga}, {property.state}
                               </span>
                             </div>
                           </div>
-
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
                               property.status === 'active'
@@ -582,7 +996,7 @@ export default function Dashboard() {
                                 ? 'bg-white/8 text-white/40'
                                 : 'bg-red-500/10 text-red-400'
                             }`}>
-                              {property.status.replace('_', ' ')}
+                              {property.status.replace(/_/g, ' ')}
                             </span>
                             <Link to={`/property/${property.id}`}>
                               <Eye className="w-4 h-4 text-white/20 hover:text-white/60 transition-colors" />
@@ -595,10 +1009,8 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* ── Sidebar ── */}
+              {/* Sidebar */}
               <div className="space-y-4">
-
-                {/* Quick actions */}
                 <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
                   <h3 className="text-[13px] font-bold text-white/50 uppercase tracking-wider mb-4">
                     Quick Actions
@@ -622,29 +1034,24 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Platform ID card */}
                 {(profile?.agent_id || profile?.landlord_id) && (
                   <div className="bg-[#0a1f11] border border-[#f0c040]/15 rounded-2xl p-5">
                     <div className="text-[10px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">
-                      Your Platform ID
+                      Platform ID
                     </div>
-                    <div className="font-mono text-[14px] font-bold text-white">
+                    <div className="font-mono text-[13px] font-bold text-white break-all">
                       {profile.agent_id || profile.landlord_id}
                     </div>
-                    <p className="text-[11px] text-white/30 mt-2">
-                      Share this on your listings and business card
-                    </p>
+                    <p className="text-[11px] text-white/30 mt-2">Share on your business card</p>
                   </div>
                 )}
 
-                {/* Barrister Amaka card */}
                 <div className="bg-[#0a1f11] border border-[#f0c040]/15 rounded-2xl overflow-hidden">
                   <div className="px-4 pt-4 pb-2">
                     <div className="text-[9px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">
                       Know Your Rights
                     </div>
                     <div className="flex items-start gap-3">
-                      {/* Mini Barrister Amaka */}
                       <svg width="44" height="60" viewBox="0 0 80 110" fill="none" className="flex-shrink-0">
                         <rect x="18" y="55" width="44" height="55" rx="6" fill="#1a1a2e" />
                         <rect x="22" y="58" width="36" height="50" rx="4" fill="#16213e" />
@@ -659,7 +1066,9 @@ export default function Dashboard() {
                         <rect x="14" y="65" width="12" height="30" rx="4" fill="#1a1a2e" />
                         <rect x="54" y="65" width="12" height="30" rx="4" fill="#1a1a2e" />
                         <rect x="24" y="80" width="32" height="6" rx="2" fill="#1a6b3c" />
-                        <text x="40" y="85" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="#fff">BARRISTER AMAKA</text>
+                        <text x="40" y="85" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="#fff">
+                          BARRISTER AMAKA
+                        </text>
                       </svg>
                       <div>
                         <p className="text-[12px] font-semibold text-white leading-snug mb-1">
@@ -669,7 +1078,10 @@ export default function Dashboard() {
                           }
                         </p>
                         <p className="text-[10px] text-white/30">
-                          {isTenant ? 'Tenancy Law of Lagos State 2011' : 'Recovery of Premises Act'}
+                          {isTenant
+                            ? 'Tenancy Law of Lagos State 2011'
+                            : 'Recovery of Premises Act'
+                          }
                         </p>
                       </div>
                     </div>
@@ -687,15 +1099,14 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* ── Mobile bottom tab bar ── */}
       <BottomTabBar active="dashboard" role={profile?.role} />
     </div>
   );
 }
 
-// ─── Quick action link ────────────────────────────────────────────
+// ── Helper components ──────────────────────────────────────────
 const QuickAction = ({
-  icon: Icon, label, to, gold = false
+  icon: Icon, label, to, gold = false,
 }: {
   icon: React.ElementType;
   label: string;
@@ -715,20 +1126,27 @@ const QuickAction = ({
   </Link>
 );
 
-// ─── Bottom tab bar ───────────────────────────────────────────────
 const BottomTabBar = ({
-  active, role
+  active, role,
 }: {
   active: string;
   role?: string;
 }) => {
   const navigate = useNavigate();
-
   const tabs = [
-    { id: 'home', icon: Home, label: 'Home', path: role === 'landlord' ? '/landlord/dashboard' : role === 'agent' ? '/agent/dashboard' : '/dashboard' },
-    { id: 'search', icon: Search, label: 'Search', path: '/listings' },
+    {
+      id: 'dashboard',
+      icon: Home,
+      label: 'Home',
+      path: role === 'landlord'
+        ? '/landlord/dashboard'
+        : role === 'agent'
+        ? '/agent/dashboard'
+        : '/dashboard',
+    },
+    { id: 'search',   icon: Search,       label: 'Search',   path: '/listings' },
     { id: 'messages', icon: MessageSquare, label: 'Messages', path: '/messages' },
-    { id: 'profile', icon: User, label: 'Profile', path: '/profile' },
+    { id: 'profile',  icon: User,          label: 'Profile',  path: '/profile'  },
   ];
 
   return (
