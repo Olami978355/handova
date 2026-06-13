@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Deal, DealLog, DealStatus } from '../types';
+import { Deal, DealLog } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 export function useDeal(dealId: string) {
@@ -13,23 +13,39 @@ export function useDeal(dealId: string) {
   const fetchDeal = async () => {
     try {
       setLoading(true);
+
+      // Step 1 — fetch deal + property, NO profile FK join
       const { data, error: dealError } = await supabase
         .from('deals')
-        .select('*, properties(*), profiles!tenant_id(*)')
+        .select('*, properties(*)')
         .eq('id', dealId)
         .single();
 
       if (dealError) throw dealError;
-      setDeal(data);
 
+      // Step 2 — fetch tenant profile separately
+      let tenantProfile = null;
+      if (data.tenant_id) {
+        const { data: tenantData } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, email, role')
+          .eq('id', data.tenant_id)
+          .single();
+        tenantProfile = tenantData;
+      }
+
+      setDeal({ ...data, profiles: tenantProfile });
+
+      // Step 3 — fetch logs without profile FK join
       const { data: logData, error: logError } = await supabase
         .from('deal_logs')
-        .select('*, profiles!performed_by(*)')
+        .select('*')
         .eq('deal_id', dealId)
         .order('created_at', { ascending: false });
 
       if (logError) throw logError;
       setLogs(logData || []);
+
     } catch (err: any) {
       console.error('Error fetching deal:', err);
       setError(err.message);
@@ -42,15 +58,14 @@ export function useDeal(dealId: string) {
     if (dealId) {
       fetchDeal();
 
-      // Subscribe to deal changes
       const channelId = Math.random().toString(36).substring(7);
       const subscription = supabase
         .channel(`deal:${dealId}-${channelId}`)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'deals', 
-          filter: `id=eq.${dealId}` 
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'deals',
+          filter: `id=eq.${dealId}`,
         }, () => {
           fetchDeal();
         })
@@ -67,7 +82,6 @@ export function useDeal(dealId: string) {
       const { data, error } = await supabase.functions.invoke(functionName, {
         body: { dealId, ...body },
       });
-
       if (error) throw error;
       return { success: true, data };
     } catch (err: any) {
@@ -81,11 +95,9 @@ export function useDeal(dealId: string) {
       const formData = new FormData();
       formData.append('dealId', dealId);
       formData.append('file', file);
-
       const { data, error } = await supabase.functions.invoke('upload-agreement', {
         body: formData,
       });
-
       if (error) throw error;
       return { success: true, data };
     } catch (err: any) {

@@ -368,77 +368,106 @@ export default function Dashboard() {
           // Table may not exist — silent fail
         }
 
-      } else {
-        // ── Landlord / Agent fetch ────────────────────────────
-        try {
-          const { data, error: err } = await supabase
-            .from('properties')
-            .select('*')
-            .eq('owner_id', user.id)
-            .order('created_at', { ascending: false });
-          if (err) throw err;
-          setProperties(data || []);
+} else {
+  // ── Landlord / Agent fetch ────────────────────────────
 
-          // Deals
-         const { data: dealsData, error: dealsErr } = await supabase
-  .from('deals')
-  .select('*, properties(id, title, images, address, state, lga)')
-  .or(`landlord_id.eq.${user.id},agent_id.eq.${user.id}`)
-  .order('created_at', { ascending: false })
-  .limit(10);
-if (dealsErr) console.error('Deals error:', dealsErr.message);
-else setDeals(dealsData || []);
+  // Properties
+  try {
+    const { data, error: err } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: false });
+    if (err) console.error('Properties error:', err.message);
+    else setProperties(data || []);
 
-// Bookings for landlord's properties
-const propIds = (data || []).map(p => p.id);
-if (propIds.length > 0) {
-  const { data: bookingsData, error: bookingsErr } = await supabase
-    .from('inspection_bookings')
-    .select('*, properties(id, title, images)')
-    .in('property_id', propIds)
-    .in('status', [
-      'payment_confirmed',
-      'inspection_scheduled',
-      'inspection_done',
-      'tenant_interested',
-    ])
-    .order('created_at', { ascending: false })
-    .limit(20);
+    // Bookings for landlord's properties — only if we have properties
+    const propIds = (data || []).map(p => p.id);
+    if (propIds.length > 0) {
+      try {
+        const { data: bookingsData, error: bookingsErr } = await supabase
+          .from('inspection_bookings')
+          .select('*, properties(id, title, images)')
+          .in('property_id', propIds)
+          .in('status', [
+            'payment_confirmed',
+            'inspection_scheduled',
+            'inspection_done',
+            'tenant_interested',
+          ])
+          .order('created_at', { ascending: false })
+          .limit(20);
 
-  if (bookingsErr) {
-    console.error('Bookings error:', bookingsErr.message);
-  } else {
-    // Fetch tenant profiles separately to avoid FK join 403
-    const tenantIds = [
-      ...new Set((bookingsData || []).map(b => b.tenant_id).filter(Boolean))
-    ] as string[];
+        if (bookingsErr) {
+          console.error('Bookings error:', bookingsErr.message);
+        } else {
+          const tenantIds = [
+            ...new Set((bookingsData || []).map(b => b.tenant_id).filter(Boolean))
+          ] as string[];
 
-    let tenantMap: Record<string, { full_name: string; avatar_url?: string }> = {};
+          let tenantMap: Record<string, { full_name: string; avatar_url?: string }> = {};
 
-    if (tenantIds.length > 0) {
-      const { data: tenantProfiles } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url')
-        .in('id', tenantIds);
+          if (tenantIds.length > 0) {
+            const { data: tenantProfiles } = await supabase
+              .from('profiles')
+              .select('id, full_name, avatar_url')
+              .in('id', tenantIds);
 
-      if (tenantProfiles) {
-        tenantMap = Object.fromEntries(
-          tenantProfiles.map(p => [p.id, { full_name: p.full_name, avatar_url: p.avatar_url }])
-        );
+            if (tenantProfiles) {
+              tenantMap = Object.fromEntries(
+                tenantProfiles.map(p => [p.id, { full_name: p.full_name, avatar_url: p.avatar_url }])
+              );
+            }
+          }
+
+          const enrichedBookings = (bookingsData || []).map(b => ({
+            ...b,
+            profiles: tenantMap[b.tenant_id] || null,
+          }));
+
+          setBookings(enrichedBookings);
+        }
+      } catch (e) {
+        console.error('Bookings fetch failed:', e);
       }
     }
-
-    const enrichedBookings = (bookingsData || []).map(b => ({
-      ...b,
-      profiles: tenantMap[b.tenant_id] || null,
-    }));
-
-    setBookings(enrichedBookings);
+  } catch (e) {
+    console.error('Properties fetch failed:', e);
   }
-}
-} catch (err: unknown) {
-  throw err;
-}
+
+  // Deals — split into two queries to avoid .or() crashing
+  // when one FK column is null
+  try {
+    const [landlordDeals, agentDeals] = await Promise.all([
+      supabase
+        .from('deals')
+        .select('*, properties(id, title, images, address, state, lga)')
+        .eq('landlord_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10),
+      supabase
+        .from('deals')
+        .select('*, properties(id, title, images, address, state, lga)')
+        .eq('agent_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10),
+    ]);
+
+    const combined = [
+      ...(landlordDeals.data || []),
+      ...(agentDeals.data || []),
+    ];
+
+    const seen = new Set<string>();
+    const deduped = combined
+      .filter(d => { if (seen.has(d.id)) return false; seen.add(d.id); return true; })
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 10);
+
+    setDeals(deduped);
+  } catch (e) {
+    console.error('Deals fetch failed:', e);
+  }
 }
 } catch (err: unknown) {
 const msg = err instanceof Error ? err.message : 'Failed to load dashboard';

@@ -11,7 +11,6 @@ export const useMessages = (conversationId?: string) => {
   const [sendError, setSendError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const mountedRef = useRef(true);
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -19,43 +18,13 @@ export const useMessages = (conversationId?: string) => {
     }, 80);
   }, []);
 
-  const markAsRead = useCallback(async (convId: string) => {
-    if (!user) return;
-    try {
-      await supabase
-        .from('messages')
-        .update({ read: true })
-        .eq('conversation_id', convId)
-        .neq('sender_id', user.id)
-        .eq('read', false);
-    } catch (err) {
-      console.error('Error marking messages as read:', err);
-    }
-  }, [user?.id]);
-
   const fetchMessages = useCallback(async () => {
     if (!conversationId || !user) return;
     setLoading(true);
     try {
-      // Step 1 — fetch messages with sender profile only
-      // Avoid PostgREST alias join on custom_deal_offers
-      // which causes 400 when FK is not in schema cache
       const { data: rawMessages, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          sender:profiles(
-            id,
-            full_name,
-            avatar_url,
-            role,
-            email,
-            verification_status,
-            nin_verified,
-            created_at,
-            updated_at
-          )
-        `)
+        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
@@ -63,55 +32,67 @@ export const useMessages = (conversationId?: string) => {
 
       const msgs = rawMessages || [];
 
-      // Step 2 — collect all deal offer IDs in one pass
+      const senderIds = [...new Set(msgs.map(m => m.sender_id).filter(Boolean))];
+      let senderMap: Record<string, any> = {};
+      if (senderIds.length > 0) {
+        const { data: senderProfiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, role, email, verification_status, nin_verified, created_at, updated_at')
+          .in('id', senderIds);
+        if (senderProfiles) {
+          senderMap = Object.fromEntries(senderProfiles.map(p => [p.id, p]));
+        }
+      }
+
       const dealOfferIds = msgs
         .filter(m => m.custom_deal_offer_id)
         .map(m => m.custom_deal_offer_id as string);
 
       let dealOffersMap: Record<string, CustomDealOffer> = {};
-
       if (dealOfferIds.length > 0) {
         const { data: offers } = await supabase
           .from('custom_deal_offers')
           .select('*')
           .in('id', dealOfferIds);
-
         if (offers) {
-          dealOffersMap = Object.fromEntries(
-            offers.map(o => [o.id, o as CustomDealOffer])
-          );
+          dealOffersMap = Object.fromEntries(offers.map(o => [o.id, o as CustomDealOffer]));
         }
       }
 
-      // Step 3 — merge deal offers into messages
       const enriched = msgs.map(msg => ({
         ...msg,
+        sender: senderMap[msg.sender_id] || undefined,
         custom_deal_offer: msg.custom_deal_offer_id
           ? dealOffersMap[msg.custom_deal_offer_id] || undefined
           : undefined,
       }));
 
-      if (mountedRef.current) {
-        setMessages(enriched as Message[]);
-        scrollToBottom();
-        await markAsRead(conversationId);
-      }
-    } catch (err) {
-      console.error('Error fetching messages:', err);
+      setMessages(enriched as Message[]);
+      scrollToBottom();
+
+      await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('conversation_id', conversationId)
+        .neq('sender_id', user.id)
+        .eq('read', false);
+
+    } catch (err: any) {
+      console.error('fetchMessages error:', err?.message);
     } finally {
-      if (mountedRef.current) setLoading(false);
+      setLoading(false);
     }
-  }, [conversationId, user?.id, scrollToBottom, markAsRead]);
+  }, [conversationId, user?.id, scrollToBottom]);
 
   useEffect(() => {
-    mountedRef.current = true;
-    setMessages([]);
-    setSendError(null);
-
     if (!conversationId || !user) {
       setLoading(false);
       return;
     }
+
+    setMessages([]);
+    setLoading(true);
+    setSendError(null);
 
     fetchMessages();
 
@@ -120,97 +101,34 @@ export const useMessages = (conversationId?: string) => {
       channelRef.current = null;
     }
 
-    const channelName = `messages-conv-${conversationId}-${Date.now()}`;
-
+    const channelName = 'messages-conv-' + conversationId + '-' + Date.now();
     const channel = supabase
       .channel(channelName)
-      .on(
-        'postgres_changes' as const,
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        async (payload) => {
-          if (!mountedRef.current) return;
-
-          const newMsg = payload.new as Message;
-
-          // Fetch sender profile separately
-          const { data: senderProfile } = await supabase
-            .from('profiles')
-            .select(
-              'id, full_name, avatar_url, role, email, verification_status, nin_verified, created_at, updated_at'
-            )
-            .eq('id', newMsg.sender_id)
-            .single();
-
-          // Fetch deal offer if attached
-          let customDealOffer: CustomDealOffer | undefined;
-          if (newMsg.custom_deal_offer_id) {
-            const { data: offerData } = await supabase
-              .from('custom_deal_offers')
-              .select('*')
-              .eq('id', newMsg.custom_deal_offer_id)
-              .single();
-            if (offerData) customDealOffer = offerData as CustomDealOffer;
-          }
-
-          const enriched: Message = {
-            ...newMsg,
-            sender: senderProfile || undefined,
-            custom_deal_offer: customDealOffer,
-          };
-
-          if (mountedRef.current) {
-            setMessages(prev => {
-              // Remove optimistic version of this message if exists
-              const withoutOptimistic = prev.filter(
-                m => !m.id.startsWith('temp-') || m.content !== newMsg.content
-              );
-              // Skip if already in state
-              if (withoutOptimistic.some(m => m.id === newMsg.id)) {
-                return withoutOptimistic;
-              }
-              return [...withoutOptimistic, enriched];
-            });
-            scrollToBottom();
-
-            // Mark as read if not from current user
-            if (newMsg.sender_id !== user.id) {
-              await supabase
-                .from('messages')
-                .update({ read: true })
-                .eq('id', newMsg.id);
-            }
-          }
-        }
-      )
-      .on(
-        'postgres_changes' as const,
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'custom_deal_offers',
-        },
-        () => {
-          if (mountedRef.current) fetchMessages();
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log(`Messages realtime connected for ${conversationId}`);
-        }
-        if (status === 'CHANNEL_ERROR') {
-          console.error(`Messages channel error for ${conversationId}`);
-        }
-      });
+      .on('postgres_changes' as const, {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: 'conversation_id=eq.' + conversationId,
+      }, () => {
+        fetchMessages();
+      })
+      .on('postgres_changes' as const, {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'custom_deal_offers',
+      }, () => {
+        fetchMessages();
+      })
+      .subscribe();
 
     channelRef.current = channel;
 
+    const pollInterval = setInterval(() => {
+      fetchMessages();
+    }, 15000);
+
     return () => {
-      mountedRef.current = false;
+      clearInterval(pollInterval);
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
@@ -220,11 +138,9 @@ export const useMessages = (conversationId?: string) => {
 
   const sendMessage = async (content: string): Promise<void> => {
     if (!conversationId || !user || !content.trim() || sending) return;
-
     setSending(true);
     setSendError(null);
-
-    const tempId = `temp-${Date.now()}`;
+    const tempId = 'temp-' + Date.now();
     const optimistic: Message = {
       id: tempId,
       conversation_id: conversationId,
@@ -244,12 +160,9 @@ export const useMessages = (conversationId?: string) => {
         updated_at: '',
       },
     };
-
     setMessages(prev => [...prev, optimistic]);
     scrollToBottom();
-
     try {
-      // Insert without join — avoids 400 on insert+select join
       const { data: sent, error: insertError } = await supabase
         .from('messages')
         .insert({
@@ -258,49 +171,26 @@ export const useMessages = (conversationId?: string) => {
           content: content.trim(),
           message_type: 'text',
         })
-        .select('*')
+        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at')
         .single();
-
       if (insertError) throw new Error(insertError.message);
-
-      // Fetch sender profile separately
       const { data: senderProfile } = await supabase
         .from('profiles')
-        .select(
-          'id, full_name, avatar_url, role, email, verification_status, nin_verified, created_at, updated_at'
-        )
+        .select('id, full_name, avatar_url, role, email, verification_status, nin_verified, created_at, updated_at')
         .eq('id', user.id)
         .single();
-
-      const fullMessage: Message = {
-        ...(sent as Message),
-        sender: senderProfile || undefined,
-      };
-
-      if (mountedRef.current) {
-        setMessages(prev =>
-          prev.map(m => m.id === tempId ? fullMessage : m)
-        );
-
-        await supabase
-          .from('conversations')
-          .update({
-            last_message: content.trim(),
-            last_message_at: new Date().toISOString(),
-          })
-          .eq('id', conversationId);
-
-        scrollToBottom();
-      }
+      setMessages(prev => prev.map(m => m.id === tempId ? { ...(sent as Message), sender: senderProfile || undefined } : m));
+      await supabase
+        .from('conversations')
+        .update({ last_message: content.trim(), last_message_at: new Date().toISOString() })
+        .eq('id', conversationId);
+      scrollToBottom();
     } catch (err: unknown) {
-      if (mountedRef.current) {
-        setMessages(prev => prev.filter(m => m.id !== tempId));
-        const msg = err instanceof Error ? err.message : 'Failed to send message';
-        setSendError(msg);
-      }
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+      setSendError(err instanceof Error ? err.message : 'Failed to send message');
       throw err;
     } finally {
-      if (mountedRef.current) setSending(false);
+      setSending(false);
     }
   };
 
@@ -313,14 +203,11 @@ export const useMessages = (conversationId?: string) => {
     note?: string;
   }): Promise<void> => {
     if (!conversationId || !user || sending) return;
-
     setSending(true);
     setSendError(null);
-
     try {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 3);
-
       const { data: dealOffer, error: offerError } = await supabase
         .from('custom_deal_offers')
         .insert({
@@ -337,13 +224,8 @@ export const useMessages = (conversationId?: string) => {
         })
         .select()
         .single();
-
       if (offerError) throw new Error(offerError.message);
-
-      const content = `Custom deal offer: ₦${offer.agreedPrice.toLocaleString()}${
-        offer.duration ? ` · ${offer.duration}` : ''
-      }`;
-
+      const content = 'Custom deal offer: \u20a6' + offer.agreedPrice.toLocaleString() + (offer.duration ? ' \u00b7 ' + offer.duration : '');
       const { error: msgError } = await supabase
         .from('messages')
         .insert({
@@ -353,45 +235,72 @@ export const useMessages = (conversationId?: string) => {
           message_type: 'custom_deal_offer',
           custom_deal_offer_id: dealOffer.id,
         });
-
       if (msgError) throw new Error(msgError.message);
-
       await supabase
         .from('conversations')
-        .update({
-          last_message: content,
-          last_message_at: new Date().toISOString(),
-        })
+        .update({ last_message: content, last_message_at: new Date().toISOString() })
         .eq('id', conversationId);
-
-      // Refresh to show deal offer card immediately
       await fetchMessages();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to send deal offer';
-      if (mountedRef.current) setSendError(msg);
+      setSendError(err instanceof Error ? err.message : 'Failed to send deal offer');
       throw err;
     } finally {
-      if (mountedRef.current) setSending(false);
+      setSending(false);
     }
   };
 
-  const respondToOffer = async (
-    offerId: string,
-    accept: boolean
-  ): Promise<void> => {
+  const respondToOffer = async (offerId: string, accept: boolean): Promise<void> => {
     try {
-      const { error } = await supabase
+      const { data: offer, error: fetchError } = await supabase
+        .from('custom_deal_offers')
+        .select('*')
+        .eq('id', offerId)
+        .single();
+      if (fetchError) throw new Error(fetchError.message);
+      const { error: updateError } = await supabase
         .from('custom_deal_offers')
         .update({ status: accept ? 'accepted' : 'declined' })
         .eq('id', offerId);
+      if (updateError) throw new Error(updateError.message);
+      if (accept) {
+        const { data: offererProfile } = await supabase
+          .from('profiles')
+          .select('id, role')
+          .eq('id', offer.offered_by)
+          .single();
+        const isAgent = offererProfile?.role === 'agent';
+        const platformFee = Math.round(offer.agreed_price * 0.02);
+        const agentFee = isAgent ? Math.round(offer.agreed_price * 0.10) : 0;
+        const landlordPayout = offer.agreed_price - platformFee - agentFee;
+      // Fetch property owner to always set landlord_id
+const { data: propertyData } = await supabase
+  .from('properties')
+  .select('owner_id')
+  .eq('id', offer.property_id)
+  .single();
 
-      if (error) throw new Error(error.message);
+const dealPayload: Record<string, unknown> = {
+  property_id: offer.property_id,
+  tenant_id: offer.offered_to,
+  landlord_id: propertyData?.owner_id || offer.offered_by,
+  amount: offer.agreed_price,
+  platform_fee: platformFee,
+  agent_fee: agentFee,
+  landlord_payout: landlordPayout,
+  status: 'pending_payment',
+  move_in_date: offer.move_in_date || null,
+  notes: offer.note || null,
+};
 
-      // Refresh to show updated offer status
+if (isAgent) {
+  dealPayload.agent_id = offer.offered_by;
+}
+        const { error: dealError } = await supabase.from('deals').insert(dealPayload);
+        if (dealError) throw new Error('Deal creation failed: ' + dealError.message);
+      }
       await fetchMessages();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to respond to offer';
-      if (mountedRef.current) setSendError(msg);
+      setSendError(err instanceof Error ? err.message : 'Failed to respond to offer');
       throw err;
     }
   };

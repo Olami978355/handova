@@ -205,9 +205,9 @@ export default function Listings() {
 
     try {
       let query = supabase
-        .from('properties')
-        .select('*, profiles(full_name, avatar_url, role)', { count: 'exact' })
-        .eq('status', 'active');
+  .from('properties')
+  .select('*', { count: 'exact' })
+  .eq('status', 'active');
 
       if (type !== 'all') query = query.eq('listing_type', type);
       if (transaction !== 'all') query = query.eq('transaction_type', transaction);

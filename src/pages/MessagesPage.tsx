@@ -39,13 +39,16 @@ export default function MessagesPage() {
     setSearchParams({});
   };
 
-  // Shared props for ChatWindow
-  const chatWindowProps = {
-    conversationId: conversationId || undefined,
-    otherParticipantName: selectedConversation?.participants?.[0]?.full_name,
-    propertyId: selectedConversation?.property_id,
-    otherParticipantId: selectedConversation?.participants?.[0]?.id,
-  };
+ 
+ const urlPropertyId = searchParams.get('property') || undefined;
+const urlRecipientId = searchParams.get('recipient') || undefined;
+// ✅ Use conversationId from URL directly, not from selectedConversation
+const chatWindowProps = {
+  conversationId: conversationId || undefined,
+  otherParticipantName: selectedConversation?.participants?.[0]?.full_name,
+  propertyId: selectedConversation?.property_id || urlPropertyId,
+  otherParticipantId: selectedConversation?.participants?.[0]?.id || urlRecipientId,
+};
 
   if (!user) {
     return (

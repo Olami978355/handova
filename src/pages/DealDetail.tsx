@@ -180,16 +180,22 @@ export default function DealDetail() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-[14px] font-bold text-white mb-1 truncate">{deal.properties?.title}</h4>
-                  <p className="text-[12px] text-white/40 mb-3">{deal.properties?.address}</p>
+                  <h4 className="text-[14px] font-bold text-white mb-1 truncate">
+                    {deal.properties?.title || 'Property'}
+                  </h4>
+                  <p className="text-[12px] text-white/40 mb-3">
+                    {deal.properties?.address || ''}
+                  </p>
                   <div className="flex gap-2">
                     <div className="bg-white/4 border border-white/6 rounded-xl px-3 py-2">
                       <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Amount</p>
                       <p className="text-[13px] font-black text-[#f0c040]">{formatNaira(deal.amount)}</p>
                     </div>
                     <div className="bg-white/4 border border-white/6 rounded-xl px-3 py-2">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Type</p>
-                      <p className="text-[13px] font-black text-white capitalize">{deal.deal_type?.replace('_', ' ')}</p>
+                      <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Duration</p>
+                      <p className="text-[13px] font-black text-white capitalize">
+                        {deal.notes || '1 year'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -330,8 +336,8 @@ export default function DealDetail() {
                   </label>
                   <div className="flex gap-3">
                     {deal.agreement_url && (
-                      
-                      <a  href={deal.agreement_url}
+                      <a
+                        href={deal.agreement_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-bold text-white/60 hover:text-white transition-colors"
@@ -430,6 +436,14 @@ export default function DealDetail() {
                   </p>
                 </div>
               )}
+
+              {/* No action needed for current user */}
+              {deal.status !== 'funds_released' && deal.status !== 'disputed' &&
+                !isTenant && !isLandlord && !isAgent && !isAdmin && !isModerator && (
+                <div className="p-8 text-center">
+                  <p className="text-[13px] text-white/30">No actions required from you at this stage.</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -444,8 +458,18 @@ export default function DealDetail() {
               </div>
               <div className="space-y-3">
                 {[
-                  { label: 'Tenant', name: deal.profiles?.full_name, initial: 'T' },
-                  { label: 'Landlord', name: `ID: ${deal.landlord_id.slice(0, 8)}...`, initial: 'L' },
+                  {
+                    label: 'Tenant',
+                    name: deal.profiles?.full_name || 'Tenant',
+                    initial: 'T',
+                  },
+                  {
+                    label: 'Landlord',
+                    name: deal.landlord_id
+                      ? `ID: ${deal.landlord_id.slice(0, 8)}...`
+                      : 'N/A',
+                    initial: 'L',
+                  },
                   ...(deal.agent_id
                     ? [{ label: 'Agent', name: `ID: ${deal.agent_id.slice(0, 8)}...`, initial: 'A' }]
                     : []),
@@ -471,7 +495,7 @@ export default function DealDetail() {
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
                   { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}` },
                   ...(deal.agent_id
-                    ? [{ label: `Agent Fee (${(deal.agent_commission_rate * 100).toFixed(0)}%)`, value: `-${formatNaira(deal.agent_fee)}` }]
+                    ? [{ label: 'Agent Fee (10%)', value: `-${formatNaira(deal.agent_fee)}` }]
                     : []),
                   { label: 'Landlord Payout', value: formatNaira(deal.landlord_payout), highlight: true },
                 ].map((row) => (
@@ -493,27 +517,31 @@ export default function DealDetail() {
                 <History className="w-4 h-4 text-[#1a6b3c]" />
                 <h3 className="text-[13px] font-bold text-white">Activity Log</h3>
               </div>
-              <div className="space-y-4">
-                {logs.map((log, i) => (
-                  <div key={log.id} className="relative flex gap-3">
-                    {i !== logs.length - 1 && (
-                      <div className="absolute left-3.5 top-7 bottom-0 w-px bg-white/5" />
-                    )}
-                    <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 z-10">
-                      <Clock className="w-3.5 h-3.5 text-white/25" />
+              {logs.length === 0 ? (
+                <p className="text-[12px] text-white/25 text-center py-4">No activity yet</p>
+              ) : (
+                <div className="space-y-4">
+                  {logs.map((log, i) => (
+                    <div key={log.id} className="relative flex gap-3">
+                      {i !== logs.length - 1 && (
+                        <div className="absolute left-3.5 top-7 bottom-0 w-px bg-white/5" />
+                      )}
+                      <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 z-10">
+                        <Clock className="w-3.5 h-3.5 text-white/25" />
+                      </div>
+                      <div>
+                        <p className="text-[12px] font-semibold text-white capitalize">
+                          {log.action.replace(/_/g, ' ')}
+                        </p>
+                        <p className="text-[10px] text-white/25">
+                          {new Date(log.created_at).toLocaleDateString()} ·{' '}
+                          {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[12px] font-semibold text-white capitalize">
-                        {log.action.replace(/_/g, ' ')}
-                      </p>
-                      <p className="text-[10px] text-white/25">
-                        {new Date(log.created_at).toLocaleDateString()} ·{' '}
-                        {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Admin danger zone */}
@@ -533,7 +561,7 @@ export default function DealDetail() {
           </div>
         </div>
       </div>
-;
+
       {/* ── Dispute modal ── */}
       <AnimatePresence>
         {showDisputeModal && (

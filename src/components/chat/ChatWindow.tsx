@@ -22,7 +22,6 @@ const formatNaira = (amount: number) =>
     style: 'currency', currency: 'NGN', maximumFractionDigits: 0
   }).format(amount);
 
-// ── Custom Deal Offer Card ──────────────────────────────────────
 const DealOfferCard = ({
   offer,
   isMe,
@@ -35,10 +34,32 @@ const DealOfferCard = ({
   onDecline: () => void;
 }) => {
   const navigate = useNavigate();
+  const [navigating, setNavigating] = useState(false);
   const isPending = offer.status === 'pending';
   const isAccepted = offer.status === 'accepted';
   const isDeclined = offer.status === 'declined';
   const isExpired = offer.status === 'expired';
+
+  const handleViewDeal = async () => {
+    setNavigating(true);
+    try {
+      const { data } = await supabase
+        .from('deals')
+        .select('id')
+        .eq('property_id', offer.property_id)
+        .eq('tenant_id', offer.offered_to)
+        .maybeSingle();
+      if (data) {
+        navigate(`/deals/${data.id}`);
+      } else {
+        navigate('/dashboard');
+      }
+    } catch {
+      navigate('/dashboard');
+    } finally {
+      setNavigating(false);
+    }
+  };
 
   return (
     <div className={`w-72 rounded-2xl overflow-hidden border ${
@@ -119,12 +140,18 @@ const DealOfferCard = ({
             </button>
           </div>
         )}
+        {isPending && isMe && (
+          <p className="text-[11px] text-white/30 text-center pt-1">
+            Waiting for tenant response...
+          </p>
+        )}
         {isAccepted && (
           <button
-            onClick={() => navigate('/deals')}
-            className="w-full bg-[#1a6b3c] text-white py-2.5 rounded-xl font-bold text-[12px] hover:bg-[#0f4a2a] transition-colors"
+            onClick={handleViewDeal}
+            disabled={navigating}
+            className="w-full bg-[#1a6b3c] text-white py-2.5 rounded-xl font-bold text-[12px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            View Deal
+            {navigating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'View Deal'}
           </button>
         )}
       </div>
@@ -132,7 +159,6 @@ const DealOfferCard = ({
   );
 };
 
-// ── Create Deal Modal ───────────────────────────────────────────
 const CreateDealModal = ({
   onClose,
   onSend,
@@ -183,14 +209,10 @@ const CreateDealModal = ({
             <h3 className="text-[15px] font-bold text-white">Create Custom Deal</h3>
             <p className="text-[11px] text-white/35">Send a negotiated offer to the tenant</p>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
-          >
+          <button onClick={onClose} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
-
         <div className="p-5 space-y-4">
           {localError && (
             <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
@@ -198,11 +220,8 @@ const CreateDealModal = ({
               <p className="text-[12px] text-red-400">{localError}</p>
             </div>
           )}
-
           <div>
-            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
-              Agreed Price (₦) *
-            </label>
+            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Agreed Price (₦) *</label>
             <input
               type="number"
               value={agreedPrice}
@@ -211,21 +230,13 @@ const CreateDealModal = ({
               className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/50 transition-colors"
             />
             {agreedPrice && !isNaN(parseInt(agreedPrice)) && (
-              <p className="text-[11px] text-[#f0c040] mt-1 ml-1">
-                = {formatNaira(parseInt(agreedPrice))}
-              </p>
+              <p className="text-[11px] text-[#f0c040] mt-1 ml-1">= {formatNaira(parseInt(agreedPrice))}</p>
             )}
           </div>
-
           <div>
-            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
-              Duration
-            </label>
-            <select
-              value={duration}
-              onChange={e => setDuration(e.target.value)}
-              className="w-full px-4 py-3 bg-[#0a1f11] border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50 transition-colors appearance-none"
-            >
+            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Duration</label>
+            <select value={duration} onChange={e => setDuration(e.target.value)}
+              className="w-full px-4 py-3 bg-[#0a1f11] border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50 transition-colors appearance-none">
               <option value="6 months" className="bg-[#0a1f11]">6 months</option>
               <option value="1 year" className="bg-[#0a1f11]">1 year</option>
               <option value="2 years" className="bg-[#0a1f11]">2 years</option>
@@ -233,53 +244,26 @@ const CreateDealModal = ({
               <option value="Outright purchase" className="bg-[#0a1f11]">Outright purchase</option>
             </select>
           </div>
-
           <div>
-            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
-              Proposed Move-in Date
-            </label>
-            <input
-              type="date"
-              value={moveInDate}
-              onChange={e => setMoveInDate(e.target.value)}
+            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Proposed Move-in Date</label>
+            <input type="date" value={moveInDate} onChange={e => setMoveInDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50 transition-colors"
-            />
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50 transition-colors" />
           </div>
-
           <div>
             <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
               Note <span className="text-white/20 normal-case font-normal">(optional)</span>
             </label>
-            <textarea
-              value={note}
-              onChange={e => setNote(e.target.value)}
-              placeholder="Any additional terms or conditions..."
-              rows={2}
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/50 transition-colors resize-none"
-            />
+            <textarea value={note} onChange={e => setNote(e.target.value)}
+              placeholder="Any additional terms or conditions..." rows={2}
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/50 transition-colors resize-none" />
           </div>
-
-          <p className="text-[11px] text-white/25 text-center">
-            This offer expires in 3 days if not accepted
-          </p>
-
+          <p className="text-[11px] text-white/25 text-center">This offer expires in 3 days if not accepted</p>
           <div className="flex gap-3 pt-1">
-            <button
-              onClick={onClose}
-              className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!agreedPrice || sending}
-              className="flex-[2] bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
-            >
-              {sending
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <Tag className="w-4 h-4" />
-              }
+            <button onClick={onClose} className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors">Cancel</button>
+            <button onClick={handleSubmit} disabled={!agreedPrice || sending}
+              className="flex-[2] bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+              {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tag className="w-4 h-4" />}
               Send Deal Offer
             </button>
           </div>
@@ -289,9 +273,6 @@ const CreateDealModal = ({
   );
 };
 
-// ══════════════════════════════════════════════════════════════
-// MAIN CHAT WINDOW
-// ══════════════════════════════════════════════════════════════
 export const ChatWindow: React.FC<ChatWindowProps> = ({
   conversationId: propConversationId,
   otherParticipantName,
@@ -304,23 +285,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const urlPropertyId = searchParams.get('property') || undefined;
   const urlRecipientId = searchParams.get('recipient') || undefined;
+  const urlConvId = searchParams.get('id') || undefined;
 
   const propertyId = propPropertyId || urlPropertyId;
   const recipientId = propRecipientId || urlRecipientId;
 
-  // ✅ Fixed — proper generic syntax
-  const [resolvedConversationId, setResolvedConversationId] = useState<string | undefined>(propConversationId);
+  const [resolvedConversationId, setResolvedConversationId] = useState<string | undefined>(
+    propConversationId || urlConvId
+  );
 
   const {
-    messages,
-    loading,
-    sending,
-    sendError,
-    sendMessage,
-    sendCustomDealOffer,
-    respondToOffer,
-    messagesEndRef,
-    refresh,
+    messages, loading, sending, sendError,
+    sendMessage, sendCustomDealOffer, respondToOffer,
+    messagesEndRef, refresh,
   } = useMessages(resolvedConversationId);
 
   const [newMessage, setNewMessage] = useState('');
@@ -329,10 +306,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [creatingConversation, setCreatingConversation] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const isLandlordOrAgent =
-    profile?.role === 'landlord' || profile?.role === 'agent';
+  const isLandlordOrAgent = profile?.role === 'landlord' || profile?.role === 'agent';
 
-  // Auto resize textarea
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -340,12 +315,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     ta.style.height = `${Math.min(ta.scrollHeight, 120)}px`;
   }, [newMessage]);
 
-  // Sync if parent passes a new conversationId
   useEffect(() => {
-    if (propConversationId && propConversationId !== resolvedConversationId) {
-      setResolvedConversationId(propConversationId);
+    const urlId = searchParams.get('id') || undefined;
+    const newId = propConversationId || urlId;
+    if (newId && newId !== resolvedConversationId) {
+      setResolvedConversationId(newId);
     }
-  }, [propConversationId]);
+  }, [propConversationId, searchParams]);
 
   const handleSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -366,7 +342,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             .maybeSingle();
 
           let conversationId: string;
-
           if (existing) {
             conversationId = existing.id;
           } else {
@@ -379,7 +354,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               })
               .select()
               .single();
-
             if (createError) throw createError;
             conversationId = created.id;
           }
@@ -395,18 +369,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               content,
               message_type: 'text',
             });
-
           if (msgError) throw msgError;
 
           await supabase
             .from('conversations')
-            .update({
-              last_message: content,
-              last_message_at: new Date().toISOString(),
-            })
+            .update({ last_message: content, last_message_at: new Date().toISOString() })
             .eq('id', conversationId);
 
-          // Refresh messages now that we have the conversation ID
           refresh();
         } finally {
           setCreatingConversation(false);
@@ -416,9 +385,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       }
     } catch (err: unknown) {
       setNewMessage(content);
-      setLocalError(
-        err instanceof Error ? err.message : 'Failed to send. Please try again.'
-      );
+      setLocalError(err instanceof Error ? err.message : 'Failed to send. Please try again.');
       setCreatingConversation(false);
     }
   };
@@ -457,9 +424,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       });
       setShowDealModal(false);
     } catch (err: unknown) {
-      setLocalError(
-        err instanceof Error ? err.message : 'Failed to send deal offer'
-      );
+      setLocalError(err instanceof Error ? err.message : 'Failed to send deal offer');
     }
   };
 
@@ -485,11 +450,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   return (
     <>
-      <div
-        className="flex-1 flex flex-col h-full overflow-hidden"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-      >
-        {/* Messages */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-[#0a0a0a]">
           {loading && resolvedConversationId ? (
             <div className="flex flex-col items-center justify-center h-full gap-3">
@@ -502,9 +463,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 <Send className="w-6 h-6 text-white/15" />
               </div>
               <p className="text-[14px] font-bold text-white/30">No messages yet</p>
-              <p className="text-[12px] text-white/20">
-                Say hello to {otherParticipantName || 'start the conversation'}
-              </p>
+              <p className="text-[12px] text-white/20">Say hello to {otherParticipantName || 'start the conversation'}</p>
             </div>
           ) : (
             <AnimatePresence initial={false}>
@@ -521,9 +480,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                     transition={{ duration: 0.15 }}
                     className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex flex-col ${
-                      isMe ? 'items-end' : 'items-start'
-                    } ${isCustomDeal ? 'max-w-[85%]' : 'max-w-[78%]'}`}>
+                    <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} ${isCustomDeal ? 'max-w-[85%]' : 'max-w-[78%]'}`}>
                       {isCustomDeal && msg.custom_deal_offer ? (
                         <DealOfferCard
                           offer={msg.custom_deal_offer}
@@ -547,10 +504,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                           </span>
                         )}
                         <span className="text-[10px] text-white/20">
-                          {isOptimistic
-                            ? 'Sending...'
-                            : formatRelativeTime(msg.created_at)
-                          }
+                          {isOptimistic ? 'Sending...' : formatRelativeTime(msg.created_at)}
                         </span>
                       </div>
                     </div>
@@ -562,32 +516,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Error banner */}
         <AnimatePresence>
           {(localError || sendError) && (
             <motion.div
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="mx-4 mb-2 flex items-center justify-between gap-2 px-3.5 py-2.5 bg-red-500/10 border border-red-500/20 rounded-xl"
             >
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-                <p className="text-[12px] text-red-400">
-                  {localError || sendError}
-                </p>
+                <p className="text-[12px] text-red-400">{localError || sendError}</p>
               </div>
-              <button
-                onClick={() => { setLocalError(null); refresh(); }}
-                className="text-red-400/60 hover:text-red-400 transition-colors flex-shrink-0"
-              >
+              <button onClick={() => { setLocalError(null); refresh(); }} className="text-red-400/60 hover:text-red-400 transition-colors flex-shrink-0">
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Input area */}
         <div className="flex-shrink-0 px-4 py-3 bg-[#0a1f11] border-t border-white/5">
           {isLandlordOrAgent && propertyId && (
             <div className="mb-2">
@@ -606,7 +551,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               </button>
             </div>
           )}
-
           <div className="flex items-end gap-2">
             <div className="flex-1 bg-white/5 border border-white/8 rounded-xl px-4 py-2.5 focus-within:border-[#1a6b3c]/50 transition-colors">
               <textarea
@@ -625,15 +569,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               disabled={!newMessage.trim() || isSending}
               className="w-10 h-10 bg-[#1a6b3c] rounded-xl flex items-center justify-center text-white hover:bg-[#0f4a2a] disabled:opacity-35 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
             >
-              {isSending
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <Send className="w-4 h-4" />
-              }
+              {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-[10px] text-white/15 mt-1.5 ml-1">
-            Enter to send · Shift+Enter for new line
-          </p>
+          <p className="text-[10px] text-white/15 mt-1.5 ml-1">Enter to send · Shift+Enter for new line</p>
         </div>
       </div>
 

@@ -9,11 +9,9 @@ export const useConversations = () => {
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const mountedRef = useRef(true);
 
   const fetchConversations = useCallback(async () => {
     if (!user) return;
-
     try {
       const { data, error } = await supabase
         .from('conversations')
@@ -49,29 +47,22 @@ export const useConversations = () => {
           return {
             ...conv,
             participants: otherProfile ? [otherProfile] : [],
-            // Only set unread_count if greater than 0
             unread_count: count && count > 0 ? count : undefined,
           };
         })
       );
 
-      if (mountedRef.current) {
-        setConversations(enriched);
-        const total = enriched.reduce(
-          (acc, c) => acc + (c.unread_count || 0), 0
-        );
-        setTotalUnreadCount(total);
-      }
+      setConversations(enriched);
+      const total = enriched.reduce((acc, c) => acc + (c.unread_count || 0), 0);
+      setTotalUnreadCount(total);
     } catch (err) {
       console.error('Error fetching conversations:', err);
     } finally {
-      if (mountedRef.current) setLoading(false);
+      setLoading(false);
     }
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
-    mountedRef.current = true;
-
     if (!user) {
       setLoading(false);
       return;
@@ -84,46 +75,24 @@ export const useConversations = () => {
       channelRef.current = null;
     }
 
-    // ALL listeners before subscribe
     const channel = supabase
       .channel(`conversations-${user.id}-${Date.now()}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        },
-        () => { if (mountedRef.current) fetchConversations(); }
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' },
+        () => fetchConversations()
       )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'messages',
-        },
-        () => { if (mountedRef.current) fetchConversations(); }
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' },
+        () => fetchConversations()
       )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversations',
-        },
-        () => { if (mountedRef.current) fetchConversations(); }
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' },
+        () => fetchConversations()
       )
       .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('Conversations realtime connected');
-        }
+        if (status === 'SUBSCRIBED') console.log('Conversations realtime connected');
       });
 
     channelRef.current = channel;
 
     return () => {
-      mountedRef.current = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;

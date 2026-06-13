@@ -44,13 +44,15 @@ export const useNotifications = () => {
 
     fetchNotifications();
 
+    // Clean up existing channel before creating new one
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
 
-    const channelName = `notif-${user.id}-${Date.now()}`;
+    const channelName = `notifications-${user.id}-${Date.now()}`;
 
+    // ✅ Chain ALL .on() calls BEFORE .subscribe()
     const channel = supabase
       .channel(channelName)
       .on(
@@ -79,36 +81,38 @@ export const useNotifications = () => {
         (payload) => {
           if (!mountedRef.current) return;
           const updated = payload.new as Notification;
-          // Recalculate from full list rather than increment/decrement
           setNotifications(prev => {
-            const newList = prev.map(n =>
-              n.id === updated.id ? updated : n
-            );
+            const newList = prev.map(n => n.id === updated.id ? updated : n);
             setUnreadCount(newList.filter(n => !n.read).length);
             return newList;
           });
         }
       )
-      .subscribe((status, err) => {
+      .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           console.log('Notifications realtime connected');
         }
-        if (status === 'CHANNEL_ERROR') {
-          // Transient network issue — does not crash the app
-          console.warn(
-            'Notification channel error:',
-            err?.message || 'unknown'
-          );
-        }
-        if (status === 'TIMED_OUT') {
-          console.warn('Notification channel timed out — will retry');
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('Notification channel issue — falling back to polling');
+          if (channelRef.current) {
+            supabase.removeChannel(channelRef.current);
+            channelRef.current = null;
+          }
         }
       });
 
     channelRef.current = channel;
 
+    // Polling fallback every 30s if realtime fails
+    const pollInterval = setInterval(() => {
+      if (mountedRef.current && !channelRef.current) {
+        fetchNotifications();
+      }
+    }, 30000);
+
     return () => {
       mountedRef.current = false;
+      clearInterval(pollInterval);
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;

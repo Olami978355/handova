@@ -52,7 +52,6 @@ const StatBox = ({ icon: Icon, value, label }: { icon: React.ElementType; value:
   </div>
 );
 
-// ── Share card component (rendered off-screen for html2canvas) ──
 const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: Profile | null }>(
   ({ property, owner }, ref) => {
     const formatPrice = (amount: number) =>
@@ -68,7 +67,6 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
           overflow: 'hidden',
         }}
       >
-        {/* Hero image */}
         <div style={{ height: '580px', overflow: 'hidden', position: 'relative' }}>
           {property.images?.[0] ? (
             <img src={property.images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
@@ -77,9 +75,7 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
               <span style={{ fontSize: '80px' }}>🏠</span>
             </div>
           )}
-          {/* Gradient overlay */}
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to top, #0a1f11, transparent)' }} />
-          {/* Badges */}
           <div style={{ position: 'absolute', top: '32px', left: '32px', display: 'flex', gap: '12px' }}>
             <div style={{ background: '#f0c040', color: '#000', padding: '8px 18px', borderRadius: '12px', fontSize: '20px', fontWeight: '800', textTransform: 'uppercase' }}>
               {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
@@ -89,8 +85,6 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
             </div>
           </div>
         </div>
-
-        {/* Content */}
         <div style={{ flex: 1, padding: '40px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <h2 style={{ fontSize: '44px', fontWeight: '900', color: '#ffffff', margin: '0 0 12px', lineHeight: '1.1' }}>
@@ -108,7 +102,6 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
               )}
             </p>
           </div>
-
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.4)', margin: '0 0 4px' }}>Listed by</p>
@@ -119,7 +112,6 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
                 </p>
               )}
             </div>
-            {/* RentEasy logo text */}
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: '36px', fontWeight: '900', color: '#ffffff', margin: '0 0 4px' }}>
                 Rent<span style={{ color: '#f0c040' }}>Easy</span>
@@ -136,9 +128,6 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
 );
 ShareCard.displayName = 'ShareCard';
 
-// ═══════════════════════════════════════════════════════════════
-// SHARE PANEL COMPONENT
-// ═══════════════════════════════════════════════════════════════
 const SharePanel = ({ property, owner, onClose }: { property: Property; owner: Profile | null; onClose: () => void }) => {
   const [copied, setCopied] = useState(false);
   const [generatingCard, setGeneratingCard] = useState(false);
@@ -155,9 +144,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
   const trackShare = async (platform: string) => {
     try {
       await supabase.rpc('increment_share_count', { property_id: property.id });
-    } catch {
-      // silent
-    }
+    } catch { }
   };
 
   const handleCopy = async () => {
@@ -213,15 +200,11 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
   return (
     <>
       <ShareCard ref={shareCardRef} property={property} owner={owner} />
-
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
         className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
       />
-
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -232,20 +215,14 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
       >
         <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
           <h3 className="text-[15px] font-bold text-white">Share this listing</h3>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
-          >
+          <button onClick={onClose} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
-
         <div className="p-5 space-y-3">
-
           <a
             href={`https://wa.me/?text=${whatsappText}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            target="_blank" rel="noopener noreferrer"
             onClick={() => trackShare('whatsapp')}
             className="flex items-center gap-3 w-full p-4 bg-[#25D366]/10 border border-[#25D366]/20 rounded-xl hover:bg-[#25D366]/15 transition-colors"
           >
@@ -257,11 +234,9 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               <p className="text-[11px] text-white/35">Send with pre-filled property details</p>
             </div>
           </a>
-
           <a
             href={`https://twitter.com/intent/tweet?text=${twitterText}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            target="_blank" rel="noopener noreferrer"
             onClick={() => trackShare('twitter')}
             className="flex items-center gap-3 w-full p-4 bg-white/4 border border-white/8 rounded-xl hover:bg-white/6 transition-colors"
           >
@@ -273,7 +248,6 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               <p className="text-[11px] text-white/35">Post to your followers</p>
             </div>
           </a>
-
           <button
             onClick={handleCopy}
             className="flex items-center gap-3 w-full p-4 bg-white/4 border border-white/8 rounded-xl hover:bg-white/6 transition-colors"
@@ -286,7 +260,6 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               <p className="text-[11px] text-white/35 truncate max-w-[220px]">{propertyUrl}</p>
             </div>
           </button>
-
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={handleDownloadCard}
@@ -300,7 +273,6 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               <p className="text-[12px] font-bold text-white">Save as Image</p>
               <p className="text-[10px] text-white/30 text-center">1080×1080 card</p>
             </button>
-
             <button
               onClick={qrDataUrl ? handleDownloadQR : handleGenerateQR}
               disabled={generatingQR}
@@ -318,16 +290,12 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               <p className="text-[10px] text-white/30 text-center">Print-ready QR code</p>
             </button>
           </div>
-
         </div>
       </motion.div>
     </>
   );
 };
 
-// ═══════════════════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════
 export default function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -345,49 +313,61 @@ export default function PropertyDetail() {
 
   useEffect(() => { if (id) fetchProperty(); }, [id]);
 
-const fetchProperty = async () => {
-  if (!id) return;
-  setLoading(true);
-  setError(null);
-  try {
-    const { data, error: fetchError } = await supabase
-      .from('properties')
-      .select('*, profiles(id, full_name, avatar_url, role, verification_status)')
-      .eq('id', id)
-      .single();
-    if (fetchError) throw fetchError;
-    if (!data) throw new Error('Property not found');
-    setProperty(data);
-    setOwner(data.profiles as Profile);
-
-    // Increment view count — debounced via localStorage
-    const viewKey = `viewed_${id}`;
-    const lastViewed = localStorage.getItem(viewKey);
-    const now = Date.now();
-    if (!lastViewed || now - parseInt(lastViewed) > 3600000) {
-      localStorage.setItem(viewKey, now.toString());
-      supabase.from('properties')
-        .update({ view_count: (data.view_count || 0) + 1 })
+  const fetchProperty = async () => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      // Step 1 — fetch property without profile FK join
+      const { data, error: fetchError } = await supabase
+        .from('properties')
+        .select('*')
         .eq('id', id)
-        .then(() => {});
-    }
+        .single();
 
-    // Check if saved
-    if (user) {
-      const { data: savedData } = await supabase
-        .from('saved_properties')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('property_id', id)
-        .maybeSingle();
-      setSaved(!!savedData);
+      if (fetchError) throw fetchError;
+      if (!data) throw new Error('Property not found');
+
+      setProperty(data);
+
+      // Step 2 — fetch owner profile separately
+      if (data.owner_id) {
+        const { data: ownerData } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, role, verification_status, agent_id, landlord_id')
+          .eq('id', data.owner_id)
+          .single();
+        setOwner(ownerData as Profile);
+      }
+
+      // Increment view count — debounced via localStorage
+      const viewKey = `viewed_${id}`;
+      const lastViewed = localStorage.getItem(viewKey);
+      const now = Date.now();
+      if (!lastViewed || now - parseInt(lastViewed) > 3600000) {
+        localStorage.setItem(viewKey, now.toString());
+        supabase.from('properties')
+          .update({ view_count: (data.view_count || 0) + 1 })
+          .eq('id', id)
+          .then(() => {});
+      }
+
+      // Check if saved
+      if (user) {
+        const { data: savedData } = await supabase
+          .from('saved_properties')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('property_id', id)
+          .maybeSingle();
+        setSaved(!!savedData);
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load property');
+    } finally {
+      setLoading(false);
     }
-  } catch (err: unknown) {
-    setError(err instanceof Error ? err.message : 'Failed to load property');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const allMedia = [
     ...(property?.images || []).map(url => ({ type: 'image' as const, url })),
@@ -432,7 +412,6 @@ const fetchProperty = async () => {
 
   return (
     <>
-      {/* ── OG Meta tags ── */}
       <Helmet>
         <title>{property.title} — RentEasy</title>
         <meta property="og:title" content={property.title} />
@@ -456,29 +435,27 @@ const fetchProperty = async () => {
             </button>
             <div className="flex items-center gap-2">
               <button
-  onClick={async () => {
-    if (!user) { navigate('/login'); return; }
-    setSavingProperty(true);
-    try {
-      if (saved) {
-        await supabase.from('saved_properties').delete().eq('user_id', user.id).eq('property_id', property.id);
-        setSaved(false);
-      } else {
-        await supabase.from('saved_properties').insert({ user_id: user.id, property_id: property.id });
-        setSaved(true);
-      }
-    } catch { /* silent */ }
-    finally { setSavingProperty(false); }
-  }}
-  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-    saved ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/8'
-  }`}
->
-  {savingProperty
-    ? <Loader2 className="w-4 h-4 animate-spin" />
-    : <Heart className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} />
-  }
-</button>
+                onClick={async () => {
+                  if (!user) { navigate('/login'); return; }
+                  setSavingProperty(true);
+                  try {
+                    if (saved) {
+                      await supabase.from('saved_properties').delete().eq('user_id', user.id).eq('property_id', property.id);
+                      setSaved(false);
+                    } else {
+                      await supabase.from('saved_properties').insert({ user_id: user.id, property_id: property.id });
+                      setSaved(true);
+                    }
+                  } catch { }
+                  finally { setSavingProperty(false); }
+                }}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${saved ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/8'}`}
+              >
+                {savingProperty
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <Heart className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} />
+                }
+              </button>
               <button
                 onClick={() => setShowSharePanel(true)}
                 className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-all"
@@ -555,14 +532,12 @@ const fetchProperty = async () => {
                 {property.images?.length || 0} photo{(property.images?.length || 0) !== 1 ? 's' : ''}
                 {property.videos?.length ? ` · ${property.videos.length} video${property.videos.length > 1 ? 's' : ''}` : ''}
               </span>
-              {/* Inline share row */}
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-white/25">Share:</span>
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(`🏠 ${property.title}\n📍 ${property.lga}, ${property.state}\n💰 ${formatNaira(property.price)}\n\n${propertyUrl}`)}`}
                   target="_blank" rel="noopener noreferrer"
                   className="w-7 h-7 bg-[#25D366]/15 rounded-lg flex items-center justify-center text-[#25D366] hover:bg-[#25D366]/25 transition-colors"
-                  title="Share on WhatsApp"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
                 </a>
@@ -570,7 +545,6 @@ const fetchProperty = async () => {
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${property.title} · ${formatNaira(property.price)} · ${propertyUrl} #RentEasy`)}`}
                   target="_blank" rel="noopener noreferrer"
                   className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-colors"
-                  title="Share on X"
                 >
                   <Twitter className="w-3.5 h-3.5" />
                 </a>
@@ -750,65 +724,45 @@ const fetchProperty = async () => {
             <div className="space-y-4">
 
               {/* Owner card */}
-<div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-  <h3 className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">
-    Listed by
-  </h3>
-
-  <div className="flex items-center gap-3 mb-5">
-    <div className="w-12 h-12 bg-[#1a6b3c] rounded-xl overflow-hidden flex items-center justify-center text-white font-bold text-[16px] flex-shrink-0">
-      {owner?.avatar_url ? (
-        <img src={owner.avatar_url} alt="" className="w-full h-full object-cover" />
-      ) : (
-        (owner?.full_name || 'U').charAt(0).toUpperCase()
-      )}
-    </div>
-    <div className="min-w-0">
-      <div className="flex items-center gap-1.5">
-        <span className="text-[14px] font-bold text-white truncate">
-          {owner?.full_name}
-        </span>
-        {owner?.verification_status === 'verified' && (
-          <Shield className="w-3.5 h-3.5 text-[#1a6b3c] flex-shrink-0" />
-        )}
-      </div>
-      <div className="flex items-center gap-2 mt-0.5">
-        {/* Show correct role label */}
-        <span className="text-[11px] text-white/35 capitalize font-medium">
-          {owner?.role === 'agent'
-            ? 'Verified Agent'
-            : owner?.role === 'landlord'
-            ? 'Landlord'
-            : owner?.role}
-        </span>
-        {/* Show correct RE ID */}
-        {(owner?.agent_id || owner?.landlord_id) && (
-          <span className="text-[10px] text-white/25 font-mono">
-            {owner.agent_id || owner.landlord_id}
-          </span>
-        )}
-      </div>
-    </div>
-  </div>
-
-  {/* Chat button label — shows correct party */}
-  {!isOwner && (
-    <ChatButton
-      property={property}
-      buttonLabel={
-        owner?.role === 'agent'
-          ? 'Message Agent'
-          : 'Message Landlord'
-      }
-    />
-  )}
-
-  {isOwner && (
-    <div className="text-[12px] text-white/30 text-center py-2">
-      This is your listing
-    </div>
-  )}
-</div>
+              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+                <h3 className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">Listed by</h3>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-[#1a6b3c] rounded-xl overflow-hidden flex items-center justify-center text-white font-bold text-[16px] flex-shrink-0">
+                    {owner?.avatar_url ? (
+                      <img src={owner.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      (owner?.full_name || 'U').charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[14px] font-bold text-white truncate">{owner?.full_name}</span>
+                      {owner?.verification_status === 'verified' && (
+                        <Shield className="w-3.5 h-3.5 text-[#1a6b3c] flex-shrink-0" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[11px] text-white/35 capitalize font-medium">
+                        {owner?.role === 'agent' ? 'Verified Agent' : owner?.role === 'landlord' ? 'Landlord' : owner?.role}
+                      </span>
+                      {(owner?.agent_id || owner?.landlord_id) && (
+                        <span className="text-[10px] text-white/25 font-mono">
+                          {owner.agent_id || owner.landlord_id}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {!isOwner && (
+                  <ChatButton
+                    property={property}
+                    buttonLabel={owner?.role === 'agent' ? 'Message Agent' : 'Message Landlord'}
+                  />
+                )}
+                {isOwner && (
+                  <div className="text-[12px] text-white/30 text-center py-2">This is your listing</div>
+                )}
+              </div>
 
               {/* Inspection fee */}
               {property.status === 'active' && !isOwner && <InspectionFeeDisplay property={property} />}
@@ -832,7 +786,6 @@ const fetchProperty = async () => {
                 </div>
               </div>
 
-              {/* Report */}
               {user && !isOwner && (
                 <button className="w-full text-[12px] text-white/25 hover:text-white/50 transition-colors py-2 text-center">
                   🚩 Report this listing
