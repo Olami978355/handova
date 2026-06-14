@@ -45,8 +45,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Get initial session FIRST before rendering anything
+    // Timeout fallback — if Supabase takes too long, stop blocking render
+    const sessionTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(sessionTimeout);
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -59,10 +64,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       initialised.current = true;
     });
 
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Skip the initial session event if already handled above
         if (!initialised.current && event === 'INITIAL_SESSION') return;
 
         setSession(session);
@@ -77,7 +80,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(sessionTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const refreshProfile = async () => {
@@ -122,8 +128,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
-  // Do not render children until session is determined
-  // This prevents any component from firing requests without auth
   if (loading) {
     return (
       <div
