@@ -36,11 +36,13 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
 
-  if (!profile?.role || !profile?.full_name) {
+  // Only redirect to onboarding if profile has loaded AND role is missing
+  // If profile is still null (fetching), wait — never redirect prematurely
+  if (profile !== null && (!profile?.role || !profile?.full_name)) {
     if (location.pathname !== '/onboarding') {
       return <Navigate to="/onboarding" replace />;
     }
-  } else if (location.pathname === '/onboarding') {
+  } else if (profile?.role && location.pathname === '/onboarding') {
     return <Navigate to="/dashboard" replace />;
   }
 
