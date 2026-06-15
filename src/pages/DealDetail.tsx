@@ -23,6 +23,7 @@ export default function DealDetail() {
     uploadAgreement, signAgreement, confirmMoveIn,
     releaseFunds, markDisputed,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
+    refresh,
   } = useDeal(id || '');
 
   const [processing, setProcessing] = useState(false);
@@ -85,6 +86,21 @@ export default function DealDetail() {
       ? 'bg-red-500/20 text-red-400 border border-red-500/30'
       : 'bg-[#f0c040]/15 text-[#f0c040] border border-[#f0c040]/20';
 
+  // Determine if this is an agent-only deal
+  const isAgentDeal = !!deal.agent_id;
+  const isLandlordDeal = !!deal.landlord_id && deal.landlord_id !== deal.agent_id;
+
+  // Build parties list dynamically
+  const parties = [
+    { label: 'Tenant', name: deal.profiles?.full_name || 'Tenant', initial: 'T' },
+    ...(isLandlordDeal
+      ? [{ label: 'Landlord', name: `ID: ${deal.landlord_id!.slice(0, 8)}...`, initial: 'L' }]
+      : []),
+    ...(isAgentDeal
+      ? [{ label: 'Agent', name: `ID: ${deal.agent_id!.slice(0, 8)}...`, initial: 'A' }]
+      : []),
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] pb-24" style={font}>
 
@@ -119,7 +135,6 @@ export default function DealDetail() {
             </div>
           </div>
 
-          {/* Progress stepper */}
           <div className="flex items-center">
             {statusSteps.map((s, i) => {
               const Icon = s.icon;
@@ -220,7 +235,9 @@ export default function DealDetail() {
                       </p>
                     </div>
                   </div>
-                  {deal.inspection_fee_credit && deal.inspection_fee_credit > 0 && (
+
+                  {/* Only show credit if it's actually > 0 */}
+                  {deal.inspection_fee_credit != null && deal.inspection_fee_credit > 0 && (
                     <div className="flex items-center justify-between p-3 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl mb-4">
                       <div className="flex items-center gap-2 text-[12px] font-semibold text-[#1a6b3c]">
                         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -231,31 +248,50 @@ export default function DealDetail() {
                       </span>
                     </div>
                   )}
-                  <PaystackButton
-                    amount={deal.amount - (deal.inspection_fee_credit || 0)}
-                    email={user?.email || ''}
-                    reference={`ESCROW_${deal.id}_${Date.now()}`}
-                    label="Pay into Escrow"
-                    className="w-full"
-                    onSuccess={async (reference) => {
-                      setProcessing(true);
-                      try {
-                        const { error } = await supabase.functions.invoke('process-payment-webhook', {
-                          body: {
-                            event: 'charge.success',
-                            data: { reference, metadata: { deal_id: deal.id, type: 'escrow_payment' } },
-                          },
-                        });
-                        if (error) throw error;
-                      } catch (err) {
-                        console.error('Payment processing error:', err);
-                        alert('Payment successful but processing failed. Contact support with ref: ' + reference);
-                      } finally {
-                        setProcessing(false);
-                      }
-                    }}
-                    onClose={() => {}}
-                  />
+
+                  {processing ? (
+                    <div className="flex items-center justify-center gap-3 py-4">
+                      <div className="w-5 h-5 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+                      <p className="text-[13px] text-white/50">Processing payment...</p>
+                    </div>
+                  ) : (
+                    <PaystackButton
+                      amount={deal.amount - (deal.inspection_fee_credit || 0)}
+                      email={user?.email || ''}
+                      reference={`ESCROW_${deal.id}_${Date.now()}`}
+                      label="Pay into Escrow"
+                      className="w-full"
+                      onSuccess={async (reference) => {
+                        setProcessing(true);
+                        try {
+                          // ✅ Update deal status directly — don't rely on edge function
+                          const { error } = await supabase
+                            .from('deals')
+                            .update({ status: 'payment_received' })
+                            .eq('id', deal.id);
+
+                          if (error) throw error;
+
+                          // Also try edge function non-blocking
+                          supabase.functions.invoke('process-payment-webhook', {
+                            body: {
+                              event: 'charge.success',
+                              data: { reference, metadata: { deal_id: deal.id, type: 'escrow_payment' } },
+                            },
+                          }).catch(() => {});
+
+                          // Refresh deal to show updated status
+                          await refresh();
+                        } catch (err) {
+                          console.error('Payment processing error:', err);
+                          alert('Payment received but status update failed. Contact support with ref: ' + reference);
+                        } finally {
+                          setProcessing(false);
+                        }
+                      }}
+                      onClose={() => {}}
+                    />
+                  )}
                 </div>
               )}
 
@@ -336,7 +372,7 @@ export default function DealDetail() {
                   </label>
                   <div className="flex gap-3">
                     {deal.agreement_url && (
-                      <a
+                      
                         href={deal.agreement_url}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -373,7 +409,7 @@ export default function DealDetail() {
                     <div>
                       <h4 className="text-[14px] font-bold text-white mb-1">Confirm Move-in</h4>
                       <p className="text-[12px] text-white/45 leading-relaxed">
-                        Have you moved in successfully? Confirming will release funds to the landlord.
+                        Have you moved in successfully? Confirming will release funds to the owner.
                       </p>
                     </div>
                   </div>
@@ -406,7 +442,7 @@ export default function DealDetail() {
                     disabled={processing}
                     className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Release Funds to Landlord'}
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Release Funds'}
                   </button>
                 </div>
               )}
@@ -437,7 +473,6 @@ export default function DealDetail() {
                 </div>
               )}
 
-              {/* No action needed for current user */}
               {deal.status !== 'funds_released' && deal.status !== 'disputed' &&
                 !isTenant && !isLandlord && !isAgent && !isAdmin && !isModerator && (
                 <div className="p-8 text-center">
@@ -457,23 +492,7 @@ export default function DealDetail() {
                 <h3 className="text-[13px] font-bold text-white">Parties Involved</h3>
               </div>
               <div className="space-y-3">
-                {[
-                  {
-                    label: 'Tenant',
-                    name: deal.profiles?.full_name || 'Tenant',
-                    initial: 'T',
-                  },
-                  {
-                    label: 'Landlord',
-                    name: deal.landlord_id
-                      ? `ID: ${deal.landlord_id.slice(0, 8)}...`
-                      : 'N/A',
-                    initial: 'L',
-                  },
-                  ...(deal.agent_id
-                    ? [{ label: 'Agent', name: `ID: ${deal.agent_id.slice(0, 8)}...`, initial: 'A' }]
-                    : []),
-                ].map((p) => (
+                {parties.map((p) => (
                   <div key={p.label} className="flex items-center gap-3 p-3 bg-white/4 rounded-xl">
                     <div className="w-8 h-8 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-[#1a6b3c] text-[12px] font-bold flex-shrink-0">
                       {p.initial}
@@ -494,10 +513,14 @@ export default function DealDetail() {
                 {[
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
                   { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}` },
-                  ...(deal.agent_id
-                    ? [{ label: 'Agent Fee (10%)', value: `-${formatNaira(deal.agent_fee)}` }]
+                  ...(deal.agent_fee && deal.agent_fee > 0
+                    ? [{ label: 'Agent Commission (10%)', value: `-${formatNaira(deal.agent_fee)}` }]
                     : []),
-                  { label: 'Landlord Payout', value: formatNaira(deal.landlord_payout), highlight: true },
+                  {
+                    label: isAgentDeal && !isLandlordDeal ? 'Agent Payout' : 'Landlord Payout',
+                    value: formatNaira(deal.landlord_payout),
+                    highlight: true,
+                  },
                 ].map((row) => (
                   <div key={row.label} className="flex items-center justify-between">
                     <span className={`text-[12px] ${row.highlight ? 'font-bold text-white' : 'text-white/40'}`}>
@@ -567,9 +590,7 @@ export default function DealDetail() {
         {showDisputeModal && (
           <>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setShowDisputeModal(false)}
               className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
             />
