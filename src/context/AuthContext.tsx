@@ -21,15 +21,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const initialised = useRef(false);
+  const fetchingProfile = useRef(false);
 
   const fetchProfile = async (userId: string) => {
+    if (fetchingProfile.current) return;
+    fetchingProfile.current = true;
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-
       if (error) {
         console.error('Error fetching profile:', error);
         setProfile(null);
@@ -41,33 +43,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(null);
     } finally {
       setLoading(false);
+      fetchingProfile.current = false;
     }
   };
 
   useEffect(() => {
-    // Timeout fallback — if Supabase takes too long, stop blocking render
-    const sessionTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      clearTimeout(sessionTimeout);
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setLoading(false);
-      }
-
-      initialised.current = true;
-    });
-
+    // Listen for auth state changes FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!initialised.current && event === 'INITIAL_SESSION') return;
-
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -77,13 +60,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setProfile(null);
           setLoading(false);
         }
+
+        initialised.current = true;
       }
     );
 
-    return () => {
-      clearTimeout(sessionTimeout);
-      subscription.unsubscribe();
-    };
+    // Then get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!initialised.current) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchProfile(session.user.id);
+        } else {
+          setLoading(false);
+        }
+        initialised.current = true;
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const refreshProfile = async () => {
@@ -111,7 +107,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ...fields,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'id' });
-
       if (error) throw error;
       await refreshProfile();
       return { success: true };
@@ -130,25 +125,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          background: '#0a0a0a',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            border: '3px solid #1a6b3c',
-            borderTopColor: 'transparent',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite',
-          }}
-        />
+      <div style={{
+        minHeight: '100vh',
+        background: '#0a0a0a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <div style={{
+          width: 32,
+          height: 32,
+          border: '3px solid #1a6b3c',
+          borderTopColor: 'transparent',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+        }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
