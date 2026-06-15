@@ -372,7 +372,7 @@ export default function DealDetail() {
                   </label>
                   <div className="flex gap-3">
                     {deal.agreement_url && (
-                      
+                      <a
                         href={deal.agreement_url}
                         target="_blank"
                         rel="noopener noreferrer"
