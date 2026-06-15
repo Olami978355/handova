@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ConversationsProvider } from './context/ConversationsContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import ConfirmEmail from './pages/auth/ConfirmEmail';
 import { HelmetProvider } from 'react-helmet-async';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
@@ -60,6 +61,7 @@ function AppInner() {
             <Route path="signup" element={<SignupPage />} />
             <Route path="listings" element={<Listings />} />
             <Route path="map" element={<MapSearch />} />
+            <Route path="auth/confirm" element={<ConfirmEmail />} />
             <Route path="property/:id" element={<PropertyDetail />} />
 
             {/* Protected Routes */}

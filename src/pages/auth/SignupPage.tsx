@@ -83,7 +83,7 @@ export default function SignupPage() {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/onboarding`,
+         emailRedirectTo: `https://rent-easy-ruby.vercel.app/auth/confirm`, 
         },
       });
 
@@ -112,44 +112,59 @@ export default function SignupPage() {
   };
 
   // ── Success state ──────────────────────────────────────────────
-  if (success) {
-    return (
-      <div
-        className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-5"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+ if (success) {
+  return (
+    <div
+      className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-5"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md text-center"
       >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md text-center"
+        <div className="flex justify-center mb-8">
+          <RentEasyLogo size={48} />
+        </div>
+        <div className="w-16 h-16 bg-[#1a6b3c]/20 border border-[#1a6b3c]/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <Mail className="w-8 h-8 text-[#4ade80]" />
+        </div>
+        <h2 className="text-[28px] font-black text-white tracking-tight mb-3">
+          Check your email
+        </h2>
+        <p className="text-[14px] text-white/50 leading-relaxed mb-2">
+          We sent a confirmation link to
+        </p>
+        <p className="text-[15px] font-bold text-[#f0c040] mb-6">
+          {formData.email}
+        </p>
+        <p className="text-[13px] text-white/35 mb-8 leading-relaxed">
+          Click the link in your email to verify your account.
+          Check your spam folder if you don't see it within a few minutes.
+        </p>
+        <button
+          onClick={async () => {
+            await supabase.auth.resend({
+              type: 'signup',
+              email: formData.email,
+              options: { emailRedirectTo: 'https://rent-easy-ruby.vercel.app/auth/confirm' }
+            });
+            alert('Confirmation email resent! Check your inbox.');
+          }}
+          className="w-full bg-[#1a6b3c] text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors mb-3"
         >
-          <div className="w-16 h-16 bg-[#1a6b3c]/20 border border-[#1a6b3c]/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Mail className="w-8 h-8 text-[#4ade80]" />
-          </div>
-          <h2 className="text-[28px] font-black text-white tracking-tight mb-3">
-            Check your email
-          </h2>
-          <p className="text-[14px] text-white/50 leading-relaxed mb-2">
-            We sent a confirmation link to
-          </p>
-          <p className="text-[15px] font-bold text-[#f0c040] mb-8">
-            {formData.email}
-          </p>
-          <p className="text-[13px] text-white/35 mb-8 leading-relaxed">
-            Click the link in your email to confirm your account and 
-            continue setting up your profile. Check your spam folder 
-            if you don't see it.
-          </p>
-          <button
-            onClick={() => setSuccess(false)}
-            className="text-[13px] text-white/40 hover:text-white/70 transition-colors underline underline-offset-4"
-          >
-            Try a different email address
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
+          Resend Confirmation Email
+        </button>
+        <button
+          onClick={() => setSuccess(false)}
+          className="text-[13px] text-white/40 hover:text-white/70 transition-colors underline underline-offset-4"
+        >
+          Try a different email address
+        </button>
+      </motion.div>
+    </div>
+  );
+}
 
   // ── Main form ──────────────────────────────────────────────────
   return (

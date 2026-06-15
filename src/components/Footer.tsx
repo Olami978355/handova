@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Facebook, Twitter, Instagram, Linkedin, ArrowRight, CheckCircle, Shield } from 'lucide-react';
+import { Mail, Facebook, Twitter, Instagram, Linkedin, ArrowRight, CheckCircle, Shield, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const RentEasyLogo = ({ size = 28 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
@@ -30,24 +31,48 @@ const quickLinks = [
   { label: 'Map View', path: '/map' },
   { label: 'How It Works', path: '/#how-it-works' },
   { label: 'Know Your Rights', path: '/legal-guide' },
-  { label: 'About Us', path: '#' },
+  { label: 'FAQ', path: '/faq' },
+  { label: 'About Us', path: '/about' },
+  { label: 'Contact Us', path: '/contact' },
 ];
 
 const legalLinks = [
-  { label: 'Privacy Policy', path: '#' },
-  { label: 'Terms of Service', path: '#' },
-  { label: 'Refund Policy', path: '#' },
+  { label: 'Privacy Policy', path: '/legal#privacy' },
+  { label: 'Terms of Service', path: '/legal#terms' },
+  { label: 'Refund Policy', path: '/legal#refund' },
+  { label: 'Escrow Agreement', path: '/legal#escrow' },
 ];
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [subError, setSubError] = useState('');
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-    setEmail('');
+    if (!email || subscribing) return;
+    setSubscribing(true);
+    setSubError('');
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert({ email: email.trim().toLowerCase() });
+      if (error) {
+        if (error.code === '23505') {
+          setSubError('This email is already subscribed!');
+        } else {
+          throw error;
+        }
+      } else {
+        setSubscribed(true);
+        setEmail('');
+      }
+    } catch {
+      setSubError('Something went wrong. Please try again.');
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   return (
@@ -136,14 +161,19 @@ export default function Footer() {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => { setEmail(e.target.value); setSubError(''); }}
                     placeholder="Your email address"
                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-4 pr-12 text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
                   />
-                  <button type="submit" className="absolute right-2 top-1.5 bottom-1.5 w-8 bg-[#1a6b3c] rounded-lg flex items-center justify-center hover:bg-[#0f4a2a] transition-colors">
-                    <ArrowRight className="w-4 h-4 text-white" />
+                  <button type="submit" disabled={subscribing}
+                    className="absolute right-2 top-1.5 bottom-1.5 w-8 bg-[#1a6b3c] rounded-lg flex items-center justify-center hover:bg-[#0f4a2a] transition-colors disabled:opacity-50">
+                    {subscribing
+                      ? <Loader2 className="w-4 h-4 text-white animate-spin" />
+                      : <ArrowRight className="w-4 h-4 text-white" />
+                    }
                   </button>
                 </div>
+                {subError && <p className="text-[11px] text-red-400">{subError}</p>}
                 <p className="text-[11px] text-white/20">No spam. Unsubscribe anytime.</p>
               </form>
             )}
