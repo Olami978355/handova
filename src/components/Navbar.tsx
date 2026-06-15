@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu, X, LogOut, LayoutDashboard,
-  MessageSquare, Shield, Plus, ChevronRight
+  MessageSquare, Shield, Plus, ChevronRight,
+  FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -117,10 +118,7 @@ export default function Navbar() {
                   <LayoutDashboard className="w-4 h-4" />
                   Dashboard
                 </Link>
-
-                {/* NotificationBell owns its own hook — no props */}
                 <NotificationBell />
-
                 <Link
                   to="/messages"
                   className="relative p-2 text-white/60 hover:text-white transition-colors"
@@ -132,9 +130,7 @@ export default function Navbar() {
                     </span>
                   )}
                 </Link>
-
                 <div className="w-px h-6 bg-white/10" />
-
                 <Link
                   to="/profile"
                   className="w-8 h-8 bg-[#1a6b3c] rounded-xl flex items-center justify-center font-bold text-sm text-white overflow-hidden hover:ring-2 hover:ring-[#f0c040]/40 transition-all"
@@ -145,7 +141,6 @@ export default function Navbar() {
                     (profile?.full_name || user.email || 'U').charAt(0).toUpperCase()
                   )}
                 </Link>
-
                 <button
                   onClick={handleLogout}
                   className="p-2 text-white/35 hover:text-red-400 transition-colors"
@@ -209,6 +204,23 @@ export default function Navbar() {
                   <ChevronRight className="w-4 h-4 opacity-30" />
                 </Link>
               ))}
+
+              {/* Legal — visible to everyone */}
+              <Link
+                to="/legal"
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center justify-between py-3 px-3 rounded-xl text-[14px] font-semibold transition-colors ${
+                  location.pathname === '/legal'
+                    ? 'bg-[#1a6b3c]/20 text-[#f0c040]'
+                    : 'text-white/65 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-[#1a6b3c]" />
+                  Legal
+                </div>
+                <ChevronRight className="w-4 h-4 opacity-30" />
+              </Link>
 
               <div className="h-px bg-white/5 my-3" />
 
