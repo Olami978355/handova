@@ -20,8 +20,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const initialised = useRef(false);
   const fetchingProfile = useRef(false);
+  const initialised = useRef(false);
 
   const fetchProfile = async (userId: string) => {
     if (fetchingProfile.current) return;
@@ -33,13 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .single();
       if (error) {
-        console.error('Error fetching profile:', error);
         setProfile(null);
       } else {
         setProfile(data);
       }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
+    } catch {
       setProfile(null);
     } finally {
       setLoading(false);
@@ -48,14 +46,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Listen for auth state changes FIRST
+    // ✅ Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          await fetchProfile(session.user.id);
+          fetchProfile(session.user.id);
         } else {
           setProfile(null);
           setLoading(false);
@@ -65,18 +63,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Then get initial session
+    // ✅ Get existing session immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!initialised.current) {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          fetchProfile(session.user.id);
-        } else {
-          setLoading(false);
-        }
-        initialised.current = true;
+      if (initialised.current) return; // already handled by onAuthStateChange
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
       }
+      initialised.current = true;
+    }).catch(() => {
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -111,7 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await refreshProfile();
       return { success: true };
     } catch (error) {
-      console.error('Error updating profile:', error);
       return { success: false, error };
     }
   };
@@ -123,7 +121,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
-  if (loading) {
+  // ✅ Only show spinner for max 3 seconds
+  // After that render the app regardless
+  const [showSpinner, setShowSpinner] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setShowSpinner(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (loading && showSpinner) {
     return (
       <div style={{
         minHeight: '100vh',
