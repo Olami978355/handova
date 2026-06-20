@@ -221,6 +221,16 @@ export default function Navbar() {
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-30" />
               </Link>
+              <div className="h-px bg-white/5 my-3" />
+
+{/* Legal link in hamburger */}
+<Link
+  to="/legal"
+  onClick={() => setIsOpen(false)}
+  className="flex items-center gap-3 py-3 px-3 rounded-xl text-[14px] font-semibold text-white/65 hover:bg-white/5 hover:text-white transition-colors"
+>
+  <Shield className="w-5 h-5 text-[#1a6b3c]" /> Legal
+</Link>
 
               <div className="h-px bg-white/5 my-3" />
 
