@@ -4,6 +4,7 @@ export type VerificationStatus = 'unverified' | 'pending_verification' | 'verifi
 export type RequestStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Profile {
+  account_status?: 'active' | 'suspended';
   id: string;
   full_name: string;
   email: string;
@@ -189,6 +190,7 @@ export interface InspectionBooking {
 
 // ─── Deals ───────────────────────────────────────────────────────
 export type DealStatus =
+  | 'agreement_draft'
   | 'pending_payment'
   | 'payment_received'
   | 'agreement_sent'

@@ -3,7 +3,7 @@ import { Search, MoreVertical, Loader2, CheckCircle2, XCircle, AlertCircle, Shie
 import { useAdmin } from '../../hooks/useAdmin';
 import { UserRole } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { VerifiedBadge } from '../VerifiedBadge';
+import { VerifiedBadge } from '../../components/VerifiedBadge';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 

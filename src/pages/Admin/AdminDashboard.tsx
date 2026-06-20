@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAdminStats } from '../../hooks/useAdminStats';
 import { supabase } from '../../lib/supabase';
-import { VerifiedBadge } from '../VerifiedBadge';
+import { VerifiedBadge } from '../../components/VerifiedBadge';
 import UserManagement from './UserManagement';
 import VerificationQueue from './VerificationQueue';
 import PropertyModeration from './PropertyModeration';

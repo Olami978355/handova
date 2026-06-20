@@ -14,6 +14,7 @@ import QRCode from 'qrcode';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Property, Profile } from '../types';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { ChatButton } from '../components/chat/ChatButton';
 import { InspectionFeeDisplay } from '../components/inspection/InspectionFeeDisplay';
 

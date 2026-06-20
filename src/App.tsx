@@ -44,7 +44,7 @@ const SuspendedScreen = () => (
       If you believe this is an error, please contact our support team.
     </p>
     
-      href="/contact"
+    <a
       className="bg-[#1a6b3c] text-white px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors"
     >
       Contact Support
