@@ -3,13 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, ShieldCheck, Building2, History,
   LayoutDashboard, AlertCircle, ChevronRight,
-  DollarSign, Shield, User, Home, Eye
+  DollarSign, Shield, User, Home, Eye, TrendingUp,
+  Bell, Settings, LogOut
 } from 'lucide-react';
 import { useAdmin } from '../../hooks/useAdmin';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAdminStats } from '../../hooks/useAdminStats';
 import { supabase } from '../../lib/supabase';
+import { VerifiedBadge } from '../VerifiedBadge';
 import UserManagement from './UserManagement';
 import VerificationQueue from './VerificationQueue';
 import PropertyModeration from './PropertyModeration';
@@ -35,8 +37,8 @@ const RentEasyLogo = ({ size = 28 }: { size?: number }) => (
 );
 
 export default function AdminDashboard() {
-  const { profile } = useAuth();
-  const { isAdmin, isModerator, loading, error, fetchUsers, fetchPendingVerifications, fetchProperties, fetchLogs } = useAdmin();
+  const { profile, signOut } = useAuth();
+  const { isModerator, loading, error } = useAdmin();
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const navigate = useNavigate();
 
@@ -46,7 +48,7 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center" style={font}>
+      <div className="min-h-screen bg-[#070b08] flex flex-col items-center justify-center p-5 text-center" style={font}>
         <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
         <h2 className="text-[20px] font-bold text-white mb-2">Admin Panel Error</h2>
         <p className="text-[13px] text-white/40 mb-6 max-w-md">{error}</p>
@@ -59,7 +61,7 @@ export default function AdminDashboard() {
 
   if (loading && !isModerator) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center" style={font}>
+      <div className="min-h-screen bg-[#070b08] flex items-center justify-center" style={font}>
         <div className="w-8 h-8 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -77,68 +79,94 @@ export default function AdminDashboard() {
   ].filter(item => item.roles.includes(profile?.role || ''));
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col lg:flex-row" style={font}>
+    <div className="min-h-screen bg-[#070b08] flex flex-col lg:flex-row" style={font}>
 
-      {/* ── Desktop sidebar ── */}
-      <aside className="w-60 bg-[#0a1f11] border-r border-white/6 hidden lg:flex flex-col sticky top-0 h-screen">
+      {/* Desktop sidebar */}
+      <aside className="w-64 bg-[#0a1f11] border-r border-white/6 hidden lg:flex flex-col sticky top-0 h-screen">
         <div className="p-5 border-b border-white/6 flex items-center gap-2.5">
-          <RentEasyLogo size={30} />
+          <RentEasyLogo size={32} />
           <div>
             <span className="text-[15px] font-extrabold text-white">Rent<span className="text-[#f0c040]">Easy</span></span>
-            <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider">Admin Panel</p>
+            <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">Admin Console</p>
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-1 mt-2">
+          <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest px-4 mb-2">Menu</p>
           {sidebarItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as AdminTab)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-[13px] transition-all ${
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-[13px] transition-all group ${
                 activeTab === item.id
-                  ? 'bg-[#1a6b3c] text-white'
+                  ? 'bg-[#1a6b3c] text-white shadow-lg shadow-[#1a6b3c]/20'
                   : 'text-white/45 hover:bg-white/5 hover:text-white'
               }`}
             >
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              {item.label}
+              <div className="flex items-center gap-3">
+                <item.icon className="w-4 h-4 flex-shrink-0" />
+                {item.label}
+              </div>
+              {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5" />}
             </button>
           ))}
         </nav>
 
+        <div className="p-3 border-t border-white/6 space-y-1">
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-semibold text-[12px] text-white/40 hover:bg-white/5 hover:text-white transition-colors"
+          >
+            <Settings className="w-4 h-4" /> Account Settings
+          </button>
+          <button
+            onClick={async () => { await signOut(); navigate('/'); }}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-semibold text-[12px] text-red-400/60 hover:bg-red-500/8 hover:text-red-400 transition-colors"
+          >
+            <LogOut className="w-4 h-4" /> Sign Out
+          </button>
+        </div>
+
         <div className="p-4 border-t border-white/6">
           <div className="flex items-center gap-3 p-3 bg-white/4 rounded-xl">
-            <div className="w-8 h-8 bg-[#1a6b3c] rounded-xl overflow-hidden flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
+            <div className="w-9 h-9 bg-[#1a6b3c] rounded-xl overflow-hidden flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
               {profile?.avatar_url
                 ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 : (profile?.full_name || 'A').charAt(0).toUpperCase()
               }
             </div>
-            <div className="min-w-0">
-              <p className="text-[12px] font-bold text-white truncate">{profile?.full_name}</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1">
+                <p className="text-[12px] font-bold text-white truncate">{profile?.full_name}</p>
+                <VerifiedBadge status={profile?.verification_status} size={12} />
+              </div>
               <p className="text-[10px] font-bold text-[#f0c040] uppercase tracking-wider">{profile?.role}</p>
             </div>
           </div>
         </div>
       </aside>
 
-      {/* ── Main ── */}
+      {/* Main */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Header */}
-        <header className="bg-[#0a1f11] border-b border-white/6 h-14 flex items-center justify-between px-5 sticky top-0 z-10">
-          <div className="flex items-center gap-2 lg:hidden">
-            <RentEasyLogo size={24} />
-            <span className="text-[13px] font-bold text-white/50 uppercase tracking-wider">Admin</span>
+        <header className="bg-[#0a1f11]/80 backdrop-blur-xl border-b border-white/6 h-16 flex items-center justify-between px-5 lg:px-8 sticky top-0 z-10">
+          <div className="flex items-center gap-3">
+            <div className="lg:hidden flex items-center gap-2">
+              <RentEasyLogo size={26} />
+            </div>
+            <div className="hidden lg:block">
+              <h2 className="text-[18px] font-black text-white">
+                {sidebarItems.find(i => i.id === activeTab)?.label}
+              </h2>
+              <p className="text-[11px] text-white/30">Manage and moderate the RentEasy platform</p>
+            </div>
           </div>
-          <h2 className="text-[14px] font-bold text-white hidden lg:block">
-            {sidebarItems.find(i => i.id === activeTab)?.label}
-          </h2>
-          <div className="flex items-center gap-2">
-            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider ${
+          <div className="flex items-center gap-3">
+            <span className={`text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider border ${
               profile?.role === 'admin'
-                ? 'bg-[#f0c040]/10 text-[#f0c040] border border-[#f0c040]/20'
-                : 'bg-[#1a6b3c]/20 text-[#1a6b3c] border border-[#1a6b3c]/30'
+                ? 'bg-[#f0c040]/10 text-[#f0c040] border-[#f0c040]/20'
+                : 'bg-[#1a6b3c]/15 text-[#1a6b3c] border-[#1a6b3c]/25'
             }`}>
               {profile?.role}
             </span>
@@ -146,7 +174,7 @@ export default function AdminDashboard() {
         </header>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-5 pb-24 lg:pb-8">
+        <div className="flex-1 overflow-y-auto p-5 lg:p-8 pb-24 lg:pb-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -166,8 +194,8 @@ export default function AdminDashboard() {
         </div>
       </main>
 
-      {/* ── Mobile bottom nav ── */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-[#0a1f11] border-t border-white/6 flex items-center justify-around px-2 py-2 z-50">
+      {/* Mobile bottom nav */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-[#0a1f11]/95 backdrop-blur-xl border-t border-white/6 flex items-center justify-around px-2 py-2 z-50">
         {sidebarItems.slice(0, 5).map((item) => (
           <button
             key={item.id}
@@ -268,37 +296,54 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
   }
 
   const statCards = [
-    { id: 'users', label: 'Total Users', value: stats?.totalUsers.toLocaleString() || '0', icon: Users, color: 'text-[#1a6b3c]' },
-    { id: 'verifications', label: 'Pending Verifications', value: stats?.pendingVerifications.toLocaleString() || '0', icon: ShieldCheck, color: 'text-[#f0c040]' },
-    { id: 'properties', label: 'Active Properties', value: stats?.activeProperties.toLocaleString() || '0', icon: Building2, color: 'text-[#1a6b3c]' },
-    { id: 'escrow', label: 'Platform Revenue', value: `₦${((stats?.totalRevenue || 0) / 1000000).toFixed(1)}M`, icon: DollarSign, color: 'text-[#f0c040]' },
+    { id: 'users', label: 'Total Users', value: stats?.totalUsers.toLocaleString() || '0', icon: Users, color: '#1a6b3c', trend: '+12%' },
+    { id: 'verifications', label: 'Pending Verifications', value: stats?.pendingVerifications.toLocaleString() || '0', icon: ShieldCheck, color: '#f0c040', urgent: (stats?.pendingVerifications || 0) > 0 },
+    { id: 'properties', label: 'Active Properties', value: stats?.activeProperties.toLocaleString() || '0', icon: Building2, color: '#60a5fa', trend: '+8%' },
+    { id: 'escrow', label: 'Platform Revenue', value: `₦${((stats?.totalRevenue || 0) / 1000000).toFixed(2)}M`, icon: DollarSign, color: '#a78bfa', trend: '+24%' },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-[16px] font-bold text-white">Platform Overview</h3>
-        <span className="text-[11px] text-white/25 font-medium">Updated {getLastUpdatedText()}</span>
+        <div>
+          <h3 className="text-[20px] font-black text-white">Platform Overview</h3>
+          <p className="text-[12px] text-white/30 mt-1">Real-time snapshot of RentEasy activity</p>
+        </div>
+        <span className="text-[11px] text-white/25 font-medium flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 bg-[#4ade80] rounded-full animate-pulse" />
+          Updated {getLastUpdatedText()}
+        </span>
       </div>
 
-      {/* Stat cards — square */}
+      {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <button
             key={stat.id}
             onClick={() => setActiveTab(stat.id as AdminTab)}
-            className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 text-left hover:border-white/12 transition-all group"
-            style={{ aspectRatio: '1' }}
+            className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 text-left hover:border-white/15 hover:-translate-y-0.5 transition-all group relative overflow-hidden"
           >
-            <div className="flex flex-col justify-between h-full">
-              <div className={`w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center ${stat.color}`}>
-                <stat.icon className="w-4 h-4" />
+            {stat.urgent && (
+              <div className="absolute top-3 right-3 w-2 h-2 bg-[#f0c040] rounded-full animate-pulse" />
+            )}
+            <div className="flex flex-col justify-between h-full gap-4">
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center"
+                style={{ background: `${stat.color}15`, border: `1px solid ${stat.color}25` }}
+              >
+                <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
               </div>
               <div>
-                <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider mb-1">{stat.label}</p>
-                <h3 className="text-[22px] font-black text-white">{stat.value}</h3>
+                <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider mb-1.5">{stat.label}</p>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-[26px] font-black text-white leading-none">{stat.value}</h3>
+                  {stat.trend && (
+                    <span className="text-[10px] font-bold text-[#4ade80] flex items-center gap-0.5">
+                      <TrendingUp className="w-2.5 h-2.5" />{stat.trend}
+                    </span>
+                  )}
+                </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/15 group-hover:text-white/40 transition-colors" />
             </div>
           </button>
         ))}
@@ -308,7 +353,12 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
 
         {/* Recent activity */}
         <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-          <h3 className="text-[14px] font-bold text-white mb-4">Recent Activity</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[14px] font-bold text-white flex items-center gap-2">
+              <Bell className="w-4 h-4 text-[#1a6b3c]" />
+              Recent Activity
+            </h3>
+          </div>
           <div className="space-y-3">
             {activityLoading ? (
               [...Array(4)].map((_, i) => (
@@ -324,8 +374,8 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
               <p className="text-[12px] text-white/25 text-center py-8">No recent activity</p>
             ) : (
               recentActivity.map((activity, i) => (
-                <div key={i} className="flex items-center gap-3 group">
-                  <div className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/30 group-hover:bg-[#1a6b3c]/15 group-hover:text-[#1a6b3c] transition-colors flex-shrink-0">
+                <div key={i} className="flex items-center gap-3 group p-2 rounded-xl hover:bg-white/3 transition-colors">
+                  <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-white/30 group-hover:bg-[#1a6b3c]/15 group-hover:text-[#1a6b3c] transition-colors flex-shrink-0">
                     <activity.icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -352,17 +402,17 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
           </div>
           <div className="space-y-4">
             {[
-              { label: 'Verification Response Time', value: '4.2h', pct: 85 },
-              { label: 'Escrow Success Rate', value: '99.8%', pct: 99 },
-              { label: 'Server Uptime', value: '99.99%', pct: 100 },
+              { label: 'Verification Response Time', value: '4.2h', pct: 85, color: '#1a6b3c' },
+              { label: 'Escrow Success Rate', value: '99.8%', pct: 99, color: '#4ade80' },
+              { label: 'Server Uptime', value: '99.99%', pct: 100, color: '#60a5fa' },
             ].map((item) => (
               <div key={item.label} className="p-4 bg-white/4 border border-white/5 rounded-xl">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[12px] font-semibold text-white/60">{item.label}</span>
-                  <span className="text-[12px] font-bold text-[#1a6b3c]">{item.value}</span>
+                  <span className="text-[12px] font-bold" style={{ color: item.color }}>{item.value}</span>
                 </div>
                 <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#1a6b3c] rounded-full" style={{ width: `${item.pct}%` }} />
+                  <div className="h-full rounded-full transition-all" style={{ width: `${item.pct}%`, background: item.color }} />
                 </div>
               </div>
             ))}

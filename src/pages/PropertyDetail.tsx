@@ -737,9 +737,7 @@ export default function PropertyDetail() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[14px] font-bold text-white truncate">{owner?.full_name}</span>
-                      {owner?.verification_status === 'verified' && (
-                        <Shield className="w-3.5 h-3.5 text-[#1a6b3c] flex-shrink-0" />
-                      )}
+                      <VerifiedBadge status={owner?.verification_status} size={14} />
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[11px] text-white/35 capitalize font-medium">

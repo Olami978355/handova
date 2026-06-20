@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Search, MoreVertical, Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Search, MoreVertical, Loader2, CheckCircle2, XCircle, AlertCircle, ShieldOff, X } from 'lucide-react';
 import { useAdmin } from '../../hooks/useAdmin';
 import { UserRole } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { VerifiedBadge } from '../VerifiedBadge';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 export default function UserManagement() {
-  const { users, loading, fetchUsers, updateUserRole, isAdmin } = useAdmin();
+  const { users, loading, fetchUsers, updateUserRole, suspendUser, isAdmin } = useAdmin();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [suspendReason, setSuspendReason] = useState('');
+  const [userToSuspend, setUserToSuspend] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -37,6 +42,22 @@ export default function UserManagement() {
     const result = await updateUserRole(userId, newRole);
     if (result.success) { setSelectedUser(null); showToast(`Role updated to ${newRole}`, 'success'); }
     else showToast(result.error || 'Failed to update role', 'error');
+  };
+
+  const handleSuspend = async () => {
+    if (!userToSuspend || !suspendReason) return;
+    setActionLoading(true);
+    const result = await suspendUser(userToSuspend, suspendReason);
+    setActionLoading(false);
+    if (result.success) {
+      showToast('User suspended', 'success');
+      setShowSuspendModal(false);
+      setSuspendReason('');
+      setUserToSuspend(null);
+      setSelectedUser(null);
+    } else {
+      showToast(result.error || 'Failed to suspend user', 'error');
+    }
   };
 
   const roleStyle = (role: string) => {
@@ -120,7 +141,10 @@ export default function UserManagement() {
                         {u.avatar_url ? <img src={u.avatar_url} alt="" className="w-full h-full object-cover" /> : u.full_name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-[13px] font-bold text-white">{u.full_name}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-[13px] font-bold text-white">{u.full_name}</p>
+                          <VerifiedBadge status={u.verification_status} size={13} />
+                        </div>
                         <p className="text-[11px] text-white/35">{u.email}</p>
                       </div>
                     </div>
@@ -153,7 +177,7 @@ export default function UserManagement() {
                           initial={{ opacity: 0, scale: 0.95, y: 6 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95, y: 6 }}
-                          className="absolute right-5 top-14 w-44 bg-[#111a14] border border-white/10 rounded-xl shadow-2xl z-20 p-1.5"
+                          className="absolute right-5 top-14 w-48 bg-[#111a14] border border-white/10 rounded-xl shadow-2xl z-20 p-1.5"
                         >
                           <p className="px-3 py-2 text-[10px] font-bold text-white/25 uppercase tracking-wider">Change Role</p>
                           {(['tenant', 'landlord', 'agent', 'moderator', 'admin'] as UserRole[]).map((role) => (
@@ -166,6 +190,13 @@ export default function UserManagement() {
                               <span className="capitalize">{role}</span>
                             </button>
                           ))}
+                          <div className="h-px bg-white/5 my-1.5" />
+                          <button
+                            onClick={() => { setUserToSuspend(u.id); setShowSuspendModal(true); setSelectedUser(null); }}
+                            className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] font-bold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                          >
+                            <ShieldOff className="w-3.5 h-3.5" /> Suspend Account
+                          </button>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -179,6 +210,51 @@ export default function UserManagement() {
           </table>
         </div>
       </div>
+
+      {/* Suspend modal */}
+      <AnimatePresence>
+        {showSuspendModal && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowSuspendModal(false)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl" style={font}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-red-500/10 rounded-xl flex items-center justify-center">
+                    <ShieldOff className="w-4 h-4 text-red-400" />
+                  </div>
+                  <h3 className="text-[15px] font-bold text-white">Suspend User Account</h3>
+                </div>
+                <button onClick={() => setShowSuspendModal(false)} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-[12px] text-white/45 mb-4 leading-relaxed">
+                This will immediately block the user from accessing the platform. They will be notified with your reason.
+              </p>
+              <textarea
+                value={suspendReason}
+                onChange={(e) => setSuspendReason(e.target.value)}
+                placeholder="e.g. Repeated fraudulent listings, harassment of other users..."
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none mb-4"
+              />
+              <div className="flex gap-3">
+                <button onClick={() => { setShowSuspendModal(false); setSuspendReason(''); setUserToSuspend(null); }}
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors">
+                  Cancel
+                </button>
+                <button onClick={handleSuspend} disabled={!suspendReason || actionLoading}
+                  className="flex-1 bg-red-500 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-600 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                  {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Suspension'}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
