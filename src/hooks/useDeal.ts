@@ -14,7 +14,6 @@ export function useDeal(dealId: string) {
     try {
       setLoading(true);
 
-      // Step 1 — fetch deal + property, NO profile FK join
       const { data, error: dealError } = await supabase
         .from('deals')
         .select('*, properties(*)')
@@ -23,7 +22,6 @@ export function useDeal(dealId: string) {
 
       if (dealError) throw dealError;
 
-      // Step 2 — fetch tenant profile separately
       let tenantProfile = null;
       if (data.tenant_id) {
         const { data: tenantData } = await supabase
@@ -36,7 +34,6 @@ export function useDeal(dealId: string) {
 
       setDeal({ ...data, profiles: tenantProfile });
 
-      // Step 3 — fetch logs without profile FK join
       const { data: logData, error: logError } = await supabase
         .from('deal_logs')
         .select('*')
@@ -90,18 +87,105 @@ export function useDeal(dealId: string) {
     }
   };
 
+  // ✅ Upload agreement and move to agreement_draft → pending_payment flow
   const uploadAgreement = async (file: File) => {
     try {
-      const formData = new FormData();
-      formData.append('dealId', dealId);
-      formData.append('file', file);
-      const { data, error } = await supabase.functions.invoke('upload-agreement', {
-        body: formData,
-      });
-      if (error) throw error;
-      return { success: true, data };
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${dealId}/agreement.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('agreements')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('agreements')
+        .getPublicUrl(filePath);
+
+      // Update deal with agreement URL and move to next stage
+      const { error: updateError } = await supabase
+        .from('deals')
+        .update({
+          agreement_url: publicUrl,
+          status: 'agreement_draft',
+        })
+        .eq('id', dealId);
+
+      if (updateError) throw updateError;
+
+      // Notify tenant that agreement is ready to review
+      if (deal?.tenant_id) {
+        await supabase.from('notifications').insert({
+          user_id: deal.tenant_id,
+          title: 'Tenancy Agreement Ready for Review',
+          message: `Your tenancy agreement for ${deal.properties?.title || 'the property'} has been uploaded. Please review it before making your escrow payment.`,
+          type: 'deal_state_change',
+          link: `/deals/${dealId}`,
+        });
+      }
+
+      await fetchDeal();
+      return { success: true };
     } catch (err: any) {
       console.error('Error uploading agreement:', err);
+      return { success: false, error: err.message };
+    }
+  };
+
+  // ✅ Tenant approves draft agreement → moves to pending_payment
+  const approveDraftAgreement = async () => {
+    try {
+      const { error } = await supabase
+        .from('deals')
+        .update({ status: 'pending_payment' })
+        .eq('id', dealId);
+
+      if (error) throw error;
+
+      // Notify agent/landlord
+      const ownerId = deal?.agent_id || deal?.landlord_id;
+      if (ownerId) {
+        await supabase.from('notifications').insert({
+          user_id: ownerId,
+          title: 'Tenant Approved the Agreement',
+          message: `The tenant has reviewed and approved the tenancy agreement for ${deal?.properties?.title || 'your property'}. They will now proceed with escrow payment.`,
+          type: 'deal_state_change',
+          link: `/deals/${dealId}`,
+        });
+      }
+
+      await fetchDeal();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  // ✅ Tenant requests changes to draft agreement
+  const requestAgreementChanges = async (reason: string) => {
+    try {
+      const { error } = await supabase
+        .from('deals')
+        .update({ status: 'agreement_draft', notes: `Change requested: ${reason}` })
+        .eq('id', dealId);
+
+      if (error) throw error;
+
+      const ownerId = deal?.agent_id || deal?.landlord_id;
+      if (ownerId) {
+        await supabase.from('notifications').insert({
+          user_id: ownerId,
+          title: 'Tenant Requested Agreement Changes',
+          message: `The tenant has requested changes to the tenancy agreement: "${reason}". Please upload a revised agreement.`,
+          type: 'deal_state_change',
+          link: `/deals/${dealId}`,
+        });
+      }
+
+      await fetchDeal();
+      return { success: true };
+    } catch (err: any) {
       return { success: false, error: err.message };
     }
   };
@@ -118,6 +202,8 @@ export function useDeal(dealId: string) {
     error,
     refresh: fetchDeal,
     uploadAgreement,
+    approveDraftAgreement,
+    requestAgreementChanges,
     signAgreement,
     confirmMoveIn,
     releaseFunds,

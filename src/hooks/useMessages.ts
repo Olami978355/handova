@@ -287,7 +287,7 @@ const dealPayload: Record<string, unknown> = {
   platform_fee: platformFee,
   agent_fee: agentFee,
   landlord_payout: landlordPayout,
-  status: 'pending_payment',
+ status: 'agreement_draft',
   move_in_date: offer.move_in_date || null,
   notes: offer.note || null,
 };
