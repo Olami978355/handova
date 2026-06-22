@@ -67,7 +67,7 @@ serve(async (req) => {
     const { error: updateError } = await adminSupabase
       .from('deals')
       .update({ 
-        status: 'agreement_sent', 
+        status: 'agreement_draft', 
         agreement_url: publicUrl,
         updated_at: new Date().toISOString() 
       })
