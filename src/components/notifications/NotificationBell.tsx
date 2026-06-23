@@ -27,12 +27,8 @@ export const NotificationBell: React.FC = () => {
   }, []);
 
   const handleOpen = () => {
-    const opening = !isOpen;
-    setIsOpen(opening);
-    if (opening && unreadCount > 0) {
-      setTimeout(() => markAllAsRead(), 1500);
-    }
-  };
+  setIsOpen(!isOpen);
+};
 
   return (
     <div className="relative" ref={bellRef}>
