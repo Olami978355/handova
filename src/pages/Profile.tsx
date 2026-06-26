@@ -7,6 +7,7 @@ import {
   ChevronRight, ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AgentCardRequest } from '../components/profile/AgentCardRequest';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
@@ -265,6 +266,9 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+            {/* Agent/Landlord Digital ID Card — NEW */}
+            <AgentCardRequest />
+
           </div>
 
           {/* ── Main content ── */}

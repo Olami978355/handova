@@ -26,9 +26,9 @@ serve(async (req) => {
     if (dealError || !deal) throw new Error('Deal not found');
 
     // 2.1 Verify deal status
-    if (deal.status !== 'pending_signatures') {
-      throw new Error(`Cannot sign agreement in ${deal.status} status`);
-    }
+if (deal.status !== 'payment_received') {
+  throw new Error(`Cannot sign agreement in ${deal.status} status`);
+}
 
     // 2.2 Verify agreement exists
     if (!deal.agreement_url) {

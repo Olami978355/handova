@@ -4,8 +4,9 @@ import {
   Users, ShieldCheck, Building2, History,
   LayoutDashboard, AlertCircle, ChevronRight,
   DollarSign, Shield, User, Home, Eye, TrendingUp,
-  Bell, Settings, LogOut
+  Bell, Settings, LogOut, CreditCard
 } from 'lucide-react';
+import CardRequestQueue from './CardRequestQueue';
 import { useAdmin } from '../../hooks/useAdmin';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +19,7 @@ import PropertyModeration from './PropertyModeration';
 import DisputeQueue from './DisputeQueue';
 import AdminLogs from './AdminLogs';
 
-type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'escrow' | 'logs';
+type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'escrow' | 'logs' | 'card-requests';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -75,6 +76,7 @@ export default function AdminDashboard() {
     { id: 'verifications', label: 'Verifications', icon: ShieldCheck, roles: ['admin', 'moderator'] },
     { id: 'properties', label: 'Properties', icon: Building2, roles: ['admin', 'moderator'] },
     { id: 'escrow', label: 'Disputes', icon: AlertCircle, roles: ['admin', 'moderator'] },
+    { id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] },
     { id: 'logs', label: 'Logs', icon: History, roles: ['admin'] },
   ].filter(item => item.roles.includes(profile?.role || ''));
 
@@ -189,6 +191,7 @@ export default function AdminDashboard() {
               {activeTab === 'properties' && <PropertyModeration />}
               {activeTab === 'escrow' && <DisputeQueue />}
               {activeTab === 'logs' && <AdminLogs />}
+              {activeTab === 'card-requests' && <CardRequestQueue />}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -254,7 +254,8 @@ export default function DealDetail() {
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      if (file.type !== 'application/pdf') { alert('Please upload a PDF file'); return; }
+                      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image file (JPG, PNG, WebP)'); return; }
                       if (file.size > 20 * 1024 * 1024) { alert('File exceeds 20MB limit'); return; }
                       setProcessing(true);
                       setUploadProgress(30);
@@ -392,7 +393,7 @@ export default function DealDetail() {
                         <input
                           type="file"
                           ref={fileInputRef}
-                          accept="application/pdf"
+                          accept="application/pdf,image/jpeg,image/jpg,image/png,image/webp"
                           className="hidden"
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
