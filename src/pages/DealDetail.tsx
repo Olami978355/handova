@@ -242,14 +242,14 @@ export default function DealDetail() {
                     <div>
                       <h4 className="text-[14px] font-bold text-white mb-1">Upload Tenancy Agreement</h4>
                       <p className="text-[12px] text-white/45 leading-relaxed">
-                        Upload the tenancy agreement for the tenant to review before they pay. PDF only, max 20MB.
+                        Upload the tenancy agreement for the tenant to review before they pay. PDF or image (JPG, PNG, WebP), max 20MB.
                       </p>
                     </div>
                   </div>
                   <input
                     type="file"
                     ref={fileInputRef}
-                    accept="application/pdf"
+                    accept="application/pdf,image/jpeg,image/jpg,image/png,image/webp"
                     className="hidden"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];

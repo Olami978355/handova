@@ -13,7 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    const { reference } = await req.json()
+    const { reference, expectedAmount } = await req.json()
+
+    if (!reference) {
+      throw new Error('Missing reference')
+    }
 
     if (!PAYSTACK_SECRET_KEY) {
       throw new Error('PAYSTACK_SECRET_KEY is not set')
@@ -29,10 +33,25 @@ serve(async (req) => {
 
     const data = await response.json()
 
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    })
+    if (!data.status || data.data?.status !== 'success') {
+      return new Response(
+        JSON.stringify({ verified: false, reason: 'Transaction not successful', raw: data }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      )
+    }
+
+    // Optional but recommended: verify the amount actually paid matches what was expected (in kobo)
+    if (expectedAmount && data.data?.amount !== expectedAmount) {
+      return new Response(
+        JSON.stringify({ verified: false, reason: 'Amount mismatch', expected: expectedAmount, actual: data.data?.amount }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      )
+    }
+
+    return new Response(
+      JSON.stringify({ verified: true, data: data.data }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+    )
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
