@@ -88,30 +88,34 @@ export function useDeal(dealId: string) {
   };
 
   // ✅ Upload agreement and move to agreement_draft → pending_payment flow
+ // ✅ Upload agreement and move to agreement_draft → pending_payment flow
   const uploadAgreement = async (file: File) => {
     try {
       const fileExt = file.name.split('.').pop();
       const filePath = `${dealId}/agreement.${fileExt}`;
-
       const { error: uploadError } = await supabase.storage
         .from('agreements')
         .upload(filePath, file, { upsert: true });
-
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      // 'agreements' is a private bucket, so getPublicUrl() would return a
+      // URL that never actually works. Generate a signed URL instead.
+      // Signed URLs expire, so we store the file PATH (not the URL) and
+      // regenerate a fresh signed URL each time it's needed for viewing.
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('agreements')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7-day signed URL
+      if (signedUrlError) throw signedUrlError;
 
       // Update deal with agreement URL and move to next stage
       const { error: updateError } = await supabase
         .from('deals')
         .update({
-          agreement_url: publicUrl,
+          agreement_url: signedUrlData.signedUrl,
+          agreement_path: filePath,
           status: 'agreement_draft',
         })
         .eq('id', dealId);
-
       if (updateError) throw updateError;
 
       // Notify tenant that agreement is ready to review
@@ -124,12 +128,28 @@ export function useDeal(dealId: string) {
           link: `/deals/${dealId}`,
         });
       }
-
       await fetchDeal();
       return { success: true };
     } catch (err: any) {
       console.error('Error uploading agreement:', err);
       return { success: false, error: err.message };
+    }
+  };
+
+  // Generates a fresh signed URL for viewing the agreement, since stored
+  // signed URLs expire after 7 days. Call this when a user clicks to view
+  // the agreement, rather than relying solely on the stored agreement_url.
+  const getAgreementViewUrl = async (): Promise<string | null> => {
+    if (!deal?.agreement_path) return deal?.agreement_url || null;
+    try {
+      const { data, error } = await supabase.storage
+        .from('agreements')
+        .createSignedUrl(deal.agreement_path, 60 * 10); // 10-minute link, just for this view
+      if (error) throw error;
+      return data.signedUrl;
+    } catch (err) {
+      console.error('Error generating agreement view URL:', err);
+      return deal?.agreement_url || null;
     }
   };
 
@@ -202,6 +222,7 @@ export function useDeal(dealId: string) {
     error,
     refresh: fetchDeal,
     uploadAgreement,
+    getAgreementViewUrl,
     approveDraftAgreement,
     requestAgreementChanges,
     signAgreement,

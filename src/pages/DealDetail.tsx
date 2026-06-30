@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Shield, CheckCircle2, Clock, FileText, CreditCard,
@@ -21,13 +21,20 @@ export default function DealDetail() {
   const { user } = useAuth();
   const {
     deal, logs, loading, error,
-    uploadAgreement, approveDraftAgreement, requestAgreementChanges,
+    uploadAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl,
     signAgreement, confirmMoveIn, releaseFunds, markDisputed,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
   } = useDeal(id || '');
 
   const [processing, setProcessing] = useState(false);
+  const [agreementViewUrl, setAgreementViewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (deal?.agreement_path || deal?.agreement_url) {
+      getAgreementViewUrl().then(setAgreementViewUrl);
+    }
+  }, [deal?.agreement_path]);
   const [disputeReason, setDisputeReason] = useState('');
   const [changeReason, setChangeReason] = useState('');
   const [showDisputeModal, setShowDisputeModal] = useState(false);
@@ -315,7 +322,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
                   {/* View agreement button */}
                   <a
-                    href={deal.agreement_url}
+                    href={agreementViewUrl || deal.agreement_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w/full py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-white/70 hover:text-white hover:bg-white/8 transition-colors"
@@ -371,7 +378,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     </div>
                   </div>
                   <a
-                    href={deal.agreement_url}
+                    href={agreementViewUrl || deal.agreement_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white transition-colors"
@@ -428,7 +435,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   {/* Show agreement for final reference */}
                   {deal.agreement_url && (
                     <a
-                      href={deal.agreement_url}
+                      href={agreementViewUrl || deal.agreement_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 mb-4 text-[12px] text-[#f0c040]/60 hover:text-[#f0c040] transition-colors"
@@ -537,7 +544,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   <div className="flex gap-3">
                     {deal.agreement_url && (
                       <a
-                        href={deal.agreement_url}
+                        href={agreementViewUrl || deal.agreement_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-bold text-white/60 hover:text-white transition-colors"
