@@ -118,15 +118,21 @@ export function useDeal(dealId: string) {
         .eq('id', dealId);
       if (updateError) throw updateError;
 
-      // Notify tenant that agreement is ready to review
+      // Notify tenant that agreement is ready to review.
+      // Wrapped separately so a notification failure never breaks the
+      // core upload flow (which has already succeeded by this point).
       if (deal?.tenant_id) {
-        await supabase.from('notifications').insert({
-          user_id: deal.tenant_id,
-          title: 'Tenancy Agreement Ready for Review',
-          message: `Your tenancy agreement for ${deal.properties?.title || 'the property'} has been uploaded. Please review it before making your escrow payment.`,
-          type: 'deal_state_change',
-          link: `/deals/${dealId}`,
-        });
+        try {
+          await supabase.from('notifications').insert({
+            user_id: deal.tenant_id,
+            title: 'Tenancy Agreement Ready for Review',
+            body: `Your tenancy agreement for ${deal.properties?.title || 'the property'} has been uploaded. Please review it before making your escrow payment.`,
+            type: 'deal_state_change',
+            link: `/deals/${dealId}`,
+          });
+        } catch (notifyErr) {
+          console.error('Notification insert failed (non-fatal):', notifyErr);
+        }
       }
       await fetchDeal();
       return { success: true };
