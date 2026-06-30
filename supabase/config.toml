@@ -1,0 +1,10 @@
+project_id = "huvczugwcphcptblwbym"
+
+# process-payment-webhook is called by Paystack, an external service that
+# cannot send a Supabase JWT. It authenticates requests using its own
+# HMAC-SHA512 signature (verified inside the function itself via the
+# x-paystack-signature header), so the platform-level JWT check must be
+# disabled here — otherwise Supabase's gateway rejects the request with
+# a 401 before our function code ever runs.
+[functions.process-payment-webhook]
+verify_jwt = false
