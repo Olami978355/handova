@@ -222,6 +222,7 @@ export interface Deal {
   landlord_payout: number;
   status: DealStatus;
   agreement_url?: string;
+  agreement_path?: string;
   tenant_signed_at?: string;
   landlord_signed_at?: string;
   move_in_date?: string;
