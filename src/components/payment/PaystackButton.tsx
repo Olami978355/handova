@@ -24,7 +24,7 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
     email,
     amount: Math.round(amount * 100), // Convert to kobo
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
-    metadata: metadata || {},
+    metadata: { custom_fields: [], ...(metadata || {}) },
   };
   const initializePayment = usePaystackPayment(config);
   const handlePayment = () => {
