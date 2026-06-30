@@ -462,39 +462,32 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       reference={`ESCROW_${deal.id}_${Date.now()}`}
                       label="Pay into Escrow"
                       className="w-full"
+                      disabled={!deal.agreement_url}
+                      metadata={{ deal_id: deal.id, type: 'escrow_payment' }}
                       onSuccess={async (reference) => {
                         setProcessing(true);
                         try {
-                          const { error } = await supabase
-                            .from('deals')
-                            .update({ status: 'payment_received' })
-                            .eq('id', deal.id);
-                          if (error) throw error;
-
-                          // Notify owner
-                          const ownerId = deal.agent_id || deal.landlord_id;
-                          if (ownerId) {
-                            await supabase.from('notifications').insert({
-                              user_id: ownerId,
-                              title: 'Escrow Payment Received!',
-                              message: `The tenant has paid ${formatNaira(deal.amount)} into escrow for ${deal.properties?.title || 'your property'}.`,
-                              type: 'deal_state_change',
-                              link: `/deals/${deal.id}`,
-                            });
+                          let confirmed = false;
+                          for (let i = 0; i < 10; i++) {
+                            await new Promise(r => setTimeout(r, 2000));
+                            await refresh();
+                            const { data: updated } = await supabase
+                              .from('deals')
+                              .select('status')
+                              .eq('id', deal.id)
+                              .single();
+                            if (updated?.status === 'payment_received') {
+                              confirmed = true;
+                              break;
+                            }
                           }
-
-                          // Non-blocking edge function
-                          supabase.functions.invoke('process-payment-webhook', {
-                            body: {
-                              event: 'charge.success',
-                              data: { reference, metadata: { deal_id: deal.id, type: 'escrow_payment' } },
-                            },
-                          }).catch(() => {});
-
-                          await refresh();
-                        } catch (err) {
-                          console.error('Payment processing error:', err);
-                          alert('Payment received but status update failed. Contact support with ref: ' + reference);
+                          if (!confirmed) {
+                            alert(
+                              'Your payment was received by Paystack (ref: ' + reference + '). ' +
+                              'Our system is confirming it — please refresh in a moment. ' +
+                              'Contact support if this persists after 5 minutes.'
+                            );
+                          }
                         } finally {
                           setProcessing(false);
                         }

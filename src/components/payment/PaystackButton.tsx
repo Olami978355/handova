@@ -6,6 +6,7 @@ interface PaystackButtonProps {
   amount: number;
   email: string;
   reference: string;
+  metadata?: Record<string, any>;
   onSuccess: (reference: string) => void | Promise<void>;
   onClose: () => void;
   label: string;
@@ -14,25 +15,22 @@ interface PaystackButtonProps {
 }
 
 export const PaystackButton: React.FC<PaystackButtonProps> = ({
-  amount, email, reference, onSuccess, onClose,
+  amount, email, reference, metadata, onSuccess, onClose,
   label, disabled = false, className = '',
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
-
   const config = {
     reference,
     email,
     amount: Math.round(amount * 100), // Convert to kobo
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
+    metadata: metadata || {},
   };
-
   const initializePayment = usePaystackPayment(config);
-
   const handlePayment = () => {
     if (disabled || isProcessing || !import.meta.env.VITE_PAYSTACK_PUBLIC_KEY) return;
     
     setIsProcessing(true);
-
     initializePayment({
       onSuccess: async (response: { reference: string }) => {
         try {
@@ -49,11 +47,9 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
       },
     });
   };
-
   const formattedAmount = new Intl.NumberFormat('en-NG', {
     style: 'currency', currency: 'NGN', minimumFractionDigits: 0,
   }).format(amount);
-
   return (
     <button
       onClick={handlePayment}
