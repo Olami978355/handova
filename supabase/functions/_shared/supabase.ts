@@ -1,5 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 
+// The new sb_secret_ key format does NOT bypass RLS when passed to createClient().
+// It must be sent as the apikey header in direct REST calls instead.
+// We use a custom fetch wrapper that injects the secret key correctly.
+
 function getServiceRoleKey(): string {
   const secretKeys = Deno.env.get('SUPABASE_SECRET_KEYS');
   if (secretKeys) {
@@ -7,9 +11,7 @@ function getServiceRoleKey(): string {
       const parsed = JSON.parse(secretKeys);
       const key = parsed['default'] ?? Object.values(parsed)[0];
       if (key) return key as string;
-    } catch {
-      // not valid JSON, fall through to legacy
-    }
+    } catch { /* fall through */ }
   }
   return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 }
@@ -22,13 +24,21 @@ export const createSupabaseClient = (req: Request) => {
       global: {
         headers: { Authorization: req.headers.get('Authorization')! },
       },
+      auth: { persistSession: false, autoRefreshToken: false },
     }
   );
 };
 
 export const createAdminClient = () => {
-  return createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    getServiceRoleKey()
-  );
+  const url = Deno.env.get('SUPABASE_URL') ?? '';
+  const key = getServiceRoleKey();
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+    },
+  });
 };
