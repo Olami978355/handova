@@ -17,9 +17,10 @@ import UserManagement from './UserManagement';
 import VerificationQueue from './VerificationQueue';
 import PropertyModeration from './PropertyModeration';
 import DisputeQueue from './DisputeQueue';
+import EscrowQueue from './EscrowQueue';
 import AdminLogs from './AdminLogs';
 
-type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'escrow' | 'logs' | 'card-requests';
+type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'escrow' | 'fund-releases' | 'logs' | 'card-requests';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -76,6 +77,7 @@ export default function AdminDashboard() {
     { id: 'verifications', label: 'Verifications', icon: ShieldCheck, roles: ['admin', 'moderator'] },
     { id: 'properties', label: 'Properties', icon: Building2, roles: ['admin', 'moderator'] },
     { id: 'escrow', label: 'Disputes', icon: AlertCircle, roles: ['admin', 'moderator'] },
+    { id: 'fund-releases', label: 'Fund Releases', icon: DollarSign, roles: ['admin', 'moderator'] },
     { id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] },
     { id: 'logs', label: 'Logs', icon: History, roles: ['admin'] },
   ].filter(item => item.roles.includes(profile?.role || ''));
@@ -190,6 +192,7 @@ export default function AdminDashboard() {
               {activeTab === 'verifications' && <VerificationQueue />}
               {activeTab === 'properties' && <PropertyModeration />}
               {activeTab === 'escrow' && <DisputeQueue />}
+              {activeTab === 'fund-releases' && <EscrowQueue />}
               {activeTab === 'logs' && <AdminLogs />}
               {activeTab === 'card-requests' && <CardRequestQueue />}
             </motion.div>
