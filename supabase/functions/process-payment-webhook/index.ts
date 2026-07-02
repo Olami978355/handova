@@ -41,6 +41,15 @@ serve(async (req) => {
 
     const validSignature = await verifySignature(rawBody, signature, paystackSecret);
     if (!validSignature) {
+      const debugKey = await crypto.subtle.importKey(
+        'raw', new TextEncoder().encode(paystackSecret),
+        { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']
+      );
+      const debugMac = await crypto.subtle.sign('HMAC', debugKey, new TextEncoder().encode(rawBody));
+      const debugComputed = Array.from(new Uint8Array(debugMac)).map(b => b.toString(16).padStart(2, '0')).join('');
+      console.error('DEBUG received signature:', signature);
+      console.error('DEBUG computed signature:', debugComputed);
+      console.error('DEBUG raw body length:', rawBody.length);
       console.error('Invalid Paystack webhook signature — rejecting request');
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -67,14 +76,45 @@ serve(async (req) => {
       throw new Error(`Missing deal_id or reference in webhook payload (dealId=${dealId}, reference=${reference})`);
     }
 
-    const { data: deal, error: dealError } = await supabase
-      .from('deals')
-      .select('*, properties(*)')
-      .eq('id', dealId)
-      .single();
+    console.log('DEBUG dealId value:', JSON.stringify(dealId));
+    console.log('DEBUG dealId type:', typeof dealId);
+    console.log('DEBUG dealId length:', dealId.length);
+    console.log('DEBUG full metadata object:', JSON.stringify(body.data?.metadata));
 
-    if (dealError || !deal) {
-      throw new Error(`Deal not found: ${dealId}`);
+    console.log('DEBUG SUPABASE_URL:', Deno.env.get('SUPABASE_URL'));
+    console.log('DEBUG has SERVICE_ROLE_KEY:', !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
+
+    // Use raw fetch instead of Supabase JS client - sb_secret_ keys only
+    // bypass RLS correctly when sent as apikey header in direct REST calls
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const secretKeys = Deno.env.get('SUPABASE_SECRET_KEYS');
+    let adminKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    if (secretKeys) {
+      try {
+        const parsed = JSON.parse(secretKeys);
+        const k = parsed['default'] ?? Object.values(parsed)[0];
+        if (k) adminKey = k as string;
+      } catch { /* use legacy */ }
+    }
+    console.log('DEBUG adminKey prefix:', adminKey.slice(0, 20));
+
+    const dealRes = await fetch(
+      `${supabaseUrl}/rest/v1/deals?id=eq.${dealId}&select=*,properties(*)`,
+      {
+        headers: {
+          'apikey': adminKey,
+          'Authorization': `Bearer ${adminKey}`,
+          'Accept': 'application/json',
+        },
+      }
+    );
+    const dealArr = await dealRes.json();
+    console.log('DEBUG deal fetch status:', dealRes.status);
+    console.log('DEBUG deal fetch result:', JSON.stringify(dealArr).slice(0, 200));
+    const deal = Array.isArray(dealArr) && dealArr.length > 0 ? dealArr[0] : null;
+
+    if (!deal) {
+      throw new Error(`Deal not found: ${dealId} (status: ${dealRes.status})`);
     }
 
     // Tenant email looked up separately to avoid the FK-alias join pattern
