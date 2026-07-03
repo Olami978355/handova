@@ -136,7 +136,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                     </span>
                   </div>
                   <p className="text-[11px] text-white/35 line-clamp-2 leading-relaxed">
-                    {notif.message}
+                    {notif.body}
                   </p>
                 </div>
                 {/* Unread dot */}

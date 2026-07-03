@@ -338,7 +338,8 @@ export interface Notification {
   id: string;
   user_id: string;
   title: string;
-  message: string;
+  body: string;
+  message?: string;
   type: NotificationType;
   read: boolean;
   link?: string;
