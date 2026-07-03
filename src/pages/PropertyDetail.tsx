@@ -411,6 +411,19 @@ export default function PropertyDetail() {
     );
   }
 
+  if (property.status === 'inactive' || property.status === 'flagged') {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <AlertCircle className="w-12 h-12 text-[#f0c040] mb-4" />
+        <h1 className="text-[20px] font-bold text-white mb-2">Listing Unavailable</h1>
+        <p className="text-[13px] text-white/40 mb-6 max-w-xs">This listing has been suspended and is currently unavailable.</p>
+        <button onClick={() => navigate('/listings')} className="bg-[#1a6b3c] text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors">
+          Back to Listings
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
       <Helmet>
