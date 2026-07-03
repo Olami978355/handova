@@ -179,7 +179,7 @@ const LandlordBookingCard = ({
       await supabase.from('notifications').insert({
         user_id: booking.tenant_id,
         title: 'Inspection Date Confirmed!',
-        message: `Your inspection for ${booking.properties?.title} has been confirmed for ${
+        body: `Your inspection for ${booking.properties?.title} has been confirmed for ${
           new Date(confirmedDate).toLocaleDateString('en-NG', {
             weekday: 'long', day: 'numeric', month: 'long',
           })
