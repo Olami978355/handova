@@ -251,53 +251,11 @@ export const useMessages = (conversationId?: string) => {
 
   const respondToOffer = async (offerId: string, accept: boolean): Promise<void> => {
     try {
-      const { data: offer, error: fetchError } = await supabase
-        .from('custom_deal_offers')
-        .select('*')
-        .eq('id', offerId)
-        .single();
-      if (fetchError) throw new Error(fetchError.message);
-      const { error: updateError } = await supabase
-        .from('custom_deal_offers')
-        .update({ status: accept ? 'accepted' : 'declined' })
-        .eq('id', offerId);
-      if (updateError) throw new Error(updateError.message);
-      if (accept) {
-        const { data: offererProfile } = await supabase
-          .from('profiles')
-          .select('id, role')
-          .eq('id', offer.offered_by)
-          .single();
-        const isAgent = offererProfile?.role === 'agent';
-        const platformFee = Math.round(offer.agreed_price * 0.02);
-        const agentFee = isAgent ? Math.round(offer.agreed_price * 0.10) : 0;
-        const landlordPayout = offer.agreed_price - platformFee - agentFee;
-      // Fetch property owner to always set landlord_id
-const { data: propertyData } = await supabase
-  .from('properties')
-  .select('owner_id')
-  .eq('id', offer.property_id)
-  .single();
-
-const dealPayload: Record<string, unknown> = {
-  property_id: offer.property_id,
-  tenant_id: offer.offered_to,
-  landlord_id: propertyData?.owner_id || offer.offered_by,
-  amount: offer.agreed_price,
-  platform_fee: platformFee,
-  agent_fee: agentFee,
-  landlord_payout: landlordPayout,
- status: 'agreement_draft',
-  move_in_date: offer.move_in_date || null,
-  notes: offer.note || null,
-};
-
-if (isAgent) {
-  dealPayload.agent_id = offer.offered_by;
-}
-        const { error: dealError } = await supabase.from('deals').insert(dealPayload);
-        if (dealError) throw new Error('Deal creation failed: ' + dealError.message);
-      }
+      const { data, error } = await supabase.functions.invoke('respond-to-deal-offer', {
+        body: { offerId, accept },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
       await fetchMessages();
     } catch (err: unknown) {
       setSendError(err instanceof Error ? err.message : 'Failed to respond to offer');

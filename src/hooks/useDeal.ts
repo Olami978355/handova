@@ -169,6 +169,13 @@ export function useDeal(dealId: string) {
 
       if (error) throw error;
 
+      await supabase.from('deal_logs').insert({
+        deal_id: dealId,
+        action: 'pending_payment',
+        performed_by: user?.id ?? null,
+        details: { source: 'approveDraftAgreement' },
+      });
+
       // Notify agent/landlord
       const ownerId = deal?.agent_id || deal?.landlord_id;
       if (ownerId) {
@@ -197,6 +204,13 @@ export function useDeal(dealId: string) {
         .eq('id', dealId);
 
       if (error) throw error;
+
+      await supabase.from('deal_logs').insert({
+        deal_id: dealId,
+        action: 'agreement_draft',
+        performed_by: user?.id ?? null,
+        details: { source: 'requestAgreementChanges', reason },
+      });
 
       const ownerId = deal?.agent_id || deal?.landlord_id;
       if (ownerId) {

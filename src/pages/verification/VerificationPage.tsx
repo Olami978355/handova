@@ -73,10 +73,11 @@ export default function VerificationPage() {
         .upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('verification-docs')
-        .getPublicUrl(filePath);
-
+      const { data: signedData, error: signedError } = await supabase.storage
+  .from('verification-docs')
+  .createSignedUrl(filePath, 60 * 60 * 24 * 7);
+if (signedError) throw signedError;
+setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
       setFormData((prev) => ({ ...prev, [field]: publicUrl }));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to upload document';
