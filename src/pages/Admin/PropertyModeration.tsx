@@ -41,7 +41,7 @@ export default function PropertyModeration() {
       await supabase.from('admin_logs').insert({ actor_id: user.id, action: 'property_approved', target_id: propertyId, target_type: 'property', details: { new_status: 'active' } });
       const property = properties.find(p => p.id === propertyId);
       if (property) {
-        await supabase.from('notifications').insert({ user_id: property.owner_id, title: 'Property Approved!', message: `Your listing "${property.title}" is now live.`, type: 'listing_approved', link: `/property/${propertyId}` });
+        await supabase.from('notifications').insert({ user_id: property.owner_id, title: 'Property Approved!', body: `Your listing "${property.title}" is now live.`, type: 'listing_approved', link: `/property/${propertyId}` });
       }
       setProperties(prev => prev.filter(p => p.id !== propertyId));
       showToast('Property approved and is now live', 'success');
@@ -62,7 +62,7 @@ export default function PropertyModeration() {
       await supabase.from('admin_logs').insert({ actor_id: user.id, action: 'property_suspended', target_id: propertyToSuspend, target_type: 'property', details: { reason: suspensionReason } });
       const property = properties.find(p => p.id === propertyToSuspend);
       if (property) {
-        await supabase.from('notifications').insert({ user_id: property.owner_id, title: 'Property Suspended', message: `Your listing "${property.title}" was suspended. Reason: ${suspensionReason}`, type: 'listing_rejected', link: `/property/${propertyToSuspend}` });
+        await supabase.from('notifications').insert({ user_id: property.owner_id, title: 'Property Suspended', body: `Your listing "${property.title}" was suspended. Reason: ${suspensionReason}`, type: 'listing_rejected', link: `/property/${propertyToSuspend}` });
       }
       setProperties(prev => prev.filter(p => p.id !== propertyToSuspend));
       showToast('Property suspended', 'success');

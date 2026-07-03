@@ -202,7 +202,7 @@ if (privateData) {
       await supabase.from('notifications').insert({
         user_id: userId,
         title: 'Verification Approved! ✓',
-        message: 'Congratulations! Your identity has been verified. Your listings can now go live instantly.',
+        body: 'Congratulations! Your identity has been verified. Your listings can now go live instantly.',
         type: 'verification_approved',
         link: '/profile',
       });
@@ -249,7 +249,7 @@ if (privateData) {
       await supabase.from('notifications').insert({
         user_id: userId,
         title: 'Verification Needs Attention',
-        message: `Your verification was not approved. Reason: ${notes}. Please resubmit with the correct documents.`,
+        body: `Your verification was not approved. Reason: ${notes}. Please resubmit with the correct documents.`,
         type: 'verification_rejected',
         link: '/verification',
       });
@@ -315,7 +315,7 @@ if (privateData) {
       await supabase.from('notifications').insert({
         user_id: targetUserId,
         title: 'Account Suspended',
-        message: `Your account has been suspended. Reason: ${reason}. Contact support if you believe this is an error.`,
+        body: `Your account has been suspended. Reason: ${reason}. Contact support if you believe this is an error.`,
         type: 'warning',
         link: '/contact',
       });

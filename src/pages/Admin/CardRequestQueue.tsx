@@ -56,7 +56,7 @@ export default function CardRequestQueue() {
       await supabase.from('notifications').insert({
         user_id: agentId,
         title: 'Digital ID Card Approved! 🎉',
-        message: 'Your RentEasy Verified Agent Digital ID is now ready. View it on your profile.',
+        body: 'Your RentEasy Verified Agent Digital ID is now ready. View it on your profile.',
         type: 'verification_approved',
         link: '/profile',
       });
@@ -91,7 +91,7 @@ export default function CardRequestQueue() {
       await supabase.from('notifications').insert({
         user_id: agentId,
         title: 'ID Card Request Update',
-        message: `Your request was not approved. Reason: ${reason}`,
+        body: `Your request was not approved. Reason: ${reason}`,
         type: 'verification_rejected',
         link: '/profile',
       });
