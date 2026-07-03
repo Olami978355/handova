@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useAuth } from '../context/AuthContext';
 import { Property, Deal, InspectionBooking } from '../types';
 
@@ -203,8 +204,9 @@ const LandlordBookingCard = ({
           {booking.profiles?.full_name?.charAt(0)?.toUpperCase() || 'T'}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-bold text-white">
-            {booking.profiles?.full_name || 'Tenant'}
+          <p className="text-[13px] font-bold text-white flex items-center gap-1">
+            <span>{booking.profiles?.full_name || 'Tenant'}</span>
+            <VerifiedBadge status={booking.profiles?.verification_status} size={12} />
           </p>
           <p className="text-[11px] text-white/40 truncate">{booking.properties?.title}</p>
           <div className="flex items-center gap-2 mt-1">

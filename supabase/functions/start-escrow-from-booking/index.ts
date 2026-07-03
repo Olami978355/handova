@@ -17,7 +17,6 @@ serve(async (req) => {
 
     const { bookingId } = await req.json();
 
-    // Fetch booking
     const { data: booking, error: bookingError } = await supabase
       .from('inspection_bookings')
       .select('*, properties(*)')
@@ -26,7 +25,6 @@ serve(async (req) => {
 
     if (bookingError || !booking) throw new Error('Booking not found');
 
-    // Check if user is landlord or agent
     if (booking.landlord_id !== user.id && booking.agent_id !== user.id) {
       throw new Error('You are not authorized to start escrow for this booking.');
     }
@@ -34,45 +32,41 @@ serve(async (req) => {
     const toKobo = (naira: number) => Math.round(naira * 100);
     const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
 
-    // BUG FIX 2: Use PostgreSQL advisory lock to prevent race conditions
-    // We'll use a transaction with a lock on the property ID
+    // Advisory lock to prevent race conditions on this property
     const propertyIdInt = parseInt(booking.property_id.replace(/-/g, '').substring(0, 8), 16);
-    
-    // Start transaction
-    const { data: lockResult, error: lockError } = await supabase.rpc('execute_sql', {
+    const { error: lockError } = await supabase.rpc('execute_sql', {
       sql: `SELECT pg_advisory_xact_lock(${propertyIdInt});`
     });
-
     if (lockError) throw lockError;
 
-    // Check if property already has an active deal
+    // Active-deal check: status-based, not a has_active_deal column (doesn't
+    // exist on properties). Any deal on this property that isn't
+    // funds_released counts as still active and blocks a new one.
     const { data: property, error: propError } = await supabase
       .from('properties')
-      .select('has_active_deal, status')
+      .select('status')
       .eq('id', booking.property_id)
       .single();
-
     if (propError) throw propError;
-    if (property.has_active_deal || property.status !== 'active') {
+
+    const { data: existingDeals, error: existingError } = await supabase
+      .from('deals')
+      .select('id')
+      .eq('property_id', booking.property_id)
+      .neq('status', 'funds_released');
+    if (existingError) throw existingError;
+
+    if ((existingDeals && existingDeals.length > 0) || property.status !== 'active') {
       throw new Error('This property already has an active deal or is no longer available.');
     }
 
-    // 1. Set properties.has_active_deal = true (BUG FIX 4)
-    const { error: propUpdateError } = await supabase
-      .from('properties')
-      .update({ has_active_deal: true })
-      .eq('id', booking.property_id);
-
-    if (propUpdateError) throw propUpdateError;
-
-    // 2. Refund all other interested tenants 100% (BUG FIX 7)
+    // Refund all other interested tenants 100%
     const { data: otherBookings, error: othersError } = await supabase
       .from('inspection_bookings')
       .select('*')
       .eq('property_id', booking.property_id)
       .eq('status', 'tenant_interested')
       .neq('id', bookingId);
-
     if (othersError) throw othersError;
 
     for (const other of otherBookings) {
@@ -89,22 +83,20 @@ serve(async (req) => {
             amount: refundAmountKobo,
           }),
         });
-
         const refundData = await refundResponse.json();
         if (refundResponse.ok) {
           await supabase
             .from('inspection_bookings')
-            .update({ 
+            .update({
               status: 'refunded',
               refund_percentage: 100,
               refund_amount: other.inspection_fee,
               paystack_refund_reference: refundData.data.reference,
               notes: 'Refunded because property has active deal with another tenant.',
-              updated_at: new Date().toISOString() 
+              updated_at: new Date().toISOString()
             })
             .eq('id', other.id);
-          
-          // Notify other tenant
+
           await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
             method: 'POST',
             headers: {
@@ -125,18 +117,24 @@ serve(async (req) => {
       }
     }
 
-    // 3. Update current booking status
     const { error: updateError } = await supabase
       .from('inspection_bookings')
-      .update({ 
+      .update({
         status: 'escrow_started',
-        updated_at: new Date().toISOString() 
+        updated_at: new Date().toISOString()
       })
       .eq('id', bookingId);
-
     if (updateError) throw updateError;
 
-    // 4. Create deals record
+    // Deal creation — platform_fee, agent_fee, landlord_payout are all
+    // NOT NULL columns, must be computed here, same pattern used in
+    // respond-to-deal-offer.
+    const isAgent = !!booking.agent_id;
+    const amount = booking.properties.price;
+    const platformFee = Math.round(amount * 0.02);
+    const agentFee = isAgent ? Math.round(amount * 0.10) : 0;
+    const landlordPayout = amount - platformFee - agentFee;
+
     const { data: deal, error: dealError } = await supabase
       .from('deals')
       .insert({
@@ -144,15 +142,23 @@ serve(async (req) => {
         tenant_id: booking.tenant_id,
         landlord_id: booking.landlord_id,
         agent_id: booking.agent_id,
-        amount: booking.properties.price,
-        status: 'agreement_pending'
+        amount,
+        listed_amount: amount,
+        platform_fee: platformFee,
+        agent_fee: agentFee,
+        agent_commission_rate: isAgent ? 10 : 0,
+        landlord_payout: landlordPayout,
+        deal_type: booking.properties.transaction_type === 'sell'
+          ? (booking.properties.listing_type === 'land' ? 'land_sale' : 'house_sale')
+          : (booking.properties.listing_type === 'land' ? 'land_rent' : 'house_rent'),
+        is_custom_deal: false,
+        status: 'agreement_draft',
       })
       .select()
       .single();
 
     if (dealError) throw dealError;
 
-    // Notify parties
     const parties = [booking.tenant_id, booking.landlord_id];
     if (booking.agent_id) parties.push(booking.agent_id);
 
