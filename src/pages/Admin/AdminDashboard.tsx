@@ -305,7 +305,7 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
     { id: 'users', label: 'Total Users', value: stats?.totalUsers.toLocaleString() || '0', icon: Users, color: '#1a6b3c', trend: '+12%' },
     { id: 'verifications', label: 'Pending Verifications', value: stats?.pendingVerifications.toLocaleString() || '0', icon: ShieldCheck, color: '#f0c040', urgent: (stats?.pendingVerifications || 0) > 0 },
     { id: 'properties', label: 'Active Properties', value: stats?.activeProperties.toLocaleString() || '0', icon: Building2, color: '#60a5fa', trend: '+8%' },
-    { id: 'escrow', label: 'Platform Revenue', value: `₦${((stats?.totalRevenue || 0) / 1000000).toFixed(2)}M`, icon: DollarSign, color: '#a78bfa', trend: '+24%' },
+    { id: 'escrow', label: 'Platform Revenue', value: `₦${(stats?.totalRevenue || 0).toLocaleString('en-NG')}`, icon: DollarSign, color: '#a78bfa', trend: '+24%' },
   ];
 
   return (
@@ -386,7 +386,7 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-semibold text-white truncate">{activity.message}</p>
-                    <p className="text-[10px] text-white/25">{new Date(activity.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    <p className="text-[10px] text-white/25">{new Date(activity.time).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })} · {new Date(activity.time).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
                   </div>
                   <button onClick={() => setActiveTab(activity.tab as AdminTab)} className="w-7 h-7 bg-white/4 rounded-lg flex items-center justify-center text-white/20 hover:text-white/60 transition-colors flex-shrink-0">
                     <Eye className="w-3.5 h-3.5" />
