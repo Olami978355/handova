@@ -34,7 +34,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060f09]" style={font}>
+    <div className="h-[calc(100vh-64px)] bg-[#060f09] overflow-y-auto" style={font}>
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
