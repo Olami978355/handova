@@ -138,11 +138,11 @@ export default function UserManagement() {
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 bg-[#1a6b3c]/20 rounded-xl overflow-hidden flex items-center justify-center text-[#1a6b3c] text-[12px] font-bold flex-shrink-0">
-                        {u.avatar_url ? <img src={u.avatar_url} alt="" className="w-full h-full object-cover" /> : u.full_name.charAt(0).toUpperCase()}
+                        {u.avatar_url ? <img src={u.avatar_url} alt="" className="w-full h-full object-cover" /> : (u.full_name || u.email || '?').charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <p className="text-[13px] font-bold text-white">{u.full_name}</p>
+                          <p className="text-[13px] font-bold text-white">{u.full_name || 'Unnamed User'}</p>
                           <VerifiedBadge status={u.verification_status} size={13} />
                         </div>
                         <p className="text-[11px] text-white/35">{u.email}</p>

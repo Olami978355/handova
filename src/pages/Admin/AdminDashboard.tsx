@@ -14,7 +14,7 @@ import { useAdminStats } from '../../hooks/useAdminStats';
 import { supabase } from '../../lib/supabase';
 import { VerifiedBadge } from '../../components/VerifiedBadge';
 import UserManagement from './UserManagement';
-import VerificationQueue from './VerificationQueue';
+import VerificationReview from './VerificationReview';
 import PropertyModeration from './PropertyModeration';
 import DisputeQueue from './DisputeQueue';
 import EscrowQueue from './EscrowQueue';
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
             >
               {activeTab === 'overview' && <OverviewStats setActiveTab={setActiveTab} />}
               {activeTab === 'users' && <UserManagement />}
-              {activeTab === 'verifications' && <VerificationQueue />}
+              {activeTab === 'verifications' && <VerificationReview />}
               {activeTab === 'properties' && <PropertyModeration />}
               {activeTab === 'escrow' && <DisputeQueue />}
               {activeTab === 'fund-releases' && <EscrowQueue />}
