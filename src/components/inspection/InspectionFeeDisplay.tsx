@@ -76,7 +76,7 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
 export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ property }) => {
   const { user, profile } = useAuth();
   const { checkExistingBooking } = useInspectionBooking();
-  const { findOrCreateConversation } = useConversationsContext();
+  const { findOrCreateConversation, conversations } = useConversationsContext();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [existingBooking, setExistingBooking] = useState<InspectionBooking | null>(null);

@@ -77,12 +77,8 @@ export const useConversations = () => {
 
     const channel = supabase
       .channel(`conversations-${user.id}-${Date.now()}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' },
-        () => fetchConversations()
-      )
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' },
-        () => fetchConversations()
-      )
+      // Only re-fetch when conversations table changes (new conversation, last_message update)
+      // Do NOT re-fetch on every message INSERT/UPDATE — that causes constant UI disruption
       .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' },
         () => fetchConversations()
       )
