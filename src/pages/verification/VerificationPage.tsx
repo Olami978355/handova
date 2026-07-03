@@ -78,7 +78,7 @@ export default function VerificationPage() {
   .createSignedUrl(filePath, 60 * 60 * 24 * 7);
 if (signedError) throw signedError;
 setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
-      setFormData((prev) => ({ ...prev, [field]: publicUrl }));
+
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to upload document';
       setError(msg);
