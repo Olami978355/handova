@@ -95,7 +95,7 @@ export default function PropertyModeration() {
   };
 
   const filtered = properties.filter(p => {
-    const matchSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) || p.address.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSearch = (p.title || "").toLowerCase().includes(searchTerm.toLowerCase()) || (p.address || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = statusFilter === 'all' || p.status === statusFilter;
     return matchSearch && matchStatus;
   });
