@@ -142,7 +142,7 @@ export function useInspectionBooking() {
         await supabase.from('notifications').insert({
           user_id: booking.properties.owner_id,
           title: 'New Inspection Booking!',
-          message: `A tenant has paid the inspection fee for ${booking.properties.title} and wants to schedule a visit.`,
+          body: `A tenant has paid the inspection fee for ${booking.properties.title} and wants to schedule a visit.`,
           type: 'inspection_booked',
           link: '/dashboard',
         });
@@ -152,7 +152,7 @@ export function useInspectionBooking() {
       await supabase.from('notifications').insert({
         user_id: user.id,
         title: 'Inspection Booked Successfully!',
-        message: `Your inspection booking for ${booking?.properties?.title} is confirmed. The landlord will confirm the date shortly.`,
+        body: `Your inspection booking for ${booking?.properties?.title} is confirmed. The landlord will confirm the date shortly.`,
         type: 'inspection_confirmed',
         link: '/dashboard',
       });
@@ -236,7 +236,7 @@ export function useInspectionBooking() {
         await supabase.from('notifications').insert({
           user_id: data.properties.owner_id,
           title: 'New Inspection Booking!',
-          message: `A tenant has paid the inspection fee for ${data.properties.title} and wants to schedule a visit.`,
+          body: `A tenant has paid the inspection fee for ${data.properties.title} and wants to schedule a visit.`,
           type: 'inspection_booked',
           link: '/dashboard',
         });
@@ -246,7 +246,7 @@ export function useInspectionBooking() {
       await supabase.from('notifications').insert({
         user_id: user.id,
         title: 'Inspection Booked Successfully!',
-        message: `Your inspection booking for ${data?.properties?.title} is confirmed. The landlord will confirm the date shortly.`,
+        body: `Your inspection booking for ${data?.properties?.title} is confirmed. The landlord will confirm the date shortly.`,
         type: 'inspection_confirmed',
         link: '/dashboard',
       });

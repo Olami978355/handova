@@ -182,7 +182,7 @@ export function useDeal(dealId: string) {
         await supabase.from('notifications').insert({
           user_id: ownerId,
           title: 'Tenant Approved the Agreement',
-          message: `The tenant has reviewed and approved the tenancy agreement for ${deal?.properties?.title || 'your property'}. They will now proceed with escrow payment.`,
+          body: `The tenant has reviewed and approved the tenancy agreement for ${deal?.properties?.title || 'your property'}. They will now proceed with escrow payment.`,
           type: 'deal_state_change',
           link: `/deals/${dealId}`,
         });
@@ -217,7 +217,7 @@ export function useDeal(dealId: string) {
         await supabase.from('notifications').insert({
           user_id: ownerId,
           title: 'Tenant Requested Agreement Changes',
-          message: `The tenant has requested changes to the tenancy agreement: "${reason}". Please upload a revised agreement.`,
+          body: `The tenant has requested changes to the tenancy agreement: "${reason}". Please upload a revised agreement.`,
           type: 'deal_state_change',
           link: `/deals/${dealId}`,
         });
