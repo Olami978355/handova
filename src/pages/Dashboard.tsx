@@ -874,12 +874,12 @@ return (
                         actionLabel="Browse properties"
                       />
                     ) : (
-                      <div className="grid grid-cols-2 gap-3 p-4">
+                      <div className="flex gap-3 p-4 overflow-x-auto scrollbar-hide" style={{scrollbarWidth:"none"}}>
                         {savedProperties.map(property => property && (
                           <Link
                             key={property.id}
                             to={`/property/${property.id}`}
-                            className="bg-[#111a14] border border-white/6 rounded-xl overflow-hidden hover:border-[#f0c040]/20 transition-all"
+                            className="bg-[#111a14] border border-white/6 rounded-xl overflow-hidden hover:border-[#f0c040]/20 transition-all flex-shrink-0 w-40"
                           >
                             <div className="h-24 overflow-hidden">
                               {property.images?.[0] ? (
