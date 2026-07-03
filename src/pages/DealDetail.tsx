@@ -11,6 +11,7 @@ import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
 import { supabase } from '../lib/supabase';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useAuth } from '../context/AuthContext';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
@@ -101,12 +102,12 @@ export default function DealDetail() {
   const isLandlordDeal = !!deal.landlord_id && deal.landlord_id !== deal.agent_id;
 
   const parties = [
-    { label: 'Tenant', name: deal.profiles?.full_name || 'Tenant', initial: 'T' },
+    { label: 'Tenant', name: deal.profiles?.full_name || 'Tenant', initial: 'T', verification_status: deal.profiles?.verification_status },
     ...(isLandlordDeal
-      ? [{ label: 'Landlord', name: `ID: ${deal.landlord_id!.slice(0, 8)}...`, initial: 'L' }]
+      ? [{ label: 'Landlord', name: deal.landlord?.full_name || 'Landlord', initial: 'L', verification_status: deal.landlord?.verification_status }]
       : []),
     ...(isAgentDeal
-      ? [{ label: 'Agent', name: `ID: ${deal.agent_id!.slice(0, 8)}...`, initial: 'A' }]
+      ? [{ label: 'Agent', name: deal.agent?.full_name || 'Agent', initial: 'A', verification_status: deal.agent?.verification_status }]
       : []),
   ];
 
@@ -686,7 +687,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     </div>
                     <div>
                       <p className="text-[10px] text-white/30 uppercase tracking-wider">{p.label}</p>
-                      <p className="text-[12px] font-semibold text-white">{p.name}</p>
+                      <p className="text-[12px] font-semibold text-white flex items-center gap-1"><span>{p.name}</span><VerifiedBadge status={p.verification_status} size={12} /></p>
                     </div>
                   </div>
                 ))}

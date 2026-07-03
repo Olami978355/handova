@@ -4,6 +4,7 @@ import { ArrowLeft, MessageSquare, User } from 'lucide-react';
 import { ChatList } from '../components/chat/ChatList';
 import { ChatWindow } from '../components/chat/ChatWindow';
 import { Conversation } from '../types';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useAuth } from '../context/AuthContext';
 import { useConversationsContext } from '../context/ConversationsContext';
 
@@ -91,8 +92,9 @@ const chatWindowProps = {
                   <ArrowLeft className="w-4 h-4" />
                 </button>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-[14px] font-bold text-white truncate">
-                    {selectedConversation?.participants?.[0]?.full_name || 'Chat'}
+                  <h3 className="text-[14px] font-bold text-white truncate flex items-center gap-1">
+                    <span className="truncate">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</span>
+                    <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                   </h3>
                   <p className="text-[11px] text-[#1a6b3c] font-medium truncate">
                     {selectedConversation?.properties?.title || 'Property'}
@@ -142,8 +144,9 @@ const chatWindowProps = {
                     {(selectedConversation?.participants?.[0]?.full_name || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-bold text-white truncate">
-                      {selectedConversation?.participants?.[0]?.full_name || 'Chat'}
+                    <h3 className="text-[14px] font-bold text-white truncate flex items-center gap-1">
+                      <span className="truncate">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</span>
+                      <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                     </h3>
                     <p className="text-[11px] text-[#1a6b3c] font-medium truncate">
                       {selectedConversation?.properties?.title || 'Property'}

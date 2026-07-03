@@ -410,7 +410,7 @@ export default function Dashboard() {
           if (tenantIds.length > 0) {
             const { data: tenantProfiles } = await supabase
               .from('profiles')
-              .select('id, full_name, avatar_url')
+              .select('id, full_name, avatar_url, verification_status')
               .in('id', tenantIds);
 
             if (tenantProfiles) {

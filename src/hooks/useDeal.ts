@@ -26,13 +26,33 @@ export function useDeal(dealId: string) {
       if (data.tenant_id) {
         const { data: tenantData } = await supabase
           .from('profiles')
-          .select('id, full_name, avatar_url, email, role')
+          .select('id, full_name, avatar_url, email, role, verification_status')
           .eq('id', data.tenant_id)
           .single();
         tenantProfile = tenantData;
       }
 
-      setDeal({ ...data, profiles: tenantProfile });
+      let landlordProfile = null;
+      if (data.landlord_id) {
+        const { data: landlordData } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, email, role, verification_status')
+          .eq('id', data.landlord_id)
+          .single();
+        landlordProfile = landlordData;
+      }
+
+      let agentProfile = null;
+      if (data.agent_id) {
+        const { data: agentData } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, email, role, verification_status')
+          .eq('id', data.agent_id)
+          .single();
+        agentProfile = agentData;
+      }
+
+      setDeal({ ...data, profiles: tenantProfile, landlord: landlordProfile, agent: agentProfile });
 
       const { data: logData, error: logError } = await supabase
         .from('deal_logs')

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, MessageSquare, Home } from 'lucide-react';
 import { useConversationsContext } from '../../context/ConversationsContext';
+import { VerifiedBadge } from '../VerifiedBadge';
 import { formatRelativeTime } from '../../utils/format';
 import { Conversation } from '../../types';
 import { supabase } from '../../lib/supabase';
@@ -133,12 +134,15 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
                   {/* Content */}
                   <div className="flex-1 min-w-0 pr-5">
                     <div className="flex items-center justify-between mb-0.5">
-                      <span className={`text-[13px] truncate ${
-                        hasUnread
-                          ? 'font-bold text-white'
-                          : 'font-semibold text-white/70'
-                      }`}>
-                        {other?.full_name || 'User'}
+                      <span className="flex items-center gap-1 min-w-0">
+                        <span className={`text-[13px] truncate ${
+                          hasUnread
+                            ? 'font-bold text-white'
+                            : 'font-semibold text-white/70'
+                        }`}>
+                          {other?.full_name || 'User'}
+                        </span>
+                        <VerifiedBadge status={other?.verification_status} size={12} />
                       </span>
                       <span className="text-[10px] text-white/25 whitespace-nowrap ml-2 flex-shrink-0">
                         {formatRelativeTime(conv.last_message_at || conv.created_at)}

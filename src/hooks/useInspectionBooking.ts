@@ -12,7 +12,7 @@ export function useInspectionBooking() {
     try {
       const { data, error } = await supabase
         .from('inspection_bookings')
-        .select('*, profiles(id, full_name, avatar_url, role)')
+        .select('*, profiles(id, full_name, avatar_url, role, verification_status)')
         .eq('property_id', propertyId)
         .order('created_at', { ascending: false });
 

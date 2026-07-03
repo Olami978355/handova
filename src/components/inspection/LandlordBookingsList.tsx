@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { InspectionBooking, Property } from '../../types';
+import { VerifiedBadge } from '../VerifiedBadge';
 import { useInspectionBooking } from '../../hooks/useInspectionBooking';
 import { supabase } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -227,8 +228,9 @@ export const LandlordBookingsList: React.FC = () => {
                               }
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[13px] font-bold text-white truncate">
-                                {booking.profiles?.full_name || 'Tenant'}
+                              <p className="text-[13px] font-bold text-white truncate flex items-center gap-1">
+                                <span className="truncate">{booking.profiles?.full_name || 'Tenant'}</span>
+                                <VerifiedBadge status={booking.profiles?.verification_status} size={12} />
                               </p>
                               <p className="text-[10px] text-white/35">
                                 {formatFee(booking.inspection_fee)} fee paid
