@@ -68,12 +68,12 @@ export const useConversations = () => {
       return;
     }
 
-    fetchConversations();
-
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
+
+    fetchConversations();
 
     const channel = supabase
       .channel(`conversations-${user.id}-${Date.now()}`)
