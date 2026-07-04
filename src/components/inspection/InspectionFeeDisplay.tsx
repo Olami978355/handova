@@ -93,7 +93,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
   // Platform fee (2%) and processing
   const platformFee = Math.round(property.price * 0.02);
   const paystackFee = Math.min(Math.round(property.price * 0.015) + 100, 2000);
-  const totalTenantPays = property.price + platformFee + paystackFee;
+  const totalTenantPays = property.price;
 
   useEffect(() => {
     if (user) {
@@ -352,8 +352,8 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           <div className="bg-[#0a1f11] border border-white/6 rounded-xl p-3 mb-3 space-y-1.5">
             {[
               { label: `Rent (${property.price_period || 'outright'})`, value: formatNaira(property.price) },
-              { label: 'Platform fee (2%)', value: `+${formatNaira(platformFee)}` },
-              { label: 'Processing fee', value: `+${formatNaira(paystackFee)}` },
+              
+              
             ].map((row, i) => (
               <div key={i} className="flex justify-between">
                 <span className="text-[11px] text-white/35">{row.label}</span>
