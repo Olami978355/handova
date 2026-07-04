@@ -107,9 +107,9 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
             <div>
               <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.4)', margin: '0 0 4px' }}>Listed by</p>
               <p style={{ fontSize: '22px', fontWeight: '700', color: '#ffffff', margin: 0 }}>{owner?.full_name}</p>
-              {(owner?.agent_id || owner?.landlord_id) && (
+              {owner?.lasrera_id && (
                 <p style={{ fontSize: '16px', color: '#f0c040', fontFamily: 'monospace', margin: '4px 0 0' }}>
-                  {owner.agent_id || owner.landlord_id}
+                  {owner.lasrera_id}
                 </p>
               )}
             </div>
@@ -335,7 +335,7 @@ export default function PropertyDetail() {
       if (data.owner_id) {
         const { data: ownerData } = await supabase
           .from('profiles')
-          .select('id, full_name, avatar_url, role, verification_status, agent_id, landlord_id')
+          .select('id, full_name, avatar_url, role, verification_status, lasrera_id')
           .eq('id', data.owner_id)
           .single();
         setOwner(ownerData as Profile);
@@ -757,9 +757,9 @@ export default function PropertyDetail() {
                       <span className="text-[11px] text-white/35 capitalize font-medium">
                         {owner?.role === 'agent' ? 'Verified Agent' : owner?.role === 'landlord' ? 'Landlord' : owner?.role}
                       </span>
-                      {(owner?.agent_id || owner?.landlord_id) && (
+                      {owner?.lasrera_id && (
                         <span className="text-[10px] text-white/25 font-mono">
-                          {owner.agent_id || owner.landlord_id}
+                          {owner.lasrera_id}
                         </span>
                       )}
                     </div>

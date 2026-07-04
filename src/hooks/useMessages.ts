@@ -18,9 +18,9 @@ export const useMessages = (conversationId?: string) => {
     }, 80);
   }, []);
 
-  const fetchMessages = useCallback(async () => {
+  const fetchMessages = useCallback(async (silent = false) => {
     if (!conversationId || !user) return;
-    setLoading(true);
+    if (!silent) setLoading(true);
     try {
       const { data: rawMessages, error } = await supabase
         .from('messages')
@@ -110,21 +110,21 @@ export const useMessages = (conversationId?: string) => {
         table: 'messages',
         filter: 'conversation_id=eq.' + conversationId,
       }, () => {
-        fetchMessages();
+        fetchMessages(true);
       })
       .on('postgres_changes' as const, {
         event: 'UPDATE',
         schema: 'public',
         table: 'custom_deal_offers',
       }, () => {
-        fetchMessages();
+        fetchMessages(true);
       })
       .subscribe();
 
     channelRef.current = channel;
 
     const pollInterval = setInterval(() => {
-      fetchMessages();
+      fetchMessages(true);
     }, 15000);
 
     return () => {

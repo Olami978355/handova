@@ -100,6 +100,9 @@ export function useDeal(dealId: string) {
         body: { dealId, ...body },
       });
       if (error) throw error;
+      // Refresh immediately rather than relying solely on the realtime
+      // subscription, which can lag behind the Edge Function's write.
+      await fetchDeal();
       return { success: true, data };
     } catch (err: any) {
       console.error(`Error calling ${functionName}:`, err);

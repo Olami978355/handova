@@ -23,5 +23,5 @@ export const COLORS = {
   background: '#ffffff',
 };
 
-export const AGENT_FEE_PERCENTAGE = 0.10;
-export const PLATFORM_FEE_PERCENTAGE = 0.10; // Rent Easy takes 10% of agent fee
+export const AGENT_FEE_PERCENTAGE = 0.10; // 10% of rent/sale price, paid by tenant to agent
+export const PLATFORM_FEE_PERCENTAGE = 0.02; // 2% of rent/sale price, deducted from landlord/agent payout

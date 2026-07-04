@@ -16,13 +16,13 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
   const { conversations, loading, refresh } = useConversationsContext();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Conversation | null>(null);
   const [deleting, setDeleting] = useState(false);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleLongPressStart = (convId: string) => {
+  const handleLongPressStart = (conv: Conversation) => {
     longPressTimer.current = setTimeout(() => {
-      setDeleteTarget(convId);
+      setDeleteTarget(conv);
     }, 600);
   };
 
@@ -34,8 +34,8 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await supabase.from('messages').delete().eq('conversation_id', deleteTarget);
-      await supabase.from('conversations').delete().eq('id', deleteTarget);
+      await supabase.from('messages').delete().eq('conversation_id', deleteTarget.id);
+      await supabase.from('conversations').delete().eq('id', deleteTarget.id);
       setDeleteTarget(null);
       refresh();
     } catch (err) {
@@ -46,6 +46,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
   };
 
   const filtered = conversations
+    .filter(conv => !!conv.last_message) // hide ghost conversations with no messages
     .filter(conv => {
       const title = conv.properties?.title?.toLowerCase() || '';
       const name = conv.participants?.[0]?.full_name?.toLowerCase() || '';
@@ -141,10 +142,10 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
                 <div key={conv.id} className="relative">
                 <button
                   onClick={() => handleSelect(conv)}
-                  onMouseDown={() => handleLongPressStart(conv.id)}
+                  onMouseDown={() => handleLongPressStart(conv)}
                   onMouseUp={handleLongPressEnd}
                   onMouseLeave={handleLongPressEnd}
-                  onTouchStart={() => handleLongPressStart(conv.id)}
+                  onTouchStart={() => handleLongPressStart(conv)}
                   onTouchEnd={handleLongPressEnd}
                   className={`w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors relative ${
                     isSelected
@@ -217,6 +218,10 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
               <Trash2 className="w-5 h-5 text-red-400" />
             </div>
             <h3 className="text-[15px] font-black text-white mb-1">Delete Conversation?</h3>
+            <p className="text-[12px] text-white/60 mb-1">
+              With <span className="font-bold text-white">{deleteTarget.participants?.[0]?.full_name || 'this user'}</span>
+              {deleteTarget.properties?.title ? <> · <span className="text-[#1a6b3c] font-semibold">{deleteTarget.properties.title}</span></> : null}
+            </p>
             <p className="text-[12px] text-white/40 mb-5">This will permanently delete all messages in this conversation.</p>
             <div className="flex gap-3">
               <button
