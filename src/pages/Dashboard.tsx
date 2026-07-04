@@ -64,7 +64,7 @@ const DealBadge = ({ status }: { status: string }) => {
     agreement_sent:    { label: 'Agreement Ready',   color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
     agreement_signed:  { label: 'Agreement Signed',  color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
     move_in_confirmed: { label: 'Move-in Confirmed', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    funds_released:    { label: 'Completed ✓',       color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    funds_released:    { label: 'Completed',       color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
     disputed:          { label: 'Disputed',           color: '#f87171', bg: 'rgba(248,113,113,0.1)' },
   };
   const s = map[status] || {

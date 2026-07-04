@@ -299,7 +299,7 @@ export default function Navbar() {
                             {profile.full_name}
                           </div>
                           <div className="text-[11px] text-white/35 capitalize">
-                            {profile.role} · {profile.verification_status === 'verified' ? '✓ Verified' : 'Unverified'}
+                            {profile.role} · {profile.verification_status === 'verified' ? 'Verified' : 'Unverified'}
                           </div>
                         </div>
                       </div>

@@ -201,7 +201,7 @@ if (privateData) {
       // Notify user
       await supabase.from('notifications').insert({
         user_id: userId,
-        title: 'Verification Approved! ✓',
+        title: 'Verification Approved',
         body: 'Congratulations! Your identity has been verified. Your listings can now go live instantly.',
         type: 'verification_approved',
         link: '/profile',
