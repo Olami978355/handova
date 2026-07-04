@@ -14,6 +14,7 @@ const noNavRoutes = [
   '/login',
   '/signup',
   '/onboarding',
+  '/notifications',
 ];
 
 export default function Layout() {
