@@ -92,6 +92,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
   }
 
   return (
+    <>
     <div
       className="flex flex-col h-full"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
@@ -235,5 +236,6 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
           </div>
         </div>
       )}
+    </>
   );
 };
