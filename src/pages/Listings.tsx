@@ -8,6 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Property, PropertyType, TransactionType } from '../types';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 
 // ─── Nigerian States ───────────────────────────────────────────────
 const NIGERIAN_STATES = [
@@ -68,6 +69,12 @@ const PropertyCard = ({ property }: { property: Property }) => {
           {property.escrow_verified && (
             <span className="bg-[#1a6b3c] text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
               <Shield className="w-2.5 h-2.5" /> Verified
+            </span>
+          )}
+          {(property as any).owner_role && (
+            <span className="bg-black/60 backdrop-blur-sm text-white/80 text-[10px] font-bold px-2.5 py-1 rounded-lg capitalize flex items-center gap-1">
+              {(property as any).owner_role}
+              <VerifiedBadge status={(property as any).owner_verification_status} size={11} />
             </span>
           )}
         </div>
@@ -227,7 +234,25 @@ export default function Listings() {
         .limit(50);
 
       if (fetchError) throw fetchError;
-      setProperties(data || []);
+
+      const rows = data || [];
+      const ownerIds = [...new Set(rows.map(p => p.owner_id).filter(Boolean))];
+      let ownerMap: Record<string, { role: string; verification_status: string }> = {};
+      if (ownerIds.length > 0) {
+        const { data: owners } = await supabase
+          .from('profiles')
+          .select('id, role, verification_status')
+          .in('id', ownerIds);
+        if (owners) {
+          ownerMap = Object.fromEntries(owners.map(o => [o.id, { role: o.role, verification_status: o.verification_status }]));
+        }
+      }
+      const enriched = rows.map(p => ({
+        ...p,
+        owner_role: ownerMap[p.owner_id]?.role,
+        owner_verification_status: ownerMap[p.owner_id]?.verification_status,
+      }));
+      setProperties(enriched);
       setTotalCount(count || 0);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to load properties';
