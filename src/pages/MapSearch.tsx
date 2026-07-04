@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatNaira } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, List, SlidersHorizontal,
@@ -49,7 +50,7 @@ const MapPropertyCard = ({ property, selected, onClick }: {
       </div>
       <div className="flex items-center gap-2 mt-1">
         <span className="text-[13px] font-black text-[#f0c040]">
-          {abbreviatePrice(property.price)}
+          {formatNaira(property.price)}
           {property.price_period && (
             <span className="text-[10px] font-normal text-white/30 ml-0.5">
               {periodLabel[property.price_period]}
@@ -271,7 +272,7 @@ export default function MapSearch() {
                       <p className="text-[13px] font-bold text-white truncate">{selectedProperty.title}</p>
                       <p className="text-[11px] text-white/40">{selectedProperty.lga}, {selectedProperty.state}</p>
                       <p className="text-[14px] font-black text-[#f0c040] mt-0.5">
-                        {abbreviatePrice(selectedProperty.price)}
+                        {formatNaira(selectedProperty.price)}
                         {selectedProperty.price_period && (
                           <span className="text-[10px] font-normal text-white/30 ml-0.5">
                             {periodLabel[selectedProperty.price_period]}

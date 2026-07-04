@@ -248,10 +248,10 @@ export default function Profile() {
                   </p>
                   <p className="text-[11px] text-white/40 leading-relaxed">
                     {profile?.verification_status === 'verified'
-                      ? 'Your identity is verified. Listings go live immediately.'
+                      ? (profile?.role === 'landlord' || profile?.role === 'agent' ? 'Your identity is verified. Listings go live immediately.' : 'Your identity is verified. Deals and messages carry more trust with landlords and agents.')
                       : profile?.verification_status === 'pending_verification'
                       ? 'We are reviewing your documents. Usually within 24 hours.'
-                      : 'Submit your NIN to unlock instant listing approval.'
+                      : (profile?.role === 'landlord' || profile?.role === 'agent' ? 'Submit your NIN to unlock instant listing approval.' : 'Submit your NIN to get a verified badge and build trust with landlords and agents.')
                     }
                   </p>
                   {profile?.verification_status !== 'verified' &&

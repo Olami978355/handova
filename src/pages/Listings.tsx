@@ -107,7 +107,7 @@ const PropertyCard = ({ property }: { property: Property }) => {
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
           <div>
             <span className="text-[17px] font-black text-[#f0c040]">
-              {abbreviatePrice(property.price)}
+              {formatNaira(property.price)}
             </span>
             {property.price_period && (
               <span className="text-[11px] text-white/35 ml-1">
@@ -128,7 +128,7 @@ const PropertyCard = ({ property }: { property: Property }) => {
             )}
             {property.inspection_fee && (
               <span className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-lg">
-                Inspect: {abbreviatePrice(property.inspection_fee)}
+                Inspect: {formatNaira(property.inspection_fee)}
               </span>
             )}
           </div>

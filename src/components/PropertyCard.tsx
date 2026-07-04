@@ -2,12 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, MapPin, Bed, Bath, Shield, Layers, Video } from 'lucide-react';
 import { Property } from '../types';
+import { formatNaira } from '../utils/format';
 
-const abbreviatePrice = (amount: number) => {
-  if (amount >= 1_000_000) return `₦${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `₦${(amount / 1_000).toFixed(0)}K`;
-  return `₦${amount.toLocaleString()}`;
-};
 
 const periodLabel: Record<string, string> = {
   yearly: '/yr', monthly: '/mo', nightly: '/night', outright: ''
@@ -86,7 +82,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         <div className="flex items-center justify-between pt-3 border-t border-white/5">
           <div>
             <span className="text-[17px] font-black text-[#f0c040]">
-              {abbreviatePrice(property.price)}
+              {formatNaira(property.price)}
             </span>
             {property.price_period && (
               <span className="text-[11px] text-white/35 ml-1">
