@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Check, Calendar, CheckCircle, ShieldCheck, ShieldX, Home, XCircle, DollarSign, MessageCircle, Info, ArrowLeft } from 'lucide-react';
-import { useNotifications } from '../hooks/useNotifications';
+import { useNotificationsContext } from '../context/NotificationsContext';
 import { Notification } from '../types';
 import { formatRelativeTime } from '../utils/format';
 
@@ -26,7 +26,7 @@ const getIcon = (type: Notification['type']) => {
 
 export default function NotificationsPage() {
   const navigate = useNavigate();
-  const { notifications, loading, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, loading, unreadCount, markAsRead, markAllAsRead } = useNotificationsContext();
 
   const handleClick = async (notif: Notification) => {
     if (!notif.read) await markAsRead(notif.id);

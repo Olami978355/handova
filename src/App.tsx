@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ConversationsProvider } from './context/ConversationsContext';
+import { NotificationsProvider } from './context/NotificationsContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { HelmetProvider } from 'react-helmet-async';
 import Layout from './components/Layout';
@@ -85,6 +86,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 function AppInner() {
   return (
+    <NotificationsProvider>
     <ConversationsProvider>
       <BrowserRouter>
         <Routes>
@@ -118,6 +120,7 @@ function AppInner() {
         </Routes>
       </BrowserRouter>
     </ConversationsProvider>
+    </NotificationsProvider>
   );
 }
 

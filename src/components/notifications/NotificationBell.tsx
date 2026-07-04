@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNotifications } from '../../hooks/useNotifications';
+import { useNotificationsContext } from '../../context/NotificationsContext';
 
 export const NotificationBell: React.FC = () => {
   const {
@@ -11,7 +11,7 @@ export const NotificationBell: React.FC = () => {
     loading,
     markAsRead,
     markAllAsRead,
-  } = useNotifications();
+  } = useNotificationsContext();
 
   const [isOpen, setIsOpen] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
