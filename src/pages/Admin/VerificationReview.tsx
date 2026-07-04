@@ -24,6 +24,7 @@ export default function VerificationReview() {
   const [docLoading, setDocLoading] = useState<string | null>(null);
   const [rejectModalFor, setRejectModalFor] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [activeTab, setActiveTab] = useState<'id' | 'agent' | 'lasrera'>('id');
 
   useEffect(() => { fetchRequests(); }, []);
 
@@ -118,6 +119,15 @@ export default function VerificationReview() {
     }
   };
 
+  const idRequests = requests.filter(r => !r.business_reg_url && !r.lasrera_doc_url);
+  const agentRequests = requests.filter(r => !!r.business_reg_url);
+  const lasreraRequests = requests.filter(r => !!r.lasrera_doc_url);
+
+  const tabbedRequests =
+    activeTab === 'id' ? idRequests :
+    activeTab === 'agent' ? agentRequests :
+    lasreraRequests;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20" style={font}>
@@ -138,7 +148,32 @@ export default function VerificationReview() {
 
   return (
     <div className="space-y-4" style={font}>
-      {requests.map((req) => (
+      <div className="flex gap-2 p-1 bg-white/4 border border-white/6 rounded-xl w-fit">
+        {([
+          { id: 'id' as const, label: 'ID Verification', count: idRequests.length },
+          { id: 'agent' as const, label: 'Agent Credentials', count: agentRequests.length },
+          { id: 'lasrera' as const, label: 'LASRERA', count: lasreraRequests.length },
+        ]).map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2 rounded-lg text-[12px] font-bold transition-colors ${
+              activeTab === tab.id ? 'bg-[#1a6b3c] text-white' : 'text-white/40 hover:text-white'
+            }`}
+          >
+            {tab.label} {tab.count > 0 ? `(${tab.count})` : ''}
+          </button>
+        ))}
+      </div>
+
+      {tabbedRequests.length === 0 ? (
+        <div className="text-center py-16 bg-[#0a1f11] border border-white/6 rounded-2xl">
+          <ShieldCheck className="w-8 h-8 text-white/15 mx-auto mb-3" />
+          <p className="text-[13px] font-semibold text-white/30">No pending requests in this category</p>
+        </div>
+      ) : null}
+
+      {tabbedRequests.map((req) => (
         <div key={req.id} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-[#1a6b3c]/20 rounded-xl overflow-hidden flex items-center justify-center text-[#1a6b3c] font-bold text-[13px] flex-shrink-0">

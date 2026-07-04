@@ -24,6 +24,7 @@ export default function PropertyModeration() {
   const [showSuspendModal, setShowSuspendModal] = useState(false);
   const [suspensionReason, setSuspensionReason] = useState('');
   const [propertyToSuspend, setPropertyToSuspend] = useState<string | null>(null);
+  const [previewProperty, setPreviewProperty] = useState<typeof properties[0] | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -255,6 +256,98 @@ export default function PropertyModeration() {
           </table>
         </div>
       </div>
+
+      {/* Property preview modal */}
+      <AnimatePresence>
+        {previewProperty && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setPreviewProperty(null)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]" />
+            <motion.div initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
+              className="fixed inset-x-4 top-4 bottom-4 md:inset-0 md:m-auto md:w-full md:max-w-2xl md:h-fit md:max-h-[85vh] bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] shadow-2xl overflow-hidden flex flex-col" style={font}
+            >
+              <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between flex-shrink-0">
+                <h3 className="text-[15px] font-bold text-white">Property Preview</h3>
+                <button onClick={() => setPreviewProperty(null)} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                {previewProperty.images?.[0] && (
+                  <img src={previewProperty.images[0]} alt="" className="w-full h-56 object-cover rounded-xl" />
+                )}
+                {previewProperty.images && previewProperty.images.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto">
+                    {previewProperty.images.slice(1).map((img, i) => (
+                      <img key={i} src={img} alt="" className="w-20 h-20 object-cover rounded-lg flex-shrink-0" />
+                    ))}
+                  </div>
+                )}
+                <div>
+                  <h4 className="text-[18px] font-black text-white mb-1">{previewProperty.title}</h4>
+                  <p className="text-[12px] text-white/40 flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" />{previewProperty.address}, {previewProperty.lga}, {previewProperty.state}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <p className="text-[20px] font-black text-[#f0c040]">
+                    {abbreviatePrice(previewProperty.price)}
+                    {previewProperty.price_period && <span className="text-[12px] text-white/30 font-normal ml-1">/{previewProperty.price_period}</span>}
+                  </p>
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider ${statusStyle(previewProperty.status)}`}>
+                    {previewProperty.status.replace('_', ' ')}
+                  </span>
+                </div>
+                {previewProperty.description && (
+                  <div>
+                    <p className="text-[11px] font-bold text-white/30 uppercase tracking-wider mb-1">Description</p>
+                    <p className="text-[13px] text-white/60 leading-relaxed whitespace-pre-wrap">{previewProperty.description}</p>
+                  </div>
+                )}
+                {previewProperty.amenities && previewProperty.amenities.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-bold text-white/30 uppercase tracking-wider mb-2">Amenities</p>
+                    <div className="flex flex-wrap gap-2">
+                      {previewProperty.amenities.map((a, i) => (
+                        <span key={i} className="text-[11px] text-white/60 bg-white/5 px-2.5 py-1 rounded-lg">{a}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <p className="text-[11px] font-bold text-white/30 uppercase tracking-wider mb-1">Listed by</p>
+                  <p className="text-[13px] font-semibold text-white">{previewProperty.profiles?.full_name || 'Unknown'}</p>
+                </div>
+              </div>
+              <div className="px-5 py-4 border-t border-white/6 flex gap-3 flex-shrink-0">
+                <button
+                  onClick={() => { setPropertyToSuspend(previewProperty.id); setShowSuspendModal(true); setPreviewProperty(null); }}
+                  disabled={actionLoading === previewProperty.id}
+                  className="px-4 py-2.5 bg-[#f0c040]/10 text-[#f0c040] border border-[#f0c040]/20 rounded-xl font-bold text-[12px] hover:bg-[#f0c040]/20 transition-colors disabled:opacity-50"
+                >
+                  Suspend
+                </button>
+                <button
+                  onClick={() => handleFlag(previewProperty.id)}
+                  disabled={actionLoading === previewProperty.id}
+                  className="px-4 py-2.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl font-bold text-[12px] hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                >
+                  Flag
+                </button>
+                <button
+                  onClick={async () => { await handleApprove(previewProperty.id); setPreviewProperty(null); }}
+                  disabled={actionLoading === previewProperty.id}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1a6b3c] text-white rounded-xl font-bold text-[12px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-50"
+                >
+                  {actionLoading === previewProperty.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                  Approve Property
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Suspend modal */}
       <AnimatePresence>
