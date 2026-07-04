@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, MessageSquare, Home } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Search, MessageSquare, Home, Trash2 } from 'lucide-react';
 import { useConversationsContext } from '../../context/ConversationsContext';
 import { VerifiedBadge } from '../VerifiedBadge';
 import { formatRelativeTime } from '../../utils/format';
@@ -16,6 +16,34 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
   const { conversations, loading, refresh } = useConversationsContext();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleLongPressStart = (convId: string) => {
+    longPressTimer.current = setTimeout(() => {
+      setDeleteTarget(convId);
+    }, 600);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await supabase.from('messages').delete().eq('conversation_id', deleteTarget);
+      await supabase.from('conversations').delete().eq('id', deleteTarget);
+      setDeleteTarget(null);
+      refresh();
+    } catch (err) {
+      console.error('Failed to delete conversation:', err);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const filtered = conversations
     .filter(conv => {
@@ -109,9 +137,14 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
               const hasUnread = unreadCount !== null && !isSelected;
 
               return (
+                <div key={conv.id} className="relative">
                 <button
-                  key={conv.id}
                   onClick={() => handleSelect(conv)}
+                  onMouseDown={() => handleLongPressStart(conv.id)}
+                  onMouseUp={handleLongPressEnd}
+                  onMouseLeave={handleLongPressEnd}
+                  onTouchStart={() => handleLongPressStart(conv.id)}
+                  onTouchEnd={handleLongPressEnd}
                   className={`w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors relative ${
                     isSelected
                       ? 'bg-[#1a6b3c]/15 border-l-2 border-[#1a6b3c]'
@@ -167,11 +200,40 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
                     </div>
                   )}
                 </button>
+                </div>
               );
             })}
           </div>
         )}
       </div>
     </div>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div className="bg-[#0a1f11] border border-white/10 rounded-2xl p-6 max-w-xs w-full">
+            <div className="w-11 h-11 bg-red-500/10 rounded-xl flex items-center justify-center mb-4">
+              <Trash2 className="w-5 h-5 text-red-400" />
+            </div>
+            <h3 className="text-[15px] font-black text-white mb-1">Delete Conversation?</h3>
+            <p className="text-[12px] text-white/40 mb-5">This will permanently delete all messages in this conversation.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-bold text-white/50 hover:text-white transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 py-2.5 bg-red-500/80 rounded-xl text-[13px] font-bold text-white hover:bg-red-500 transition-all disabled:opacity-40"
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
   );
 };
