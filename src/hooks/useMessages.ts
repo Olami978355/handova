@@ -24,7 +24,7 @@ export const useMessages = (conversationId?: string) => {
     try {
       const { data: rawMessages, error } = await supabase
         .from('messages')
-        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at')
+        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at, edited_at, deleted_for_everyone, deleted_for, quoted_message_id')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
@@ -59,12 +59,16 @@ export const useMessages = (conversationId?: string) => {
         }
       }
 
-      const enriched = msgs.map(msg => ({
+      const visibleMsgs = msgs.filter(m => !(m.deleted_for || []).includes(user.id));
+      const msgMap = Object.fromEntries(visibleMsgs.map(m => [m.id, m]));
+
+      const enriched = visibleMsgs.map(msg => ({
         ...msg,
         sender: senderMap[msg.sender_id] || undefined,
         custom_deal_offer: msg.custom_deal_offer_id
           ? dealOffersMap[msg.custom_deal_offer_id] || undefined
           : undefined,
+        quoted_message: msg.quoted_message_id ? msgMap[msg.quoted_message_id] : undefined,
       }));
 
       setMessages(enriched as Message[]);
@@ -136,7 +140,7 @@ export const useMessages = (conversationId?: string) => {
     };
   }, [conversationId, user?.id]);
 
-  const sendMessage = async (content: string): Promise<void> => {
+  const sendMessage = async (content: string, quotedMessageId?: string): Promise<void> => {
     if (!conversationId || !user || !content.trim() || sending) return;
     setSending(true);
     setSendError(null);
@@ -170,8 +174,9 @@ export const useMessages = (conversationId?: string) => {
           sender_id: user.id,
           content: content.trim(),
           message_type: 'text',
+          quoted_message_id: quotedMessageId || null,
         })
-        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at')
+        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at, edited_at, deleted_for_everyone, deleted_for, quoted_message_id')
         .single();
       if (insertError) throw new Error(insertError.message);
       const { data: senderProfile } = await supabase
@@ -263,6 +268,48 @@ export const useMessages = (conversationId?: string) => {
     }
   };
 
+  const editMessage = async (messageId: string, newContent: string): Promise<void> => {
+    if (!newContent.trim()) return;
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ content: newContent.trim(), edited_at: new Date().toISOString() })
+        .eq('id', messageId)
+        .eq('sender_id', user?.id || '');
+      if (error) throw new Error(error.message);
+      await fetchMessages();
+    } catch (err: unknown) {
+      setSendError(err instanceof Error ? err.message : 'Failed to edit message');
+      throw err;
+    }
+  };
+
+  const deleteMessage = async (messageId: string, forEveryone: boolean): Promise<void> => {
+    try {
+      if (forEveryone) {
+        const { error } = await supabase
+          .from('messages')
+          .update({ deleted_for_everyone: true, content: 'This message was deleted' })
+          .eq('id', messageId)
+          .eq('sender_id', user?.id || '');
+        if (error) throw new Error(error.message);
+      } else {
+        const target = messages.find(m => m.id === messageId);
+        const existing = (target as any)?.deleted_for || [];
+        const updated = [...new Set([...existing, user?.id])];
+        const { error } = await supabase
+          .from('messages')
+          .update({ deleted_for: updated })
+          .eq('id', messageId);
+        if (error) throw new Error(error.message);
+      }
+      await fetchMessages();
+    } catch (err: unknown) {
+      setSendError(err instanceof Error ? err.message : 'Failed to delete message');
+      throw err;
+    }
+  };
+
   return {
     messages,
     loading,
@@ -271,6 +318,8 @@ export const useMessages = (conversationId?: string) => {
     sendMessage,
     sendCustomDealOffer,
     respondToOffer,
+    editMessage,
+    deleteMessage,
     messagesEndRef,
     refresh: fetchMessages,
   };

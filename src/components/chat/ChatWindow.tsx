@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Loader2, AlertCircle, RefreshCw,
-  Tag, Calendar, Clock, CheckCircle, XCircle, X
+  Tag, Calendar, Clock, CheckCircle, XCircle, X,
+  Pencil, Reply, Trash2, Check
 } from 'lucide-react';
 import { useMessages } from '../../hooks/useMessages';
 import { useAuth } from '../../context/AuthContext';
@@ -297,12 +298,49 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const {
     messages, loading, sending, sendError,
     sendMessage, sendCustomDealOffer, respondToOffer,
+    editMessage, deleteMessage,
     messagesEndRef, refresh,
   } = useMessages(resolvedConversationId);
 
   const [newMessage, setNewMessage] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
   const [showDealModal, setShowDealModal] = useState(false);
+  const [quotedMessage, setQuotedMessage] = useState<typeof messages[0] | null>(null);
+  const [menuMessageId, setMenuMessageId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const ONE_HOUR = 60 * 60 * 1000;
+
+  const startLongPress = (msg: typeof messages[0]) => {
+    longPressTimer.current = setTimeout(() => setMenuMessageId(msg.id), 500);
+  };
+  const endLongPress = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  };
+
+  const startEdit = (msg: typeof messages[0]) => {
+    setEditingId(msg.id);
+    setEditText(msg.content);
+    setMenuMessageId(null);
+  };
+
+  const saveEdit = async () => {
+    if (!editingId || !editText.trim()) return;
+    try {
+      await editMessage(editingId, editText.trim());
+    } catch { /* surfaced via sendError */ }
+    setEditingId(null);
+    setEditText('');
+  };
+
+  const handleDeleteMessage = async (msg: typeof messages[0], forEveryone: boolean) => {
+    setMenuMessageId(null);
+    try {
+      await deleteMessage(msg.id, forEveryone);
+    } catch { /* surfaced via sendError */ }
+  };
   const [creatingConversation, setCreatingConversation] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -471,7 +509,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 const isMe = msg.sender_id === user?.id;
                 const isOptimistic = msg.id.startsWith('temp-');
                 const isCustomDeal = msg.message_type === 'custom_deal_offer';
-
+                const isDeleted = !!msg.deleted_for_everyone;
+                const isEditing = editingId === msg.id;
+                const canEdit = isMe && !isCustomDeal && !isDeleted && !isOptimistic;
+                const canDeleteForEveryone = isMe && !isDeleted && !isOptimistic &&
+                  (Date.now() - new Date(msg.created_at).getTime() < ONE_HOUR);
                 return (
                   <motion.div
                     key={msg.id}
@@ -480,7 +522,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                     transition={{ duration: 0.15 }}
                     className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} ${isCustomDeal ? 'max-w-[85%]' : 'max-w-[78%]'}`}>
+                    <div className={`relative flex flex-col ${isMe ? 'items-end' : 'items-start'} ${isCustomDeal ? 'max-w-[85%]' : 'max-w-[78%]'}`}>
                       {isCustomDeal && msg.custom_deal_offer ? (
                         <DealOfferCard
                           offer={msg.custom_deal_offer}
@@ -488,15 +530,96 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                           onAccept={() => handleAcceptOffer(msg.custom_deal_offer!.id)}
                           onDecline={() => handleDeclineOffer(msg.custom_deal_offer!.id)}
                         />
+                      ) : isEditing ? (
+                        <div className="w-full min-w-[220px]">
+                          <textarea
+                            value={editText}
+                            onChange={e => setEditText(e.target.value)}
+                            rows={2}
+                            className="w-full px-3 py-2 bg-white/5 border border-[#f0c040]/40 rounded-xl text-[13px] text-white outline-none resize-none"
+                            autoFocus
+                          />
+                          <div className="flex gap-2 mt-1.5">
+                            <button
+                              onClick={() => { setEditingId(null); setEditText(''); }}
+                              className="flex-1 py-1.5 rounded-lg text-[11px] font-bold text-white/40 bg-white/5 hover:text-white transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={saveEdit}
+                              disabled={!editText.trim()}
+                              className="flex-1 py-1.5 rounded-lg text-[11px] font-bold text-black bg-[#f0c040] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-1"
+                            >
+                              <Check className="w-3 h-3" /> Save
+                            </button>
+                          </div>
+                        </div>
                       ) : (
-                        <div className={`px-4 py-2.5 text-[13px] leading-relaxed break-words ${
-                          isMe
-                            ? 'bg-[#1a6b3c] text-white rounded-2xl rounded-tr-sm'
-                            : 'bg-[#0a1f11] border border-white/8 text-white/85 rounded-2xl rounded-tl-sm'
-                        }`}>
+                        <div
+                          onMouseDown={() => !isDeleted && startLongPress(msg)}
+                          onMouseUp={endLongPress}
+                          onMouseLeave={endLongPress}
+                          onTouchStart={() => !isDeleted && startLongPress(msg)}
+                          onTouchEnd={endLongPress}
+                          className={`px-4 py-2.5 text-[13px] leading-relaxed break-words cursor-pointer select-none ${
+                            isMe
+                              ? 'bg-[#1a6b3c] text-white rounded-2xl rounded-tr-sm'
+                              : 'bg-[#0a1f11] border border-white/8 text-white/85 rounded-2xl rounded-tl-sm'
+                          } ${isDeleted ? 'italic opacity-50' : ''}`}
+                        >
+                          {msg.quoted_message && !isDeleted && (
+                            <div className={`mb-1.5 pl-2 border-l-2 ${isMe ? 'border-white/30' : 'border-[#1a6b3c]/50'} text-[11px] opacity-70 truncate max-w-[220px]`}>
+                              {msg.quoted_message.deleted_for_everyone ? 'This message was deleted' : msg.quoted_message.content}
+                            </div>
+                          )}
                           {msg.content}
                         </div>
                       )}
+
+                      {menuMessageId === msg.id && !isEditing && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setMenuMessageId(null)}
+                          />
+                          <div className={`absolute z-50 top-full mt-1 ${isMe ? 'right-0' : 'left-0'} w-44 bg-[#111a14] border border-white/10 rounded-xl shadow-2xl p-1.5`}>
+                            {!isDeleted && (
+                              <button
+                                onClick={() => { setQuotedMessage(msg); setMenuMessageId(null); }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-white/70 hover:bg-white/8 rounded-lg transition-colors"
+                              >
+                                <Reply className="w-3.5 h-3.5" /> Quote
+                              </button>
+                            )}
+                            {canEdit && (
+                              <button
+                                onClick={() => startEdit(msg)}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-white/70 hover:bg-white/8 rounded-lg transition-colors"
+                              >
+                                <Pencil className="w-3.5 h-3.5" /> Edit
+                              </button>
+                            )}
+                            {!isDeleted && (
+                              <button
+                                onClick={() => handleDeleteMessage(msg, false)}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-white/70 hover:bg-white/8 rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete for me
+                              </button>
+                            )}
+                            {canDeleteForEveryone && (
+                              <button
+                                onClick={() => handleDeleteMessage(msg, true)}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete for everyone
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
+
                       <div className="flex items-center gap-1.5 mt-1 px-1">
                         {!isMe && !isCustomDeal && (
                           <span className="text-[10px] font-bold text-white/25 uppercase tracking-wider">
@@ -505,6 +628,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         )}
                         <span className="text-[10px] text-white/20">
                           {isOptimistic ? 'Sending...' : formatRelativeTime(msg.created_at)}
+                          {msg.edited_at && !isDeleted ? ' · edited' : ''}
                         </span>
                       </div>
                     </div>
@@ -534,6 +658,22 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </AnimatePresence>
 
         <div className="flex-shrink-0 px-4 py-3 bg-[#0a1f11] border-t border-white/5">
+          {quotedMessage && (
+            <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 bg-white/5 border-l-2 border-[#f0c040] rounded-lg">
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-[#f0c040] uppercase tracking-wider mb-0.5">
+                  Replying to {quotedMessage.sender_id === user?.id ? 'yourself' : (otherParticipantName || 'them')}
+                </p>
+                <p className="text-[12px] text-white/50 truncate">{quotedMessage.content}</p>
+              </div>
+              <button
+                onClick={() => setQuotedMessage(null)}
+                className="w-6 h-6 flex-shrink-0 bg-white/5 rounded-lg flex items-center justify-center text-white/40 hover:text-white transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
           {isLandlordOrAgent && propertyId && (
             <div className="mb-2">
               <button

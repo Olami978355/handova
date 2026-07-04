@@ -224,7 +224,6 @@ export interface Deal {
   agreement_url?: string;
   agreement_path?: string;
   agreement_skipped?: boolean;
-  agreement_skipped?: boolean;
   tenant_signed_at?: string;
   landlord_signed_at?: string;
   move_in_date?: string;
@@ -312,8 +311,13 @@ export interface Message {
   custom_deal_offer_id?: string;
   read: boolean;
   created_at: string;
+  edited_at?: string;
+  deleted_for_everyone?: boolean;
+  deleted_for?: string[];
+  quoted_message_id?: string;
   sender?: Profile;
   custom_deal_offer?: CustomDealOffer;
+  quoted_message?: Message;
 }
 
 // ─── Notifications ───────────────────────────────────────────────
