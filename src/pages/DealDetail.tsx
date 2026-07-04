@@ -22,7 +22,7 @@ export default function DealDetail() {
   const { user } = useAuth();
   const {
     deal, logs, loading, error,
-    uploadAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl,
+    uploadAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl, skipAgreement,
     signAgreement, confirmMoveIn, releaseFunds, markDisputed,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
@@ -40,6 +40,7 @@ export default function DealDetail() {
   const [changeReason, setChangeReason] = useState('');
   const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [showChangeModal, setShowChangeModal] = useState(false);
+  const [showSkipModal, setShowSkipModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -290,6 +291,13 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                     {processing ? 'Uploading...' : 'Upload Agreement PDF'}
                   </button>
+                  <button
+                    onClick={() => setShowSkipModal(true)}
+                    disabled={processing}
+                    className="w-full mt-3 py-3 rounded-xl font-bold text-[13px] text-white/40 hover:text-white hover:bg-white/5 border border-white/8 transition-colors disabled:opacity-40"
+                  >
+                    Proceed Without Written Agreement
+                  </button>
                 </div>
               )}
 
@@ -518,7 +526,44 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               )}
 
               {/* STEP 4: Payment received — both parties sign */}
-              {deal.status === 'payment_received' && (
+
+              {/* STEP 4 (skipped agreement path): tenant confirms move-in directly */}
+              {deal.status === 'payment_received' && deal.agreement_skipped && isTenant && (
+                <div className="p-5 bg-[#1a6b3c]/8 border border-[#1a6b3c]/20 rounded-xl">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-9 h-9 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Key className="w-4 h-4 text-[#1a6b3c]" />
+                    </div>
+                    <div>
+                      <h4 className="text-[14px] font-bold text-white mb-1">Confirm Move-in</h4>
+                      <p className="text-[12px] text-white/45 leading-relaxed">
+                        No written tenancy agreement was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the keys and access to the property. This will release funds to the owner.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleAction(confirmMoveIn)}
+                    disabled={processing}
+                    className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                  >
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Move-in & Release Funds'}
+                  </button>
+                  <p className="text-[11px] text-white/25 text-center mt-3">
+                    ⚠️ Only confirm after you have received the keys. This action cannot be undone.
+                  </p>
+                </div>
+              )}
+
+              {deal.status === 'payment_received' && deal.agreement_skipped && (isLandlord || isAgent) && (
+                <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
+                  <Key className="w-8 h-8 text-white/20 mx-auto mb-3" />
+                  <h4 className="text-[14px] font-bold text-white mb-2">Hand Over the Keys</h4>
+                  <p className="text-[13px] text-white/40 leading-relaxed">
+                    Payment received in escrow. No written agreement was required for this deal. Please give the tenant access to the property — funds will be released once they confirm move-in.
+                  </p>
+                </div>
+              )}
+              {deal.status === 'payment_received' && !deal.agreement_skipped && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-white/8 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -772,6 +817,59 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
           </div>
         </div>
       </div>
+
+      {/* Skip Agreement Confirmation Modal */}
+      <AnimatePresence>
+        {showSkipModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowSkipModal(false)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
+              style={font}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-[16px] font-bold text-white">Proceed Without Written Agreement?</h3>
+                <button
+                  onClick={() => setShowSkipModal(false)}
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-[13px] text-white/45 mb-5 leading-relaxed">
+                Only do this if you and the tenant have already agreed on terms directly. The tenant will be told no
+                formal tenancy agreement was uploaded before they pay into escrow. This deal will skip straight to
+                escrow payment and, after that, move-in confirmation — no signing step.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowSkipModal(false)}
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await handleAction(skipAgreement);
+                    setShowSkipModal(false);
+                  }}
+                  disabled={processing}
+                  className="flex-1 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40"
+                >
+                  {processing ? 'Processing...' : 'Confirm — Skip Agreement'}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Request Changes Modal */}
       <AnimatePresence>

@@ -25,14 +25,24 @@ serve(async (req) => {
 
     if (dealError || !deal) throw new Error('Deal not found');
 
-    // 2.1 Verify deal status
-    if (deal.status !== 'agreement_signed') {
-      throw new Error(`Cannot confirm move-in in ${deal.status} status. Agreement must be signed first.`);
-    }
+    // 2.1 Verify deal status — normally requires agreement_signed, but if the
+    // landlord/agent chose to skip the tenancy agreement entirely, the deal
+    // goes straight from payment_received to move-in confirmation instead.
+    const skippedAgreement = deal.agreement_skipped === true;
 
-    // 2.2 Verify both signatures are present
-    if (!deal.tenant_signed_at || !deal.landlord_signed_at) {
-      throw new Error('Both parties must sign the agreement before move-in can be confirmed.');
+    if (skippedAgreement) {
+      if (deal.status !== 'payment_received') {
+        throw new Error(`Cannot confirm move-in in ${deal.status} status.`);
+      }
+    } else {
+      if (deal.status !== 'agreement_signed') {
+        throw new Error(`Cannot confirm move-in in ${deal.status} status. Agreement must be signed first.`);
+      }
+
+      // 2.2 Verify both signatures are present (only applies when an agreement exists)
+      if (!deal.tenant_signed_at || !deal.landlord_signed_at) {
+        throw new Error('Both parties must sign the agreement before move-in can be confirmed.');
+      }
     }
 
     // 3. Validate caller has permission (tenant only)

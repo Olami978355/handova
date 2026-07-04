@@ -223,6 +223,8 @@ export interface Deal {
   status: DealStatus;
   agreement_url?: string;
   agreement_path?: string;
+  agreement_skipped?: boolean;
+  agreement_skipped?: boolean;
   tenant_signed_at?: string;
   landlord_signed_at?: string;
   move_in_date?: string;
