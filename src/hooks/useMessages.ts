@@ -145,12 +145,15 @@ export const useMessages = (conversationId?: string) => {
     setSending(true);
     setSendError(null);
     const tempId = 'temp-' + Date.now();
+    const quotedMsg = quotedMessageId ? messages.find(m => m.id === quotedMessageId) : undefined;
     const optimistic: Message = {
       id: tempId,
       conversation_id: conversationId,
       sender_id: user.id,
       content: content.trim(),
       message_type: 'text',
+      quoted_message_id: quotedMessageId,
+      quoted_message: quotedMsg,
       read: false,
       created_at: new Date().toISOString(),
       sender: {
@@ -184,7 +187,7 @@ export const useMessages = (conversationId?: string) => {
         .select('id, full_name, avatar_url, role, email, verification_status, nin_verified, created_at, updated_at')
         .eq('id', user.id)
         .single();
-      setMessages(prev => prev.map(m => m.id === tempId ? { ...(sent as Message), sender: senderProfile || undefined } : m));
+      setMessages(prev => prev.map(m => m.id === tempId ? { ...(sent as Message), sender: senderProfile || undefined, quoted_message: quotedMsg } : m));
       await supabase
         .from('conversations')
         .update({ last_message: content.trim(), last_message_at: new Date().toISOString() })
