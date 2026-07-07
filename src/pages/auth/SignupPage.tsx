@@ -420,11 +420,11 @@ export default function SignupPage() {
               </button>
               <span className="text-[13px] text-white/50 leading-relaxed">
                 I agree to RentEasy's{' '}
-                <Link to="#" className="text-[#f0c040]/80 hover:text-[#f0c040] transition-colors font-semibold">
+                <Link to="/legal" target="_blank" rel="noopener noreferrer" className="text-[#f0c040]/80 hover:text-[#f0c040] transition-colors font-semibold">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="#" className="text-[#f0c040]/80 hover:text-[#f0c040] transition-colors font-semibold">
+                <Link to="/legal" target="_blank" rel="noopener noreferrer" className="text-[#f0c040]/80 hover:text-[#f0c040] transition-colors font-semibold">
                   Privacy Policy
                 </Link>
               </span>
