@@ -121,15 +121,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
-  // ✅ Only show spinner for max 3 seconds
-  // After that render the app regardless
-  const [showSpinner, setShowSpinner] = useState(true);
+  // Safety timeout so the app never hangs forever waiting on Supabase,
+  // but long enough that a normal slow connection doesn't get mistaken
+  // for "logged out". If it times out AND we're actually offline, show
+  // an explicit offline screen instead of silently rendering as logged out.
+  const [timedOut, setTimedOut] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
   useEffect(() => {
-    const t = setTimeout(() => setShowSpinner(false), 3000);
+    const t = setTimeout(() => setTimedOut(true), 8000);
     return () => clearTimeout(t);
   }, []);
 
-  if (loading && showSpinner) {
+  useEffect(() => {
+    const handleOffline = () => setIsOffline(true);
+    const handleOnline = () => setIsOffline(false);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []);
+
+  if (loading && !timedOut) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -147,6 +162,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           animation: 'spin 0.8s linear infinite',
         }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (loading && timedOut && isOffline) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: '#0a0a0a',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+        padding: 24,
+        textAlign: 'center',
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
+      }}>
+        <p style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>You're offline</p>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, maxWidth: 260 }}>
+          Your account is still signed in — reconnect to the internet to continue.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            background: '#1a6b3c', color: '#fff', padding: '10px 24px',
+            borderRadius: 12, fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer',
+          }}
+        >
+          Retry
+        </button>
       </div>
     );
   }
