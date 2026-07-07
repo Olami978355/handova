@@ -312,6 +312,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const ONE_HOUR = 60 * 60 * 1000;
+  const FIFTEEN_MIN = 15 * 60 * 1000;
 
   const startLongPress = (msg: typeof messages[0]) => {
     longPressTimer.current = setTimeout(() => setMenuMessageId(msg.id), 500);
@@ -513,7 +514,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 const isCustomDeal = msg.message_type === 'custom_deal_offer';
                 const isDeleted = !!msg.deleted_for_everyone;
                 const isEditing = editingId === msg.id;
-                const canEdit = isMe && !isCustomDeal && !isDeleted && !isOptimistic;
+                const canEdit = isMe && !isCustomDeal && !isDeleted && !isOptimistic &&
+                  (Date.now() - new Date(msg.created_at).getTime() < FIFTEEN_MIN);
                 const canDeleteForEveryone = isMe && !isDeleted && !isOptimistic &&
                   (Date.now() - new Date(msg.created_at).getTime() < ONE_HOUR);
                 return (

@@ -740,6 +740,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
             </div>
 
             {/* Payout breakdown */}
+            {(isLandlord || isAgent || isAdmin || isModerator) ? (
             <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
               <h3 className="text-[13px] font-bold text-white mb-4">Payout Breakdown</h3>
               <div className="space-y-2.5">
@@ -766,6 +767,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 ))}
               </div>
             </div>
+            ) : (
+              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+                <h3 className="text-[13px] font-bold text-white mb-2">Pricing</h3>
+                <p className="text-[12px] text-white/40 leading-relaxed">
+                  The amount shown includes all applicable fees. You pay exactly what's listed — nothing extra is added at checkout.
+                </p>
+              </div>
+            )}
 
             {/* Activity log */}
             <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
