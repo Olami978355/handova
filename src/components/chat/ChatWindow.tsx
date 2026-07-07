@@ -367,6 +367,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     if (!content || sending || creatingConversation) return;
     setLocalError(null);
     setNewMessage('');
+    const quotedId = quotedMessage?.id;
+    setQuotedMessage(null);
 
     try {
       if (!resolvedConversationId && propertyId && recipientId && user) {
@@ -419,7 +421,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           setCreatingConversation(false);
         }
       } else {
-        await sendMessage(content);
+        await sendMessage(content, quotedId);
       }
     } catch (err: unknown) {
       setNewMessage(content);
