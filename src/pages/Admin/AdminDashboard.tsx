@@ -20,7 +20,7 @@ import DisputeQueue from './DisputeQueue';
 import EscrowQueue from './EscrowQueue';
 import AdminLogs from './AdminLogs';
 
-type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'escrow' | 'fund-releases' | 'logs' | 'card-requests';
+type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -76,7 +76,7 @@ export default function AdminDashboard() {
     { id: 'users', label: 'Users', icon: Users, roles: ['admin'] },
     { id: 'verifications', label: 'Verifications', icon: ShieldCheck, roles: ['admin', 'moderator'] },
     { id: 'properties', label: 'Properties', icon: Building2, roles: ['admin', 'moderator'] },
-    { id: 'escrow', label: 'Disputes', icon: AlertCircle, roles: ['admin', 'moderator'] },
+    { id: 'disputes', label: 'Disputes', icon: AlertCircle, roles: ['admin', 'moderator'] },
     { id: 'fund-releases', label: 'Fund Releases', icon: DollarSign, roles: ['admin', 'moderator'] },
     { id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] },
     { id: 'logs', label: 'Logs', icon: History, roles: ['admin'] },
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
               {activeTab === 'users' && <UserManagement />}
               {activeTab === 'verifications' && <VerificationReview />}
               {activeTab === 'properties' && <PropertyModeration />}
-              {activeTab === 'escrow' && <DisputeQueue />}
+              {activeTab === 'disputes' && <DisputeQueue />}
               {activeTab === 'fund-releases' && <EscrowQueue />}
               {activeTab === 'logs' && <AdminLogs />}
               {activeTab === 'card-requests' && <CardRequestQueue />}
@@ -254,7 +254,7 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
       const activities = [
         ...(recentUsers || []).map(u => ({ type: 'user_registered', message: `${u.full_name || 'New user'} registered`, time: u.created_at, icon: User, tab: 'users' })),
         ...(recentProperties || []).map(p => ({ type: 'property_listed', message: `New listing: ${p.title}`, time: p.created_at, icon: Home, tab: 'properties' })),
-        ...(recentDeals || []).map(d => ({ type: 'deal_created', message: `New escrow deal: ₦${d.amount?.toLocaleString()}`, time: d.created_at, icon: DollarSign, tab: 'escrow' })),
+        ...(recentDeals || []).map(d => ({ type: 'deal_created', message: `New escrow deal: ₦${d.amount?.toLocaleString()}`, time: d.created_at, icon: DollarSign, tab: 'fund-releases' })),
         ...(recentVerifications || []).map(() => ({ type: 'verification_submitted', message: 'New verification request', time: new Date().toISOString(), icon: Shield, tab: 'verifications' })),
       ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8);
 
@@ -305,7 +305,7 @@ function OverviewStats({ setActiveTab }: { setActiveTab: (tab: AdminTab) => void
     { id: 'users', label: 'Total Users', value: stats?.totalUsers.toLocaleString() || '0', icon: Users, color: '#1a6b3c', trend: '+12%' },
     { id: 'verifications', label: 'Pending Verifications', value: stats?.pendingVerifications.toLocaleString() || '0', icon: ShieldCheck, color: '#f0c040', urgent: (stats?.pendingVerifications || 0) > 0 },
     { id: 'properties', label: 'Active Properties', value: stats?.activeProperties.toLocaleString() || '0', icon: Building2, color: '#60a5fa', trend: '+8%' },
-    { id: 'escrow', label: 'Platform Revenue', value: `₦${(stats?.totalRevenue || 0).toLocaleString('en-NG')}`, icon: DollarSign, color: '#a78bfa', trend: '+24%' },
+    { id: 'fund-releases', label: 'Platform Revenue', value: `₦${(stats?.totalRevenue || 0).toLocaleString('en-NG')}`, icon: DollarSign, color: '#a78bfa', trend: '+24%' },
   ];
 
   return (
