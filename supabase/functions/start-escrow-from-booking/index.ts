@@ -151,7 +151,7 @@ serve(async (req) => {
         listed_amount: amount,
         platform_fee: platformFee,
         agent_fee: agentFee,
-        agent_commission_rate: isAgent ? 10 : 0,
+        agent_commission_rate: hasDistinctLandlord ? 10 : 0,
         landlord_payout: landlordPayout,
         deal_type: booking.properties.transaction_type === 'sell'
           ? (booking.properties.listing_type === 'land' ? 'land_sale' : 'house_sale')

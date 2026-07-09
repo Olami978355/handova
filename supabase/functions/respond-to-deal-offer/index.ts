@@ -95,6 +95,7 @@ serve(async (req) => {
       amount: offer.agreed_price,
       platform_fee: platformFee,
       agent_fee: agentFee,
+      agent_commission_rate: hasDistinctLandlord ? 10 : 0,
       landlord_payout: landlordPayout,
       status: 'agreement_draft',
       move_in_date: offer.move_in_date || null,

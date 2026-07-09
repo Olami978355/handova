@@ -143,7 +143,7 @@ export default function EscrowQueue() {
                 <span className="text-red-400">-{formatNaira(platformFee)}</span>
               </div>
               <div className="flex justify-between text-[12px]">
-                <span className="text-white/40">Agent Commission ({deal.agent_commission_rate || 10}%)</span>
+                <span className="text-white/40">Agent Commission ({deal.agent_commission_rate ?? 0}%)</span>
                 <span className="text-red-400">-{formatNaira(commission)}</span>
               </div>
               <div className="flex justify-between text-[12px] pt-1 border-t border-white/6">
