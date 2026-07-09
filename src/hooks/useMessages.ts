@@ -262,7 +262,21 @@ export const useMessages = (conversationId?: string) => {
       const { data, error } = await supabase.functions.invoke('respond-to-deal-offer', {
         body: { offerId, accept },
       });
-      if (error) throw new Error(error.message);
+      if (error) {
+        // supabase-js does not automatically surface the Edge Function's
+        // JSON error body on a non-2xx response — it has to be read from
+        // error.context manually, otherwise the user only ever sees a
+        // generic "non-2xx status code" message instead of the real reason.
+        let message = error.message;
+        try {
+          const ctx = (error as any).context;
+          if (ctx && typeof ctx.json === 'function') {
+            const body = await ctx.json();
+            if (body?.error) message = body.error;
+          }
+        } catch { /* fall back to generic message */ }
+        throw new Error(message);
+      }
       if (data?.error) throw new Error(data.error);
       await fetchMessages();
     } catch (err: unknown) {

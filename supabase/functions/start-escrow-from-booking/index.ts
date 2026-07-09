@@ -130,9 +130,14 @@ serve(async (req) => {
     // NOT NULL columns, must be computed here, same pattern used in
     // respond-to-deal-offer.
     const isAgent = !!booking.agent_id;
+    // Agent commission only applies when the agent is managing on behalf of
+    // a genuinely separate landlord — if the agent IS the landlord on this
+    // booking (self-listed property, no distinct owner), there's nobody to
+    // pay that 10% to, so it must not be deducted from their own payout.
+    const hasDistinctLandlord = isAgent && !!booking.landlord_id && booking.landlord_id !== booking.agent_id;
     const amount = booking.properties.price;
     const platformFee = Math.round(amount * 0.02);
-    const agentFee = isAgent ? Math.round(amount * 0.10) : 0;
+    const agentFee = hasDistinctLandlord ? Math.round(amount * 0.10) : 0;
     const landlordPayout = amount - platformFee - agentFee;
 
     const { data: deal, error: dealError } = await supabase

@@ -311,6 +311,11 @@ export default function PropertyDetail() {
   const [savingProperty, setSavingProperty] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDetails, setReportDetails] = useState('');
+  const [submittingReport, setSubmittingReport] = useState(false);
+  const [reportSubmitted, setReportSubmitted] = useState(false);
 
   useEffect(() => { if (id) fetchProperty(); }, [id]);
 

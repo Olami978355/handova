@@ -72,16 +72,21 @@ serve(async (req) => {
       .eq('id', offer.offered_by)
       .single();
 
-    const isAgent = offererProfile?.role === 'agent';
-    const platformFee = Math.round(offer.agreed_price * 0.02);
-    const agentFee = isAgent ? Math.round(offer.agreed_price * 0.10) : 0;
-    const landlordPayout = offer.agreed_price - platformFee - agentFee;
-
     const { data: propertyData } = await adminSupabase
       .from('properties')
       .select('owner_id')
       .eq('id', offer.property_id)
       .single();
+
+    const isAgent = offererProfile?.role === 'agent';
+    // Agent commission only applies when the agent is managing on behalf of
+    // a genuinely separate landlord — if the agent is also the property
+    // owner (self-listed, no distinct landlord), there is nobody to pay
+    // that 10% to, so it must not be deducted from their own payout.
+    const hasDistinctLandlord = isAgent && !!propertyData?.owner_id && propertyData.owner_id !== offer.offered_by;
+    const platformFee = Math.round(offer.agreed_price * 0.02);
+    const agentFee = hasDistinctLandlord ? Math.round(offer.agreed_price * 0.10) : 0;
+    const landlordPayout = offer.agreed_price - platformFee - agentFee;
 
     const dealPayload: Record<string, unknown> = {
       property_id: offer.property_id,
