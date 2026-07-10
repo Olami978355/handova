@@ -842,6 +842,106 @@ export default function PropertyDetail() {
             <SharePanel property={property} owner={owner} onClose={() => setShowSharePanel(false)} />
           )}
         </AnimatePresence>
+
+        {/* Report listing modal */}
+        <AnimatePresence>
+          {showReportModal && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => { if (!submittingReport) { setShowReportModal(false); setReportSubmitted(false); setReportReason(''); setReportDetails(''); } }}
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl p-6"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              >
+                {reportSubmitted ? (
+                  <div className="text-center py-4">
+                    <div className="w-12 h-12 bg-[#1a6b3c]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="w-6 h-6 text-[#4ade80]" />
+                    </div>
+                    <h3 className="text-[16px] font-bold text-white mb-2">Report submitted</h3>
+                    <p className="text-[13px] text-white/40 mb-6">Thanks for flagging this. Our team will review it shortly.</p>
+                    <button
+                      onClick={() => { setShowReportModal(false); setReportSubmitted(false); setReportReason(''); setReportDetails(''); }}
+                      className="w-full bg-[#1a6b3c] text-white py-3 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between mb-5">
+                      <h3 className="text-[15px] font-bold text-white">Report this listing</h3>
+                      <button
+                        onClick={() => setShowReportModal(false)}
+                        className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-2 mb-4">
+                      {[
+                        'Misleading photos or description',
+                        'Price seems wrong or fake',
+                        'Property already rented/sold elsewhere',
+                        'Suspected scam or fraud',
+                        'Inappropriate content',
+                        'Other',
+                      ].map((r) => (
+                        <button
+                          key={r}
+                          onClick={() => setReportReason(r)}
+                          className={`w-full text-left px-4 py-3 rounded-xl text-[13px] font-medium transition-colors border ${
+                            reportReason === r
+                              ? 'bg-[#f0c040]/10 border-[#f0c040]/30 text-white'
+                              : 'bg-white/4 border-white/8 text-white/60 hover:bg-white/6'
+                          }`}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                    <textarea
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      placeholder="Any extra details (optional)..."
+                      rows={3}
+                      className="w-full p-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/40 transition-colors resize-none mb-4"
+                    />
+                    <button
+                      onClick={async () => {
+                        if (!reportReason || !user) return;
+                        setSubmittingReport(true);
+                        try {
+                          await supabase.from('property_reports').insert({
+                            property_id: property.id,
+                            reporter_id: user.id,
+                            reason: reportReason,
+                            details: reportDetails.trim() || null,
+                          });
+                          setReportSubmitted(true);
+                        } catch (err) {
+                          console.error('Failed to submit report:', err);
+                        } finally {
+                          setSubmittingReport(false);
+                        }
+                      }}
+                      disabled={!reportReason || submittingReport}
+                      className="w-full bg-red-500/90 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-500 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                    >
+                      {submittingReport ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Report'}
+                    </button>
+                  </>
+                )}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );

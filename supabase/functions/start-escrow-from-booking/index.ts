@@ -129,15 +129,16 @@ serve(async (req) => {
     // Deal creation — platform_fee, agent_fee, landlord_payout are all
     // NOT NULL columns, must be computed here, same pattern used in
     // respond-to-deal-offer.
+    // Agent commission (10%) always applies whenever an agent is on this
+    // booking, regardless of whether landlord_id happens to equal agent_id —
+    // that just means the real landlord isn't a RentEasy account. The agent
+    // still earns their commission and receives the landlord's share too,
+    // forwarding it to the real landlord themselves outside the platform.
+    // RentEasy always pays the agent one combined transfer.
     const isAgent = !!booking.agent_id;
-    // Agent commission only applies when the agent is managing on behalf of
-    // a genuinely separate landlord — if the agent IS the landlord on this
-    // booking (self-listed property, no distinct owner), there's nobody to
-    // pay that 10% to, so it must not be deducted from their own payout.
-    const hasDistinctLandlord = isAgent && !!booking.landlord_id && booking.landlord_id !== booking.agent_id;
     const amount = booking.properties.price;
     const platformFee = Math.round(amount * 0.02);
-    const agentFee = hasDistinctLandlord ? Math.round(amount * 0.10) : 0;
+    const agentFee = isAgent ? Math.round(amount * 0.10) : 0;
     const landlordPayout = amount - platformFee - agentFee;
 
     const { data: deal, error: dealError } = await supabase
@@ -151,7 +152,7 @@ serve(async (req) => {
         listed_amount: amount,
         platform_fee: platformFee,
         agent_fee: agentFee,
-        agent_commission_rate: hasDistinctLandlord ? 10 : 0,
+        agent_commission_rate: isAgent ? 10 : 0,
         landlord_payout: landlordPayout,
         deal_type: booking.properties.transaction_type === 'sell'
           ? (booking.properties.listing_type === 'land' ? 'land_sale' : 'house_sale')
