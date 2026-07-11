@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
+import { createSupabaseClient, createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
 import { logDealAction, notifyDealParties, corsHeaders } from '../_shared/utils.ts';
 
 serve(async (req) => {
@@ -80,7 +80,7 @@ if (deal.status !== 'payment_received') {
 
     // 6. Notify parties
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const serviceRoleKey = getServiceRoleKey();
 
     if (bothSigned) {
       await notifyDealParties(

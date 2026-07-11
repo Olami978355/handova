@@ -19,7 +19,10 @@ serve(async (req) => {
       .select('*')
       .eq('id', offerId)
       .single();
-    if (fetchError || !offer) throw new Error('Offer not found');
+    if (fetchError || !offer) {
+      console.error('Offer fetch failed. offerId:', offerId, 'error:', JSON.stringify(fetchError));
+      throw new Error(fetchError ? `Offer lookup failed: ${fetchError.message}` : 'Offer not found');
+    }
 
     // Only the person the offer was made to can respond to it
     if (user.id !== offer.offered_to) {

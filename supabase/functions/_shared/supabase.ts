@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 // It must be sent as the apikey header in direct REST calls instead.
 // We use a custom fetch wrapper that injects the secret key correctly.
 
-function getServiceRoleKey(): string {
+export function getServiceRoleKey(): string {
   const secretKeys = Deno.env.get('SUPABASE_SECRET_KEYS');
   if (secretKeys) {
     try {

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { createAdminClient } from '../_shared/supabase.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -42,10 +43,7 @@ serve(async (req) => {
     // 4. Update the target user's role using the SERVICE ROLE client
     // We need a separate client with the service role to bypass RLS if necessary,
     // or just to perform administrative actions.
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseAdmin = createAdminClient()
 
     const { data: updatedProfile, error: updateError } = await supabaseAdmin
       .from('profiles')

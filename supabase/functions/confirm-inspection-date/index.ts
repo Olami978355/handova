@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createAdminClient } from '../_shared/supabase.ts';
+import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
 import { corsHeaders, sendEmail } from '../_shared/utils.ts';
 
 serve(async (req) => {
@@ -49,7 +49,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        'Authorization': `Bearer ${getServiceRoleKey()}`,
       },
       body: JSON.stringify({
         user_ids: [booking.tenant_id],

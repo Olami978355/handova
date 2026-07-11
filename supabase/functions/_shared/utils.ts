@@ -1,5 +1,21 @@
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 
+// Same key resolution used in supabase.ts — the old SUPABASE_SERVICE_ROLE_KEY
+// env var is no longer populated under the new sb_secret_ key system, so it
+// must be read from SUPABASE_SECRET_KEYS instead, or notifications silently
+// fail to send across the entire deal flow.
+function getServiceRoleKey(): string {
+  const secretKeys = Deno.env.get('SUPABASE_SECRET_KEYS');
+  if (secretKeys) {
+    try {
+      const parsed = JSON.parse(secretKeys);
+      const key = parsed['default'] ?? Object.values(parsed)[0];
+      if (key) return key as string;
+    } catch { /* fall through */ }
+  }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+}
+
 export const logDealAction = async (
   supabase: SupabaseClient,
   dealId: string,
@@ -32,7 +48,7 @@ export const notifyDealParties = async (
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const serviceRoleKey = getServiceRoleKey();
     
     if (supabaseUrl && serviceRoleKey) {
       await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
@@ -54,7 +70,7 @@ export const notifyDealParties = async (
       const notifications = parties.map(userId => ({
         user_id: userId,
         title,
-        message: body,
+        body,
         link,
         type,
         read: false,
@@ -79,7 +95,7 @@ export const sendEmail = async (
 ) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const serviceRoleKey = getServiceRoleKey();
     
     if (supabaseUrl && serviceRoleKey) {
       const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
