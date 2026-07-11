@@ -4,6 +4,7 @@ import {
   Eye, Info, ArrowRight
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { Link } from 'react-router-dom';
 import { InspectionBooking } from '../../types';
 import { format } from 'date-fns';
 import { formatFee } from '../../utils/inspectionFee';
@@ -12,6 +13,7 @@ const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 export default function DisputeQueue() {
   const [disputes, setDisputes] = useState<InspectionBooking[]>([]);
+  const [dealDisputes, setDealDisputes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [resolving, setResolving] = useState<string | null>(null);
   const [selectedDispute, setSelectedDispute] = useState<InspectionBooking | null>(null);

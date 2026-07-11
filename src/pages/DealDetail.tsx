@@ -753,12 +753,19 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 {[
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
                   { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}` },
-                  ...(deal.agent_fee && deal.agent_fee > 0
-                    ? [{ label: 'Agent Commission (10%)', value: `-${formatNaira(deal.agent_fee)}` }]
+                  ...(deal.agent_id && deal.agent_fee && deal.agent_fee > 0
+                    ? [
+                        { label: 'Your Commission (10%)', value: formatNaira(deal.agent_fee) },
+                        { label: "Landlord's Share (forward to them yourself)", value: formatNaira(deal.landlord_payout) },
+                      ]
                     : []),
                   {
-                    label: isAgentDeal && !isLandlordDeal ? 'Agent Payout' : 'Landlord Payout',
-                    value: formatNaira(deal.landlord_payout),
+                    label: deal.agent_id ? 'Your Total Payout' : 'Landlord Payout',
+                    value: formatNaira(
+                      deal.agent_id
+                        ? Number(deal.agent_fee || 0) + Number(deal.landlord_payout)
+                        : deal.landlord_payout
+                    ),
                     highlight: true,
                   },
                 ].map((row) => (
