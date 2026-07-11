@@ -41,7 +41,7 @@ serve(async (req) => {
       .from('deals')
       .update({ 
         status: 'disputed', 
-        notes: reason || 'Deal marked as disputed by admin.',
+        dispute_reason: reason || 'Deal marked as disputed by admin.',
         updated_at: new Date().toISOString() 
       })
       .eq('id', dealId);

@@ -224,6 +224,8 @@ export interface Deal {
   agreement_url?: string;
   agreement_path?: string;
   agreement_skipped?: boolean;
+  duration?: string;
+  dispute_reason?: string;
   tenant_signed_at?: string;
   landlord_signed_at?: string;
   move_in_date?: string;

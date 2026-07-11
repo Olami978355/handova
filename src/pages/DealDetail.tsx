@@ -229,7 +229,7 @@ export default function DealDetail() {
                     <div className="bg-white/4 border border-white/6 rounded-xl px-3 py-2">
                       <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Duration</p>
                       <p className="text-[13px] font-black text-white capitalize">
-                        {deal.notes?.startsWith('Change requested:') ? '1 year' : deal.notes || '1 year'}
+                        {deal.duration || '1 year'}
                       </p>
                     </div>
                   </div>
@@ -710,6 +710,12 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   <p className="text-[13px] text-white/40 max-w-xs mx-auto">
                     This transaction has been flagged. Our moderation team is reviewing the case within 3-5 business days.
                   </p>
+                  {deal.dispute_reason && (
+                    <div className="mt-4 p-4 bg-red-500/6 border border-red-500/15 rounded-xl text-left max-w-xs mx-auto">
+                      <p className="text-[10px] font-bold text-red-400/70 uppercase tracking-wider mb-1">Reason</p>
+                      <p className="text-[12px] text-white/60 leading-relaxed">{deal.dispute_reason}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -771,7 +777,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
                 <h3 className="text-[13px] font-bold text-white mb-2">Pricing</h3>
                 <p className="text-[12px] text-white/40 leading-relaxed">
-                  The amount shown includes all applicable fees. You pay exactly what's listed — nothing extra is added at checkout.
+                  The amount shown includes all applicable fees. 
                 </p>
               </div>
             )}

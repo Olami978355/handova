@@ -104,6 +104,7 @@ serve(async (req) => {
       status: 'agreement_draft',
       move_in_date: offer.move_in_date || null,
       notes: offer.note || null,
+      duration: offer.duration || null,
     };
     if (isAgent) {
       dealPayload.agent_id = offer.offered_by;
