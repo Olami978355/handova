@@ -760,7 +760,8 @@ export default function PropertyDetail() {
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[11px] text-white/35 capitalize font-medium">
-                        {owner?.role === 'agent' ? 'Verified Agent' : owner?.role === 'landlord' ? 'Landlord' : owner?.role}
+                        {owner?.role === 'agent' ? 'Agent' : owner?.role === 'landlord' ? 'Landlord' : owner?.role}
+                        {owner?.verification_status === 'verified' && <span className="text-white/25"> · Verified</span>}
                       </span>
                       {owner?.lasrera_id && (
                         <span className="text-[10px] text-white/25 font-mono">
