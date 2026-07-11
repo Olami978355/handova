@@ -1,7 +1,7 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ListingFormData } from '../../../hooks/useListingForm';
-import { AlertCircle, Shield, Calendar, Tag, Repeat } from 'lucide-react';
+import { AlertCircle, Shield, Calendar, Tag, Repeat, FileText } from 'lucide-react';
 
 interface StepProps {
   form: UseFormReturn<ListingFormData>;
