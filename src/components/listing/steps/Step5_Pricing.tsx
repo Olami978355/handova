@@ -227,6 +227,20 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
           This protects both parties.
         </p>
       </div>
+
+      {/* Tenancy agreement rule */}
+      {price > 0 && (
+        <div className="flex items-start gap-3 p-4 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl">
+          <FileText className="w-4 h-4 text-[#f0c040] flex-shrink-0 mt-0.5" />
+          <p className="text-[12px] text-white/50 leading-relaxed">
+            {price >= 1000000 ? (
+              <>A written tenancy agreement is <span className="text-white font-semibold">required</span> for deals ₦1,000,000 and above. Upload your own, or have RentEasy generate one for ₦10,000 (deducted from your payout once funds are released — no upfront cost).</>
+            ) : (
+              <>For deals under ₦1,000,000, a written tenancy agreement is <span className="text-white font-semibold">optional</span> — you can proceed without one if you and the tenant agree directly. Note: if a security/caution deposit is ever collected on a deal, a written agreement becomes required regardless of price.</>
+            )}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

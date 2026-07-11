@@ -192,6 +192,31 @@ export const useMessages = (conversationId?: string) => {
         .from('conversations')
         .update({ last_message: content.trim(), last_message_at: new Date().toISOString() })
         .eq('id', conversationId);
+
+      // Notify the other participant — this was previously missing entirely,
+      // meaning recipients never got alerted about new messages.
+      try {
+        const { data: conv } = await supabase
+          .from('conversations')
+          .select('participant_ids')
+          .eq('id', conversationId)
+          .single();
+        const recipientId = conv?.participant_ids?.find((id: string) => id !== user.id);
+        if (recipientId) {
+          await supabase.functions.invoke('send-notification', {
+            body: {
+              user_ids: [recipientId],
+              title: 'New Message',
+              body: content.trim().slice(0, 100),
+              link: `/messages?id=${conversationId}`,
+              type: 'new_message',
+            },
+          });
+        }
+      } catch (notifyErr) {
+        console.error('Failed to notify recipient (non-fatal):', notifyErr);
+      }
+
       scrollToBottom();
     } catch (err: unknown) {
       setMessages(prev => prev.filter(m => m.id !== tempId));

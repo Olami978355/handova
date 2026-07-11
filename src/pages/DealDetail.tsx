@@ -191,12 +191,25 @@ export default function DealDetail() {
                   <Home className="w-5 h-5 text-[#1a6b3c]" />
                   <h3 className="text-[14px] font-bold text-white">Property Details</h3>
                 </div>
-                <Link
-                  to={`/property/${deal.property_id}`}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/30 hover:text-white transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
+                <div className="flex items-center gap-2">
+                  {deal.agreement_url && (
+                    
+                    <a
+                      href={agreementViewUrl || deal.agreement_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 h-8 bg-white/5 rounded-xl text-white/40 hover:text-white transition-colors text-[11px] font-bold"
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Agreement
+                    </a>
+                  )}
+                  <Link
+                    to={`/property/${deal.property_id}`}
+                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/30 hover:text-white transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-20 h-20 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
