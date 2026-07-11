@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { ArrowLeft, MessageSquare, User } from 'lucide-react';
+import { ArrowLeft, MessageSquare, User, Phone } from 'lucide-react';
 import { ChatList } from '../components/chat/ChatList';
 import { ChatWindow } from '../components/chat/ChatWindow';
 import { Conversation } from '../types';
@@ -100,6 +100,15 @@ const chatWindowProps = {
                     {selectedConversation?.properties?.title || 'Property'}
                   </p>
                 </div>
+                {selectedConversation?.participants?.[0]?.phone && (
+                  
+                    <a
+                    href={`tel:${selectedConversation.participants[0].phone}`}
+                    className="w-8 h-8 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center text-[#1a6b3c] hover:bg-[#1a6b3c]/25 transition-colors flex-shrink-0"
+                  >
+                    <Phone className="w-4 h-4" />
+                  </a>
+                )}
               </div>
               <ChatWindow {...chatWindowProps} />
             </div>
@@ -152,6 +161,15 @@ const chatWindowProps = {
                       {selectedConversation?.properties?.title || 'Property'}
                     </p>
                   </div>
+                  {selectedConversation?.participants?.[0]?.phone && (
+                    
+                    <a
+                      href={`tel:${selectedConversation.participants[0].phone}`}
+                      className="w-8 h-8 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center text-[#1a6b3c] hover:bg-[#1a6b3c]/25 transition-colors flex-shrink-0"
+                    >
+                      <Phone className="w-4 h-4" />
+                    </a>
+                  )}
                 </div>
                 <ChatWindow {...chatWindowProps} />
               </>
