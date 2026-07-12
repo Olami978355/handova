@@ -30,6 +30,26 @@ serve(async (req) => {
       .select()
     if (error) throw error
 
+    // Also trigger real-time push notifications — was previously built but
+    // never actually called from anywhere, so users only ever saw
+    // notifications after manually opening the app.
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      for (const uid of targetUserIds) {
+        await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': req.headers.get('Authorization') || '',
+            'apikey': req.headers.get('apikey') || '',
+          },
+          body: JSON.stringify({ user_id: uid, title, body, url: link }),
+        });
+      }
+    } catch (pushErr) {
+      console.error('Failed to trigger push notifications (non-fatal):', pushErr)
+    }
+
     // Also email the recipients — was completely missing before.
     try {
       const { data: profiles } = await supabaseClient
