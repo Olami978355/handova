@@ -19,6 +19,7 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
   label, disabled = false, className = '',
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
   const config = {
     reference,
     email,
@@ -28,7 +29,13 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
   };
   const initializePayment = usePaystackPayment(config);
   const handlePayment = () => {
-    if (disabled || isProcessing || !import.meta.env.VITE_PAYSTACK_PUBLIC_KEY) return;
+    if (disabled || isProcessing) return;
+    if (!import.meta.env.VITE_PAYSTACK_PUBLIC_KEY) {
+      setConfigError('Payment is temporarily unavailable. Please contact support.');
+      console.error('VITE_PAYSTACK_PUBLIC_KEY is not set.');
+      return;
+    }
+    setConfigError(null);
     
     setIsProcessing(true);
     initializePayment({
@@ -53,10 +60,13 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
   return (
     <button
       onClick={handlePayment}
-      disabled={disabled || isProcessing || !import.meta.env.VITE_PAYSTACK_PUBLIC_KEY}
+      disabled={disabled || isProcessing}
       className={`flex items-center justify-center gap-2 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] ${className}`}
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
+      {configError && (
+        <span className="block text-[11px] text-red-400 mb-1">{configError}</span>
+      )}
       {isProcessing ? (
         <>
           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />

@@ -30,14 +30,14 @@ const getTemplate = (template: string, data: Record<string, any>) => {
         </style>
       </head>
       <body>
-        <div className="container">
-          <div className="header">
-            <a href="https://renteasy.ng" className="logo">RentEasy</a>
+        <div class="container">
+          <div class="header">
+            <a href="https://renteasy.ng" class="logo">RentEasy</a>
           </div>
-          <div className="content">
+          <div class="content">
             ${content}
           </div>
-          <div className="footer">
+          <div class="footer">
             &copy; 2024 Rent Easy Nigeria. All rights reserved.<br>
             Lagos, Nigeria
           </div>
@@ -52,59 +52,63 @@ const getTemplate = (template: string, data: Record<string, any>) => {
         <h1>Welcome to Rent Easy, ${data.name}!</h1>
         <p>We're excited to have you join Nigeria's most trusted real estate platform.</p>
         <p>Whether you're looking for a new home or listing a property, we've got you covered with our secure escrow system and verified listings.</p>
-        <a href="${data.link}" className="button">Get Started</a>
+        <a href="${data.link}" class="button">Get Started</a>
       `);
     
     case 'verification_status':
       return baseLayout(`
         <h1>Verification Update</h1>
         <p>Hello ${data.name},</p>
-        <p>Your verification request has been <span className="highlight">${data.status}</span>.</p>
+        <p>Your verification request has been <span class="highlight">${data.status}</span>.</p>
         ${data.status === 'approved' 
           ? '<p>Congratulations! You now have a verified badge on your profile and listings.</p>' 
           : `<p>Reason: ${data.reason}</p><p>Please update your documents and try again.</p>`}
-        <a href="${data.link}" className="button">View Profile</a>
+        <a href="${data.link}" class="button">View Profile</a>
       `);
 
     case 'inspection_booked':
       return baseLayout(`
         <h1>New Inspection Booking</h1>
         <p>Hello ${data.name},</p>
-        <p>A new inspection has been booked for <span className="highlight">${data.propertyTitle}</span>.</p>
+        <p>A new inspection has been booked for <span class="highlight">${data.propertyTitle}</span>.</p>
         <p><strong>Date:</strong> ${data.date}</p>
         <p><strong>Time:</strong> ${data.time}</p>
-        <a href="${data.link}" className="button">Manage Booking</a>
+        <a href="${data.link}" class="button">Manage Booking</a>
       `);
 
     case 'deal_update':
       return baseLayout(`
         <h1>Deal Update: ${data.propertyTitle}</h1>
         <p>Hello ${data.name},</p>
-        <p>The status of your deal has changed to <span className="highlight">${data.status}</span>.</p>
+        <p>The status of your deal has changed to <span class="highlight">${data.status}</span>.</p>
         <p>${data.message}</p>
-        <a href="${data.link}" className="button">View Deal Details</a>
+        <a href="${data.link}" class="button">View Deal Details</a>
       `);
 
     case 'refund':
       return baseLayout(`
         <h1>Refund Processed</h1>
         <p>Hello ${data.name},</p>
-        <p>A refund of <span className="highlight">₦${data.amount}</span> has been processed for your booking at ${data.propertyTitle}.</p>
+        <p>A refund of <span class="highlight">₦${data.amount}</span> has been processed for your booking at ${data.propertyTitle}.</p>
         <p>The funds should appear in your account within 3-5 business days.</p>
-        <a href="${data.link}" className="button">View Transaction</a>
+        <a href="${data.link}" class="button">View Transaction</a>
       `);
 
     case 'dispute':
       return baseLayout(`
         <h1>Dispute Opened</h1>
         <p>Hello ${data.name},</p>
-        <p>A dispute has been opened regarding the deal for <span className="highlight">${data.propertyTitle}</span>.</p>
+        <p>A dispute has been opened regarding the deal for <span class="highlight">${data.propertyTitle}</span>.</p>
         <p>Our moderators are reviewing the case and will contact you shortly.</p>
-        <a href="${data.link}" className="button">View Dispute</a>
+        <a href="${data.link}" class="button">View Dispute</a>
       `);
 
     default:
-      return baseLayout(`<h1>Notification from Rent Easy</h1><p>${data.message || 'You have a new update on Rent Easy.'}</p>`);
+      return baseLayout(`
+        <h1>${data.title || 'Notification from Rent Easy'}</h1>
+        <p>${data.body || 'You have a new update on Rent Easy.'}</p>
+        ${data.link ? `<a href="${data.link}" class="button">View Details</a>` : ''}
+      `);
   }
 }
 

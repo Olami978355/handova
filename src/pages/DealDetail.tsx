@@ -228,12 +228,6 @@ export default function DealDetail() {
                   <p className="text-[12px] text-white/40 mb-3">
                     {deal.properties?.address || ''}
                   </p>
-                  {deal.properties?.house_rules && (
-                    <div className="bg-white/4 border border-white/6 rounded-xl px-3 py-2 mb-3">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">House Rules</p>
-                      <p className="text-[12px] text-white/60 leading-relaxed">{deal.properties.house_rules}</p>
-                    </div>
-                  )}
                   <div className="flex gap-2">
                     <div className="bg-white/4 border border-white/6 rounded-xl px-3 py-2">
                       <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Amount</p>
