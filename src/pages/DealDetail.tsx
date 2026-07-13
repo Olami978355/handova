@@ -23,7 +23,7 @@ export default function DealDetail() {
   const {
     deal, logs, loading, error,
     uploadAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl, skipAgreement,
-    signAgreement, confirmMoveIn, releaseFunds, markDisputed,
+    signAgreement, confirmMoveIn, releaseFunds, markDisputed, cancelDeal,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
   } = useDeal(id || '');
@@ -39,6 +39,8 @@ export default function DealDetail() {
   const [disputeReason, setDisputeReason] = useState('');
   const [changeReason, setChangeReason] = useState('');
   const [showDisputeModal, setShowDisputeModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
   const [showChangeModal, setShowChangeModal] = useState(false);
   const [showSkipModal, setShowSkipModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -835,12 +837,20 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 <h3 className="text-[13px] font-bold text-red-400 mb-3 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" /> Danger Zone
                 </h3>
-                <button
-                  onClick={() => setShowDisputeModal(true)}
-                  className="w-full bg-red-500/15 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-[13px] hover:bg-red-500/25 transition-colors"
-                >
-                  Mark as Disputed
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowDisputeModal(true)}
+                    className="flex-1 bg-red-500/15 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-[13px] hover:bg-red-500/25 transition-colors"
+                  >
+                    Mark as Disputed
+                  </button>
+                  <button
+                    onClick={() => setShowCancelModal(true)}
+                    className="flex-1 bg-white/5 text-white/60 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors"
+                  >
+                    Cancel Deal
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -952,6 +962,63 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   className="flex-1 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40"
                 >
                   Send Request
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Cancel Deal Modal */}
+      <AnimatePresence>
+        {showCancelModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowCancelModal(false)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
+              style={font}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-[16px] font-bold text-white">Cancel This Deal</h3>
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-[13px] text-white/45 mb-4 leading-relaxed">
+                This voids the deal and frees the property back up for new deals. Cannot be undone.
+              </p>
+              <textarea
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Reason for cancellation..."
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none mb-4"
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => {
+                    handleAction(() => cancelDeal(cancelReason));
+                    setShowCancelModal(false);
+                  }}
+                  disabled={!cancelReason || processing}
+                  className="flex-1 bg-red-500 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-600 transition-all disabled:opacity-40"
+                >
+                  Confirm Cancellation
                 </button>
               </div>
             </motion.div>
