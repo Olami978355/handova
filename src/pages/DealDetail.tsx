@@ -487,7 +487,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       reference={`ESCROW_${deal.id}_${Date.now()}`}
                       label="Pay into Escrow"
                       className="w-full"
-                      disabled={!deal.agreement_url}
+                      disabled={!deal.agreement_url && !deal.agreement_skipped}
                       metadata={{ deal_id: deal.id, type: 'escrow_payment' }}
                       onSuccess={async (reference) => {
                         setProcessing(true);
