@@ -625,11 +625,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                       )}
 
                       <div className="flex items-center gap-1.5 mt-1 px-1">
-                        {!isMe && !isCustomDeal && (
-                          <span className="text-[10px] font-bold text-white/25 uppercase tracking-wider">
-                            {msg.sender?.full_name || otherParticipantName || 'User'}
-                          </span>
-                        )}
                         <span className="text-[10px] text-white/20">
                           {isOptimistic ? 'Sending...' : formatRelativeTime(msg.created_at)}
                           {msg.edited_at && !isDeleted ? ' · edited' : ''}
