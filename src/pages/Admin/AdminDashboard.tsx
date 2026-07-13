@@ -19,8 +19,9 @@ import PropertyModeration from './PropertyModeration';
 import DisputeQueue from './DisputeQueue';
 import EscrowQueue from './EscrowQueue';
 import AdminLogs from './AdminLogs';
+import PropertyReports from './PropertyReports';
 
-type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests';
+type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -79,6 +80,7 @@ export default function AdminDashboard() {
     { id: 'disputes', label: 'Disputes', icon: AlertCircle, roles: ['admin', 'moderator'] },
     { id: 'fund-releases', label: 'Fund Releases', icon: DollarSign, roles: ['admin', 'moderator'] },
     { id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] },
+    { id: 'reports', label: 'Reports', icon: AlertCircle, roles: ['admin', 'moderator'] },
     { id: 'logs', label: 'Logs', icon: History, roles: ['admin'] },
   ].filter(item => item.roles.includes(profile?.role || ''));
 
@@ -195,18 +197,19 @@ export default function AdminDashboard() {
               {activeTab === 'fund-releases' && <EscrowQueue />}
               {activeTab === 'logs' && <AdminLogs />}
               {activeTab === 'card-requests' && <CardRequestQueue />}
+              {activeTab === 'reports' && <PropertyReports />}
             </motion.div>
           </AnimatePresence>
         </div>
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-[#0a1f11]/95 backdrop-blur-xl border-t border-white/6 flex items-center justify-around px-2 py-2 z-50">
-        {sidebarItems.slice(0, 5).map((item) => (
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-[#0a1f11]/95 backdrop-blur-xl border-t border-white/6 flex items-center gap-1 px-2 py-2 z-50 overflow-x-auto">
+        {sidebarItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id as AdminTab)}
-            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
+            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all flex-shrink-0 ${
               activeTab === item.id ? 'text-[#f0c040]' : 'text-white/30'
             }`}
           >
