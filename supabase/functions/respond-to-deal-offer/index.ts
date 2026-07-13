@@ -123,7 +123,7 @@ serve(async (req) => {
       .eq('id', offerId);
     if (acceptError) throw acceptError;
 
-    await logDealAction(adminSupabase, newDeal.id, 'agreement_draft', user.id, {
+    await logDealAction(adminSupabase, newDeal.id, 'deal_created', user.id, {
       source: 'custom_deal_offer',
       offer_id: offerId,
     });

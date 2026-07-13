@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
-import { corsHeaders } from '../_shared/utils.ts';
+import { corsHeaders, logDealAction } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -165,6 +165,11 @@ serve(async (req) => {
       .single();
 
     if (dealError) throw dealError;
+
+    await logDealAction(supabase, deal.id, 'deal_created', user.id, {
+      source: 'inspection_booking',
+      booking_id: bookingId,
+    });
 
     const parties = [booking.tenant_id, booking.landlord_id];
     if (booking.agent_id) parties.push(booking.agent_id);
