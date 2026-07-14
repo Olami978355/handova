@@ -30,6 +30,14 @@ export default function DisputeQueue() {
         .order('updated_at', { ascending: true });
       if (error) throw error;
       setDisputes(data || []);
+
+      const { data: dealData, error: dealError } = await supabase
+        .from('deals')
+        .select('*, properties(*), tenant:profiles!tenant_id(full_name), landlord:profiles!landlord_id(full_name), agent:profiles!agent_id(full_name)')
+        .eq('status', 'disputed')
+        .order('updated_at', { ascending: true });
+      if (dealError) throw dealError;
+      setDealDisputes(dealData || []);
     } catch (err) {
       console.error('Error fetching disputes:', err);
     } finally {
@@ -67,6 +75,53 @@ export default function DisputeQueue() {
 
   return (
     <div className="space-y-5" style={font}>
+      {/* Deal disputes — full escrow transactions flagged as disputed */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-[16px] font-bold text-white">Deal Disputes</h2>
+            <p className="text-[12px] text-white/35">Escrow transactions flagged for review</p>
+          </div>
+          <span className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border ${
+            dealDisputes.length > 0
+              ? 'bg-red-500/10 text-red-400 border-red-500/20'
+              : 'bg-[#1a6b3c]/10 text-[#1a6b3c] border-[#1a6b3c]/20'
+          }`}>
+            {dealDisputes.length} Disputed
+          </span>
+        </div>
+        {dealDisputes.length === 0 ? (
+          <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 text-center">
+            <p className="text-[12px] text-white/25">No disputed deals right now.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {dealDisputes.map((d) => (
+              <Link
+                key={d.id}
+                to={`/deals/${d.id}`}
+                className="block bg-[#0a1f11] border border-red-500/15 rounded-2xl p-5 hover:border-red-500/30 transition-all"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="text-[13px] font-bold text-white">{d.properties?.title}</h4>
+                    <p className="text-[11px] text-white/30">
+                      {d.tenant?.full_name} (Tenant) · {d.agent?.full_name || d.landlord?.full_name} ({d.agent_id ? 'Agent' : 'Landlord'})
+                    </p>
+                  </div>
+                  <p className="text-[13px] font-black text-[#f0c040]">₦{Number(d.amount).toLocaleString()}</p>
+                </div>
+                {d.dispute_reason && (
+                  <p className="text-[12px] text-white/50 bg-white/4 border border-white/5 rounded-xl p-3 mt-2">
+                    {d.dispute_reason}
+                  </p>
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-[16px] font-bold text-white">Dispute Queue</h2>
