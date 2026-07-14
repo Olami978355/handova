@@ -201,12 +201,21 @@ serve(async (req) => {
 
     const amountNaira = verifiedAmountKobo / 100;
 
-    const { error: updateError } = await supabase
+    const { data: updatedRows, error: updateError } = await supabase
       .from('deals')
       .update({ status: 'payment_received', paystack_reference: reference, updated_at: new Date().toISOString() })
-      .eq('id', dealId);
+      .eq('id', dealId)
+      .eq('status', 'pending_payment')
+      .select('id');
 
     if (updateError) throw updateError;
+
+    if (!updatedRows || updatedRows.length === 0) {
+      return new Response(JSON.stringify({ message: 'Deal was processed concurrently by another webhook delivery' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
 
     await logDealAction(supabase, dealId, 'payment_received', null, {
       paystack_reference: reference,
