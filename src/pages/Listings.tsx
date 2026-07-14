@@ -214,7 +214,7 @@ export default function Listings() {
       let query = supabase
   .from('properties')
   .select('*', { count: 'exact' })
-  .eq('status', 'active');
+  .eq('status', 'active').is('deleted_at', null);
 
       if (type !== 'all') query = query.eq('listing_type', type);
       if (transaction !== 'all') query = query.eq('transaction_type', transaction);

@@ -423,7 +423,7 @@ export default function Landing() {
         const { data } = await supabase
           .from('properties')
           .select('*, profiles(full_name, avatar_url, role)')
-          .eq('status', 'active')
+          .eq('status', 'active').is('deleted_at', null)
           .order('created_at', { ascending: false })
           .limit(6);
         setFeaturedProperties(data || []);
@@ -437,7 +437,7 @@ export default function Landing() {
     const fetchStats = async () => {
       try {
         const [{ count: props }, { count: users }] = await Promise.all([
-          supabase.from('properties').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+          supabase.from('properties').select('*', { count: 'exact', head: true }).eq('status', 'active').is('deleted_at', null),
           supabase.from('profiles').select('*', { count: 'exact', head: true })
         ]);
         setLiveStats({ properties: props || 0, users: users || 0 });

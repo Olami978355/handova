@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     // Cannot cancel a deal once the tenant has moved in or funds are already released
-    if (deal.status === 'move_in_confirmed' || deal.status === 'funds_released') {
+    if (deal.status === 'move_in_confirmed' || deal.status === 'funds_released' || deal.status === 'disputed') {
       throw new Error(`Cannot cancel a deal in ${deal.status} status.`);
     }
 

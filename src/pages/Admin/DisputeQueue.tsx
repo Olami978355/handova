@@ -18,6 +18,9 @@ export default function DisputeQueue() {
   const [resolving, setResolving] = useState<string | null>(null);
   const [selectedDispute, setSelectedDispute] = useState<InspectionBooking | null>(null);
   const [resolutionText, setResolutionText] = useState('');
+  const [resolvingDealId, setResolvingDealId] = useState<string | null>(null);
+  const [dealResolutionNote, setDealResolutionNote] = useState('');
+  const [dealResolving, setDealResolving] = useState<string | null>(null);
 
   useEffect(() => { fetchDisputes(); }, []);
 
@@ -64,6 +67,25 @@ export default function DisputeQueue() {
     }
   };
 
+  const handleResolveDeal = async (dealId: string, outcome: 'release' | 'refund') => {
+    if (!dealResolutionNote.trim()) return;
+    setDealResolving(dealId);
+    try {
+      const { error } = await supabase.functions.invoke('resolve-deal-dispute', {
+        body: { dealId, outcome, note: dealResolutionNote },
+      });
+      if (error) throw error;
+      setResolvingDealId(null);
+      setDealResolutionNote('');
+      await fetchDisputes();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to resolve dispute';
+      alert(msg);
+    } finally {
+      setDealResolving(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3" style={font}>
@@ -97,10 +119,9 @@ export default function DisputeQueue() {
         ) : (
           <div className="space-y-3">
             {dealDisputes.map((d) => (
-              <Link
+              <div
                 key={d.id}
-                to={`/deals/${d.id}`}
-                className="block bg-[#0a1f11] border border-red-500/15 rounded-2xl p-5 hover:border-red-500/30 transition-all"
+                className="bg-[#0a1f11] border border-red-500/15 rounded-2xl p-5 hover:border-red-500/30 transition-all"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
@@ -111,12 +132,62 @@ export default function DisputeQueue() {
                   </div>
                   <p className="text-[13px] font-black text-[#f0c040]">₦{Number(d.amount).toLocaleString()}</p>
                 </div>
+
                 {d.dispute_reason && (
                   <p className="text-[12px] text-white/50 bg-white/4 border border-white/5 rounded-xl p-3 mt-2">
                     {d.dispute_reason}
                   </p>
                 )}
-              </Link>
+
+                <div className="flex items-center justify-between mt-3">
+                  <Link to={`/deals/${d.id}`} className="text-[11px] text-white/35 hover:text-white/60 flex items-center gap-1">
+                    View Deal <ArrowRight className="w-3 h-3" />
+                  </Link>
+                  {resolvingDealId !== d.id && (
+                    <button
+                      onClick={() => setResolvingDealId(d.id)}
+                      className="text-[11px] font-bold px-3 py-1.5 rounded-xl bg-[#f0c040]/10 text-[#f0c040] border border-[#f0c040]/20 hover:bg-[#f0c040]/20 transition-colors"
+                    >
+                      Resolve
+                    </button>
+                  )}
+                </div>
+
+                {resolvingDealId === d.id && (
+                  <div className="mt-4 pt-4 border-t border-white/6 space-y-3">
+                    <textarea
+                      value={dealResolutionNote}
+                      onChange={(e) => setDealResolutionNote(e.target.value)}
+                      placeholder="Resolution note (required, visible to both parties)..."
+                      className="w-full h-20 px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[12px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors resize-none"
+                    />
+                    <div className="flex gap-2.5">
+                      <button
+                        onClick={() => handleResolveDeal(d.id, 'release')}
+                        disabled={!!dealResolving || !dealResolutionNote.trim()}
+                        className="flex-1 bg-[#1a6b3c] text-white py-3 rounded-xl font-bold text-[12px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                      >
+                        {dealResolving === d.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                        Release Funds
+                      </button>
+                      <button
+                        onClick={() => handleResolveDeal(d.id, 'refund')}
+                        disabled={!!dealResolving || !dealResolutionNote.trim()}
+                        className="flex-1 bg-red-500/15 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-[12px] hover:bg-red-500/25 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                      >
+                        {dealResolving === d.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                        Refund Tenant
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => { setResolvingDealId(null); setDealResolutionNote(''); }}
+                      className="text-[11px] text-white/25 hover:text-white/45 w-full text-center"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}

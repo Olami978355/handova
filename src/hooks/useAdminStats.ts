@@ -29,7 +29,7 @@ export function useAdminStats() {
       const { count: propertiesCount, error: propertiesError } = await supabase
         .from('properties')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'active').is('deleted_at', null);
       if (propertiesError) throw propertiesError;
 
       // Pending Verifications

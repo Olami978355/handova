@@ -378,7 +378,7 @@ export default function Dashboard() {
     const { data, error: err } = await supabase
       .from('properties')
       .select('*')
-      .eq('owner_id', user.id)
+      .eq('owner_id', user.id).is('deleted_at', null)
       .order('created_at', { ascending: false });
     if (err) console.error('Properties error:', err.message);
     else setProperties(data || []);

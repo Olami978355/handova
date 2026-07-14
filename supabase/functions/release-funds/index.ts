@@ -51,11 +51,11 @@ serve(async (req) => {
     if (updateError) throw updateError;
 
     // 4.1 Update property status
-    const newStatus = deal.properties.transaction_type === 'sell' ? 'sold' : 'rented';
+    // status stays 'active'; is_rented is the new source of truth for availability
     const { error: propUpdateError } = await adminSupabase
       .from('properties')
       .update({ 
-        status: newStatus,
+        is_rented: true,
         updated_at: new Date().toISOString()
       })
       .eq('id', deal.property_id);
