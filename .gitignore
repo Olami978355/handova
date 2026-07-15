@@ -57,3 +57,6 @@ temp/
 # If using npm keep package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
+
+.vercel
+.env*

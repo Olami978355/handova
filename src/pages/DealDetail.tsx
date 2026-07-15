@@ -23,7 +23,7 @@ export default function DealDetail() {
   const {
     deal, logs, loading, error,
     uploadAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl, skipAgreement,
-    signAgreement, confirmMoveIn, releaseFunds, markDisputed, cancelDeal,
+    signAgreement, confirmMoveIn, releaseFunds, markDisputed, cancelDeal, cancelDealAsTenant,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
   } = useDeal(id || '');
@@ -41,6 +41,8 @@ export default function DealDetail() {
   const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [showTenantCancelModal, setShowTenantCancelModal] = useState(false);
+  const [tenantCancelReason, setTenantCancelReason] = useState('');
   const [showChangeModal, setShowChangeModal] = useState(false);
   const [showSkipModal, setShowSkipModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -832,6 +834,23 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
             </div>
 
             {/* Admin danger zone */}
+            {isTenant && deal.status !== 'move_in_confirmed' && deal.status !== 'funds_released' && deal.status !== 'disputed' && deal.status !== 'cancelled' && (
+              <div className="bg-[#0a1f11] border border-red-500/15 rounded-2xl p-5">
+                <h3 className="text-[13px] font-bold text-red-400 mb-3 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" /> Cancel This Deal
+                </h3>
+                <p className="text-[12px] text-white/40 mb-3">
+                  A 5% cancellation fee applies. The rest of your payment will be refunded.
+                </p>
+                <button
+                  onClick={() => setShowTenantCancelModal(true)}
+                  className="w-full bg-red-500/15 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-[13px] hover:bg-red-500/25 transition-colors"
+                >
+                  Cancel Deal
+                </button>
+              </div>
+            )}
+
             {isAdmin && deal.status !== 'disputed' && deal.status !== 'funds_released' && (
               <div className="bg-red-500/6 border border-red-500/15 rounded-2xl p-5">
                 <h3 className="text-[13px] font-bold text-red-400 mb-3 flex items-center gap-2">
@@ -1016,6 +1035,58 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     setShowCancelModal(false);
                   }}
                   disabled={!cancelReason || processing}
+                  className="flex-1 bg-red-500 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-600 transition-all disabled:opacity-40"
+                >
+                  Confirm Cancellation
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Tenant Cancel Modal */}
+      <AnimatePresence>
+        {showTenantCancelModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 z-40"
+              onClick={() => setShowTenantCancelModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="fixed bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:-translate-x-1/2 md:-translate-y-1/2 bg-[#0a1f11] border border-white/10 rounded-t-3xl md:rounded-3xl p-6 z-50 w-full md:max-w-md"
+            >
+              <h3 className="text-[16px] font-bold text-white mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-400" /> Cancel Deal
+              </h3>
+              <p className="text-[13px] text-white/45 mb-4 leading-relaxed">
+                A 5% cancellation fee will be deducted from your refund. This cannot be undone.
+              </p>
+              <textarea
+                value={tenantCancelReason}
+                onChange={(e) => setTenantCancelReason(e.target.value)}
+                placeholder="Reason for cancellation..."
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none mb-4"
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowTenantCancelModal(false)}
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => {
+                    handleAction(() => cancelDealAsTenant(tenantCancelReason));
+                    setShowTenantCancelModal(false);
+                  }}
+                  disabled={!tenantCancelReason || processing}
                   className="flex-1 bg-red-500 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-600 transition-all disabled:opacity-40"
                 >
                   Confirm Cancellation

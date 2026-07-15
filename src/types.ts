@@ -204,7 +204,9 @@ export type DealStatus =
   | 'handover_scheduled'
   | 'handover_confirmed'
   | 'funds_released'
-  | 'disputed';
+  | 'disputed'
+  | 'cancelled'
+  | 'refunded';
 
 export type DealType = 'house_rent' | 'house_sale' | 'land_sale' | 'land_rent';
 
