@@ -20,7 +20,7 @@ export default function DisputeQueue() {
   const [resolutionText, setResolutionText] = useState('');
   const [resolvingDealId, setResolvingDealId] = useState<string | null>(null);
   const [dealResolutionNote, setDealResolutionNote] = useState('');
-  const [dealResolving, setDealResolving] = useState<string | null>(null);
+  const [dealResolving, setDealResolving] = useState<{ id: string; outcome: 'release' | 'refund' } | null>(null);
 
   useEffect(() => { fetchDisputes(); }, []);
 
@@ -69,7 +69,7 @@ export default function DisputeQueue() {
 
   const handleResolveDeal = async (dealId: string, outcome: 'release' | 'refund') => {
     if (!dealResolutionNote.trim()) return;
-    setDealResolving(dealId);
+    setDealResolving({ id: dealId, outcome });
     try {
       const { error } = await supabase.functions.invoke('resolve-deal-dispute', {
         body: { dealId, outcome, note: dealResolutionNote },
@@ -167,7 +167,7 @@ export default function DisputeQueue() {
                         disabled={!!dealResolving || !dealResolutionNote.trim()}
                         className="flex-1 bg-[#1a6b3c] text-white py-3 rounded-xl font-bold text-[12px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                       >
-                        {dealResolving === d.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                        {dealResolving?.id === d.id && dealResolving?.outcome === 'release' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                         Release Funds
                       </button>
                       <button
@@ -175,7 +175,7 @@ export default function DisputeQueue() {
                         disabled={!!dealResolving || !dealResolutionNote.trim()}
                         className="flex-1 bg-red-500/15 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-[12px] hover:bg-red-500/25 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                       >
-                        {dealResolving === d.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                        {dealResolving?.id === d.id && dealResolving?.outcome === 'refund' ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                         Refund Tenant
                       </button>
                     </div>
