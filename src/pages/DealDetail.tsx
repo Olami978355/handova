@@ -7,6 +7,7 @@ import {
   Eye, ThumbsUp, ThumbsDown, MessageSquare
 } from 'lucide-react';
 import { useDeal } from '../hooks/useDeal';
+import { ReceiptPanel } from '../components/receipt/ReceiptCards';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
@@ -43,6 +44,7 @@ export default function DealDetail() {
   const [cancelReason, setCancelReason] = useState('');
   const [showTenantCancelModal, setShowTenantCancelModal] = useState(false);
   const [tenantCancelReason, setTenantCancelReason] = useState('');
+  const [showReceiptPanel, setShowReceiptPanel] = useState(false);
   const [showChangeModal, setShowChangeModal] = useState(false);
   const [showSkipModal, setShowSkipModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -800,6 +802,21 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               </div>
             )}
 
+            {!['agreement_draft', 'pending_payment'].includes(deal.status) && (
+              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+                <h3 className="text-[13px] font-bold text-white mb-2">Receipt</h3>
+                <p className="text-[12px] text-white/40 mb-3 leading-relaxed">
+                  Generate a shareable proof of this transaction.
+                </p>
+                <button
+                  onClick={() => setShowReceiptPanel(true)}
+                  className="w-full bg-white/5 text-white/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors"
+                >
+                  Generate Receipt
+                </button>
+              </div>
+            )}
+
             {/* Activity log */}
             <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
@@ -1042,6 +1059,13 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Receipt Panel */}
+      <AnimatePresence>
+        {showReceiptPanel && deal && (
+          <ReceiptPanel deal={deal} onClose={() => setShowReceiptPanel(false)} />
         )}
       </AnimatePresence>
 
