@@ -304,6 +304,18 @@ export default function PropertyDetail() {
 
   const [property, setProperty] = useState<Property | null>(null);
   const [owner, setOwner] = useState<Profile | null>(null);
+  const [priceHistory, setPriceHistory] = useState<{ old_price: number; new_price: number; changed_at: string }[]>([]);
+  const [showPriceHistory, setShowPriceHistory] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    supabase
+      .from('property_price_history')
+      .select('old_price, new_price, changed_at')
+      .eq('property_id', id)
+      .order('changed_at', { ascending: false })
+      .then(({ data }) => setPriceHistory(data || []));
+  }, [id]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -608,6 +620,24 @@ export default function PropertyDetail() {
                     <div className="text-[28px] font-black text-[#f0c040] leading-none">{formatNaira(property.price)}</div>
                     {property.price_period && (
                       <div className="text-[12px] text-white/35 mt-1">{periodLabel[property.price_period]}</div>
+                    )}
+                    {priceHistory.length > 0 && (
+                      <button
+                        onClick={() => setShowPriceHistory(!showPriceHistory)}
+                        className="text-[11px] text-white/30 hover:text-white/55 underline mt-1 transition-colors"
+                      >
+                        Price history
+                      </button>
+                    )}
+                    {showPriceHistory && priceHistory.length > 0 && (
+                      <div className="mt-2 space-y-1 text-right">
+                        {priceHistory.map((h, i) => (
+                          <div key={i} className="text-[11px] text-white/35">
+                            {formatNaira(h.old_price)} {'\u2192'} {formatNaira(h.new_price)}
+                            <span className="text-white/20"> · {new Date(h.changed_at).toLocaleDateString()}</span>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
