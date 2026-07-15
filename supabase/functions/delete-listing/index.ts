@@ -23,6 +23,16 @@ serve(async (req) => {
       throw new Error('Only the landlord or agent who listed this property can delete it.');
     }
 
+    const { data: activeDeals, error: dealsError } = await adminSupabase
+      .from('deals')
+      .select('id, status')
+      .eq('property_id', propertyId)
+      .not('status', 'in', '(cancelled,refunded,funds_released)');
+    if (dealsError) throw dealsError;
+    if (activeDeals && activeDeals.length > 0) {
+      throw new Error('Cannot delete a listing with an active deal in progress. Resolve or complete the deal first.');
+    }
+
     const { error: updateError } = await adminSupabase
       .from('properties')
       .update({ deleted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
