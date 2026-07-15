@@ -51,7 +51,7 @@ const STORAGE_KEY = 'rent_easy_listing_draft';
 
 export const useListingForm = (propertyId?: string) => {
   const isEditMode = !!propertyId;
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(propertyId ? 6 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user, profile } = useAuth();
