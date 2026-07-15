@@ -66,8 +66,7 @@ export const ChatButton: React.FC<ChatButtonProps> = ({
   if (
     isOwner ||
     !isTenant ||
-    property.status === 'rented' ||
-    property.status === 'sold'
+    property.is_rented
   ) {
     return null;
   }

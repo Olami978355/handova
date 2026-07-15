@@ -397,6 +397,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               .single();
             if (createError) throw createError;
             conversationId = created.id;
+            await supabase.from('messages').insert({
+              conversation_id: conversationId,
+              sender_id: user.id,
+              content: "⚠️ Stay safe: RentEasy holds all payments in escrow until you're satisfied — never pay a landlord or agent directly, and never send money before an inspection. If anyone pressures you to pay off-platform, report them immediately.",
+              message_type: 'system',
+            });
           }
 
           setResolvedConversationId(conversationId);
