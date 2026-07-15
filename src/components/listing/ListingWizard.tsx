@@ -18,8 +18,8 @@ const steps = [
   { id: 6, title: 'Review' },
 ];
 
-export const ListingWizard: React.FC = () => {
-  const { form, step, nextStep, prevStep, isSubmitting, onSubmit } = useListingForm();
+export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId }) => {
+  const { form, step, nextStep, prevStep, isSubmitting, onSubmit } = useListingForm(propertyId);
 
   const renderStep = () => {
     switch (step) {
@@ -130,7 +130,7 @@ export const ListingWizard: React.FC = () => {
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  Submit Listing
+                  {propertyId ? 'Save Changes' : 'Submit Listing'}
                 </>
               )}
             </button>
@@ -139,9 +139,11 @@ export const ListingWizard: React.FC = () => {
       </div>
 
       {/* Draft note */}
+      {!propertyId && (
       <p className="text-[11px] text-white/20 text-center mt-4">
         Your progress is saved automatically as you go
       </p>
+      )}
     </div>
   );
 };

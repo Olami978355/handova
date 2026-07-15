@@ -49,7 +49,8 @@ export type ListingFormData = z.infer<typeof listingSchema>;
 
 const STORAGE_KEY = 'rent_easy_listing_draft';
 
-export const useListingForm = () => {
+export const useListingForm = (propertyId?: string) => {
+  const isEditMode = !!propertyId;
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -58,6 +59,26 @@ export const useListingForm = () => {
   const form = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: async () => {
+      if (isEditMode) {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('id', propertyId)
+          .single();
+        if (error || !data) {
+          console.error('Failed to load property for editing', error);
+          return {
+            listing_type: 'house',
+            transaction_type: 'rent',
+            amenities: [],
+            images: [],
+            land_size_unit: 'sqm',
+            price_period: 'yearly',
+          };
+        }
+        return data as ListingFormData;
+      }
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
@@ -80,10 +101,12 @@ export const useListingForm = () => {
   const { watch, handleSubmit } = form;
   const values = watch();
 
-  // Save to localStorage on change
+  // Save to localStorage on change — skip entirely in edit mode
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
-  }, [values]);
+    if (!isEditMode) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+    }
+  }, [values, isEditMode]);
 
   const nextStep = async () => {
     let fieldsToValidate: (keyof ListingFormData)[] = [];
@@ -119,6 +142,15 @@ export const useListingForm = () => {
     setIsSubmitting(true);
     try {
       if (!user) throw new Error('You must be logged in to list a property');
+
+      if (isEditMode) {
+        const { error: fnError } = await supabase.functions.invoke('update-listing', {
+          body: { propertyId, data },
+        });
+        if (fnError) throw fnError;
+        navigate(`/property/${propertyId}`);
+        return;
+      }
 
       const status = profile?.verification_status === 'verified' ? 'active' : 'pending_review';
 
