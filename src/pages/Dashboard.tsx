@@ -4,7 +4,7 @@ import {
   Home, Shield, MessageSquare, Plus, Loader2,
   AlertCircle, CheckCircle, Clock, ArrowRight,
   User, CreditCard, Calendar, Search, Settings,
-  MapPin, RefreshCw, Eye, Heart
+  MapPin, RefreshCw, Eye, Heart, Pencil, Trash2, AlertTriangle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
@@ -313,6 +313,26 @@ export default function Dashboard() {
   const [savedProperties, setSavedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Property | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteListing = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke('delete-listing', {
+        body: { propertyId: deleteTarget.id },
+      });
+      if (error) throw error;
+      setProperties(prev => prev.filter(p => p.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete listing';
+      alert(msg);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const fetchData = useCallback(async () => {
     if (!user || !profile?.role) return;
@@ -378,7 +398,7 @@ export default function Dashboard() {
     const { data, error: err } = await supabase
       .from('properties')
       .select('*')
-      .eq('owner_id', user.id).is('deleted_at', null)
+      .or(`owner_id.eq.${user.id},agent_id.eq.${user.id}`).is('deleted_at', null)
       .order('created_at', { ascending: false });
     if (err) console.error('Properties error:', err.message);
     else setProperties(data || []);
@@ -1018,23 +1038,69 @@ return (
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
+                            {property.agent_id === user?.id && property.owner_id !== user?.id && (
+                              <span className="text-[9px] font-bold px-2 py-1 rounded-lg bg-[#a78bfa]/10 text-[#a78bfa]">
+                                Managing
+                              </span>
+                            )}
                             <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
-                              property.status === 'active'
+                              property.is_rented
+                                ? 'bg-white/8 text-white/40'
+                                : property.status === 'active'
                                 ? 'bg-[#4ade80]/10 text-[#4ade80]'
                                 : property.status === 'pending_review'
                                 ? 'bg-[#f0c040]/10 text-[#f0c040]'
-                                : property.status === 'rented' || property.status === 'sold'
-                                ? 'bg-white/8 text-white/40'
                                 : 'bg-red-500/10 text-red-400'
                             }`}>
-                              {property.status.replace(/_/g, ' ')}
+                              {property.is_rented ? 'rented/sold' : property.status.replace(/_/g, ' ')}
                             </span>
                             <Link to={`/property/${property.id}`}>
                               <Eye className="w-4 h-4 text-white/20 hover:text-white/60 transition-colors" />
                             </Link>
+                            <button
+                              onClick={() => navigate(`/edit-property/${property.id}`)}
+                              title="Edit listing"
+                            >
+                              <Pencil className="w-4 h-4 text-white/20 hover:text-white/60 transition-colors" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget(property)}
+                              title="Delete listing"
+                            >
+                              <Trash2 className="w-4 h-4 text-white/20 hover:text-red-400 transition-colors" />
+                            </button>
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {deleteTarget && (
+                  <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5">
+                    <div className="bg-[#0a1f11] border border-white/10 rounded-2xl p-6 w-full max-w-sm">
+                      <h3 className="text-[15px] font-bold text-white mb-2 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5 text-red-400" /> Delete Listing
+                      </h3>
+                      <p className="text-[13px] text-white/45 mb-5 leading-relaxed">
+                        Are you sure you want to delete "{deleteTarget.title}"? This cannot be undone.
+                      </p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setDeleteTarget(null)}
+                          disabled={deleting}
+                          className="flex-1 py-3 rounded-xl font-bold text-[13px] text-white/40 hover:bg-white/5 transition-colors disabled:opacity-40"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleDeleteListing}
+                          disabled={deleting}
+                          className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold text-[13px] hover:bg-red-600 transition-all disabled:opacity-40"
+                        >
+                          {deleting ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
