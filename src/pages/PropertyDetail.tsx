@@ -73,7 +73,7 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
             <img src={property.images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
           ) : (
             <div style={{ width: '100%', height: '100%', background: '#0a1f11', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: '80px' }}>🏠</span>
+              
             </div>
           )}
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to top, #0a1f11, transparent)' }} />
@@ -81,8 +81,8 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
             <div style={{ background: '#f0c040', color: '#000', padding: '8px 18px', borderRadius: '12px', fontSize: '20px', fontWeight: '800', textTransform: 'uppercase' }}>
               {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
             </div>
-            <div style={{ background: '#1a6b3c', color: '#fff', padding: '8px 18px', borderRadius: '12px', fontSize: '20px', fontWeight: '800' }}>
-              ✓ Escrow Protected
+            <div style={{ color: '#fff', fontSize: '18px', fontWeight: '700' }}>
+              Escrow Protected
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
               {property.title}
             </h2>
             <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.5)', margin: '0 0 20px' }}>
-              📍 {property.lga}, {property.state}
+              {property.lga}, {property.state}
             </p>
             <p style={{ fontSize: '52px', fontWeight: '900', color: '#f0c040', margin: '0 0 8px' }}>
               {formatPrice(property.price)}
