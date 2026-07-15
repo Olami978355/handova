@@ -857,7 +857,9 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   <AlertTriangle className="w-4 h-4" /> Cancel This Deal
                 </h3>
                 <p className="text-[12px] text-white/40 mb-3">
-                  A 5% cancellation fee applies. The rest of your payment will be refunded.
+                  {deal.status === 'agreement_draft' || deal.status === 'pending_payment'
+                    ? 'No payment has been made yet — this deal can be cancelled free of charge.'
+                    : 'A 5% cancellation fee applies. The rest of your payment will be refunded.'}
                 </p>
                 <button
                   onClick={() => setShowTenantCancelModal(true)}
@@ -1090,7 +1092,9 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 <AlertTriangle className="w-5 h-5 text-red-400" /> Cancel Deal
               </h3>
               <p className="text-[13px] text-white/45 mb-4 leading-relaxed">
-                A 5% cancellation fee will be deducted from your refund. This cannot be undone.
+                {deal.status === 'agreement_draft' || deal.status === 'pending_payment'
+                  ? 'No payment has been made on this deal, so this cancellation is free. This cannot be undone.'
+                  : 'A 5% cancellation fee will be deducted from your refund. This cannot be undone.'}
               </p>
               <textarea
                 value={tenantCancelReason}

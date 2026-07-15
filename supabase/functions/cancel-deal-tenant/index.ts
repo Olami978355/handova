@@ -36,29 +36,40 @@ serve(async (req) => {
       throw new Error(`Cannot cancel a deal in ${deal.status} status.`);
     }
 
-    if (!deal.paystack_reference) {
-      throw new Error('No payment reference found on this deal — nothing to refund.');
-    }
+    const isPrePayment = deal.status === 'agreement_draft' || deal.status === 'pending_payment';
 
-    const feeAmount = Math.round(deal.amount * CANCELLATION_FEE_RATE * 100) / 100;
-    const refundAmount = deal.amount - feeAmount;
-    const toKobo = (naira: number) => Math.round(naira * 100);
-    const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
+    let feeAmount = 0;
+    let refundAmount = 0;
 
-    const refundResponse = await fetch('https://api.paystack.co/refund', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${paystackSecret}`,
-      },
-      body: JSON.stringify({
-        transaction: deal.paystack_reference,
-        amount: toKobo(refundAmount),
-      }),
-    });
-    const refundData = await refundResponse.json();
-    if (!refundResponse.ok) {
-      throw new Error(`Paystack refund failed: ${refundData.message}`);
+    if (isPrePayment) {
+      // No payment has been made yet — free cancellation, nothing to refund via Paystack.
+      feeAmount = 0;
+      refundAmount = 0;
+    } else {
+      if (!deal.paystack_reference) {
+        throw new Error('No payment reference found on this deal — nothing to refund.');
+      }
+
+      feeAmount = Math.round(deal.amount * CANCELLATION_FEE_RATE * 100) / 100;
+      refundAmount = deal.amount - feeAmount;
+      const toKobo = (naira: number) => Math.round(naira * 100);
+      const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
+
+      const refundResponse = await fetch('https://api.paystack.co/refund', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${paystackSecret}`,
+        },
+        body: JSON.stringify({
+          transaction: deal.paystack_reference,
+          amount: toKobo(refundAmount),
+        }),
+      });
+      const refundData = await refundResponse.json();
+      if (!refundResponse.ok) {
+        throw new Error(`Paystack refund failed: ${refundData.message}`);
+      }
     }
 
     const { error: updateError } = await adminSupabase
@@ -88,7 +99,9 @@ serve(async (req) => {
       adminSupabase,
       deal,
       'Deal Cancelled by Tenant',
-      `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. A 5% cancellation fee (₦${feeAmount.toLocaleString()}) was applied; ₦${refundAmount.toLocaleString()} was refunded.`,
+      isPrePayment
+        ? `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. No payment had been made, so no fee applies.`
+        : `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. A 5% cancellation fee (₦${feeAmount.toLocaleString()}) was applied; ₦${refundAmount.toLocaleString()} was refunded.`,
       `/deals/${dealId}`,
       'deal_state_change'
     );
