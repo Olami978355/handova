@@ -126,3 +126,78 @@ export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+export const executeDealPayout = async (
+  adminSupabase: any,
+  deal: any,
+  actorId: string,
+  actorRole: string,
+  extraLogDetails: Record<string, any> = {}
+) => {
+  const payoutRecipientId = deal.agent_id || deal.landlord_id;
+  const transferAmountNaira = deal.agent_id
+    ? Number(deal.agent_fee) + Number(deal.landlord_payout)
+    : Number(deal.landlord_payout);
+
+  const { data: payoutProfile, error: payoutProfileError } = await adminSupabase
+    .from('profiles')
+    .select('paystack_recipient_code, full_name')
+    .eq('id', payoutRecipientId)
+    .single();
+
+  if (payoutProfileError || !payoutProfile?.paystack_recipient_code) {
+    await adminSupabase.from('deals').update({ transfer_status: 'failed' }).eq('id', deal.id);
+    await logDealAction(adminSupabase, deal.id, 'transfer_failed', actorId, {
+      reason: 'Recipient has no bank details on file',
+      payout_recipient_id: payoutRecipientId,
+      ...extraLogDetails,
+    });
+    return { transferInitiated: false, warning: 'Deal marked as funds released, but the payout recipient has no bank details on file. Transfer was NOT sent.' };
+  }
+
+  const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
+  if (!paystackSecret) throw new Error('PAYSTACK_SECRET_KEY not set');
+
+  const transferReference = `RELEASE_${deal.id}_${Date.now()}`;
+
+  const transferRes = await fetch('https://api.paystack.co/transfer', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${paystackSecret}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      source: 'balance',
+      amount: Math.round(transferAmountNaira * 100),
+      recipient: payoutProfile.paystack_recipient_code,
+      reference: transferReference,
+      reason: `Rent Easy payout for deal ${deal.id}`,
+    }),
+  });
+  const transferData = await transferRes.json();
+
+  if (!transferData.status) {
+    await adminSupabase.from('deals').update({ transfer_status: 'failed' }).eq('id', deal.id);
+    await logDealAction(adminSupabase, deal.id, 'transfer_failed', actorId, {
+      reason: transferData.message || 'Unknown Paystack transfer error',
+      ...extraLogDetails,
+    });
+    return { transferInitiated: false, warning: `Deal marked as funds released, but the Paystack transfer failed: ${transferData.message}` };
+  }
+
+  await adminSupabase
+    .from('deals')
+    .update({
+      transfer_status: 'pending',
+      paystack_transfer_reference: transferReference,
+      paystack_transfer_code: transferData.data.transfer_code,
+    })
+    .eq('id', deal.id);
+
+  await logDealAction(adminSupabase, deal.id, 'funds_released', actorId, {
+    released_by_role: actorRole,
+    transfer_reference: transferReference,
+    transfer_amount: transferAmountNaira,
+    payout_recipient_id: payoutRecipientId,
+    ...extraLogDetails,
+  });
+
+  return { transferInitiated: true };
+};

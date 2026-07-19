@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -42,33 +42,56 @@ serve(async (req) => {
       throw new Error(`Cannot resolve a deal in ${deal.status} status. Only disputed deals can be resolved here.`);
     }
 
-    const newStatus = outcome === 'release' ? 'funds_released' : 'refunded';
-
-    const { error: updateError } = await adminSupabase
-      .from('deals')
-      .update({
-        status: newStatus,
-        resolution_note: note,
-        resolved_by: user.id,
-        resolved_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', dealId);
-    if (updateError) throw updateError;
+    let responseExtra: Record<string, any> = {};
 
     if (outcome === 'release') {
-      await adminSupabase
-        .from('properties')
-        .update({ is_rented: true, updated_at: new Date().toISOString() })
-        .eq('id', deal.property_id);
+      // Mark deal settled first, then run the same real payout logic release-funds uses.
+      const { error: statusErr } = await adminSupabase
+        .from('deals')
+        .update({ status: 'funds_released', resolution_note: note, resolved_by: user.id, resolved_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        .eq('id', dealId);
+      if (statusErr) throw statusErr;
+
+      await adminSupabase.from('properties').update({ is_rented: true, updated_at: new Date().toISOString() }).eq('id', deal.property_id);
+
+      const payoutResult = await executeDealPayout(adminSupabase, deal, user.id, profile.role, { via: 'dispute_resolution', dispute_note: note });
+      responseExtra = payoutResult;
     } else {
-      await adminSupabase
-        .from('properties')
-        .update({ is_rented: false, updated_at: new Date().toISOString() })
-        .eq('id', deal.property_id);
+      // Refund — full amount, no fee, real Paystack refund.
+      if (!deal.paystack_reference) {
+        throw new Error('No payment reference found on this deal — nothing to refund.');
+      }
+      const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
+      const refundResponse = await fetch('https://api.paystack.co/refund', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${paystackSecret}` },
+        body: JSON.stringify({ transaction: deal.paystack_reference, amount: Math.round(Number(deal.amount) * 100) }),
+      });
+      const refundData = await refundResponse.json();
+      if (!refundResponse.ok) {
+        throw new Error(`Paystack refund failed: ${refundData.message}`);
+      }
+
+      const { error: updateError } = await adminSupabase
+        .from('deals')
+        .update({
+          status: 'refunded',
+          resolution_note: note,
+          resolved_by: user.id,
+          resolved_at: new Date().toISOString(),
+          cancellation_fee: 0,
+          refund_amount: deal.amount,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', dealId);
+      if (updateError) throw updateError;
+
+      await logDealAction(adminSupabase, dealId, 'dispute_resolved', user.id, { outcome, note, refundAmount: deal.amount });
     }
 
-    await logDealAction(adminSupabase, dealId, 'dispute_resolved', user.id, { outcome, note });
+    if (outcome === 'release') {
+      await logDealAction(adminSupabase, dealId, 'dispute_resolved', user.id, { outcome, note });
+    }
 
     await notifyDealParties(
       adminSupabase,
@@ -76,12 +99,12 @@ serve(async (req) => {
       'Dispute Resolved',
       outcome === 'release'
         ? `The dispute for ${deal.properties.title} has been resolved. Funds have been released. Note: ${note}`
-        : `The dispute for ${deal.properties.title} has been resolved. The tenant has been refunded. Note: ${note}`,
+        : `The dispute for ${deal.properties.title} has been resolved. The tenant has been fully refunded. Note: ${note}`,
       `/deals/${dealId}`,
       'deal_state_change'
     );
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, outcome, ...responseExtra }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
