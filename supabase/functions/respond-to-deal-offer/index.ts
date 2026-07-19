@@ -46,29 +46,6 @@ serve(async (req) => {
       });
     }
 
-    // ACCEPTING — this is the money path, needs the same protections as
-    // start-escrow-from-booking: lock the property, check for an existing
-    // active deal, only then create. A deal counts as "active" if it's
-    // anything other than funds_released — this includes 'disputed' since
-    // there is currently no resolution path that would legitimately free
-    // the property back up.
-    const propertyIdInt = parseInt(offer.property_id.replace(/-/g, '').substring(0, 8), 16);
-    const { error: lockError } = await adminSupabase.rpc('execute_sql', {
-      sql: `SELECT pg_advisory_xact_lock(${propertyIdInt});`,
-    });
-    if (lockError) throw lockError;
-
-    const { data: existingDeals, error: existingError } = await adminSupabase
-      .from('deals')
-      .select('id, status')
-      .eq('property_id', offer.property_id)
-      .neq('status', 'funds_released');
-    if (existingError) throw existingError;
-
-    if (existingDeals && existingDeals.length > 0) {
-      throw new Error('This property already has an active deal in progress. This offer can no longer be accepted.');
-    }
-
     const { data: offererProfile } = await adminSupabase
       .from('profiles')
       .select('id, role')
