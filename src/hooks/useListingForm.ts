@@ -76,7 +76,18 @@ export const useListingForm = (propertyId?: string) => {
             price_period: 'yearly',
           };
         }
-        return data as ListingFormData;
+        return {
+          ...data,
+          price: Number(data.price),
+          bedrooms: data.bedrooms != null ? Number(data.bedrooms) : undefined,
+          bathrooms: data.bathrooms != null ? Number(data.bathrooms) : undefined,
+          land_size_value: data.land_size_value != null ? Number(data.land_size_value) : undefined,
+          lat: data.lat != null ? Number(data.lat) : undefined,
+          lng: data.lng != null ? Number(data.lng) : undefined,
+          images: data.images || [],
+          videos: data.videos || [],
+          amenities: data.amenities || [],
+        } as ListingFormData;
       }
 
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -212,6 +223,10 @@ export const useListingForm = (propertyId?: string) => {
     prevStep,
     clearDraft,
     isSubmitting,
-    onSubmit: handleSubmit(onSubmit),
+    onSubmit: handleSubmit(onSubmit, (errors) => {
+      console.error('Listing form validation failed:', errors);
+      const fields = Object.keys(errors).join(', ');
+      alert(`Please check these fields before saving: ${fields}`);
+    }),
   };
 };
