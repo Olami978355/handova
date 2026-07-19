@@ -713,6 +713,22 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 </div>
               )}
 
+              {/* Cancelled */}
+              {deal.status === 'cancelled' && (
+                <div className="p-8 text-center">
+                  <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <X className="w-7 h-7 text-white/40" />
+                  </div>
+                  <h4 className="text-[18px] font-bold text-white mb-2">Deal Cancelled</h4>
+                  {deal.cancellation_reason && (
+                    <div className="mt-4 p-4 bg-white/4 border border-white/8 rounded-xl text-left max-w-xs mx-auto">
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-1">Reason</p>
+                      <p className="text-[12px] text-white/60 leading-relaxed">{deal.cancellation_reason}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Disputed */}
               {deal.status === 'disputed' && (
                 <div className="p-8 text-center">

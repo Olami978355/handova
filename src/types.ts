@@ -230,6 +230,7 @@ export interface Deal {
   agreement_skipped?: boolean;
   duration?: string;
   dispute_reason?: string;
+  cancellation_reason?: string;
   tenant_signed_at?: string;
   landlord_signed_at?: string;
   move_in_date?: string;
