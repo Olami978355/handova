@@ -129,15 +129,28 @@ if (privateData) {
   };
 
   // ✅ Fixed — no FK join, fetch actor profiles separately
-  const fetchLogs = async () => {
+  const fetchLogs = async (filters?: { search?: string; dateFrom?: string; dateTo?: string }) => {
     if (!isAdmin) return;
     setLoading(true);
     try {
-      const { data: logsData, error } = await supabase
-        .from('admin_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
+
+    let query = supabase
+      .from('admin_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (filters?.search) {
+      query = query.or('action.ilike.%' + filters.search + '%,target_id.ilike.%' + filters.search + '%');
+    }
+    if (filters?.dateFrom) {
+      query = query.gte('created_at', filters.dateFrom);
+    }
+    if (filters?.dateTo) {
+      query = query.lte('created_at', filters.dateTo);
+    }
+
+    const { data: logsData, error } = await query;
 
       if (error) throw error;
 

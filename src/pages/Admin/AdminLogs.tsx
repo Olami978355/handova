@@ -10,25 +10,40 @@ const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 export default function AdminLogs() {
   const { logs, setLogs, loading, fetchLogs, isAdmin } = useAdmin();
   const [searchTerm, setSearchTerm] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [selectedLog, setSelectedLog] = useState<AdminLog | null>(null);
 
   useEffect(() => { fetchLogs(); }, []);
 
-  const handleSearch = async (term: string) => {
+  const applyFilters = (overrides?: { search?: string; dateFrom?: string; dateTo?: string }) => {
+    fetchLogs({
+      search: overrides?.search ?? searchTerm,
+      dateFrom: overrides?.dateFrom ?? dateFrom,
+      dateTo: overrides?.dateTo ?? dateTo,
+    });
+  };
+
+  const handleSearch = (term: string) => {
     setSearchTerm(term);
-    if (!term) { fetchLogs(); return; }
-    try {
-      const { data, error } = await supabase
-        .from('admin_logs')
-        .select('*, actor:actor_id (*)')
-        .ilike('action', `%${term}%`)
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      setLogs(data || []);
-    } catch (err) {
-      console.error('Search error:', err);
-    }
+    applyFilters({ search: term });
+  };
+
+  const handleDateFromChange = (value: string) => {
+    setDateFrom(value);
+    applyFilters({ dateFrom: value });
+  };
+
+  const handleDateToChange = (value: string) => {
+    setDateTo(value);
+    applyFilters({ dateTo: value });
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setDateFrom('');
+    setDateTo('');
+    fetchLogs();
   };
 
   if (!isAdmin) {
@@ -61,16 +76,38 @@ export default function AdminLogs() {
 
   return (
     <div className="space-y-5" style={font}>
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
+      {/* Search + filters */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[240px]">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
+          <input
+            type="text"
+            placeholder="Search by action or target ID..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
+          />
+        </div>
         <input
-          type="text"
-          placeholder="Search by action..."
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
+          type="date"
+          value={dateFrom}
+          onChange={(e) => handleDateFromChange(e.target.value)}
+          className="px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#1a6b3c]/50 transition-colors"
         />
+        <input
+          type="date"
+          value={dateTo}
+          onChange={(e) => handleDateToChange(e.target.value)}
+          className="px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#1a6b3c]/50 transition-colors"
+        />
+        {(searchTerm || dateFrom || dateTo) && (
+          <button
+            onClick={clearFilters}
+            className="px-4 py-3 bg-white/5 text-white/40 rounded-xl text-[13px] font-semibold hover:text-white transition-colors"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
