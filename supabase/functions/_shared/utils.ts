@@ -201,3 +201,21 @@ export const executeDealPayout = async (
 
   return { transferInitiated: true };
 };
+
+export const logAdminAction = async (
+  supabase: any,
+  actorId: string,
+  action: string,
+  targetId: string,
+  targetType: string,
+  details: Record<string, any> = {}
+) => {
+  const { error } = await supabase.from('admin_logs').insert({
+    actor_id: actorId,
+    action,
+    target_id: targetId,
+    target_type: targetType,
+    details,
+  });
+  if (error) console.error('Error logging admin action:', error);
+};

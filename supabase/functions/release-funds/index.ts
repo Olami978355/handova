@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout, logAdminAction } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -63,6 +63,7 @@ serve(async (req) => {
 
     // 4.2 Execute payout via shared helper (real Paystack transfer)
     const payoutResult = await executeDealPayout(adminSupabase, deal, user.id, profile.role);
+    await logAdminAction(adminSupabase, user.id, 'funds_released', dealId, 'deal', { role: profile.role });
     if (!payoutResult.transferInitiated) {
       return new Response(JSON.stringify({ success: true, transferInitiated: false, warning: payoutResult.warning }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

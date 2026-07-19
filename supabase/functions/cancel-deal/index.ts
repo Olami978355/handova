@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, logAdminAction } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -56,6 +56,7 @@ serve(async (req) => {
       .eq('id', deal.property_id);
 
     await logDealAction(adminSupabase, dealId, 'deal_cancelled', user.id, { reason });
+    await logAdminAction(adminSupabase, user.id, 'deal_cancelled', dealId, 'deal', { reason });
 
     await notifyDealParties(
       adminSupabase,

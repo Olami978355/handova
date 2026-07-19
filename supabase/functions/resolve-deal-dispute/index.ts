@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout, logAdminAction } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -92,6 +92,7 @@ serve(async (req) => {
     if (outcome === 'release') {
       await logDealAction(adminSupabase, dealId, 'dispute_resolved', user.id, { outcome, note });
     }
+    await logAdminAction(adminSupabase, user.id, 'dispute_resolved', dealId, 'deal', { outcome, note });
 
     await notifyDealParties(
       adminSupabase,
