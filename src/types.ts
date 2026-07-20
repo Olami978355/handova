@@ -21,7 +21,7 @@ export interface Profile {
   bank_account_name?: string;
   bank_account_number?: string;
   bank_code?: string;
-  profile_slug?: string;
+  username?: string;
   created_at: string;
   updated_at: string;
 }

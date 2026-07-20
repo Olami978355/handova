@@ -25,6 +25,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('profile');
@@ -33,12 +34,33 @@ export default function Profile() {
     fullName: profile?.full_name || '',
     phone: profile?.phone || '',
     avatarUrl: profile?.avatar_url || '',
+    username: profile?.username || '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError(null);
     if (success) setSuccess(null);
+  };
+
+  const checkUsername = async (value: string) => {
+    const cleaned = value.toLowerCase().trim();
+    if (!cleaned) { setUsernameStatus('idle'); return; }
+    if (!/^[a-z0-9_]{3,20}$/.test(cleaned)) { setUsernameStatus('invalid'); return; }
+    if (cleaned === profile?.username) { setUsernameStatus('idle'); return; }
+    setUsernameStatus('checking');
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', cleaned)
+      .maybeSingle();
+    setUsernameStatus(data ? 'taken' : 'available');
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    setFormData(prev => ({ ...prev, username: value }));
+    checkUsername(value);
   };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -53,6 +75,7 @@ export default function Profile() {
         full_name: formData.fullName,
         phone: formData.phone,
         avatar_url: formData.avatarUrl || profile?.avatar_url || null,
+        username: formData.username || null,
         email: user.email || '',
       });
       if (!result.success) throw new Error(result.error?.message || 'Failed to update');
@@ -337,6 +360,34 @@ export default function Profile() {
                         </div>
                       </div>
 
+                      <div>
+                        <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                          Username
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[14px] text-white/25 pointer-events-none">@</span>
+                          <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleUsernameChange}
+                            placeholder="yourname"
+                            className="w-full pl-8 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                          />
+                        </div>
+                        {usernameStatus === 'checking' && (
+                          <p className="text-[11px] text-white/30 mt-1.5">Checking availability...</p>
+                        )}
+                        {usernameStatus === 'available' && (
+                          <p className="text-[11px] text-[#4ade80] mt-1.5">Username available</p>
+                        )}
+                        {usernameStatus === 'taken' && (
+                          <p className="text-[11px] text-red-400 mt-1.5">Username already taken</p>
+                        )}
+                        {usernameStatus === 'invalid' && (
+                          <p className="text-[11px] text-red-400 mt-1.5">3-20 characters, lowercase letters, numbers, underscore only</p>
+                        )}
+                      </div>
                       {/* Email — read only */}
                       <div>
                         <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
