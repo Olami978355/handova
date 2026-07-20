@@ -20,6 +20,7 @@ import MessagesPage from './pages/MessagesPage';
 import { ListingPage } from './pages/ListingPage';
 import EditListing from './pages/EditListing';
 import NotificationsPage from './pages/NotificationsPage';
+import PublicProfile from './pages/PublicProfile';
 import { ListingSuccess } from './pages/ListingSuccess';
 import MapSearch from './pages/MapSearch';
 import Admin from './pages/Admin';
@@ -100,6 +101,7 @@ function AppInner() {
             <Route path="listings" element={<Listings />} />
             <Route path="map" element={<MapSearch />} />
             <Route path="property/:id" element={<PropertyDetail />} />
+            <Route path="u/:username" element={<PublicProfile />} />
             <Route path="legal" element={<LegalPage />} />
             <Route path="faq" element={<FAQPage />} />
             <Route path="about" element={<AboutPage />} />
