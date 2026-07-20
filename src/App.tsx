@@ -19,6 +19,7 @@ import Profile from './pages/Profile';
 import MessagesPage from './pages/MessagesPage';
 import { ListingPage } from './pages/ListingPage';
 import EditListing from './pages/EditListing';
+import NotificationsPage from './pages/NotificationsPage';
 import { ListingSuccess } from './pages/ListingSuccess';
 import MapSearch from './pages/MapSearch';
 import Admin from './pages/Admin';
@@ -115,6 +116,7 @@ function AppInner() {
             <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="add-property" element={<ProtectedRoute><ListingPage /></ProtectedRoute>} />
             <Route path="edit-property/:id" element={<ProtectedRoute><EditListing /></ProtectedRoute>} />
+            <Route path="notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
             <Route path="listing-success" element={<ProtectedRoute><ListingSuccess /></ProtectedRoute>} />
             <Route path="admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="deals/:id" element={<ProtectedRoute><DealDetail /></ProtectedRoute>} />
