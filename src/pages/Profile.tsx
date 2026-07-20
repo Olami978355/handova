@@ -33,6 +33,7 @@ export default function Profile() {
   const [formData, setFormData] = useState({
     fullName: profile?.full_name || '',
     phone: profile?.phone || '',
+    phonePublic: profile?.phone_public || false,
     avatarUrl: profile?.avatar_url || '',
     username: profile?.username || '',
   });
@@ -76,6 +77,7 @@ export default function Profile() {
         phone: formData.phone,
         avatar_url: formData.avatarUrl || profile?.avatar_url || null,
         username: formData.username || null,
+        phone_public: formData.phonePublic,
         email: user.email || '',
       });
       if (!result.success) throw new Error(result.error?.message || 'Failed to update');
@@ -358,6 +360,14 @@ export default function Profile() {
                             />
                           </div>
                         </div>
+                          <label className="flex items-center gap-2 mt-2 text-[11px] text-white/40">
+                            <input
+                              type="checkbox"
+                              checked={formData.phonePublic}
+                              onChange={(e) => setFormData(prev => ({ ...prev, phonePublic: e.target.checked }))}
+                            />
+                            Show my phone number on my public profile
+                          </label>
                       </div>
 
                       <div>

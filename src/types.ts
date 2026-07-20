@@ -9,6 +9,7 @@ export interface Profile {
   full_name: string;
   email: string;
   phone?: string;
+  phone_public?: boolean;
   avatar_url?: string;
   role: UserRole;
   verification_status: VerificationStatus;
