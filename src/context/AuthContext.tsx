@@ -23,8 +23,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchingProfile = useRef(false);
   const initialised = useRef(false);
 
-  const fetchProfile = async (userId: string) => {
-    if (fetchingProfile.current) return;
+  const fetchProfile = async (userId: string, isRetry = false) => {
+    if (fetchingProfile.current && !isRetry) return;
     fetchingProfile.current = true;
     try {
       const { data, error } = await supabase
@@ -32,7 +32,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .select('*')
         .eq('id', userId)
         .single();
-      if (error) {
+      if (error || !data) {
+        if (!isRetry) {
+          fetchingProfile.current = false;
+          await new Promise(resolve => setTimeout(resolve, 700));
+          await fetchProfile(userId, true);
+          return;
+        }
         setProfile(null);
       } else {
         setProfile(data);
