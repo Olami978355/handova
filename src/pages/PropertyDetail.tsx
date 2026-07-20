@@ -351,7 +351,7 @@ export default function PropertyDetail() {
       // Step 2 — fetch owner profile separately
       if (data.owner_id) {
         const { data: ownerData } = await supabase
-          .from('profiles')
+          .from('public_profiles')
           .select('id, full_name, avatar_url, role, verification_status, lasrera_id')
           .eq('id', data.owner_id)
           .single();

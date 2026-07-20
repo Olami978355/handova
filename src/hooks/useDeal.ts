@@ -25,8 +25,8 @@ export function useDeal(dealId: string) {
       let tenantProfile = null;
       if (data.tenant_id) {
         const { data: tenantData } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, email, role, verification_status')
+          .from('public_profiles')
+          .select('id, full_name, avatar_url, role, verification_status')
           .eq('id', data.tenant_id)
           .single();
         tenantProfile = tenantData;
@@ -35,8 +35,8 @@ export function useDeal(dealId: string) {
       let landlordProfile = null;
       if (data.landlord_id) {
         const { data: landlordData } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, email, role, verification_status')
+          .from('public_profiles')
+          .select('id, full_name, avatar_url, role, verification_status')
           .eq('id', data.landlord_id)
           .single();
         landlordProfile = landlordData;
@@ -45,8 +45,8 @@ export function useDeal(dealId: string) {
       let agentProfile = null;
       if (data.agent_id) {
         const { data: agentData } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, email, role, verification_status')
+          .from('public_profiles')
+          .select('id, full_name, avatar_url, role, verification_status')
           .eq('id', data.agent_id)
           .single();
         agentProfile = agentData;

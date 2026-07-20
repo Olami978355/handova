@@ -36,8 +36,8 @@ export const useMessages = (conversationId?: string) => {
       let senderMap: Record<string, any> = {};
       if (senderIds.length > 0) {
         const { data: senderProfiles } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, role, email, verification_status, nin_verified, created_at, updated_at')
+          .from('public_profiles')
+          .select('id, full_name, avatar_url, role, verification_status, nin_verified, created_at')
           .in('id', senderIds);
         if (senderProfiles) {
           senderMap = Object.fromEntries(senderProfiles.map(p => [p.id, p]));

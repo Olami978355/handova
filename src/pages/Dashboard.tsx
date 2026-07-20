@@ -431,7 +431,7 @@ export default function Dashboard() {
 
           if (tenantIds.length > 0) {
             const { data: tenantProfiles } = await supabase
-              .from('profiles')
+              .from('public_profiles')
               .select('id, full_name, avatar_url, verification_status')
               .in('id', tenantIds);
 

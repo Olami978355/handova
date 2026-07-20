@@ -240,7 +240,7 @@ export default function Listings() {
       let ownerMap: Record<string, { role: string; verification_status: string }> = {};
       if (ownerIds.length > 0) {
         const { data: owners } = await supabase
-          .from('profiles')
+          .from('public_profiles')
           .select('id, role, verification_status')
           .in('id', ownerIds);
         if (owners) {

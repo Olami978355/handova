@@ -438,7 +438,7 @@ export default function Landing() {
       try {
         const [{ count: props }, { count: users }] = await Promise.all([
           supabase.from('properties').select('*', { count: 'exact', head: true }).eq('status', 'active').is('deleted_at', null),
-          supabase.from('profiles').select('*', { count: 'exact', head: true })
+          supabase.from('public_profiles').select('*', { count: 'exact', head: true })
         ]);
         setLiveStats({ properties: props || 0, users: users || 0 });
       } catch { /* silent */ }

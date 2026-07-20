@@ -30,8 +30,8 @@ export const useConversations = () => {
           let otherProfile: Profile | undefined;
           if (otherParticipantId) {
             const { data: profileData } = await supabase
-              .from('profiles')
-              .select('id, full_name, avatar_url, role, verification_status, phone')
+              .from('public_profiles')
+              .select('id, full_name, avatar_url, role, verification_status, phone, username')
               .eq('id', otherParticipantId)
               .single();
             if (profileData) otherProfile = profileData as Profile;
