@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { ArrowLeft, MessageSquare, User, Phone } from 'lucide-react';
+import { ArrowLeft, MessageSquare, User, Phone, MoreVertical, Flag, Ban, X } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { ChatList } from '../components/chat/ChatList';
 import { ChatWindow } from '../components/chat/ChatWindow';
 import { Conversation } from '../types';
@@ -15,6 +16,44 @@ export default function MessagesPage() {
 
   const conversationId = searchParams.get('id');
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [showChatMenu, setShowChatMenu] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const otherId = selectedConversation?.participants?.[0]?.id;
+
+  const handleBlock = async () => {
+    if (!otherId || !user) return;
+    setActionLoading(true);
+    try {
+      const { error } = await supabase.from('blocked_users').insert({ blocker_id: user.id, blocked_id: otherId });
+      if (error) throw error;
+      alert('User blocked.');
+      setShowChatMenu(false);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to block user');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReport = async () => {
+    if (!otherId || !user || !reportReason.trim()) return;
+    setActionLoading(true);
+    try {
+      const { error } = await supabase.from('user_reports').insert({ reporter_id: user.id, reported_id: otherId, reason: reportReason });
+      if (error) throw error;
+      alert('Report submitted. Our team will review it.');
+      setShowReportModal(false);
+      setShowChatMenu(false);
+      setReportReason('');
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to submit report');
+    } finally {
+      setActionLoading(false);
+    }
+  };
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -93,7 +132,7 @@ const chatWindowProps = {
                 </button>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-[14px] font-bold text-white truncate flex items-center gap-1">
-                    <span className="truncate">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</span>
+                    <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
                     <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                   </h3>
                   <p className="text-[11px] text-[#1a6b3c] font-medium truncate">
@@ -109,6 +148,22 @@ const chatWindowProps = {
                     <Phone className="w-4 h-4" />
                   </a>
                 )}
+                <button
+                  onClick={() => setShowChatMenu(!showChatMenu)}
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors flex-shrink-0 relative"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                  {showChatMenu && (
+                    <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-[#0a1f11] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                      <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-white/70 hover:bg-white/5 transition-colors text-left">
+                        <Ban className="w-3.5 h-3.5" /> Block user
+                      </button>
+                      <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-red-400 hover:bg-red-500/10 transition-colors text-left">
+                        <Flag className="w-3.5 h-3.5" /> Report user
+                      </button>
+                    </div>
+                  )}
+                </button>
               </div>
               <ChatWindow {...chatWindowProps} />
             </div>
@@ -154,7 +209,7 @@ const chatWindowProps = {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[14px] font-bold text-white truncate flex items-center gap-1">
-                      <span className="truncate">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</span>
+                      <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
                       <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                     </h3>
                     <p className="text-[11px] text-[#1a6b3c] font-medium truncate">
@@ -170,6 +225,22 @@ const chatWindowProps = {
                       <Phone className="w-4 h-4" />
                     </a>
                   )}
+                  <button
+                    onClick={() => setShowChatMenu(!showChatMenu)}
+                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors flex-shrink-0 relative"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                    {showChatMenu && (
+                      <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-[#0a1f11] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                        <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-white/70 hover:bg-white/5 transition-colors text-left">
+                          <Ban className="w-3.5 h-3.5" /> Block user
+                        </button>
+                        <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-red-400 hover:bg-red-500/10 transition-colors text-left">
+                          <Flag className="w-3.5 h-3.5" /> Report user
+                        </button>
+                      </div>
+                    )}
+                  </button>
                 </div>
                 <ChatWindow {...chatWindowProps} />
               </>
@@ -189,4 +260,32 @@ const chatWindowProps = {
       )}
     </div>
   );
+      {showReportModal && (
+        <>
+          <div onClick={() => setShowReportModal(false)} className="fixed inset-0 bg-black/70 z-[100]" />
+          <div className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-sm h-fit bg-[#0a1f11] border border-white/10 rounded-2xl z-[110] overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
+              <h3 className="text-[15px] font-bold text-white">Report User</h3>
+              <button onClick={() => setShowReportModal(false)} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <textarea
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                placeholder="What happened?"
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none"
+              />
+              <button
+                onClick={handleReport}
+                disabled={!reportReason.trim() || actionLoading}
+                className="w-full bg-red-500 text-white py-3 rounded-xl font-bold text-[13px] hover:bg-red-600 transition-all disabled:opacity-40"
+              >
+                {actionLoading ? 'Submitting...' : 'Submit Report'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 }
