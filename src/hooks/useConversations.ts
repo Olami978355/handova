@@ -20,6 +20,13 @@ export const useConversations = () => {
         .order('last_message_at', { ascending: false, nullsFirst: false });
 
       if (error) throw error;
+      const { data: blockedRows } = await supabase
+        .from('blocked_users')
+        .select('blocker_id, blocked_id')
+        .or(`blocker_id.eq.${user.id},blocked_id.eq.${user.id}`);
+      const blockedIds = new Set(
+        (blockedRows || []).map(r => r.blocker_id === user.id ? r.blocked_id : r.blocker_id)
+      );
 
       const enriched = await Promise.all(
         (data || []).map(async conv => {
@@ -52,7 +59,11 @@ export const useConversations = () => {
         })
       );
 
-      setConversations(enriched);
+      const visible = enriched.filter(c => {
+        const otherId = c.participant_ids.find((id: string) => id !== user.id);
+        return !otherId || !blockedIds.has(otherId);
+      });
+      setConversations(visible);
       const total = enriched.reduce((acc, c) => acc + (c.unread_count || 0), 0);
       setTotalUnreadCount(total);
     } catch (err) {
