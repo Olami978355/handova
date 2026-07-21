@@ -423,7 +423,7 @@ export default function Landing() {
         const { data } = await supabase
           .from('properties')
           .select('*, profiles(full_name, avatar_url, role)')
-          .eq('status', 'active').is('deleted_at', null)
+          .eq('status', 'active').is('deleted_at', null).eq('is_delisted', false)
           .order('created_at', { ascending: false })
           .limit(6);
         setFeaturedProperties(data || []);

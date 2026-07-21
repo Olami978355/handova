@@ -4,7 +4,7 @@ import {
   Home, Shield, MessageSquare, Plus, Loader2,
   AlertCircle, CheckCircle, Clock, ArrowRight,
   User, CreditCard, Calendar, Search, Settings,
-  MapPin, RefreshCw, Eye, Heart, Pencil, Trash2, AlertTriangle
+  MapPin, RefreshCw, Eye, EyeOff, Heart, Pencil, Trash2, AlertTriangle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
@@ -331,6 +331,19 @@ export default function Dashboard() {
       alert(msg);
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleToggleDelist = async (property: Property) => {
+    try {
+      const { error } = await supabase.functions.invoke('delist-listing', {
+        body: { propertyId: property.id, delist: !property.is_delisted },
+      });
+      if (error) throw error;
+      setProperties(prev => prev.map(p => p.id === property.id ? { ...p, is_delisted: !p.is_delisted } : p));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update listing visibility';
+      alert(msg);
     }
   };
 
@@ -1062,6 +1075,15 @@ return (
                               title="Edit listing"
                             >
                               <Pencil className="w-4 h-4 text-white/20 hover:text-white/60 transition-colors" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleDelist(property)}
+                              title={property.is_delisted ? 'Re-list' : 'Delist'}
+                            >
+                              {property.is_delisted
+                                ? <Eye className="w-4 h-4 text-[#f0c040] hover:text-[#e0b030] transition-colors" />
+                                : <EyeOff className="w-4 h-4 text-white/20 hover:text-white/60 transition-colors" />
+                              }
                             </button>
                             <button
                               onClick={() => setDeleteTarget(property)}

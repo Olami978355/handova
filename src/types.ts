@@ -79,6 +79,7 @@ export interface Property {
   amenities: string[];
   is_rented: boolean;
   deleted_at?: string | null;
+  is_delisted?: boolean;
   min_rental_duration?: string;
   house_rules?: string;
   land_size_value?: number;

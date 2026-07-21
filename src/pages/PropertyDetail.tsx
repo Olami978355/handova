@@ -428,7 +428,7 @@ export default function PropertyDetail() {
     );
   }
 
-  if (property.status === 'inactive' || property.status === 'flagged' || property.deleted_at) {
+  if (property.status === 'inactive' || property.status === 'flagged' || property.deleted_at || (property.is_delisted && !isOwner)) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <AlertCircle className="w-12 h-12 text-[#f0c040] mb-4" />

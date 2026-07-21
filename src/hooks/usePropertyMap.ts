@@ -21,7 +21,7 @@ export const usePropertyMap = (filters: MapFilters) => {
         const { data, error: supabaseError } = await supabase
           .from('properties')
           .select('*')
-          .eq('status', 'active').is('deleted_at', null);
+          .eq('status', 'active').is('deleted_at', null).eq('is_delisted', false);
         
         if (supabaseError) throw supabaseError;
         setAllProperties(data || []);
