@@ -135,9 +135,11 @@ export const executeDealPayout = async (
   extraLogDetails: Record<string, any> = {}
 ) => {
   const payoutRecipientId = deal.agent_id || deal.landlord_id;
-  const transferAmountNaira = deal.agent_id
+  const grossPayout = deal.agent_id
     ? Number(deal.agent_fee) + Number(deal.landlord_payout)
     : Number(deal.landlord_payout);
+  const agreementFee = Number(deal.agreement_fee) || 0;
+  const transferAmountNaira = Math.max(0, grossPayout - agreementFee);
 
   const { data: payoutProfile, error: payoutProfileError } = await adminSupabase
     .from('profiles')

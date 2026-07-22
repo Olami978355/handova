@@ -293,6 +293,7 @@ export function useDeal(dealId: string) {
   const confirmMoveIn = () => callEdgeFunction('confirm-move-in');
   const confirmHandover = () => callEdgeFunction('confirm-handover');
   const releaseFunds = () => callEdgeFunction('release-funds');
+  const generateAgreement = () => callEdgeFunction('generate-agreement');
   const markDisputed = (reason: string) => callEdgeFunction('mark-disputed', { reason });
 
   return {
@@ -310,6 +311,7 @@ export function useDeal(dealId: string) {
     confirmMoveIn,
     confirmHandover,
     releaseFunds,
+    generateAgreement,
     markDisputed,
     cancelDeal,
     cancelDealAsTenant,

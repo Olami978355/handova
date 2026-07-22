@@ -23,7 +23,7 @@ export default function DealDetail() {
   const { user } = useAuth();
   const {
     deal, logs, loading, error,
-    uploadAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl, skipAgreement,
+    uploadAgreement, generateAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl, skipAgreement,
     signAgreement, confirmMoveIn, confirmHandover, releaseFunds, markDisputed, cancelDeal, cancelDealAsTenant,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
@@ -262,7 +262,7 @@ export default function DealDetail() {
                       <Upload className="w-4 h-4 text-[#1a6b3c]" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">Upload Tenancy Agreement</h4>
+                      <h4 className="text-[14px] font-bold text-white mb-1">{(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Upload or Generate Contract' : 'Upload or Generate Agreement'}</h4>
                       <p className="text-[12px] text-white/45 leading-relaxed">
                         Upload the tenancy agreement for the tenant to review before they pay. PDF or image (JPG, PNG, WebP), max 20MB.
                       </p>
@@ -303,6 +303,18 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                     {processing ? 'Uploading...' : 'Upload Agreement PDF'}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setProcessing(true);
+                      const result = await generateAgreement();
+                      setProcessing(false);
+                      if (!result.success) alert(result.error || 'Failed to generate agreement');
+                    }}
+                    disabled={processing}
+                    className="w-full mt-3 bg-white/5 text-white/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                  >
+                    Generate {(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Contract' : 'Agreement'} for Me (₦10,000 fee, deducted from payout)
                   </button>
                   <button
                     onClick={() => setShowSkipModal(true)}
@@ -792,12 +804,18 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                         { label: "Landlord's Share (forward to them yourself)", value: formatNaira(deal.landlord_payout) },
                       ]
                     : []),
+                  ...(deal.agreement_fee && deal.agreement_fee > 0
+                    ? [{ label: 'Agreement Generation Fee', value: `-${formatNaira(deal.agreement_fee)}` }]
+                    : []),
                   {
                     label: deal.agent_id ? 'Your Total Payout' : 'Landlord Payout',
                     value: formatNaira(
-                      deal.agent_id
-                        ? Number(deal.agent_fee || 0) + Number(deal.landlord_payout)
-                        : deal.landlord_payout
+                      Math.max(0,
+                        (deal.agent_id
+                          ? Number(deal.agent_fee || 0) + Number(deal.landlord_payout)
+                          : Number(deal.landlord_payout)
+                        ) - Number(deal.agreement_fee || 0)
+                      )
                     ),
                     highlight: true,
                   },

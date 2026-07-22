@@ -230,6 +230,8 @@ export interface Deal {
   agreement_url?: string;
   agreement_path?: string;
   agreement_skipped?: boolean;
+  agreement_source?: string;
+  agreement_fee?: number;
   duration?: string;
   dispute_reason?: string;
   cancellation_reason?: string;
