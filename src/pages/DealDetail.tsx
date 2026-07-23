@@ -46,6 +46,21 @@ export default function DealDetail() {
   const [showTenantCancelModal, setShowTenantCancelModal] = useState(false);
   const [tenantCancelReason, setTenantCancelReason] = useState('');
   const [showReceiptPanel, setShowReceiptPanel] = useState(false);
+  const [canPayAsDelegate, setCanPayAsDelegate] = useState(false);
+
+  useEffect(() => {
+    if (!deal || !user || isTenant) return;
+    supabase
+      .from('deal_delegates')
+      .select('id')
+      .eq('deal_id', deal.id)
+      .eq('delegate_id', user.id)
+      .eq('principal_id', deal.tenant_id)
+      .eq('status', 'accepted')
+      .eq('can_pay', true)
+      .maybeSingle()
+      .then(({ data }) => setCanPayAsDelegate(!!data));
+  }, [deal?.id, user?.id, isTenant]);
   const [showChangeModal, setShowChangeModal] = useState(false);
   const [showSkipModal, setShowSkipModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -453,7 +468,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               )}
 
               {/* STEP 3: Tenant pays into escrow */}
-              {deal.status === 'pending_payment' && isTenant && (
+              {deal.status === 'pending_payment' && (isTenant || canPayAsDelegate) && (
                 <div className="p-5 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-[#f0c040]/15 rounded-xl flex items-center justify-center flex-shrink-0">
