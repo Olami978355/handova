@@ -12,55 +12,70 @@ serve(async (req) => {
     const adminSupabase = createAdminClient();
     const { dealId } = await req.json();
 
-    // 1. Verify caller authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) throw new Error('Unauthorized');
 
-    // 2. Fetch deal details
     const { data: deal, error: dealError } = await adminSupabase
       .from('deals')
       .select('*, properties(*)')
       .eq('id', dealId)
       .single();
-
     if (dealError || !deal) throw new Error('Deal not found');
 
-    // 2.1 Verify deal status
-if (deal.status !== 'payment_received') {
-  throw new Error(`Cannot sign agreement in ${deal.status} status`);
-}
-
-    // 2.2 Verify agreement exists
+    if (deal.status !== 'payment_received') {
+      throw new Error(`Cannot sign agreement in ${deal.status} status`);
+    }
     if (!deal.agreement_url) {
       throw new Error('Agreement has not been uploaded yet');
     }
 
-    // 3. Validate caller has permission (landlord or tenant)
-    if (user.id !== deal.landlord_id && user.id !== deal.tenant_id) {
-      throw new Error('Permission denied');
+    // Determine which "side" this caller can sign for: their own party role,
+    // or an accepted delegate invitation granting can_sign on someone else's behalf.
+    let signingSide: 'tenant' | 'landlord' | null = null;
+    let onBehalfOf: string | null = null; // principal_id, only set when signing as a delegate
+
+    if (user.id === deal.tenant_id) {
+      signingSide = 'tenant';
+    } else if (user.id === deal.landlord_id || user.id === deal.agent_id) {
+      // Agent signs directly as the landlord side when they're the deal's agent —
+      // no separate delegate grant needed, matches how they're already tied to the deal.
+      signingSide = 'landlord';
+    } else {
+      const { data: delegateRow } = await adminSupabase
+        .from('deal_delegates')
+        .select('*')
+        .eq('deal_id', dealId)
+        .eq('delegate_id', user.id)
+        .eq('status', 'accepted')
+        .eq('can_sign', true)
+        .maybeSingle();
+
+      if (delegateRow) {
+        signingSide = delegateRow.principal_id === deal.tenant_id ? 'tenant' : 'landlord';
+        onBehalfOf = delegateRow.principal_id;
+      }
     }
 
-    // 3.1 Check if already signed
-    const isTenant = user.id === deal.tenant_id;
-    const isLandlord = user.id === deal.landlord_id;
+    if (!signingSide) {
+      throw new Error('Permission denied. You are not authorized to sign this agreement.');
+    }
 
-    if (isTenant && deal.tenant_signed_at) throw new Error('Tenant has already signed');
-    if (isLandlord && deal.landlord_signed_at) throw new Error('Landlord has already signed');
+    const isTenantSide = signingSide === 'tenant';
+    if (isTenantSide && deal.tenant_signed_at) throw new Error('Tenant side has already signed');
+    if (!isTenantSide && deal.landlord_signed_at) throw new Error('Landlord side has already signed');
 
-    // 4. Update deal with signature
     const updateData: any = { updated_at: new Date().toISOString() };
-
-    if (isTenant) {
+    if (isTenantSide) {
       updateData.tenant_signed_at = new Date().toISOString();
-    } else if (isLandlord) {
+      updateData.tenant_signed_by = user.id;
+    } else {
       updateData.landlord_signed_at = new Date().toISOString();
+      updateData.landlord_signed_by = user.id;
     }
 
-    // Check if both have signed
     const tenantSigned = updateData.tenant_signed_at || deal.tenant_signed_at;
     const landlordSigned = updateData.landlord_signed_at || deal.landlord_signed_at;
     const bothSigned = !!(tenantSigned && landlordSigned);
-    
     if (bothSigned) {
       updateData.status = 'agreement_signed';
     }
@@ -69,16 +84,26 @@ if (deal.status !== 'payment_received') {
       .from('deals')
       .update(updateData)
       .eq('id', dealId);
-
     if (updateError) throw updateError;
 
-    // 5. Log action
     await logDealAction(adminSupabase, dealId, 'agreement_signed', user.id, {
-      signer_role: isTenant ? 'tenant' : 'landlord',
+      signing_side: signingSide,
+      signed_on_behalf_of: onBehalfOf,
       both_signed: bothSigned,
     });
 
-    // 6. Notify parties
+    // If a delegate signed, always notify the principal they represent —
+    // same safety pattern used everywhere else delegates can act.
+    if (onBehalfOf) {
+      await adminSupabase.from('notifications').insert({
+        user_id: onBehalfOf,
+        title: 'Agreement Signed by Your Delegate',
+        body: `Your delegate has signed the agreement for ${deal.properties.title} on your behalf.`,
+        link: `/deals/${dealId}`,
+        type: 'deal_state_change',
+      });
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceRoleKey = getServiceRoleKey();
 
@@ -92,36 +117,27 @@ if (deal.status !== 'payment_received') {
         'deal_state_change'
       );
     } else {
-      // Notify the other party
-      const targetId = isTenant ? deal.landlord_id : deal.tenant_id;
-      
+      const targetId = isTenantSide ? deal.landlord_id : deal.tenant_id;
       if (supabaseUrl && serviceRoleKey) {
         await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${serviceRoleKey}`,
-          },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
           body: JSON.stringify({
             user_id: targetId,
             title: 'Agreement Signed',
-            body: `${isTenant ? 'Tenant' : 'Landlord'} has signed the agreement for ${deal.properties.title}.`,
+            body: `${isTenantSide ? 'Tenant' : 'Landlord'} side has signed the agreement for ${deal.properties.title}.`,
             link: `/dashboard/deals/${dealId}`,
             type: 'deal_state_change',
           }),
         });
-        
         if (deal.agent_id) {
           await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${serviceRoleKey}`,
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
             body: JSON.stringify({
               user_id: deal.agent_id,
               title: 'Agreement Signed',
-              body: `${isTenant ? 'Tenant' : 'Landlord'} has signed the agreement for ${deal.properties.title}.`,
+              body: `${isTenantSide ? 'Tenant' : 'Landlord'} side has signed the agreement for ${deal.properties.title}.`,
               link: `/dashboard/deals/${dealId}`,
               type: 'deal_state_change',
             }),
@@ -130,7 +146,7 @@ if (deal.status !== 'payment_received') {
       }
     }
 
-    return new Response(JSON.stringify({ success: true, both_signed: !!(tenantSigned && landlordSigned) }), {
+    return new Response(JSON.stringify({ success: true, both_signed: bothSigned }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useDeal } from '../hooks/useDeal';
 import { ReceiptPanel } from '../components/receipt/ReceiptCards';
+import { DelegatesSection } from '../components/deal/DelegatesSection';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
@@ -789,6 +790,8 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 ))}
               </div>
             </div>
+
+            <DelegatesSection dealId={deal.id} isPrincipal={isTenant || isLandlord || isAgent} />
 
             {/* Payout breakdown */}
             {(isLandlord || isAgent || isAdmin || isModerator) ? (
