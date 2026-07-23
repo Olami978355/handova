@@ -39,8 +39,21 @@ serve(async (req) => {
       }
     }
 
+    let onBehalfOf: string | null = null;
     if (user.id !== deal.tenant_id) {
-      throw new Error('Permission denied. Only the buyer can confirm handover.');
+      const { data: delegateRow } = await adminSupabase
+        .from('deal_delegates')
+        .select('*')
+        .eq('deal_id', dealId)
+        .eq('delegate_id', user.id)
+        .eq('principal_id', deal.tenant_id)
+        .eq('status', 'accepted')
+        .eq('can_confirm_movein', true)
+        .maybeSingle();
+      if (!delegateRow) {
+        throw new Error('Permission denied. Only the buyer or their authorized delegate can confirm handover.');
+      }
+      onBehalfOf = deal.tenant_id;
     }
 
     // Reuses the same 'move_in_confirmed' status value as rentals — release-funds,
@@ -58,7 +71,18 @@ serve(async (req) => {
 
     await logDealAction(adminSupabase, dealId, 'handover_confirmed', user.id, {
       handover_date: new Date().toISOString(),
+      confirmed_by_delegate: !!onBehalfOf,
     });
+
+    if (onBehalfOf) {
+      await adminSupabase.from('notifications').insert({
+        user_id: onBehalfOf,
+        title: 'Handover Confirmed by Your Delegate',
+        body: `Your delegate has confirmed handover for ${deal.properties.title} on your behalf. Funds will be released to the seller.`,
+        link: `/deals/${dealId}`,
+        type: 'deal_state_change',
+      });
+    }
 
     await notifyDealParties(
       adminSupabase,

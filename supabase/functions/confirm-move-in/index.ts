@@ -45,9 +45,23 @@ serve(async (req) => {
       }
     }
 
-    // 3. Validate caller has permission (tenant only)
+    // 3. Validate caller has permission — tenant directly, or an accepted
+    // delegate with can_confirm_movein granted.
+    let onBehalfOf: string | null = null;
     if (user.id !== deal.tenant_id) {
-      throw new Error('Permission denied. Only the tenant can confirm move-in.');
+      const { data: delegateRow } = await adminSupabase
+        .from('deal_delegates')
+        .select('*')
+        .eq('deal_id', dealId)
+        .eq('delegate_id', user.id)
+        .eq('principal_id', deal.tenant_id)
+        .eq('status', 'accepted')
+        .eq('can_confirm_movein', true)
+        .maybeSingle();
+      if (!delegateRow) {
+        throw new Error('Permission denied. Only the tenant or their authorized delegate can confirm move-in.');
+      }
+      onBehalfOf = deal.tenant_id;
     }
 
     // 4. Update deal status
@@ -65,7 +79,20 @@ serve(async (req) => {
     // 5. Log action
     await logDealAction(adminSupabase, dealId, 'move_in_confirmed', user.id, {
       move_in_date: new Date().toISOString(),
+      confirmed_by_delegate: !!onBehalfOf,
     });
+
+    // Real-time safety net: if a delegate confirmed, the tenant must be
+    // notified immediately — this action is irreversible and releases funds.
+    if (onBehalfOf) {
+      await adminSupabase.from('notifications').insert({
+        user_id: onBehalfOf,
+        title: 'Move-in Confirmed by Your Delegate',
+        body: `Your delegate has confirmed move-in for ${deal.properties.title} on your behalf. Funds will be released to the landlord.`,
+        link: `/deals/${dealId}`,
+        type: 'deal_state_change',
+      });
+    }
 
     // 6. Notify parties
     await notifyDealParties(
