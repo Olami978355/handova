@@ -332,6 +332,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   >
                     Generate {(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Contract' : 'Agreement'} for Me (₦10,000 fee, deducted from payout)
                   </button>
+                  {(Number(deal.amount) < 1000000 && !(deal.properties?.caution_fee && Number(deal.properties.caution_fee) > 0)) && (
                   <button
                     onClick={() => setShowSkipModal(true)}
                     disabled={processing}
@@ -339,6 +340,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   >
                     Proceed Without Written Agreement
                   </button>
+                  )}
                 </div>
               )}
 

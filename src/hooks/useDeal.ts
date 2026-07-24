@@ -219,38 +219,7 @@ export function useDeal(dealId: string) {
   };
 
   // ✅ Landlord/agent skips the tenancy agreement entirely — moves straight to pending_payment
-  const skipAgreement = async () => {
-    try {
-      const { error } = await supabase
-        .from('deals')
-        .update({ status: 'pending_payment', agreement_skipped: true })
-        .eq('id', dealId);
-
-      if (error) throw error;
-
-      await supabase.from('deal_logs').insert({
-        deal_id: dealId,
-        action: 'pending_payment',
-        performed_by: user?.id ?? null,
-        details: { source: 'skipAgreement' },
-      });
-
-      if (deal?.tenant_id) {
-        await supabase.from('notifications').insert({
-          user_id: deal.tenant_id,
-          title: 'Proceeding Without Written Agreement',
-          body: `The landlord/agent has chosen to proceed without a formal tenancy agreement for ${deal?.properties?.title || 'this property'}. By paying into escrow, you confirm you have agreed on terms directly with them.`,
-          type: 'deal_state_change',
-          link: `/deals/${dealId}`,
-        });
-      }
-
-      await fetchDeal();
-      return { success: true };
-    } catch (err: any) {
-      return { success: false, error: err.message };
-    }
-  };
+  const skipAgreement = () => callEdgeFunction('skip-agreement');
 
   // ✅ Tenant requests changes to draft agreement
   const requestAgreementChanges = async (reason: string) => {
