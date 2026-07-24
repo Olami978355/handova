@@ -18,6 +18,7 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
   const listingType = watch('listing_type');
   const price = watch('price');
   const pricePeriod = watch('price_period');
+  const cautionFee = watch('caution_fee');
 
   const periods = [
     { id: 'yearly', label: 'Yearly', icon: Calendar },
@@ -110,6 +111,26 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {transactionType === 'rent' && (
+        <div>
+          <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+            Caution / Security Deposit (₦) <span className="text-white/25 normal-case">(optional)</span>
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-[16px] font-bold pointer-events-none">₦</span>
+            <input
+              type="number"
+              {...register('caution_fee', { valueAsNumber: true })}
+              placeholder="e.g. 100000"
+              className="w-full pl-10 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[15px] font-semibold text-white placeholder:text-white/20 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+            />
+          </div>
+          <p className="text-[11px] text-white/25 mt-1.5">
+            If set, a written tenancy agreement becomes required for this listing, regardless of price.
+          </p>
         </div>
       )}
 
@@ -233,10 +254,10 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
         <div className="flex items-start gap-3 p-4 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl">
           <FileText className="w-4 h-4 text-[#f0c040] flex-shrink-0 mt-0.5" />
           <p className="text-[12px] text-white/50 leading-relaxed">
-            {price >= 1000000 ? (
+            {(price >= 1000000 || (cautionFee && cautionFee > 0)) ? (
               <>A written tenancy agreement is <span className="text-white font-semibold">required</span> for deals ₦1,000,000 and above. Upload your own, or have RentEasy generate one for ₦10,000 (deducted from your payout once funds are released — no upfront cost).</>
             ) : (
-              <>For deals under ₦1,000,000, a written tenancy agreement is <span className="text-white font-semibold">optional</span> — you can proceed without one if you and the tenant agree directly. Note: if a security/caution deposit is ever collected on a deal, a written agreement becomes required regardless of price.</>
+              <>For deals under ₦1,000,000 with no caution fee, a written tenancy agreement is <span className="text-white font-semibold">optional</span>. You can proceed without one if you and the tenant agree directly. Adding a caution fee makes a written agreement required, regardless of price.</>
             )}
           </p>
         </div>

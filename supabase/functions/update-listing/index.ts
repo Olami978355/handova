@@ -30,7 +30,7 @@ serve(async (req) => {
       'listing_type', 'transaction_type', 'category', 'title', 'description',
       'min_rental_duration', 'house_rules', 'bedrooms', 'bathrooms', 'amenities',
       'land_size_value', 'land_size_unit', 'land_title', 'state', 'lga', 'address',
-      'lat', 'lng', 'images', 'videos', 'survey_plan_url', 'price', 'price_period',
+      'lat', 'lng', 'images', 'videos', 'survey_plan_url', 'price', 'price_period', 'caution_fee',
     ];
     const updatePayload: Record<string, unknown> = { updated_at: new Date().toISOString() };
     for (const field of allowedFields) {

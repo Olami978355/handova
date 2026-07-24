@@ -42,6 +42,7 @@ export const listingSchema = z.object({
   
   // Step 5
   price: z.number().min(1000, 'Price must be at least ₦1,000'),
+  caution_fee: z.number().min(0).optional(),
   price_period: z.enum(['yearly', 'monthly', 'nightly', 'outright']).optional(),
 });
 
@@ -190,6 +191,7 @@ export const useListingForm = (propertyId?: string) => {
         amenities: data.amenities,
         min_rental_duration: data.min_rental_duration,
         house_rules: data.house_rules,
+        caution_fee: data.transaction_type === 'rent' ? (data.caution_fee || null) : null,
         status: status,
       });
 
