@@ -236,9 +236,6 @@ export interface Deal {
   duration?: string;
   dispute_reason?: string;
   cancellation_reason?: string;
-  admin_monitoring?: boolean;
-  admin_monitoring_note?: string;
-  admin_monitoring_added_by?: string;
   tenant_signed_at?: string;
   landlord_signed_at?: string;
   move_in_date?: string;
