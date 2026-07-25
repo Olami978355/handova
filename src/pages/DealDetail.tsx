@@ -47,6 +47,23 @@ export default function DealDetail() {
   const [tenantCancelReason, setTenantCancelReason] = useState('');
   const [showReceiptPanel, setShowReceiptPanel] = useState(false);
   const [canPayAsDelegate, setCanPayAsDelegate] = useState(false);
+  const [monitoringLoading, setMonitoringLoading] = useState(false);
+
+  const handleToggleMonitoring = async () => {
+    if (!deal) return;
+    setMonitoringLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('toggle-admin-monitoring', {
+        body: { dealId: deal.id, enable: !deal.admin_monitoring },
+      });
+      if (error) throw error;
+      await refresh();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to update monitoring status');
+    } finally {
+      setMonitoringLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!deal || !user || isTenant) return;
@@ -149,6 +166,11 @@ export default function DealDetail() {
           <span className={`text-[11px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider ${statusColor}`}>
             {deal.status.replace(/_/g, ' ')}
           </span>
+          {deal.admin_monitoring && (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/20 ml-2">
+              <Shield className="w-3 h-3" /> RentEasy Monitoring
+            </span>
+          )}
         </div>
       </div>
 
@@ -947,6 +969,13 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     Cancel Deal
                   </button>
                 </div>
+                <button
+                  onClick={handleToggleMonitoring}
+                  disabled={monitoringLoading}
+                  className="w-full mt-3 bg-white/5 text-white/60 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors disabled:opacity-40"
+                >
+                  {monitoringLoading ? 'Updating...' : deal.admin_monitoring ? 'Remove RentEasy Monitoring' : 'Add RentEasy Monitoring'}
+                </button>
               </div>
             )}
           </div>
