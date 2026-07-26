@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Deal, DealLog } from '../types';
+import { Deal, DealLog, AcceptedDelegate } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 export function useDeal(dealId: string) {
@@ -52,7 +52,35 @@ export function useDeal(dealId: string) {
         agentProfile = agentData;
       }
 
-      setDeal({ ...data, profiles: tenantProfile, landlord: landlordProfile, agent: agentProfile });
+      // Accepted delegates (including any system account) shown as
+      // additional parties on the deal.
+      let acceptedDelegates: AcceptedDelegate[] = [];
+      const { data: delegateRows } = await supabase
+        .from('deal_delegates')
+        .select('id, principal_id, delegate_id, can_sign, can_pay, can_confirm_movein')
+        .eq('deal_id', dealId)
+        .eq('status', 'accepted');
+
+      if (delegateRows && delegateRows.length > 0) {
+        const delegateIds = delegateRows.map(d => d.delegate_id);
+        const { data: delegateProfiles } = await supabase
+          .from('public_profiles')
+          .select('id, full_name, avatar_url, role, verification_status, is_system_account')
+          .in('id', delegateIds);
+
+        acceptedDelegates = delegateRows.map(d => ({
+          ...d,
+          delegate: delegateProfiles?.find(p => p.id === d.delegate_id) || null,
+        }));
+      }
+
+      setDeal({
+        ...data,
+        profiles: tenantProfile,
+        landlord: landlordProfile,
+        agent: agentProfile,
+        accepted_delegates: acceptedDelegates,
+      });
 
       const { data: logData, error: logError } = await supabase
         .from('deal_logs')
@@ -100,8 +128,6 @@ export function useDeal(dealId: string) {
         body: { dealId, ...body },
       });
       if (error) throw error;
-      // Refresh immediately rather than relying solely on the realtime
-      // subscription, which can lag behind the Edge Function's write.
       await fetchDeal();
       return { success: true, data };
     } catch (err: any) {
@@ -110,8 +136,6 @@ export function useDeal(dealId: string) {
     }
   };
 
-  // ✅ Upload agreement and move to agreement_draft → pending_payment flow
- // ✅ Upload agreement and move to agreement_draft → pending_payment flow
   const uploadAgreement = async (file: File) => {
     try {
       const fileExt = file.name.split('.').pop();
@@ -121,16 +145,11 @@ export function useDeal(dealId: string) {
         .upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
 
-      // 'agreements' is a private bucket, so getPublicUrl() would return a
-      // URL that never actually works. Generate a signed URL instead.
-      // Signed URLs expire, so we store the file PATH (not the URL) and
-      // regenerate a fresh signed URL each time it's needed for viewing.
       const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('agreements')
-        .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7-day signed URL
+        .createSignedUrl(filePath, 60 * 60 * 24 * 7);
       if (signedUrlError) throw signedUrlError;
 
-      // Update deal with agreement URL and move to next stage
       const { error: updateError } = await supabase
         .from('deals')
         .update({
@@ -141,9 +160,6 @@ export function useDeal(dealId: string) {
         .eq('id', dealId);
       if (updateError) throw updateError;
 
-      // Notify tenant that agreement is ready to review.
-      // Wrapped separately so a notification failure never breaks the
-      // core upload flow (which has already succeeded by this point).
       if (deal?.tenant_id) {
         try {
           await supabase.from('notifications').insert({
@@ -165,15 +181,12 @@ export function useDeal(dealId: string) {
     }
   };
 
-  // Generates a fresh signed URL for viewing the agreement, since stored
-  // signed URLs expire after 7 days. Call this when a user clicks to view
-  // the agreement, rather than relying solely on the stored agreement_url.
   const getAgreementViewUrl = async (): Promise<string | null> => {
     if (!deal?.agreement_path) return deal?.agreement_url || null;
     try {
       const { data, error } = await supabase.storage
         .from('agreements')
-        .createSignedUrl(deal.agreement_path, 60 * 10); // 10-minute link, just for this view
+        .createSignedUrl(deal.agreement_path, 60 * 10);
       if (error) throw error;
       return data.signedUrl;
     } catch (err) {
@@ -182,7 +195,6 @@ export function useDeal(dealId: string) {
     }
   };
 
-  // ✅ Tenant approves draft agreement → moves to pending_payment
   const approveDraftAgreement = async () => {
     try {
       const { error } = await supabase
@@ -199,7 +211,6 @@ export function useDeal(dealId: string) {
         details: { source: 'approveDraftAgreement' },
       });
 
-      // Notify agent/landlord
       const ownerId = deal?.agent_id || deal?.landlord_id;
       if (ownerId) {
         await supabase.from('notifications').insert({
@@ -218,10 +229,8 @@ export function useDeal(dealId: string) {
     }
   };
 
-  // ✅ Landlord/agent skips the tenancy agreement entirely — moves straight to pending_payment
   const skipAgreement = () => callEdgeFunction('skip-agreement');
 
-  // ✅ Tenant requests changes to draft agreement
   const requestAgreementChanges = async (reason: string) => {
     try {
       const { error } = await supabase

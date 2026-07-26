@@ -132,6 +132,19 @@ export default function DealDetail() {
     ...(isAgentDeal
       ? [{ label: 'Agent', name: deal.agent?.full_name || 'Agent', initial: 'A', verification_status: deal.agent?.verification_status }]
       : []),
+    ...(deal.accepted_delegates || []).map((d) => {
+      const principalRole =
+        d.principal_id === deal.tenant_id ? 'Tenant' :
+        d.principal_id === deal.landlord_id ? 'Landlord' :
+        d.principal_id === deal.agent_id ? 'Agent' : 'Principal';
+      const delegateName = d.delegate?.full_name || 'Delegate';
+      return {
+        label: `${principalRole}'s Delegate`,
+        name: delegateName,
+        initial: delegateName.charAt(0).toUpperCase(),
+        verification_status: d.delegate?.verification_status,
+      };
+    }),
   ];
 
   return (

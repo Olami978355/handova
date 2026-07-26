@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { UserPlus, Check, X, Loader2, Shield } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
@@ -14,6 +14,13 @@ interface DelegateRow {
   status: 'pending' | 'accepted' | 'declined';
   principal?: { full_name: string };
   delegate?: { full_name: string };
+}
+
+interface UsernameSuggestion {
+  id: string;
+  username: string;
+  full_name: string;
+  avatar_url: string | null;
 }
 
 interface DelegatesSectionProps {
@@ -34,6 +41,12 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
 
+  const [suggestions, setSuggestions] = useState<UsernameSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suggestionBoxRef = useRef<HTMLDivElement | null>(null);
+
   const fetchDelegates = async () => {
     setLoading(true);
     const { data } = await supabase
@@ -46,6 +59,52 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
   };
 
   useEffect(() => { fetchDelegates(); }, [dealId]);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (suggestionBoxRef.current && !suggestionBoxRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleUsernameChange = (raw: string) => {
+    // Strip a leading @ if the user typed it
+    const value = raw.startsWith('@') ? raw.slice(1) : raw;
+    setUsername(value);
+    setInviteError(null);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    const query = value.trim().toLowerCase();
+    if (query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true);
+      const { data } = await supabase
+        .from('public_profiles')
+        .select('id, username, full_name, avatar_url')
+        .ilike('username', `${query}%`)
+        .neq('id', user?.id || '')
+        .limit(6);
+      setSuggestions(data || []);
+      setShowSuggestions(true);
+      setSearching(false);
+    }, 250);
+  };
+
+  const handleSelectSuggestion = (s: UsernameSuggestion) => {
+    setUsername(s.username);
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
 
   const handleInvite = async () => {
     if (!username.trim()) return;
@@ -69,6 +128,8 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
       setCanPay(false);
       setCanConfirmMovein(false);
       setShowInviteForm(false);
+      setSuggestions([]);
+      setShowSuggestions(false);
       await fetchDelegates();
     } catch (err: unknown) {
       setInviteError(err instanceof Error ? err.message : 'Failed to send invite');
@@ -151,13 +212,49 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
 
       {showInviteForm && (
         <div className="p-3 mb-3 bg-white/4 border border-white/8 rounded-xl space-y-3">
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Their username"
-            className="w-full px-3 py-2.5 bg-white/5 border border-white/8 rounded-lg text-[12px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
-          />
+          <div className="relative" ref={suggestionBoxRef}>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => handleUsernameChange(e.target.value)}
+              onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+              placeholder="Their username (or @username)"
+              autoComplete="off"
+              className="w-full px-3 py-2.5 bg-white/5 border border-white/8 rounded-lg text-[12px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
+            />
+            {searching && (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-white/30 absolute right-3 top-1/2 -translate-y-1/2" />
+            )}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-10 top-full mt-1 w-full bg-[#0f2416] border border-white/10 rounded-lg overflow-hidden shadow-xl">
+                {suggestions.map(s => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => handleSelectSuggestion(s)}
+                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/8 transition-colors text-left"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-[#1a6b3c]/20 flex items-center justify-center text-[10px] font-bold text-[#1a6b3c] flex-shrink-0 overflow-hidden">
+                      {s.avatar_url ? (
+                        <img src={s.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        s.username?.[0]?.toUpperCase() || '?'
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold text-white truncate">@{s.username}</p>
+                      <p className="text-[10px] text-white/35 truncate">{s.full_name}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            {showSuggestions && !searching && suggestions.length === 0 && username.trim().length >= 2 && (
+              <div className="absolute z-10 top-full mt-1 w-full bg-[#0f2416] border border-white/10 rounded-lg px-3 py-2">
+                <p className="text-[11px] text-white/30">No matching username.</p>
+              </div>
+            )}
+          </div>
           <div className="space-y-1.5">
             {[
               { label: 'Can sign the agreement', checked: canSign, set: setCanSign },

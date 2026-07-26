@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Loader2, AlertCircle, ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Mail, Lock, User, Loader2, AlertCircle, ArrowRight, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { motion } from 'framer-motion';
 
 const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
     <rect width="80" height="80" rx="18" fill="#1a6b3c" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
+    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
     <path d="M54 54 L64 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
     <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
     <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
@@ -35,6 +34,10 @@ const getPasswordStrength = (password: string) => {
   return { score, label: 'Strong', color: '#4ade80' };
 };
 
+const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
+
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
+
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,15 +49,50 @@ export default function SignupPage() {
 
   const [formData, setFormData] = useState({
     email: '',
+    username: '',
     password: '',
     confirmPassword: '',
   });
 
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle');
+  const usernameDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const passwordStrength = getPasswordStrength(formData.password);
 
+  const checkUsername = (value: string) => {
+    const clean = value.trim().toLowerCase();
+    if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current);
+
+    if (!clean) {
+      setUsernameStatus('idle');
+      return;
+    }
+    if (!USERNAME_REGEX.test(clean)) {
+      setUsernameStatus('invalid');
+      return;
+    }
+    setUsernameStatus('checking');
+    usernameDebounceRef.current = setTimeout(async () => {
+      const { data } = await supabase
+        .from('public_profiles')
+        .select('id')
+        .eq('username', clean)
+        .maybeSingle();
+      setUsernameStatus(data ? 'taken' : 'available');
+    }, 400);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current);
+    };
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: name === 'username' ? value.toLowerCase().replace(/\s/g, '') : value }));
     if (error) setError(null);
+    if (name === 'username') checkUsername(value);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -64,6 +102,19 @@ export default function SignupPage() {
     // Validations
     if (!agreed) {
       setError('You must agree to the Terms of Service and Privacy Policy to continue.');
+      return;
+    }
+    const cleanUsername = formData.username.trim().toLowerCase();
+    if (!USERNAME_REGEX.test(cleanUsername)) {
+      setError('Username must be 3-20 characters, lowercase letters, numbers, and underscores only.');
+      return;
+    }
+    if (usernameStatus === 'taken') {
+      setError('That username is already taken. Please choose another.');
+      return;
+    }
+    if (usernameStatus === 'checking') {
+      setError('Still checking username availability, please wait a moment.');
       return;
     }
     if (formData.password.length < 6) {
@@ -91,10 +142,23 @@ export default function SignupPage() {
       if (!data.user) throw new Error('Signup failed. Please try again.');
 
       if (data.session) {
-        // Email confirmation not required — go straight to onboarding
+        // We have an authenticated session immediately (email confirmation off) —
+        // save the username now while we have permission to write to this profile.
+        const { error: usernameError } = await supabase
+          .from('profiles')
+          .update({ username: cleanUsername })
+          .eq('id', data.user.id);
+
+        if (usernameError) {
+          // Username save failed (e.g. race-condition duplicate) — don't block
+          // account creation, user can still set it from Profile settings.
+          console.error('Failed to save username during signup:', usernameError);
+        }
+
         navigate('/onboarding');
       } else {
-        // Email confirmation required
+        // Email confirmation required — username will need to be set after
+        // confirming, since we don't have an authenticated session yet.
         setSuccess(true);
       }
     } catch (err: unknown) {
@@ -307,6 +371,47 @@ export default function SignupPage() {
                   className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
                 />
               </div>
+            </div>
+
+            {/* Username */}
+            <div>
+              <label className="block text-[12px] font-semibold text-white/50 uppercase tracking-wider mb-2">
+                Username
+              </label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none" />
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  placeholder="yourname"
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  className={`w-full pl-11 pr-10 py-3.5 bg-white/5 border rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none transition-colors ${
+                    usernameStatus === 'taken' || usernameStatus === 'invalid'
+                      ? 'border-red-500/40 focus:border-red-500/60'
+                      : usernameStatus === 'available'
+                      ? 'border-[#1a6b3c] focus:border-[#1a6b3c]'
+                      : 'border-white/10 focus:border-[#1a6b3c]'
+                  }`}
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  {usernameStatus === 'checking' && <Loader2 className="w-4 h-4 text-white/30 animate-spin" />}
+                  {usernameStatus === 'available' && <CheckCircle className="w-4 h-4 text-[#4ade80]" />}
+                  {(usernameStatus === 'taken' || usernameStatus === 'invalid') && <XCircle className="w-4 h-4 text-red-400" />}
+                </div>
+              </div>
+              {usernameStatus === 'taken' && (
+                <p className="text-[11px] text-red-400 mt-1.5">This username is already taken.</p>
+              )}
+              {usernameStatus === 'invalid' && (
+                <p className="text-[11px] text-red-400 mt-1.5">3-20 characters, lowercase letters, numbers, and underscores only.</p>
+              )}
+              {usernameStatus === 'available' && (
+                <p className="text-[11px] text-[#4ade80] mt-1.5">Username available.</p>
+              )}
             </div>
 
             {/* Password */}

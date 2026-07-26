@@ -23,6 +23,7 @@ export interface Profile {
   bank_account_number?: string;
   bank_code?: string;
   username?: string;
+  is_system_account?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -254,6 +255,26 @@ export interface Deal {
   tenant?: Profile;
   landlord?: Profile;
   agent?: Profile;
+  accepted_delegates?: AcceptedDelegate[];
+}
+
+export interface DelegateProfileSummary {
+  id: string;
+  full_name: string;
+  avatar_url?: string;
+  role: UserRole;
+  verification_status: VerificationStatus;
+  is_system_account?: boolean;
+}
+
+export interface AcceptedDelegate {
+  id: string;
+  principal_id: string;
+  delegate_id: string;
+  can_sign: boolean;
+  can_pay: boolean;
+  can_confirm_movein: boolean;
+  delegate: DelegateProfileSummary | null;
 }
 
 // ─── Custom Deal Offer ───────────────────────────────────────────
