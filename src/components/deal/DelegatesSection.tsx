@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { UserPlus, Check, X, Loader2, Shield } from 'lucide-react';
+import { UserPlus, Check, X, Loader2, Shield, UserMinus } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 
@@ -11,7 +11,7 @@ interface DelegateRow {
   can_sign: boolean;
   can_pay: boolean;
   can_confirm_movein: boolean;
-  status: 'pending' | 'accepted' | 'declined';
+  status: 'pending' | 'accepted' | 'declined' | 'revoked';
   principal?: { full_name: string };
   delegate?: { full_name: string };
 }
@@ -40,6 +40,7 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
+  const [revokingId, setRevokingId] = useState<string | null>(null);
 
   const [suggestions, setSuggestions] = useState<UsernameSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -60,7 +61,6 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
 
   useEffect(() => { fetchDelegates(); }, [dealId]);
 
-  // Close suggestions on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (suggestionBoxRef.current && !suggestionBoxRef.current.contains(e.target as Node)) {
@@ -72,7 +72,6 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
   }, []);
 
   const handleUsernameChange = (raw: string) => {
-    // Strip a leading @ if the user typed it
     const value = raw.startsWith('@') ? raw.slice(1) : raw;
     setUsername(value);
     setInviteError(null);
@@ -153,6 +152,22 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
     }
   };
 
+  const handleRevoke = async (delegateRowId: string, delegateName: string) => {
+    if (!window.confirm(`Revoke ${delegateName}'s delegate access on this deal?`)) return;
+    setRevokingId(delegateRowId);
+    try {
+      const { error } = await supabase.functions.invoke('revoke-deal-delegate', {
+        body: { delegateRowId },
+      });
+      if (error) throw error;
+      await fetchDelegates();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to revoke delegate');
+    } finally {
+      setRevokingId(null);
+    }
+  };
+
   const permissionLabels = (d: DelegateRow) => {
     const perms = [];
     if (d.can_sign) perms.push('Sign');
@@ -164,7 +179,11 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
   if (loading) return null;
 
   const myPendingInvites = delegates.filter(d => d.delegate_id === user?.id && d.status === 'pending');
-  const otherDelegates = delegates.filter(d => !(d.delegate_id === user?.id && d.status === 'pending'));
+  // Revoked/declined rows are history, not active — hide from the main list
+  const otherDelegates = delegates.filter(d =>
+    !(d.delegate_id === user?.id && d.status === 'pending') &&
+    (d.status === 'accepted' || d.status === 'pending')
+  );
 
   if (delegates.length === 0 && !isPrincipal) return null;
 
@@ -284,21 +303,36 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
         )
       ) : (
         <div className="space-y-2">
-          {otherDelegates.map(d => (
-            <div key={d.id} className="flex items-center justify-between p-3 bg-white/4 rounded-xl">
-              <div>
-                <p className="text-[12px] font-semibold text-white">{d.delegate?.full_name || 'Unknown'}</p>
-                <p className="text-[10px] text-white/35">on behalf of {d.principal?.full_name} · {permissionLabels(d)}</p>
+          {otherDelegates.map(d => {
+            const canRevoke = isPrincipal && d.principal_id === user?.id && (d.status === 'accepted' || d.status === 'pending');
+            return (
+              <div key={d.id} className="flex items-center justify-between p-3 bg-white/4 rounded-xl">
+                <div>
+                  <p className="text-[12px] font-semibold text-white">{d.delegate?.full_name || 'Unknown'}</p>
+                  <p className="text-[10px] text-white/35">on behalf of {d.principal?.full_name} · {permissionLabels(d)}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase ${
+                    d.status === 'accepted' ? 'bg-[#4ade80]/10 text-[#4ade80]' :
+                    d.status === 'declined' ? 'bg-red-500/10 text-red-400' :
+                    'bg-[#f0c040]/10 text-[#f0c040]'
+                  }`}>
+                    {d.status}
+                  </span>
+                  {canRevoke && (
+                    <button
+                      onClick={() => handleRevoke(d.id, d.delegate?.full_name || 'this delegate')}
+                      disabled={revokingId === d.id}
+                      title="Revoke delegate access"
+                      className="w-6 h-6 flex items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
+                    >
+                      {revokingId === d.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <UserMinus className="w-3 h-3" />}
+                    </button>
+                  )}
+                </div>
               </div>
-              <span className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase ${
-                d.status === 'accepted' ? 'bg-[#4ade80]/10 text-[#4ade80]' :
-                d.status === 'declined' ? 'bg-red-500/10 text-red-400' :
-                'bg-[#f0c040]/10 text-[#f0c040]'
-              }`}>
-                {d.status}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

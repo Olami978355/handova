@@ -53,28 +53,64 @@ serve(async (req) => {
       }
     }
 
-    const insertPayload: Record<string, unknown> = {
-      deal_id: dealId,
-      principal_id: user.id,
-      delegate_id: delegateProfile.id,
-      can_sign: !!canSign,
-      can_pay: !!canPay,
-      can_confirm_movein: !!canConfirmMovein,
-    };
-    if (isSystemAccount) {
-      insertPayload.status = 'accepted';
-      insertPayload.responded_at = new Date().toISOString();
+    // Check for an existing row for this exact (deal, principal, delegate) combo —
+    // the unique constraint means a revoked/declined delegate can't be re-inserted,
+    // it has to be reactivated instead.
+    const { data: existingRow } = await adminSupabase
+      .from('deal_delegates')
+      .select('id, status')
+      .eq('deal_id', dealId)
+      .eq('principal_id', user.id)
+      .eq('delegate_id', delegateProfile.id)
+      .maybeSingle();
+
+    if (existingRow && (existingRow.status === 'accepted' || existingRow.status === 'pending')) {
+      throw new Error('You have already invited this person on this deal.');
     }
 
-    const { data: invite, error: insertError } = await adminSupabase
-      .from('deal_delegates')
-      .insert(insertPayload)
-      .select()
-      .single();
-    if (insertError) {
-      if (insertError.code === '23505') throw new Error('You have already invited this person on this deal.');
-      throw insertError;
+    let invite;
+    if (existingRow) {
+      // Reactivate a previously revoked/declined invite.
+      const reactivatePayload: Record<string, unknown> = {
+        can_sign: !!canSign,
+        can_pay: !!canPay,
+        can_confirm_movein: !!canConfirmMovein,
+        status: isSystemAccount ? 'accepted' : 'pending',
+        responded_at: isSystemAccount ? new Date().toISOString() : null,
+      };
+      const { data: updated, error: updateError } = await adminSupabase
+        .from('deal_delegates')
+        .update(reactivatePayload)
+        .eq('id', existingRow.id)
+        .select()
+        .single();
+      if (updateError) throw updateError;
+      invite = updated;
+    } else {
+      const insertPayload: Record<string, unknown> = {
+        deal_id: dealId,
+        principal_id: user.id,
+        delegate_id: delegateProfile.id,
+        can_sign: !!canSign,
+        can_pay: !!canPay,
+        can_confirm_movein: !!canConfirmMovein,
+      };
+      if (isSystemAccount) {
+        insertPayload.status = 'accepted';
+        insertPayload.responded_at = new Date().toISOString();
+      }
+      const { data: created, error: insertError } = await adminSupabase
+        .from('deal_delegates')
+        .insert(insertPayload)
+        .select()
+        .single();
+      if (insertError) {
+        if (insertError.code === '23505') throw new Error('You have already invited this person on this deal.');
+        throw insertError;
+      }
+      invite = created;
     }
+
     await logDealAction(adminSupabase, dealId, isSystemAccount ? 'system_delegate_added' : 'delegate_invited', user.id, {
       delegate_id: delegateProfile.id,
       can_sign: !!canSign,
