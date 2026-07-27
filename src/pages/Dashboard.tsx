@@ -4,7 +4,7 @@ import {
   Home, Shield, MessageSquare, Plus, Loader2,
   AlertCircle, CheckCircle, Clock, ArrowRight,
   User, CreditCard, Calendar, Search, Settings,
-  MapPin, RefreshCw, Eye, EyeOff, Heart, Pencil, Trash2, AlertTriangle
+  MapPin, RefreshCw, Eye, EyeOff, Heart, Pencil, Trash2, AlertTriangle, Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
@@ -1141,6 +1141,7 @@ return (
                         <QuickAction icon={MessageSquare} label="Messages" to="/messages" />
                         <QuickAction icon={User} label="My Profile" to="/profile" />
                         <QuickAction icon={MapPin} label="Map View" to="/map" />
+                        <QuickAction icon={Users} label="My Delegates" to="/my-delegates" />
                       </>
                     ) : (
                       <>
@@ -1148,6 +1149,7 @@ return (
                         <QuickAction icon={MessageSquare} label="Messages" to="/messages" />
                         <QuickAction icon={Shield} label="Get Verified" to="/verification" />
                         <QuickAction icon={User} label="My Profile" to="/profile" />
+                        <QuickAction icon={Users} label="My Delegates" to="/my-delegates" />
                       </>
                     )}
                   </div>

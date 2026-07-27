@@ -30,6 +30,7 @@ import FAQPage from './pages/FAQPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LegalGuidePage from './pages/LegalGuidePage';
+import MyDelegates from './pages/MyDelegates';
 
 const SuspendedScreen = () => (
   <div
@@ -119,6 +120,7 @@ function AppInner() {
             <Route path="add-property" element={<ProtectedRoute><ListingPage /></ProtectedRoute>} />
             <Route path="edit-property/:id" element={<ProtectedRoute><EditListing /></ProtectedRoute>} />
             <Route path="notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+            <Route path="my-delegates" element={<ProtectedRoute><MyDelegates /></ProtectedRoute>} />
             <Route path="listing-success" element={<ProtectedRoute><ListingSuccess /></ProtectedRoute>} />
             <Route path="admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="deals/:id" element={<ProtectedRoute><DealDetail /></ProtectedRoute>} />
