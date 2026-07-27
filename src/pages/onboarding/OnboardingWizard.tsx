@@ -175,7 +175,8 @@ export default function OnboardingWizard() {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
+      const bustedUrl = `${publicUrl}?t=${Date.now()}`;
+      setFormData(prev => ({ ...prev, avatarUrl: bustedUrl }));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Upload failed';
       setError(`Photo upload failed: ${msg}`);

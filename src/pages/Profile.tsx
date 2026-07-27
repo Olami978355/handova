@@ -115,10 +115,11 @@ export default function Profile() {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
+      const bustedUrl = `${publicUrl}?t=${Date.now()}`;
+      setFormData(prev => ({ ...prev, avatarUrl: bustedUrl }));
 
       const result = await updateProfile({
-        avatar_url: publicUrl,
+        avatar_url: bustedUrl,
         full_name: profile?.full_name || '',
         phone: profile?.phone || '',
         email: user.email || '',
