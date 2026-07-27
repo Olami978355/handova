@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Property } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 // ─── Logo SVG ────────────────────────────────────────────────────
 const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
@@ -407,6 +408,25 @@ const WaitlistSection = () => {
 // ═══════════════════════════════════════════════════════════════
 export default function Landing() {
   const navigate = useNavigate();
+  const { user, profile, loading: authLoading } = useAuth();
+
+  // Already-signed-in users shouldn't land on the marketing page —
+  // send them to onboarding (if profile incomplete) or their dashboard.
+  useEffect(() => {
+    if (authLoading || !user) return;
+    if (profile !== null && (!profile?.role || !profile?.full_name)) {
+      navigate('/onboarding', { replace: true });
+      return;
+    }
+    if (profile?.role) {
+      const dashboardPath =
+        profile.role === 'admin' || profile.role === 'moderator' ? '/admin' :
+        profile.role === 'landlord' ? '/landlord/dashboard' :
+        profile.role === 'agent' ? '/agent/dashboard' :
+        '/listings';
+      navigate(dashboardPath, { replace: true });
+    }
+  }, [user, profile, authLoading, navigate]);
   const [state, setState] = useState('');
   const [propertyType, setPropertyType] = useState('all');
   const [transaction, setTransaction] = useState('rent');
