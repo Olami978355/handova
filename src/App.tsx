@@ -30,6 +30,7 @@ import FAQPage from './pages/FAQPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LegalGuidePage from './pages/LegalGuidePage';
+import Directory from './pages/Directory';
 import MyDelegates from './pages/MyDelegates';
 
 const SuspendedScreen = () => (
@@ -103,6 +104,7 @@ function AppInner() {
             <Route path="map" element={<MapSearch />} />
             <Route path="property/:id" element={<PropertyDetail />} />
             <Route path="u/:username" element={<PublicProfile />} />
+            <Route path="directory" element={<Directory />} />
             <Route path="legal" element={<LegalPage />} />
             <Route path="faq" element={<FAQPage />} />
             <Route path="about" element={<AboutPage />} />
