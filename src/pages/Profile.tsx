@@ -38,6 +38,12 @@ export default function Profile() {
     username: profile?.username || '',
   });
 
+  const isDirty =
+    formData.fullName !== (profile?.full_name || '') ||
+    formData.phone !== (profile?.phone || '') ||
+    formData.phonePublic !== (profile?.phone_public || false) ||
+    (formData.username || '') !== (profile?.username || '');
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError(null);
@@ -361,14 +367,24 @@ export default function Profile() {
                             />
                           </div>
                         </div>
-                          <label className="flex items-center gap-2 mt-2 text-[11px] text-white/40">
-                            <input
-                              type="checkbox"
-                              checked={formData.phonePublic}
-                              onChange={(e) => setFormData(prev => ({ ...prev, phonePublic: e.target.checked }))}
-                            />
-                            Show my phone number on my public profile
-                          </label>
+                          <div className="flex items-center gap-2 mt-2">
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={formData.phonePublic}
+                              onClick={() => setFormData(prev => ({ ...prev, phonePublic: !prev.phonePublic }))}
+                              className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors ${
+                                formData.phonePublic ? 'bg-[#1a6b3c]' : 'bg-white/15'
+                              }`}
+                            >
+                              <span
+                                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                                  formData.phonePublic ? 'translate-x-4' : 'translate-x-1'
+                                }`}
+                              />
+                            </button>
+                            <span className="text-[11px] text-white/40">Show my phone number on my public profile</span>
+                          </div>
                       </div>
 
                       <div>
@@ -430,7 +446,7 @@ export default function Profile() {
                       <div className="pt-2">
                         <button
                           type="submit"
-                          disabled={loading}
+                          disabled={loading || !isDirty}
                           className="flex items-center gap-2 bg-[#f0c040] text-black px-8 py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {loading
