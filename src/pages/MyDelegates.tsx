@@ -118,9 +118,15 @@ export default function MyDelegates() {
               <Users className="w-7 h-7 text-white/20" />
             </div>
             <p className="text-[15px] font-bold text-white/40 mb-1">No delegate relationships yet</p>
-            <p className="text-[12px] text-white/20 max-w-xs">
+            <p className="text-[12px] text-white/20 max-w-xs mb-4">
               Delegates can sign, pay, or confirm move-in on your behalf for a specific deal. Add one from any active deal.
             </p>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="text-[12px] font-semibold text-[#f0c040] hover:text-[#e0b030] transition-colors"
+            >
+              View Your Deals
+            </button>
           </div>
         ) : (
           <div className="space-y-8">

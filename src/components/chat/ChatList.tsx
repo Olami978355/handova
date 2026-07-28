@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MessageSquare, Home, Trash2 } from 'lucide-react';
 import { useConversationsContext } from '../../context/ConversationsContext';
 import { VerifiedBadge } from '../VerifiedBadge';
@@ -13,6 +14,7 @@ interface ChatListProps {
 }
 
 export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
+  const navigate = useNavigate();
   const { conversations, loading, refresh } = useConversationsContext();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
@@ -122,9 +124,17 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
             <p className="text-[13px] font-semibold text-white/30 mb-1">
               No conversations
             </p>
-            <p className="text-[11px] text-white/20">
+            <p className="text-[11px] text-white/20 mb-3">
               {search ? 'No results found.' : 'Start from a property page.'}
             </p>
+            {!search && (
+              <button
+                onClick={() => navigate('/listings')}
+                className="text-[12px] font-semibold text-[#f0c040] hover:text-[#e0b030] transition-colors"
+              >
+                Browse Properties
+              </button>
+            )}
           </div>
         ) : (
           <div className="divide-y divide-white/4">

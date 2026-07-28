@@ -227,7 +227,19 @@ export default function MapSearch() {
                   <Home className="w-6 h-6 text-white/15" />
                 </div>
                 <p className="text-[13px] font-semibold text-white/35 mb-1">No properties found</p>
-                <p className="text-[11px] text-white/20">Try adjusting your filters</p>
+                <p className="text-[11px] text-white/20 mb-3">Try adjusting your filters</p>
+                <button
+                  onClick={() => {
+                    setType('all');
+                    setTransactionType('all');
+                    setMinPrice('');
+                    setMaxPrice('');
+                    setVerifiedOnly(false);
+                  }}
+                  className="text-[12px] font-semibold text-[#f0c040] hover:text-[#e0b030] transition-colors"
+                >
+                  Clear all filters
+                </button>
               </div>
             ) : (
               properties.map(property => (
