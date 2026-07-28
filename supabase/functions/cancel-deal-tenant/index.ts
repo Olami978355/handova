@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, sendDealStatusEmails } from '../_shared/utils.ts';
 
 const CANCELLATION_FEE_RATE = 0.05; // 5% — flat rate, adjust here if it changes
 
@@ -104,6 +104,18 @@ serve(async (req) => {
         : `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. A 5% cancellation fee (₦${feeAmount.toLocaleString()}) was applied; ₦${refundAmount.toLocaleString()} was refunded.`,
       `/deals/${dealId}`,
       'deal_state_change'
+    );
+
+    const emailMessage = isPrePayment
+      ? `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. No payment had been made, so no fee applies.`
+      : `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. A 5% cancellation fee (₦${feeAmount.toLocaleString()}) was applied; ₦${refundAmount.toLocaleString()} was refunded.`;
+
+    await sendDealStatusEmails(
+      adminSupabase,
+      deal,
+      'Cancelled by Tenant',
+      emailMessage,
+      `/deals/${dealId}`
     );
 
     return new Response(JSON.stringify({ success: true, feeAmount, refundAmount }), {

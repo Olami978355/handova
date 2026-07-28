@@ -122,6 +122,46 @@ export const sendEmail = async (
   }
 };
 
+export const sendDealStatusEmails = async (
+  adminSupabase: any,
+  deal: any,
+  status: string,
+  message: string,
+  link: string,
+  template: string = 'deal_update'
+) => {
+  try {
+    const partyIds = [deal.tenant_id, deal.landlord_id];
+    if (deal.agent_id) partyIds.push(deal.agent_id);
+
+    const { data: profiles } = await adminSupabase
+      .from('profiles')
+      .select('id, email, full_name')
+      .in('id', partyIds);
+
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://rent-easy-ruby.vercel.app';
+    const propertyTitle = deal.properties?.title || 'a property';
+
+    for (const p of profiles || []) {
+      if (!p.email) continue;
+      await sendEmail(
+        p.email,
+        `Deal Update: ${propertyTitle}`,
+        template,
+        {
+          name: p.full_name || 'there',
+          propertyTitle,
+          status,
+          message,
+          link: `${siteUrl}${link}`,
+        }
+      );
+    }
+  } catch (error) {
+    console.error('Error sending deal status emails:', error);
+  }
+};
+
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',

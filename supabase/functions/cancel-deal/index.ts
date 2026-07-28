@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders, logAdminAction } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, logAdminAction, sendDealStatusEmails } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -65,6 +65,13 @@ serve(async (req) => {
       `The deal for ${deal.properties.title} has been cancelled. Reason: ${reason || 'Not specified'}.`,
       `/deals/${dealId}`,
       'deal_state_change'
+    );
+    await sendDealStatusEmails(
+      adminSupabase,
+      deal,
+      'Cancelled',
+      `The deal for ${deal.properties.title} has been cancelled. Reason: ${reason || 'Not specified'}.`,
+      `/deals/${dealId}`
     );
 
     return new Response(JSON.stringify({ success: true }), {

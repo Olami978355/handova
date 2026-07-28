@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout, logAdminAction } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout, logAdminAction, sendDealStatusEmails } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -79,6 +79,13 @@ serve(async (req) => {
       `Funds for ${deal.properties.title} have been released to the landlord and agent.`,
       `/dashboard/deals/${dealId}`,
       'deal_state_change'
+    );
+    await sendDealStatusEmails(
+      adminSupabase,
+      deal,
+      'Funds Released',
+      `Funds for ${deal.properties.title} have been released to the landlord and agent.`,
+      `/deals/${dealId}`
     );
 
     return new Response(JSON.stringify({ success: true, transferInitiated: true }), {

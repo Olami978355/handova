@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders } from '../_shared/utils.ts';
+import { logDealAction, notifyDealParties, corsHeaders, sendDealStatusEmails } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -61,6 +61,14 @@ serve(async (req) => {
       `The deal for ${deal.properties.title} has been marked as disputed. Our support team will contact you.`,
       `/dashboard/deals/${dealId}`,
       'deal_state_change'
+    );
+    await sendDealStatusEmails(
+      adminSupabase,
+      deal,
+      'Disputed',
+      `The deal for ${deal.properties.title} has been marked as disputed. Our support team will contact you.`,
+      `/deals/${dealId}`,
+      'dispute'
     );
 
     return new Response(JSON.stringify({ success: true }), {
