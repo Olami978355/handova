@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { PushPermissionBanner } from './notifications/PushPermissionBanner';
+import { ChangelogBanner } from './ChangelogBanner';
 
 const noFooterRoutes = [
   '/messages',
@@ -27,6 +28,7 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       {showNav && <Navbar />}
       <PushPermissionBanner />
+      <ChangelogBanner />
       <main className={`flex-grow ${showNav ? 'pt-16' : ''}`}>
         <Outlet />
       </main>
