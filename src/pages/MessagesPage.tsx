@@ -43,7 +43,7 @@ export default function MessagesPage() {
     setActionLoading(true);
     try {
       const { error } = await supabase.from('user_reports').insert({ reporter_id: user.id, reported_id: otherId, reason: reportReason });
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       alert('Report submitted. Our team will review it.');
       setShowReportModal(false);
       setShowChatMenu(false);

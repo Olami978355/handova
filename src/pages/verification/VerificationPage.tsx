@@ -102,7 +102,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
           lasrera_doc_url: formData.lasreraDocUrl,
           status: 'pending',
         });
-      if (requestError) throw requestError;
+      if (requestError) throw new Error(requestError.message);
 
       const { error: profileError } = await supabase
         .from('profiles')
