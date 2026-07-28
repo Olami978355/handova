@@ -15,7 +15,7 @@ export function useAdmin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [users, setUsers] = useState<Profile[]>([]);
+  const [users, setUsers] = useState<(Profile & { strike_count?: number })[]>([]);
   const [pendingVerifications, setPendingVerifications] = useState<VerificationRequest[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [logs, setLogs] = useState<AdminLog[]>([]);
@@ -32,7 +32,21 @@ export function useAdmin() {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      setUsers(data || []);
+
+      const userIds = (data || []).map(u => u.id);
+      let strikeCounts: Record<string, number> = {};
+      if (userIds.length > 0) {
+        const { data: strikeRows } = await supabase
+          .from('strikes')
+          .select('user_id')
+          .in('user_id', userIds);
+        (strikeRows || []).forEach(s => {
+          strikeCounts[s.user_id] = (strikeCounts[s.user_id] || 0) + 1;
+        });
+      }
+
+      const enriched = (data || []).map(u => ({ ...u, strike_count: strikeCounts[u.id] || 0 }));
+      setUsers(enriched);
     } catch (err: any) {
       setError(err.message);
     } finally {

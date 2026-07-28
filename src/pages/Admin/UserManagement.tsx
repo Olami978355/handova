@@ -144,6 +144,16 @@ export default function UserManagement() {
                         <div className="flex items-center gap-1.5">
                           <p className="text-[13px] font-bold text-white">{u.full_name || 'Unnamed User'}</p>
                           <VerifiedBadge status={u.verification_status} size={13} />
+                          {(u.strike_count || 0) > 0 && (
+                            <span
+                              title={`${u.strike_count} strike${u.strike_count === 1 ? '' : 's'}`}
+                              className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                                (u.strike_count || 0) >= 3 ? 'bg-red-500/15 text-red-400' : 'bg-[#f0c040]/15 text-[#f0c040]'
+                              }`}
+                            >
+                              {u.strike_count} strike{u.strike_count === 1 ? '' : 's'}
+                            </span>
+                          )}
                         </div>
                         <p className="text-[11px] text-white/35">{u.email}</p>
                       </div>

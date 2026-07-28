@@ -43,8 +43,10 @@ serve(async (req) => {
     if (landlordAtFault) {
       // BUG FIX 6: Add strike to landlord atomically
       const { data: strikeResult, error: strikeError } = await supabase.rpc('add_strike_and_check', {
-        p_landlord_id: booking.landlord_id,
-        p_reason: `Dispute on booking ${bookingId}: ${resolution}`
+        p_user_id: booking.landlord_id,
+        p_reason: `Dispute on booking ${bookingId}: ${resolution}`,
+        p_related_type: 'inspection_booking',
+        p_related_id: bookingId
       });
 
       if (strikeError) throw strikeError;
