@@ -9,6 +9,7 @@ import {
 import { useDeal } from '../hooks/useDeal';
 import { ReceiptPanel } from '../components/receipt/ReceiptCards';
 import { DelegatesSection } from '../components/deal/DelegatesSection';
+import { DealReviewSection } from '../components/deal/DealReviewSection';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
@@ -822,6 +823,21 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
             </div>
 
             <DelegatesSection dealId={deal.id} isPrincipal={isTenant || isLandlord || isAgent} />
+
+            <DealReviewSection
+              dealId={deal.id}
+              dealStatus={deal.status}
+              currentUserId={user?.id}
+              isTenant={isTenant}
+              isLandlord={isLandlord}
+              isAgent={isAgent}
+              tenantName={deal.profiles?.full_name}
+              landlordName={deal.landlord?.full_name}
+              agentName={deal.agent?.full_name}
+              tenantId={deal.tenant_id}
+              landlordId={deal.landlord_id}
+              agentId={deal.agent_id}
+            />
 
             {/* Payout breakdown */}
             {(isLandlord || isAgent || isAdmin || isModerator) ? (
