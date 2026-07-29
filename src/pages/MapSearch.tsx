@@ -30,6 +30,16 @@ const MapPropertyCard = ({ property, selected, onClick }: {
 }) => (
   <div
     onClick={onClick}
+    role="button"
+    tabIndex={0}
+    aria-pressed={selected}
+    aria-label={`View ${property.title} on map`}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick();
+      }
+    }}
     className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border ${
       selected
         ? 'bg-[#1a6b3c]/15 border-[#1a6b3c]/40'

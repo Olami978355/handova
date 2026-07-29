@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import { PushPermissionBanner } from './notifications/PushPermissionBanner';
 import { ChangelogBanner } from './ChangelogBanner';
+import { OfflineBanner } from './OfflineBanner';
 
 const noFooterRoutes = [
   '/messages',
@@ -26,7 +27,8 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {showNav && <Navbar />}
+<OfflineBanner />
+            {showNav && <Navbar />}
       <PushPermissionBanner />
       <ChangelogBanner />
       <main className={`flex-grow ${showNav ? 'pt-16' : ''}`}>

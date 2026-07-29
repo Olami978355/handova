@@ -65,7 +65,7 @@ export const ChangelogBanner: React.FC = () => {
               Got it
             </button>
           </div>
-          <button onClick={handleDismiss} className="text-white/30 hover:text-white transition-colors flex-shrink-0">
+          <button onClick={handleDismiss} aria-label="Dismiss" className="text-white/30 hover:text-white transition-colors flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>

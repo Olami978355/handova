@@ -97,6 +97,7 @@ export default function MyDelegates() {
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => navigate(-1)}
+              aria-label="Go back"
             className="w-9 h-9 rounded-xl bg-white/5 border border-white/8 flex items-center justify-center text-white/50 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />

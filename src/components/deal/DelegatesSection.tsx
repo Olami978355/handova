@@ -324,6 +324,7 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
                       onClick={() => handleRevoke(d.id, d.delegate?.full_name || 'this delegate')}
                       disabled={revokingId === d.id}
                       title="Revoke delegate access"
+                      aria-label="Revoke delegate access"
                       className="w-6 h-6 flex items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
                     >
                       {revokingId === d.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <UserMinus className="w-3 h-3" />}
