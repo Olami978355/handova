@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { formatNaira } from '../utils/format';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft, List, SlidersHorizontal,
   X, Home, Loader2, MapPin, Shield
@@ -76,14 +76,32 @@ const MapPropertyCard = ({ property, selected, onClick }: {
 
 export default function MapSearch() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
-  const [type, setType] = useState<PropertyType | 'all'>('all');
-  const [transactionType, setTransactionType] = useState<TransactionType | 'all'>('all');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [type, setType] = useState<PropertyType | 'all'>((searchParams.get('type') as PropertyType) || 'all');
+  const [transactionType, setTransactionType] = useState<TransactionType | 'all'>((searchParams.get('transaction') as TransactionType) || 'all');
+  const [minPrice, setMinPrice] = useState(searchParams.get('min') || '');
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || '');
+  const [verifiedOnly, setVerifiedOnly] = useState(searchParams.get('verified') === 'true');
+  const syncTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (syncTimeout.current) clearTimeout(syncTimeout.current);
+    syncTimeout.current = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (type !== 'all') params.set('type', type);
+      if (transactionType !== 'all') params.set('transaction', transactionType);
+      if (minPrice) params.set('min', minPrice);
+      if (maxPrice) params.set('max', maxPrice);
+      if (verifiedOnly) params.set('verified', 'true');
+      setSearchParams(params, { replace: true });
+    }, 300);
+    return () => {
+      if (syncTimeout.current) clearTimeout(syncTimeout.current);
+    };
+  }, [type, transactionType, minPrice, maxPrice, verifiedOnly]);
 
   const filters = {
     type, transactionType,
@@ -95,6 +113,7 @@ export default function MapSearch() {
   const { properties, loading, error } = usePropertyMap(filters);
 
   const resetFilters = () => {
+    setSearchParams(new URLSearchParams(), { replace: true });
     setType('all');
     setTransactionType('all');
     setMinPrice('');
