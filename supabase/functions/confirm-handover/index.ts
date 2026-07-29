@@ -21,7 +21,7 @@ serve(async (req) => {
       .single();
     if (dealError || !deal) throw new Error('Deal not found');
 
-    if (deal.deal_type !== 'house_sale' && deal.deal_type !== 'land_sale') {
+    if (deal.properties?.transaction_type !== 'sell') {
       throw new Error('This endpoint is only for sale transactions. Use confirm-move-in for rentals.');
     }
 

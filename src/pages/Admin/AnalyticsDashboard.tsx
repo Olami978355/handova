@@ -5,9 +5,9 @@ import { supabase } from '../../lib/supabase';
 interface DealRow {
   id: string;
   status: string;
-  deal_type: string;
   amount: number;
   platform_fee: number | null;
+  properties?: { transaction_type: string; listing_type: string }[] | null;
 }
 
 const DEAL_TYPE_LABELS: Record<string, string> = {
@@ -28,7 +28,7 @@ export default function AnalyticsDashboard() {
       setError(null);
       const { data, error: fetchError } = await supabase
         .from('deals')
-        .select('id, status, deal_type, amount, platform_fee');
+        .select('id, status, amount, platform_fee, properties(transaction_type, listing_type)');
       if (fetchError) throw fetchError;
       setDeals(data || []);
     } catch (err: unknown) {
@@ -73,8 +73,16 @@ export default function AnalyticsDashboard() {
 
   const pct = (n: number) => totalDeals > 0 ? ((n / totalDeals) * 100).toFixed(1) : '0.0';
 
+  const getDealType = (d: DealRow): string | null => {
+    const prop = d.properties?.[0];
+    if (!prop) return null;
+    const isSale = prop.transaction_type === 'sell';
+    const isLand = prop.listing_type === 'land';
+    return isLand ? (isSale ? 'land_sale' : 'land_rent') : (isSale ? 'house_sale' : 'house_rent');
+  };
+
   const revenueByType = Object.keys(DEAL_TYPE_LABELS).map(type => {
-    const typeDeals = deals.filter(d => d.deal_type === type && d.status === 'funds_released');
+    const typeDeals = deals.filter(d => getDealType(d) === type && d.status === 'funds_released');
     const revenue = typeDeals.reduce((sum, d) => sum + (d.platform_fee || (d.amount || 0) * 0.02), 0);
     return { type, label: DEAL_TYPE_LABELS[type], revenue, count: typeDeals.length };
   }).sort((a, b) => b.revenue - a.revenue);

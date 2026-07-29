@@ -104,12 +104,14 @@ export default function DealDetail() {
     );
   }
 
+  const isSaleDeal = deal.properties?.transaction_type === 'sell';
+
   const statusSteps = [
     { id: 'agreement_draft', label: 'Agreement', icon: FileText },
     { id: 'pending_payment', label: 'Payment', icon: CreditCard },
     { id: 'payment_received', label: 'Received', icon: CheckCircle2 },
     { id: 'agreement_signed', label: 'Signed', icon: CheckCircle2 },
-    { id: 'move_in_confirmed', label: (deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Handover' : 'Move In', icon: Key },
+    { id: 'move_in_confirmed', label: isSaleDeal ? 'Handover' : 'Move In', icon: Key },
     { id: 'funds_released', label: 'Completed', icon: Shield },
   ];
 
@@ -292,7 +294,7 @@ export default function DealDetail() {
                       <Upload className="w-4 h-4 text-[#1a6b3c]" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">{(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Upload or Generate Contract' : 'Upload or Generate Agreement'}</h4>
+                      <h4 className="text-[14px] font-bold text-white mb-1">{isSaleDeal ? 'Upload or Generate Contract' : 'Upload or Generate Agreement'}</h4>
                       <p className="text-[12px] text-white/45 leading-relaxed">
                         Upload the tenancy agreement for the tenant to review before they pay. PDF or image (JPG, PNG, WebP), max 20MB.
                       </p>
@@ -344,7 +346,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     disabled={processing}
                     className="w-full mt-3 bg-white/5 text-white/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    Generate {(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Contract' : 'Agreement'} for Me (₦10,000 fee, deducted from payout)
+                    Generate {isSaleDeal ? 'Contract' : 'Agreement'} for Me (₦10,000 fee, deducted from payout)
                   </button>
                   {(Number(deal.amount) < 1000000 && !(deal.properties?.caution_fee && Number(deal.properties.caution_fee) > 0)) && (
                   <button
@@ -592,23 +594,23 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       <Key className="w-4 h-4 text-[#1a6b3c]" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">{(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
+                      <h4 className="text-[14px] font-bold text-white mb-1">{isSaleDeal ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
                       <p className="text-[12px] text-white/45 leading-relaxed">
-                        {(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale')
+                        {isSaleDeal
                           ? 'No written contract was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the property and all relevant documents. This will release funds to the seller.'
                           : 'No written tenancy agreement was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the keys and access to the property. This will release funds to the owner.'}
                       </p>
                     </div>
                   </div>
                   <button
-                    onClick={() => handleAction((deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? confirmHandover : confirmMoveIn)}
+                    onClick={() => handleAction(isSaleDeal ? confirmHandover : confirmMoveIn)}
                     disabled={processing}
                     className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : ((deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
                   </button>
                   <p className="text-[11px] text-white/25 text-center mt-3">
-                    {(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
+                    {isSaleDeal ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
                   </p>
                 </div>
               )}
@@ -683,23 +685,23 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       <Key className="w-4 h-4 text-[#1a6b3c]" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">{(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
+                      <h4 className="text-[14px] font-bold text-white mb-1">{isSaleDeal ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
                       <p className="text-[12px] text-white/45 leading-relaxed">
-                        {(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale')
+                        {isSaleDeal
                           ? 'Has the property been handed over successfully? Only confirm after you have physically received the property and all relevant documents. This will release funds to the seller.'
                           : 'Have you moved in successfully? Only confirm after you have physically received the keys and access to the property. This will release funds to the owner.'}
                       </p>
                     </div>
                   </div>
                   <button
-                    onClick={() => handleAction((deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? confirmHandover : confirmMoveIn)}
+                    onClick={() => handleAction(isSaleDeal ? confirmHandover : confirmMoveIn)}
                     disabled={processing}
                     className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : ((deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
                   </button>
                   <p className="text-[11px] text-white/25 text-center mt-3">
-                    {(deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale') ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
+                    {isSaleDeal ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
                   </p>
                 </div>
               )}

@@ -220,7 +220,6 @@ export interface Deal {
   tenant_id: string;
   landlord_id: string;
   agent_id?: string;
-  deal_type: DealType;
   amount: number;
   listed_amount: number;
   inspection_fee_credit?: number;

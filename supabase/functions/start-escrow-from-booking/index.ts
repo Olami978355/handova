@@ -83,9 +83,6 @@ serve(async (req) => {
         agent_fee: agentFee,
         agent_commission_rate: isAgent ? 10 : 0,
         landlord_payout: landlordPayout,
-        deal_type: booking.properties.transaction_type === 'sell'
-          ? (booking.properties.listing_type === 'land' ? 'land_sale' : 'house_sale')
-          : (booking.properties.listing_type === 'land' ? 'land_rent' : 'house_rent'),
         is_custom_deal: false,
         duration: '1 year',
         status: 'agreement_draft',

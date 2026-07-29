@@ -35,7 +35,7 @@ serve(async (req) => {
       throw new Error(`Cannot generate an agreement for a deal in ${deal.status} status.`);
     }
 
-    const isSale = deal.deal_type === 'house_sale' || deal.deal_type === 'land_sale';
+    const isSale = deal.properties?.transaction_type === 'sell';
 
     const { data: tenant } = await adminSupabase
       .from('profiles').select('full_name').eq('id', deal.tenant_id).single();
