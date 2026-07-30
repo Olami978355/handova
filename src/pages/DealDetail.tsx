@@ -108,9 +108,9 @@ export default function DealDetail() {
 
   const statusSteps = [
     { id: 'agreement_draft', label: 'Agreement', icon: FileText },
+    { id: 'agreement_sent', label: 'Signed', icon: CheckCircle2 },
     { id: 'pending_payment', label: 'Payment', icon: CreditCard },
     { id: 'payment_received', label: 'Received', icon: CheckCircle2 },
-    { id: 'agreement_signed', label: 'Signed', icon: CheckCircle2 },
     { id: 'move_in_confirmed', label: isSaleDeal ? 'Handover' : 'Move In', icon: Key },
     { id: 'funds_released', label: 'Completed', icon: Shield },
   ];
@@ -624,7 +624,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   </p>
                 </div>
               )}
-              {deal.status === 'payment_received' && !deal.agreement_skipped && (
+              {deal.status === 'agreement_sent' && !deal.agreement_skipped && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-white/8 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -678,7 +678,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               )}
 
               {/* STEP 5: Confirm move-in */}
-              {deal.status === 'agreement_signed' && isTenant && (
+              {deal.status === 'payment_received' && !deal.agreement_skipped && isTenant && (
                 <div className="p-5 bg-[#1a6b3c]/8 border border-[#1a6b3c]/20 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -706,7 +706,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 </div>
               )}
 
-              {deal.status === 'agreement_signed' && (isLandlord || isAgent) && (
+              {deal.status === 'payment_received' && !deal.agreement_skipped && (isLandlord || isAgent) && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
                   <Key className="w-8 h-8 text-white/20 mx-auto mb-3" />
                   <h4 className="text-[14px] font-bold text-white mb-2">Hand Over the Keys</h4>

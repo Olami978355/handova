@@ -199,7 +199,7 @@ export function useDeal(dealId: string) {
     try {
       const { error } = await supabase
         .from('deals')
-        .update({ status: 'pending_payment' })
+        .update({ status: 'agreement_sent' })
         .eq('id', dealId);
 
       if (error) throw error;

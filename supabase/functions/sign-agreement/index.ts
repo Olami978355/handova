@@ -22,7 +22,7 @@ serve(async (req) => {
       .single();
     if (dealError || !deal) throw new Error('Deal not found');
 
-    if (deal.status !== 'payment_received') {
+    if (deal.status !== 'agreement_sent') {
       throw new Error(`Cannot sign agreement in ${deal.status} status`);
     }
     if (!deal.agreement_url) {
@@ -77,7 +77,7 @@ serve(async (req) => {
     const landlordSigned = updateData.landlord_signed_at || deal.landlord_signed_at;
     const bothSigned = !!(tenantSigned && landlordSigned);
     if (bothSigned) {
-      updateData.status = 'agreement_signed';
+      updateData.status = 'pending_payment';
     }
 
     const { error: updateError } = await adminSupabase
