@@ -932,7 +932,7 @@ return (
                                 {property.title}
                               </p>
                               <p className="text-[12px] font-black text-[#f0c040] mt-0.5">
-                                ₦{(property.price / 1000000).toFixed(1)}M
+                                {formatNaira(property.price)}
                                 {property.price_period === 'yearly' && '/yr'}
                               </p>
                             </div>
