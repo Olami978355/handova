@@ -72,13 +72,16 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
   }, []);
 
   const handleUsernameChange = (raw: string) => {
-    const value = raw.startsWith('@') ? raw.slice(1) : raw;
-    setUsername(value);
+    // Keep exactly what the user typed visible (including a leading @) —
+    // only strip it when actually searching or submitting, so the box
+    // never appears to reject the @ character.
+    setUsername(raw);
     setInviteError(null);
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    const query = value.trim().toLowerCase();
+    const cleaned = raw.startsWith('@') ? raw.slice(1) : raw;
+    const query = cleaned.trim().toLowerCase();
     if (query.length < 2) {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -114,10 +117,11 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
     setInviting(true);
     setInviteError(null);
     try {
+      const cleanedUsername = (username.startsWith('@') ? username.slice(1) : username).trim().toLowerCase();
       const { error } = await supabase.functions.invoke('invite-deal-delegate', {
         body: {
           dealId,
-          delegateUsername: username.trim().toLowerCase(),
+          delegateUsername: cleanedUsername,
           canSign, canPay, canConfirmMovein,
         },
       });
@@ -237,7 +241,7 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
               value={username}
               onChange={(e) => handleUsernameChange(e.target.value)}
               onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
-              placeholder="Their username (or @username)"
+              placeholder="username"
               autoComplete="off"
               className="w-full px-3 py-2.5 bg-white/5 border border-white/8 rounded-lg text-[12px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
             />
