@@ -33,7 +33,6 @@ export default function Directory() {
       .from('public_profiles')
       .select('id, full_name, username, avatar_url, role, verification_status, lasrera_id')
       .in('role', role === 'all' ? ['agent', 'landlord'] : [role])
-      .not('username', 'is', null)
       .order('verification_status', { ascending: false })
       .order('created_at', { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
@@ -65,6 +64,31 @@ export default function Directory() {
     setHasMore(more.length === PAGE_SIZE);
     setLoadingMore(false);
   };
+
+  const CardContent = ({ p }: { p: DirectoryProfile }) => (
+    <>
+      <div className="w-12 h-12 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-[#1a6b3c] text-[16px] font-bold flex-shrink-0 overflow-hidden">
+        {p.avatar_url ? (
+          <img src={p.avatar_url} alt="" className="w-full h-full object-cover" />
+        ) : (
+          (p.full_name || 'U').charAt(0).toUpperCase()
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <p className="text-[13px] font-bold text-white truncate">{p.full_name || 'RentEasy User'}</p>
+          <VerifiedBadge status={p.verification_status} size={12} />
+        </div>
+        <p className="text-[11px] text-white/35 capitalize">{p.role}</p>
+        {p.lasrera_id && (
+          <p className="text-[10px] text-white/25 font-mono mt-0.5 truncate">{p.lasrera_id}</p>
+        )}
+        {!p.username && (
+          <p className="text-[10px] text-white/20 mt-0.5">Profile not public yet</p>
+        )}
+      </div>
+    </>
+  );
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pb-24" style={font}>
@@ -126,29 +150,22 @@ export default function Directory() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {profiles.map(p => (
-                <Link
-                  key={p.id}
-                  to={`/u/${p.username}`}
-                  className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4 flex items-center gap-3 hover:border-white/12 transition-all"
-                >
-                  <div className="w-12 h-12 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-[#1a6b3c] text-[16px] font-bold flex-shrink-0 overflow-hidden">
-                    {p.avatar_url ? (
-                      <img src={p.avatar_url} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      (p.full_name || 'U').charAt(0).toUpperCase()
-                    )}
+                p.username ? (
+                  <Link
+                    key={p.id}
+                    to={`/u/${p.username}`}
+                    className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4 flex items-center gap-3 hover:border-white/12 transition-all"
+                  >
+                    <CardContent p={p} />
+                  </Link>
+                ) : (
+                  <div
+                    key={p.id}
+                    className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4 flex items-center gap-3 opacity-70"
+                  >
+                    <CardContent p={p} />
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-[13px] font-bold text-white truncate">{p.full_name || 'RentEasy User'}</p>
-                      <VerifiedBadge status={p.verification_status} size={12} />
-                    </div>
-                    <p className="text-[11px] text-white/35 capitalize">{p.role}</p>
-                    {p.lasrera_id && (
-                      <p className="text-[10px] text-white/25 font-mono mt-0.5 truncate">{p.lasrera_id}</p>
-                    )}
-                  </div>
-                </Link>
+                )
               ))}
             </div>
 

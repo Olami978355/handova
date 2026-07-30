@@ -176,7 +176,7 @@ export default function AdminLogs() {
               <div className="p-5 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { label: 'Actor', value: selectedLog.actor?.full_name || 'System', sub: selectedLog.actor?.role },
+                    { label: 'Actor', value: selectedLog.actor?.full_name || 'System', sub: undefined as string | undefined },
                     { label: 'Timestamp', value: new Date(selectedLog.created_at).toLocaleString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
                     { label: 'Action', value: selectedLog.action.replace(/_/g, ' ') },
                     { label: 'Target ID', value: selectedLog.target_id ? selectedLog.target_id.slice(0, 16) + '...' : 'N/A' },
