@@ -27,7 +27,7 @@ export default function MessagesPage() {
     if (!otherId || !user) return;
     setActionLoading(true);
     try {
-      const { error } = await supabase.from('blocked_users').insert({ blocker_id: user.id, blocked_id: otherId });
+      const { error } = await supabase.rpc('block_user', { p_blocked_id: otherId });
       if (error) throw error;
       alert('User blocked.');
       setShowChatMenu(false);
@@ -42,7 +42,7 @@ export default function MessagesPage() {
     if (!otherId || !user || !reportReason.trim()) return;
     setActionLoading(true);
     try {
-      const { error } = await supabase.from('user_reports').insert({ reporter_id: user.id, reported_id: otherId, reason: reportReason });
+      const { error } = await supabase.rpc('report_user', { p_reported_id: otherId, p_reason: reportReason });
       if (error) throw new Error(error.message);
       alert('Report submitted. Our team will review it.');
       setShowReportModal(false);
