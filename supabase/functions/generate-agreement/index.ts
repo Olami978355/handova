@@ -6,7 +6,7 @@ import { logDealAction, corsHeaders } from '../_shared/utils.ts';
 const AGREEMENT_FEE = 10000;
 
 const formatNaira = (amount: number) =>
-  new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount);
+  `NGN ${new Intl.NumberFormat('en-NG', { maximumFractionDigits: 0 }).format(amount)}`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
