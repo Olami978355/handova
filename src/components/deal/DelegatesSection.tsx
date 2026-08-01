@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { UserPlus, Check, X, Loader2, Shield, UserMinus } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase, requireValidSession } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 
 interface DelegateRow {
@@ -117,6 +117,7 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
     setInviting(true);
     setInviteError(null);
     try {
+      if (!(await requireValidSession())) return;
       const cleanedUsername = (username.startsWith('@') ? username.slice(1) : username).trim().toLowerCase();
       const { error } = await supabase.functions.invoke('invite-deal-delegate', {
         body: {
@@ -144,6 +145,7 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
   const handleRespond = async (inviteId: string, accept: boolean) => {
     setRespondingId(inviteId);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('respond-to-delegate-invite', {
         body: { inviteId, accept },
       });
@@ -160,6 +162,7 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
     if (!window.confirm(`Revoke ${delegateName}'s delegate access on this deal?`)) return;
     setRevokingId(delegateRowId);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('revoke-deal-delegate', {
         body: { delegateRowId },
       });

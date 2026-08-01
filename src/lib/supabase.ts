@@ -21,3 +21,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     },
   },
 });
+
+export const requireValidSession = async (): Promise<boolean> => {
+  const { data, error } = await supabase.auth.getSession();
+  if (error || !data?.session) {
+    await supabase.auth.signOut();
+    window.location.href = '/login';
+    return false;
+  }
+  return true;
+};
