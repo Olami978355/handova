@@ -124,6 +124,13 @@ export function useDeal(dealId: string) {
 
   const callEdgeFunction = async (functionName: string, body: any = {}) => {
     try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData?.session) {
+        await supabase.auth.signOut();
+        window.location.href = '/login';
+        return { success: false, error: 'Your session has expired. Please log in again.' };
+      }
+
       const { data, error } = await supabase.functions.invoke(functionName, {
         body: { dealId, ...body },
       });
