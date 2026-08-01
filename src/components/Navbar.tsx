@@ -10,19 +10,14 @@ import { useAuth } from '../context/AuthContext';
 import { NotificationBell } from './notifications/NotificationBell';
 import { useConversationsContext } from '../context/ConversationsContext';
 
-const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#1a6b3c" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
-    <path d="M32 54 L32 50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M36 54 L36 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
-    <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#f0c040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+const HandovaLogo = ({ size = 32 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none">
+    <path d="M-50 -70 L-20 -55 L-20 55 L-50 70 Z" fill="#D4AF37" />
+    <path d="M50 -70 L20 -55 L20 55 L50 70 Z" fill="#D4AF37" />
+    <circle cx="-32" cy="0" r="17" fill="none" stroke="#D4AF37" strokeWidth="9" />
+    <rect x="-15" y="-4.5" width="35" height="9" fill="#D4AF37" />
+    <rect x="10" y="4.5" width="8" height="10" fill="#D4AF37" />
+    <rect x="22" y="4.5" width="8" height="10" fill="#D4AF37" />
   </svg>
 );
 
@@ -78,9 +73,9 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
 
           <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <RentEasyLogo size={34} />
+            <HandovaLogo size={34} />
             <span className="text-[20px] font-extrabold tracking-tight text-white leading-none">
-              Rent<span className="text-[#f0c040]">Easy</span>
+              Hand<span className="text-[#f0c040]">ova</span>
             </span>
           </Link>
 
@@ -146,6 +141,7 @@ export default function Navbar() {
                   onClick={handleLogout}
                   className="p-2 text-white/35 hover:text-red-400 transition-colors"
                   title="Sign out"
+                  aria-label="Sign out"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -173,6 +169,8 @@ export default function Navbar() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="w-9 h-9 flex items-center justify-center text-white hover:bg-white/5 rounded-xl transition-colors"
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -314,7 +312,7 @@ export default function Navbar() {
                     onClick={() => setIsOpen(false)}
                     className="block w-full bg-[#f0c040] text-black text-center py-3.5 rounded-xl font-bold text-[14px]"
                   >
-                    Get Started — It's Free
+                    Get Started, It's Free
                   </Link>
                   <Link
                     to="/login"
