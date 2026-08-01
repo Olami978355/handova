@@ -227,6 +227,80 @@ export const useMessages = (conversationId?: string) => {
     }
   };
 
+  const sendMediaMessage = async (file: File, mediaType: 'image' | 'video'): Promise<void> => {
+    if (!conversationId || !user || sending) return;
+    setSending(true);
+    setSendError(null);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${conversationId}/${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('chat-media')
+        .upload(filePath, file);
+      if (uploadError) throw new Error(uploadError.message);
+
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from('chat-media')
+        .createSignedUrl(filePath, 60 * 60 * 24 * 7);
+      if (signedUrlError) throw new Error(signedUrlError.message);
+
+      const fallbackContent = mediaType === 'image' ? '📷 Photo' : '🎥 Video';
+
+      const { data: sent, error: insertError } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: fallbackContent,
+          message_type: mediaType,
+          media_url: signedUrlData.signedUrl,
+          media_type: mediaType,
+        })
+        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at, edited_at, deleted_for_everyone, deleted_for, quoted_message_id, media_url, media_type')
+        .single();
+      if (insertError) throw new Error(insertError.message);
+
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, role, email, verification_status, nin_verified, created_at, updated_at')
+        .eq('id', user.id)
+        .single();
+      setMessages(prev => [...prev, { ...(sent as Message), sender: senderProfile || undefined }]);
+
+      await supabase
+        .from('conversations')
+        .update({ last_message: fallbackContent, last_message_at: new Date().toISOString() })
+        .eq('id', conversationId);
+
+      try {
+        const { data: conv } = await supabase
+          .from('conversations')
+          .select('participant_ids')
+          .eq('id', conversationId)
+          .single();
+        const recipientId = conv?.participant_ids?.find((id: string) => id !== user.id);
+        if (recipientId) {
+          await supabase.functions.invoke('send-notification', {
+            body: {
+              user_ids: [recipientId],
+              title: 'New Message',
+              body: fallbackContent,
+              link: `/messages?id=${conversationId}`,
+              type: 'new_message',
+            },
+          });
+        }
+      } catch (notifyErr) {
+        console.error('Failed to notify recipient (non-fatal):', notifyErr);
+      }
+      scrollToBottom();
+    } catch (err: unknown) {
+      setSendError(err instanceof Error ? err.message : 'Failed to send media');
+      throw err;
+    } finally {
+      setSending(false);
+    }
+  };
   const sendCustomDealOffer = async (offer: {
     propertyId: string;
     offeredTo: string;
@@ -358,6 +432,7 @@ export const useMessages = (conversationId?: string) => {
     sending,
     sendError,
     sendMessage,
+    sendMediaMessage,
     sendCustomDealOffer,
     respondToOffer,
     editMessage,

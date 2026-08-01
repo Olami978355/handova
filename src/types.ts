@@ -332,7 +332,7 @@ export interface Conversation {
   unread_count?: number;
 }
 
-export type MessageType = 'text' | 'custom_deal_offer' | 'system';
+export type MessageType = 'text' | 'custom_deal_offer' | 'system' | 'image' | 'video';
 
 export interface Message {
   id: string;
@@ -347,6 +347,8 @@ export interface Message {
   deleted_for_everyone?: boolean;
   deleted_for?: string[];
   quoted_message_id?: string;
+  media_url?: string;
+  media_type?: 'image' | 'video';
   sender?: Profile;
   custom_deal_offer?: CustomDealOffer;
   quoted_message?: Message;

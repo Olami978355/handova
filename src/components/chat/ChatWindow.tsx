@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Loader2, AlertCircle, RefreshCw,
   Tag, Calendar, Clock, CheckCircle, XCircle, X,
-  Pencil, Reply, Trash2, Check
+  Pencil, Reply, Trash2, Check, Paperclip
 } from 'lucide-react';
 import { useMessages } from '../../hooks/useMessages';
 import { useAuth } from '../../context/AuthContext';
@@ -297,12 +297,32 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const {
     messages, loading, sending, sendError,
-    sendMessage, sendCustomDealOffer, respondToOffer,
+    sendMessage, sendMediaMessage, sendCustomDealOffer, respondToOffer,
     editMessage, deleteMessage,
     messagesEndRef, refresh,
   } = useMessages(resolvedConversationId);
 
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    if (file.size > 25 * 1024 * 1024) {
+      setLocalError('File must be under 25MB.');
+      return;
+    }
+    const mediaType: 'image' | 'video' = file.type.startsWith('video') ? 'video' : 'image';
+    setUploadingMedia(true);
+    try {
+      await sendMediaMessage(file, mediaType);
+    } catch (err) {
+      setLocalError(err instanceof Error ? err.message : 'Failed to send media');
+    } finally {
+      setUploadingMedia(false);
+    }
+  };
   const [localError, setLocalError] = useState<string | null>(null);
   const [showDealModal, setShowDealModal] = useState(false);
   const [quotedMessage, setQuotedMessage] = useState<typeof messages[0] | null>(null);
@@ -595,7 +615,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                               {msg.quoted_message.deleted_for_everyone ? 'This message was deleted' : msg.quoted_message.content}
                             </div>
                           )}
-                          {msg.content}
+                          {msg.media_url && msg.media_type === 'image' && (
+                            <img src={msg.media_url} alt="" className="rounded-xl max-w-[240px] max-h-[320px] object-cover" />
+                          )}
+                          {msg.media_url && msg.media_type === 'video' && (
+                            <video src={msg.media_url} controls className="rounded-xl max-w-[240px] max-h-[320px]" />
+                          )}
+                          {!msg.media_url && msg.content}
                         </div>
                       )}
 
@@ -708,8 +734,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               </button>
             </div>
           )}
-          <div className="flex items-end gap-2">
-            <div className="flex-1 bg-white/5 border border-white/8 rounded-xl px-4 py-2.5 focus-within:border-[#1a6b3c]/50 transition-colors">
+          <div className="flex items-end gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*,video/*"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingMedia}
+              className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-white/40 hover:text-white transition-colors disabled:opacity-40"
+            >
+              {uploadingMedia ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
+            </button>
+            <div className="flex-1 bg-white/5 border border-white/8 rounded-full px-4 py-2.5 focus-within:border-[#1a6b3c]/50 transition-colors">
               <textarea
                 ref={textareaRef}
                 value={newMessage}
@@ -724,7 +765,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             <button
               onClick={() => handleSend()}
               disabled={!newMessage.trim() || isSending}
-              className="w-10 h-10 bg-[#1a6b3c] rounded-xl flex items-center justify-center text-white hover:bg-[#0f4a2a] disabled:opacity-35 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
+              className="w-10 h-10 bg-[#1a6b3c] rounded-full flex items-center justify-center text-white hover:bg-[#0f4a2a] disabled:opacity-35 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
             >
               {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
