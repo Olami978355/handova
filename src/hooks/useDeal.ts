@@ -9,6 +9,17 @@ export function useDeal(dealId: string) {
   const [logs, setLogs] = useState<DealLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [delegatePreview, setDelegatePreview] = useState<{
+    delegate_row_id: string;
+    status: string;
+    property_title: string;
+    duration: string;
+    transaction_type: string;
+    principal_full_name: string;
+    can_sign: boolean;
+    can_pay: boolean;
+    can_confirm_movein: boolean;
+  } | null>(null);
 
   const fetchDeal = async () => {
     try {
@@ -20,7 +31,21 @@ export function useDeal(dealId: string) {
         .eq('id', dealId)
         .single();
 
-      if (dealError) throw dealError;
+      if (dealError) {
+        if (dealError.code === 'PGRST116') {
+          const { data: previewData, error: previewError } = await supabase
+            .rpc('get_deal_delegate_preview', { p_deal_id: dealId });
+          if (!previewError && previewData && previewData.length > 0) {
+            setDelegatePreview(previewData[0]);
+            setDeal(null);
+            setError(null);
+            setLoading(false);
+            return;
+          }
+        }
+        throw dealError;
+      }
+      setDelegatePreview(null);
 
       let tenantProfile = null;
       if (data.tenant_id) {
@@ -287,6 +312,7 @@ export function useDeal(dealId: string) {
     loading,
     error,
     refresh: fetchDeal,
+    delegatePreview,
     uploadAgreement,
     getAgreementViewUrl,
     approveDraftAgreement,

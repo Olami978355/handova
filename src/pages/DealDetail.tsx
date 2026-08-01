@@ -10,6 +10,7 @@ import { useDeal } from '../hooks/useDeal';
 import { ReceiptPanel } from '../components/receipt/ReceiptCards';
 import { DelegatesSection } from '../components/deal/DelegatesSection';
 import { DealReviewSection } from '../components/deal/DealReviewSection';
+import { DealDelegatePreview } from '../components/deal/DealDelegatePreview';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
@@ -24,7 +25,7 @@ export default function DealDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const {
-    deal, logs, loading, error,
+    deal, logs, loading, error, delegatePreview,
     uploadAgreement, generateAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl, skipAgreement,
     signAgreement, confirmMoveIn, confirmHandover, releaseFunds, markDisputed, cancelDeal, cancelDealAsTenant,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
@@ -86,6 +87,9 @@ export default function DealDetail() {
     );
   }
 
+  if (delegatePreview) {
+    return <DealDelegatePreview preview={delegatePreview} onResponded={refresh} />;
+  }
   if (error || !deal) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6 text-center" style={font}>
