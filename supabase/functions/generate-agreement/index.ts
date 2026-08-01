@@ -35,7 +35,8 @@ serve(async (req) => {
       throw new Error(`Cannot generate an agreement for a deal in ${deal.status} status.`);
     }
 
-    const isSale = deal.properties?.transaction_type === 'sell';
+    const propertyRow = Array.isArray(deal.properties) ? deal.properties[0] : deal.properties;
+    const isSale = propertyRow?.transaction_type === 'sell';
 
     const { data: tenant } = await adminSupabase
       .from('profiles').select('full_name').eq('id', deal.tenant_id).single();
@@ -45,7 +46,7 @@ serve(async (req) => {
       ? await adminSupabase.from('profiles').select('full_name').eq('id', deal.agent_id).single()
       : { data: null };
 
-    const property = deal.properties;
+    const property = propertyRow;
     const docTitle = isSale ? 'CONTRACT OF SALE' : 'TENANCY AGREEMENT';
     const partyBLabel = isSale ? 'SELLER' : 'LANDLORD';
     const partyALabel = isSale ? 'BUYER' : 'TENANT';
@@ -136,7 +137,11 @@ serve(async (req) => {
       .upload(filePath, pdfBytes, { contentType: 'application/pdf', upsert: true });
     if (uploadError) throw uploadError;
 
-    const { data: { publicUrl } } = adminSupabase.storage.from('agreements').getPublicUrl(filePath);
+    const { data: signedUrlData, error: signedUrlError } = await adminSupabase.storage
+      .from('agreements')
+      .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7-day signed URL
+    if (signedUrlError) throw signedUrlError;
+    const publicUrl = signedUrlData.signedUrl;
 
     const { error: updateError } = await adminSupabase
       .from('deals')
