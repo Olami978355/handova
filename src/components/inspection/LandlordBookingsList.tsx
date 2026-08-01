@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { InspectionBooking, Property } from '../../types';
 import { VerifiedBadge } from '../VerifiedBadge';
 import { useInspectionBooking } from '../../hooks/useInspectionBooking';
-import { supabase } from '../../lib/supabase';
+import { supabase, requireValidSession  } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatFee } from '../../utils/inspectionFee';
 import { useNavigate } from 'react-router-dom';

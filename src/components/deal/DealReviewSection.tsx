@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Star, Loader2, CheckCircle } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase, requireValidSession  } from '../../lib/supabase';
 
 interface ReviewCandidate {
   id: string;
