@@ -56,6 +56,20 @@ serve(async (req) => {
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
+    // Watermark: centered, transparent, drawn first so all text sits on top
+    const watermarkBytes = await Deno.readFile(
+      new URL('./assets/logo-watermark.png', import.meta.url)
+    );
+    const watermarkImage = await pdfDoc.embedPng(watermarkBytes);
+    const wmWidth = 260;
+    const wmHeight = wmWidth * (watermarkImage.height / watermarkImage.width);
+    page.drawImage(watermarkImage, {
+      x: (595 - wmWidth) / 2,
+      y: (842 - wmHeight) / 2,
+      width: wmWidth,
+      height: wmHeight,
+    });
+
     let y = 800;
     const margin = 50;
     const lineHeight = 18;
