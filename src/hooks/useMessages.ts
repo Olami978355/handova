@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, requireValidSession  } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Message, CustomDealOffer } from '../types';
 
@@ -358,6 +358,7 @@ export const useMessages = (conversationId?: string) => {
 
   const respondToOffer = async (offerId: string, accept: boolean): Promise<void> => {
     try {
+      if (!(await requireValidSession())) return;
       const { data, error } = await supabase.functions.invoke('respond-to-deal-offer', {
         body: { offerId, accept },
       });

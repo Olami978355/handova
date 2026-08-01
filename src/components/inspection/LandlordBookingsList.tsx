@@ -65,6 +65,7 @@ export const LandlordBookingsList: React.FC = () => {
     setConfirming(bookingId);
     setActionError(null);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke(
         'confirm-inspection-date',
         { body: { bookingId, confirmedDate: date, confirmedTime: time } }
@@ -82,6 +83,7 @@ export const LandlordBookingsList: React.FC = () => {
     setStartingEscrow(bookingId);
     setActionError(null);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke(
         'start-escrow-from-booking',
         { body: { bookingId } }

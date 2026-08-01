@@ -95,6 +95,7 @@ export const DealReviewSection: React.FC<DealReviewSectionProps> = ({
     setSubmitting(revieweeId);
     setSubmitError(null);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('submit-deal-review', {
         body: { dealId, revieweeId, rating, comment: comments[revieweeId] || '' },
       });

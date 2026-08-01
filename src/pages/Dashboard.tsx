@@ -7,7 +7,7 @@ import {
   MapPin, RefreshCw, Eye, EyeOff, Heart, Pencil, Trash2, AlertTriangle, Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '../lib/supabase';
+import { supabase, requireValidSession  } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useAuth } from '../context/AuthContext';
 import { Property, Deal, InspectionBooking } from '../types';
@@ -320,6 +320,7 @@ export default function Dashboard() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('delete-listing', {
         body: { propertyId: deleteTarget.id },
       });
@@ -336,6 +337,7 @@ export default function Dashboard() {
 
   const handleToggleDelist = async (property: Property) => {
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('delist-listing', {
         body: { propertyId: property.id, delist: !property.is_delisted },
       });

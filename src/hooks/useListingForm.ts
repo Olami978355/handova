@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { supabase } from '../lib/supabase';
+import { supabase, requireValidSession  } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -153,6 +153,7 @@ export const useListingForm = (propertyId?: string) => {
   const onSubmit = async (data: ListingFormData) => {
     setIsSubmitting(true);
     try {
+      if (!(await requireValidSession())) return;
       if (!user) throw new Error('You must be logged in to list a property');
 
       if (isEditMode) {

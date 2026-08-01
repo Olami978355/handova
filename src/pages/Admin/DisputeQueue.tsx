@@ -3,7 +3,7 @@ import {
   AlertCircle, CheckCircle, XCircle, Loader2,
   Eye, Info, ArrowRight
 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase, requireValidSession  } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
 import { InspectionBooking } from '../../types';
 import { format } from 'date-fns';
@@ -52,6 +52,7 @@ export default function DisputeQueue() {
     if (!selectedDispute || !resolutionText) return;
     setResolving(selectedDispute.id);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('resolve-inspection-dispute', {
         body: { bookingId: selectedDispute.id, resolution: resolutionText, landlordAtFault },
       });
@@ -71,6 +72,7 @@ export default function DisputeQueue() {
     if (!dealResolutionNote.trim()) return;
     setDealResolving({ id: dealId, outcome });
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('resolve-deal-dispute', {
         body: { dealId, outcome, note: dealResolutionNote },
       });

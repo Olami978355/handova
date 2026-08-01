@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, Loader2, CheckCircle, Eye, ArrowRight } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase, requireValidSession  } from '../../lib/supabase';
 import { format } from 'date-fns';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
@@ -53,6 +53,7 @@ export default function EscrowQueue() {
   const handleRelease = async (dealId: string) => {
     setReleasing(dealId);
     try {
+      if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('release-funds', {
         body: { dealId },
       });

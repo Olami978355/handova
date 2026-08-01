@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase, requireValidSession } from './supabase';
 
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
@@ -12,6 +12,7 @@ export const formatAmountToKobo = (naira: number): number => {
 
 export const verifyPayment = async (reference: string) => {
   try {
+    if (!(await requireValidSession())) return { success: false, error: 'Session expired' };
     const { data, error } = await supabase.functions.invoke('verify-payment', {
       body: { reference },
     });

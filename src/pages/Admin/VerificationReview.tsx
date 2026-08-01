@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, CheckCircle2, XCircle, Loader2, FileText, Building2, ExternalLink } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase, requireValidSession  } from '../../lib/supabase';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -71,6 +71,7 @@ export default function VerificationReview() {
   const viewDocument = async (requestId: string, docType: string) => {
     setDocLoading(`${requestId}-${docType}`);
     try {
+      if (!(await requireValidSession())) return;
       const { data, error } = await supabase.functions.invoke('admin-view-verification-doc', {
         body: { requestId, docType },
       });
@@ -87,6 +88,7 @@ export default function VerificationReview() {
   const handleApprove = async (requestId: string) => {
     setActionLoading(requestId);
     try {
+      if (!(await requireValidSession())) return;
       const { data, error } = await supabase.functions.invoke('review-verification-request', {
         body: { requestId, decision: 'approve' },
       });
@@ -104,6 +106,7 @@ export default function VerificationReview() {
     if (!rejectModalFor || !rejectReason.trim()) return;
     setActionLoading(rejectModalFor);
     try {
+      if (!(await requireValidSession())) return;
       const { data, error } = await supabase.functions.invoke('review-verification-request', {
         body: { requestId: rejectModalFor, decision: 'reject', rejectionReason: rejectReason.trim() },
       });

@@ -265,6 +265,7 @@ export function useInspectionBooking() {
     setLoading(true);
     setError(null);
     try {
+      if (!(await requireValidSession())) return;
       const { data, error } = await supabase.functions.invoke(
         'submit-inspection-decision',
         { body: { bookingId, interested } }
