@@ -20,6 +20,12 @@ serve(async (req) => {
     // Only a real party on the deal can delegate — tenant, landlord, or agent
     const isPrincipal = user.id === deal.tenant_id || user.id === deal.landlord_id || user.id === deal.agent_id;
     if (!isPrincipal) throw new Error('Only a party on this deal can invite a delegate.');
+    // Only the tenant can delegate payment or move-in confirmation. Those actions
+    // only ever belong to the tenant in the first place, a landlord/agent delegating
+    // them would be granting a permission they never held themselves.
+    if ((canPay || canConfirmMovein) && user.id !== deal.tenant_id) {
+      throw new Error('Only the tenant can delegate payment or move-in confirmation.');
+    }
     const { data: delegateProfile, error: delegateError } = await adminSupabase
       .from('public_profiles')
       .select('id, full_name, is_system_account')

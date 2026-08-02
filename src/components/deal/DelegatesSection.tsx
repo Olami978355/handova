@@ -26,9 +26,10 @@ interface UsernameSuggestion {
 interface DelegatesSectionProps {
   dealId: string;
   isPrincipal: boolean;
+  isTenantPrincipal?: boolean;
 }
 
-export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPrincipal }) => {
+export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPrincipal, isTenantPrincipal = false }) => {
   const { user } = useAuth();
   const [delegates, setDelegates] = useState<DelegateRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -284,8 +285,10 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
           <div className="space-y-1.5">
             {[
               { label: 'Can sign the agreement', checked: canSign, set: setCanSign },
-              { label: 'Can pay on my behalf', checked: canPay, set: setCanPay },
-              { label: 'Can confirm move-in', checked: canConfirmMovein, set: setCanConfirmMovein },
+              ...(isTenantPrincipal ? [
+                { label: 'Can pay on my behalf', checked: canPay, set: setCanPay },
+                { label: 'Can confirm move-in', checked: canConfirmMovein, set: setCanConfirmMovein },
+              ] : []),
             ].map(opt => (
               <label key={opt.label} className="flex items-center gap-2 text-[11px] text-white/60">
                 <input type="checkbox" checked={opt.checked} onChange={(e) => opt.set(e.target.checked)} />

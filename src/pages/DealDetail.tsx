@@ -828,7 +828,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               </div>
             </div>
 
-            <DelegatesSection dealId={deal.id} isPrincipal={isTenant || isLandlord || isAgent} />
+            <DelegatesSection dealId={deal.id} isPrincipal={isTenant || isLandlord || isAgent} isTenantPrincipal={isTenant} />
 
             <DealReviewSection
               dealId={deal.id}
