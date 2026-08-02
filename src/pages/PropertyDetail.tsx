@@ -368,6 +368,9 @@ export default function PropertyDetail() {
           .update({ view_count: (data.view_count || 0) + 1 })
           .eq('id', id)
           .then(() => {});
+        supabase.from('property_views')
+          .insert({ property_id: id, viewer_id: user?.id || null })
+          .then(() => {});
       }
 
       // Check if saved

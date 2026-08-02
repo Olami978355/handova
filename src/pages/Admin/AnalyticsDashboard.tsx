@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, AlertCircle, XCircle, CheckCircle2, RefreshCw } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import FunnelSection from './FunnelSection';
 
 interface DealRow {
   id: string;
@@ -186,6 +187,8 @@ export default function AnalyticsDashboard() {
           </>
         )}
       </div>
+
+      <FunnelSection />
     </div>
   );
 }
