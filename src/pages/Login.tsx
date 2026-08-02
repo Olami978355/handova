@@ -4,19 +4,14 @@ import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Eye, EyeOff } from 'lucid
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 
-const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#1a6b3c" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
-    <path d="M32 54 L32 50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M36 54 L36 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
-    <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#f0c040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+const HandovaLogo = ({ size = 32 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none">
+    <path d="M-50 -70 L-20 -55 L-20 55 L-50 70 Z" fill="#D4AF37" />
+    <path d="M50 -70 L20 -55 L20 55 L50 70 Z" fill="#D4AF37" />
+    <circle cx="-32" cy="0" r="17" fill="none" stroke="#D4AF37" strokeWidth="9" />
+    <rect x="-15" y="-4.5" width="35" height="9" fill="#D4AF37" />
+    <rect x="10" y="4.5" width="8" height="10" fill="#D4AF37" />
+    <rect x="22" y="4.5" width="8" height="10" fill="#D4AF37" />
   </svg>
 );
 
@@ -108,9 +103,9 @@ export default function Login() {
 
         {/* Logo */}
         <div className="relative flex items-center gap-3">
-          <RentEasyLogo size={40} />
+          <HandovaLogo size={40} />
           <span className="text-[22px] font-extrabold tracking-tight text-white">
-            Rent<span className="text-[#f0c040]">Easy</span>
+            Hand<span className="text-[#f0c040]">ova</span>
           </span>
         </div>
 
@@ -126,7 +121,7 @@ export default function Login() {
           </h2>
           <p className="text-[14px] text-white/50 leading-relaxed max-w-xs">
             Manage your listings, track escrow payments, 
-            and communicate with tenants — all in one place.
+            and communicate with tenants, all in one place.
           </p>
 
           {/* Feature bullets */}
@@ -150,7 +145,7 @@ export default function Login() {
         {/* Bottom */}
         <div className="relative">
           <p className="text-[12px] text-white/25">
-            © {new Date().getFullYear()} RentEasy Nigeria
+            © {new Date().getFullYear()} Handova Nigeria
           </p>
         </div>
       </div>
@@ -159,9 +154,9 @@ export default function Login() {
       <div className="flex-1 flex flex-col justify-center px-5 py-12 lg:px-16">
         {/* Mobile logo */}
         <div className="lg:hidden flex items-center gap-2.5 mb-10">
-          <RentEasyLogo size={32} />
+          <HandovaLogo size={32} />
           <span className="text-[18px] font-extrabold tracking-tight text-white">
-            Rent<span className="text-[#f0c040]">Easy</span>
+            Hand<span className="text-[#f0c040]">ova</span>
           </span>
         </div>
 
@@ -245,7 +240,7 @@ export default function Login() {
                   Password
                 </label>
                 <Link
-                  to="#"
+                  to="/forgot-password"
                   className="text-[12px] text-[#f0c040]/70 hover:text-[#f0c040] transition-colors font-medium"
                 >
                   Forgot password?
@@ -266,6 +261,7 @@ export default function Login() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword
                     ? <EyeOff className="w-4 h-4" />
@@ -311,11 +307,11 @@ export default function Login() {
           {/* Legal note */}
           <p className="mt-8 text-[11px] text-white/25 text-center leading-relaxed">
             By signing in you agree to our{' '}
-            <Link to="#" className="text-white/40 hover:text-white/60 transition-colors underline">
+            <Link to="/legal#terms" className="text-white/40 hover:text-white/60 transition-colors underline">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="#" className="text-white/40 hover:text-white/60 transition-colors underline">
+            <Link to="/legal#privacy" className="text-white/40 hover:text-white/60 transition-colors underline">
               Privacy Policy
             </Link>
           </p>
