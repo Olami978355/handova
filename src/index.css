@@ -1,8 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader", ui-serif, Georgia, serif;
+
+  --color-ink: #0B0D10;
+  --color-gold: #D4AF37;
+  --color-gold-dark: #B8952E;
+  --color-slate: #2A2D33;
+  --color-paper: #FFFFFF;
+  --color-danger: #E5484D;
+  --color-danger-dark: #C93B40;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -15,33 +25,18 @@ html {
 
 body {
   font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  background-color: #0a0a0a;
+  background-color: #0B0D10;
   color: #ffffff;
   margin: 0;
   padding: 0;
 }
 
-:root {
-  --green: #1a6b3c;
-  --green-dark: #0f4a2a;
-  --green-deeper: #0a1f11;
-  --gold: #f0c040;
-  --black: #0a0a0a;
-  --black-card: #0a1f11;
-  --surface: #111a14;
-  --border: rgba(255, 255, 255, 0.08);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-muted: rgba(255, 255, 255, 0.35);
-}
-
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #1a6b3c; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #f0c040; }
-
-::selection { background: rgba(240, 192, 64, 0.25); color: #ffffff; }
-:focus-visible { outline: 2px solid #f0c040; outline-offset: 2px; }
+::-webkit-scrollbar-track { background: #0B0D10; }
+::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #B8952E; }
+::selection { background: rgba(212, 175, 55, 0.25); color: #ffffff; }
+:focus-visible { outline: 2px solid #D4AF37; outline-offset: 2px; }
 
 .skeleton {
   background: linear-gradient(
@@ -54,7 +49,6 @@ body {
   animation: skeleton-wave 1.5s infinite;
   border-radius: 8px;
 }
-
 @keyframes skeleton-wave {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
@@ -75,19 +69,16 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,0.4);
   animation: toast-in 0.2s ease;
 }
-
 .toast-success {
-  background: #0f4a2a;
-  color: #4ade80;
-  border: 1px solid rgba(74,222,128,0.2);
+  background: color-mix(in srgb, var(--color-gold) 15%, var(--color-ink) 85%);
+  color: var(--color-gold);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
 }
-
 .toast-error {
-  background: #3d0f0f;
-  color: #f87171;
-  border: 1px solid rgba(248,113,113,0.2);
+  background: color-mix(in srgb, var(--color-danger) 15%, var(--color-ink) 85%);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
 }
-
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -99,18 +90,16 @@ body {
   left: 0;
   right: 0;
   z-index: 40;
-  background: #0a1f11;
+  background: color-mix(in srgb, var(--color-slate) 35%, var(--color-ink) 65%);
   border-top: 1px solid rgba(255,255,255,0.08);
   display: flex;
   padding: 8px 0 20px;
 }
-
 @media (min-width: 1024px) {
   .bottom-tab-bar { display: none; }
 }
 
 .page-with-tabs { padding-bottom: 90px; }
-
 @media (min-width: 1024px) {
   .page-with-tabs { padding-bottom: 0; }
 }
@@ -119,25 +108,22 @@ body {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 .animate-fade-up { animation: fade-up 0.3s ease forwards; }
 .animate-fade-in { animation: fade-in 0.2s ease forwards; }
 
 .property-card {
-  background: #0a1f11;
+  background: color-mix(in srgb, var(--color-slate) 35%, var(--color-ink) 65%);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.2s ease;
 }
-
 .property-card:hover {
-  border-color: rgba(240,192,64,0.2);
+  border-color: rgba(212, 175, 55, 0.2);
   transform: translateY(-2px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
