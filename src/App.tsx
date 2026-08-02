@@ -10,6 +10,8 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import SignupPage from './pages/auth/SignupPage';
 import ConfirmEmail from './pages/auth/ConfirmEmail';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import OnboardingWizard from './pages/onboarding/OnboardingWizard';
 import VerificationPage from './pages/verification/VerificationPage';
 import Listings from './pages/Listings';
@@ -100,6 +102,8 @@ function AppInner() {
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<SignupPage />} />
             <Route path="auth/confirm" element={<ConfirmEmail />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="listings" element={<Listings />} />
             <Route path="map" element={<MapSearch />} />
             <Route path="property/:id" element={<PropertyDetail />} />
