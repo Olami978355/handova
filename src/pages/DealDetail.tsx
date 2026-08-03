@@ -20,6 +20,90 @@ import { useAuth } from '../context/AuthContext';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
+interface ConfirmModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  description: string;
+  textareaValue?: string;
+  onTextareaChange?: (v: string) => void;
+  textareaPlaceholder?: string;
+  showTextarea?: boolean;
+  cancelLabel?: string;
+  confirmLabel: string;
+  onConfirm: () => void;
+  tone?: 'gold' | 'danger';
+  processing?: boolean;
+  confirmDisabled?: boolean;
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  open, onClose, title, description,
+  textareaValue, onTextareaChange, textareaPlaceholder,
+  showTextarea = false, cancelLabel = 'Cancel', confirmLabel,
+  onConfirm, tone = 'gold', processing = false, confirmDisabled = false,
+}) => {
+  const confirmClasses = tone === 'danger'
+    ? 'bg-danger hover:bg-danger-dark text-paper'
+    : 'bg-gold hover:bg-gold-dark text-ink';
+  const focusRing = tone === 'danger' ? 'focus:border-danger/40' : 'focus:border-gold/40';
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="fixed inset-0 m-auto w-full max-w-md h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
+            style={font}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-bold text-paper">{title}</h3>
+              <button
+                onClick={onClose}
+                aria-label="Close"
+                className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">{description}</p>
+            {showTextarea && (
+              <textarea
+                value={textareaValue}
+                onChange={(e) => onTextareaChange?.(e.target.value)}
+                placeholder={textareaPlaceholder}
+                className={`w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-paper/25 outline-none ${focusRing} transition-colors resize-none mb-4`}
+              />
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={onClose}
+                className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
+              >
+                {cancelLabel}
+              </button>
+              <button
+                onClick={onConfirm}
+                disabled={confirmDisabled || processing}
+                className={`flex-1 py-3.5 rounded-xl font-bold text-[14px] transition-colors disabled:opacity-40 ${confirmClasses}`}
+              >
+                {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : confirmLabel}
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
 export default function DealDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
