@@ -69,6 +69,7 @@ export default function DealDetail() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleAction = async (action: () => Promise<{ success: boolean; error?: string }>) => {
+    if (processing) return;
     setProcessing(true);
     const result = await action();
     setProcessing(false);

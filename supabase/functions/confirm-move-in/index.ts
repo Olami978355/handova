@@ -35,8 +35,8 @@ serve(async (req) => {
         throw new Error(`Cannot confirm move-in in ${deal.status} status.`);
       }
     } else {
-      if (deal.status !== 'agreement_signed') {
-        throw new Error(`Cannot confirm move-in in ${deal.status} status. Agreement must be signed first.`);
+      if (deal.status !== 'payment_received') {
+        throw new Error(`Cannot confirm move-in in ${deal.status} status. Agreement must be signed and paid first.`);
       }
 
       // 2.2 Verify both signatures are present (only applies when an agreement exists)

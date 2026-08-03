@@ -31,8 +31,8 @@ serve(async (req) => {
         throw new Error(`Cannot confirm handover in ${deal.status} status.`);
       }
     } else {
-      if (deal.status !== 'agreement_signed') {
-        throw new Error(`Cannot confirm handover in ${deal.status} status. Contract must be signed first.`);
+      if (deal.status !== 'payment_received') {
+        throw new Error(`Cannot confirm handover in ${deal.status} status. Contract must be signed and paid first.`);
       }
       if (!deal.tenant_signed_at || !deal.landlord_signed_at) {
         throw new Error('Both parties must sign the contract before handover can be confirmed.');
