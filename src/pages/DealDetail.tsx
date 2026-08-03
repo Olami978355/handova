@@ -80,9 +80,9 @@ export default function DealDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center gap-3" style={font}>
-        <div className="w-8 h-8 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-white/30">Loading deal details...</p>
+      <div className="min-h-screen bg-ink flex flex-col items-center justify-center gap-3" style={font}>
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-paper/30">Loading deal details...</p>
       </div>
     );
   }
@@ -92,15 +92,15 @@ export default function DealDetail() {
   }
   if (error || !deal) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6 text-center" style={font}>
-        <AlertTriangle className="w-12 h-12 text-red-400 mb-4" />
-        <h1 className="text-[20px] font-bold text-white mb-2">Deal Not Found</h1>
-        <p className="text-[13px] text-white/40 mb-6 max-w-sm">
+      <div className="min-h-screen bg-ink flex flex-col items-center justify-center p-6 text-center" style={font}>
+        <AlertTriangle className="w-12 h-12 text-danger mb-4" />
+        <h1 className="text-[20px] font-bold text-paper mb-2">Deal Not Found</h1>
+        <p className="text-[13px] text-paper/40 mb-6 max-w-sm">
           {error || "This deal doesn't exist or you don't have permission to view it."}
         </p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="bg-[#1a6b3c] text-white px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+          className="bg-gold text-paper px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
         >
           Back to Dashboard
         </button>
@@ -123,10 +123,10 @@ export default function DealDetail() {
 
   const statusColor =
     deal.status === 'funds_released'
-      ? 'bg-[#1a6b3c] text-white'
+      ? 'bg-gold text-paper'
       : deal.status === 'disputed'
-      ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-      : 'bg-[#f0c040]/15 text-[#f0c040] border border-[#f0c040]/20';
+      ? 'bg-danger/20 text-danger border border-danger/30'
+      : 'bg-gold/15 text-gold border border-gold/20';
 
   const isAgentDeal = !!deal.agent_id;
   const isLandlordDeal = !!deal.landlord_id && deal.landlord_id !== deal.agent_id;
@@ -155,14 +155,14 @@ export default function DealDetail() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pb-24" style={font}>
+    <div className="min-h-screen bg-ink pb-24" style={font}>
 
       {/* Top bar */}
-      <div className="sticky top-16 z-40 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-16 z-40 bg-ink/90 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-[13px] font-semibold text-white/40 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-[13px] font-semibold text-paper/40 hover:text-paper transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
@@ -175,14 +175,14 @@ export default function DealDetail() {
       <div className="max-w-6xl mx-auto px-5 py-6 space-y-5">
 
         {/* Header card */}
-        <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 lg:p-6">
+        <div className="bg-slate/20 border border-white/6 rounded-2xl p-5 lg:p-6">
           <div className="flex items-center gap-4 mb-5">
-            <div className="w-12 h-12 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-[#1a6b3c]" />
+            <div className="w-12 h-12 bg-gold/15 rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-gold" />
             </div>
             <div>
-              <h1 className="text-[20px] font-black text-white">Escrow Transaction</h1>
-              <p className="text-[11px] text-white/30 font-mono">
+              <h1 className="text-[20px] font-black text-paper">Escrow Transaction</h1>
+              <p className="text-[11px] text-paper/30 font-mono">
                 {deal.id.slice(0, 8)}...{deal.id.slice(-8)}
               </p>
             </div>
@@ -198,21 +198,21 @@ export default function DealDetail() {
                 <React.Fragment key={s.id}>
                   <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-                      done ? 'bg-[#1a6b3c] text-white' :
-                      active ? 'bg-[#f0c040] text-black scale-110' :
-                      'bg-white/5 text-white/20'
+                      done ? 'bg-gold text-paper' :
+                      active ? 'bg-gold text-ink scale-110' :
+                      'bg-white/5 text-paper/20'
                     }`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className={`text-[9px] font-bold uppercase tracking-wider ${
-                      done ? 'text-[#1a6b3c]' : active ? 'text-[#f0c040]' : 'text-white/20'
+                      done ? 'text-gold' : active ? 'text-gold' : 'text-paper/20'
                     }`}>
                       {s.label}
                     </span>
                   </div>
                   {i < statusSteps.length - 1 && (
                     <div className={`flex-1 h-px mx-1 mb-4 min-w-[16px] ${
-                      i < currentStepIndex ? 'bg-[#1a6b3c]' : 'bg-white/8'
+                      i < currentStepIndex ? 'bg-gold' : 'bg-white/8'
                     }`} />
                   )}
                 </React.Fragment>
@@ -227,11 +227,11 @@ export default function DealDetail() {
           <div className="lg:col-span-2 space-y-5">
 
             {/* Property summary */}
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+            <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <Home className="w-5 h-5 text-[#1a6b3c]" />
-                  <h3 className="text-[14px] font-bold text-white">Property Details</h3>
+                  <Home className="w-5 h-5 text-gold" />
+                  <h3 className="text-[14px] font-bold text-paper">Property Details</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   {deal.agreement_url && (
@@ -240,14 +240,14 @@ export default function DealDetail() {
                       href={agreementViewUrl || deal.agreement_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 h-8 bg-white/5 rounded-xl text-white/40 hover:text-white transition-colors text-[11px] font-bold"
+                      className="flex items-center gap-1.5 px-3 h-8 bg-white/5 rounded-xl text-paper/40 hover:text-paper transition-colors text-[11px] font-bold"
                     >
                       <FileText className="w-3.5 h-3.5" /> Agreement
                     </a>
                   )}
                   <Link
                     to={`/property/${deal.property_id}`}
-                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/30 hover:text-white transition-colors"
+                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/30 hover:text-paper transition-colors"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </Link>
@@ -259,25 +259,25 @@ export default function DealDetail() {
                     <img src={deal.properties.images[0]} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Home className="w-8 h-8 text-white/10" />
+                      <Home className="w-8 h-8 text-paper/10" />
                     </div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-[14px] font-bold text-white mb-1 truncate">
+                  <h4 className="text-[14px] font-bold text-paper mb-1 truncate">
                     {deal.properties?.title || 'Property'}
                   </h4>
-                  <p className="text-[12px] text-white/40 mb-3">
+                  <p className="text-[12px] text-paper/40 mb-3">
                     {deal.properties?.address || ''}
                   </p>
                   <div className="flex gap-2">
                     <div className="bg-white/4 border border-white/6 rounded-xl px-3 py-2">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Amount</p>
-                      <p className="text-[13px] font-black text-[#f0c040]">{formatNaira(deal.amount)}</p>
+                      <p className="text-[10px] text-paper/30 uppercase tracking-wider mb-0.5">Amount</p>
+                      <p className="text-[13px] font-black text-gold">{formatNaira(deal.amount)}</p>
                     </div>
                     <div className="bg-white/4 border border-white/6 rounded-xl px-3 py-2">
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Duration</p>
-                      <p className="text-[13px] font-black text-white capitalize">
+                      <p className="text-[10px] text-paper/30 uppercase tracking-wider mb-0.5">Duration</p>
+                      <p className="text-[13px] font-black text-paper capitalize">
                         {deal.duration || '1 year'}
                       </p>
                     </div>
@@ -287,19 +287,19 @@ export default function DealDetail() {
             </div>
 
             {/* Actions */}
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-              <h3 className="text-[14px] font-bold text-white mb-5">Required Actions</h3>
+            <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+              <h3 className="text-[14px] font-bold text-paper mb-5">Required Actions</h3>
 
               {/* STEP 1: Agent/Landlord uploads agreement draft */}
               {deal.status === 'agreement_draft' && !deal.agreement_url && (isLandlord || isAgent) && (
-                <div className="p-5 bg-[#1a6b3c]/8 border border-[#1a6b3c]/20 rounded-xl">
+                <div className="p-5 bg-gold/8 border border-gold/20 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-9 h-9 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Upload className="w-4 h-4 text-[#1a6b3c]" />
+                    <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Upload className="w-4 h-4 text-gold" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">{isSaleDeal ? 'Upload or Generate Contract' : 'Upload or Generate Agreement'}</h4>
-                      <p className="text-[12px] text-white/45 leading-relaxed">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">{isSaleDeal ? 'Upload or Generate Contract' : 'Upload or Generate Agreement'}</h4>
+                      <p className="text-[12px] text-paper/45 leading-relaxed">
                         Upload the tenancy agreement for the tenant to review before they pay. PDF or image (JPG, PNG, WebP), max 20MB.
                       </p>
                     </div>
@@ -328,14 +328,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${uploadProgress}%` }}
-                        className="h-full bg-[#1a6b3c]"
+                        className="h-full bg-gold"
                       />
                     </div>
                   )}
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={processing}
-                    className="w-full bg-[#1a6b3c] text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full bg-gold text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                     {processing ? 'Uploading...' : 'Upload Agreement PDF'}
@@ -348,7 +348,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       if (!result.success) alert(result.error || 'Failed to generate agreement');
                     }}
                     disabled={processing}
-                    className="w-full mt-3 bg-white/5 text-white/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full mt-3 bg-white/5 text-paper/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
                     Generate {isSaleDeal ? 'Contract' : 'Agreement'} for Me (₦10,000 fee, deducted from payout)
                   </button>
@@ -359,10 +359,10 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               {deal.status === 'agreement_draft' && !deal.agreement_url && isTenant && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
                   <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Clock className="w-6 h-6 text-white/30" />
+                    <Clock className="w-6 h-6 text-paper/30" />
                   </div>
-                  <h4 className="text-[14px] font-bold text-white mb-2">Waiting for Agreement</h4>
-                  <p className="text-[13px] text-white/45 leading-relaxed">
+                  <h4 className="text-[14px] font-bold text-paper mb-2">Waiting for Agreement</h4>
+                  <p className="text-[13px] text-paper/45 leading-relaxed">
                     The agent or landlord is preparing your tenancy agreement. You will be notified once it is ready for your review.
                   </p>
                 </div>
@@ -370,14 +370,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
               {/* STEP 2: Tenant reviews draft agreement */}
               {deal.status === 'agreement_draft' && deal.agreement_url && isTenant && (
-                <div className="p-5 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl space-y-4">
+                <div className="p-5 bg-gold/6 border border-gold/15 rounded-xl space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 bg-[#f0c040]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Eye className="w-4 h-4 text-[#f0c040]" />
+                    <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Eye className="w-4 h-4 text-gold" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">Review Your Tenancy Agreement</h4>
-                      <p className="text-[12px] text-white/45 leading-relaxed">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">Review Your Tenancy Agreement</h4>
+                      <p className="text-[12px] text-paper/45 leading-relaxed">
                         Read the agreement carefully before approving. Once you approve and pay into escrow, the agreement becomes binding.
                       </p>
                     </div>
@@ -388,7 +388,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     href={agreementViewUrl || deal.agreement_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w/full py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-white/70 hover:text-white hover:bg-white/8 transition-colors"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-paper/70 hover:text-paper hover:bg-white/8 transition-colors"
                   >
                     <Download className="w-4 h-4" />
                     View / Download Agreement PDF
@@ -396,9 +396,9 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
                   {/* Change requested note */}
                   {deal.notes?.startsWith('Change requested:') && (
-                    <div className="flex items-start gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                      <AlertTriangle className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
-                      <p className="text-[12px] text-orange-400">{deal.notes}</p>
+                    <div className="flex items-start gap-2 p-3 bg-gold/10 border border-gold/20 rounded-xl">
+                      <AlertTriangle className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
+                      <p className="text-[12px] text-gold">{deal.notes}</p>
                     </div>
                   )}
 
@@ -406,7 +406,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     <button
                       onClick={() => setShowChangeModal(true)}
                       disabled={processing}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-paper/60 hover:text-paper hover:bg-white/8 transition-colors"
                     >
                       <ThumbsDown className="w-4 h-4" />
                       Request Changes
@@ -414,7 +414,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     <button
                       onClick={() => handleAction(approveDraftAgreement)}
                       disabled={processing}
-                      className="flex-[2] flex items-center justify-center gap-2 bg-[#f0c040] text-black py-3 rounded-xl font-bold text-[13px] hover:bg-[#e0b030] transition-colors disabled:opacity-40"
+                      className="flex-[2] flex items-center justify-center gap-2 bg-gold text-ink py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors disabled:opacity-40"
                     >
                       {processing
                         ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -431,11 +431,11 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-white/8 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-4 h-4 text-white/40" />
+                      <Clock className="w-4 h-4 text-paper/40" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">Agreement Uploaded</h4>
-                      <p className="text-[12px] text-white/45">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">Agreement Uploaded</h4>
+                      <p className="text-[12px] text-paper/45">
                         The tenant is reviewing the agreement. You will be notified once they approve or request changes.
                       </p>
                     </div>
@@ -444,19 +444,19 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     href={agreementViewUrl || deal.agreement_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white transition-colors"
+                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/50 hover:text-paper transition-colors"
                   >
                     <Eye className="w-4 h-4" /> View Uploaded Agreement
                   </a>
                   {deal.notes?.startsWith('Change requested:') && (
-                    <div className="mt-3 flex items-start gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                      <AlertTriangle className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                    <div className="mt-3 flex items-start gap-2 p-3 bg-gold/10 border border-gold/20 rounded-xl">
+                      <AlertTriangle className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-[12px] font-bold text-orange-400 mb-1">Tenant Requested Changes</p>
-                        <p className="text-[12px] text-orange-400/70">{deal.notes}</p>
+                        <p className="text-[12px] font-bold text-gold mb-1">Tenant Requested Changes</p>
+                        <p className="text-[12px] text-gold/70">{deal.notes}</p>
                         <button
                           onClick={() => fileInputRef.current?.click()}
-                          className="mt-3 flex items-center gap-2 text-[12px] font-bold text-[#f0c040] hover:text-[#e0b030] transition-colors"
+                          className="mt-3 flex items-center gap-2 text-[12px] font-bold text-gold hover:text-[#e0b030] transition-colors"
                         >
                           <Upload className="w-3.5 h-3.5" /> Upload Revised Agreement
                         </button>
@@ -482,14 +482,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
               {/* STEP 3: Tenant pays into escrow */}
               {deal.status === 'pending_payment' && (isTenant || canPayAsDelegate) && (
-                <div className="p-5 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl">
+                <div className="p-5 bg-gold/6 border border-gold/15 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-9 h-9 bg-[#f0c040]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <CreditCard className="w-4 h-4 text-[#f0c040]" />
+                    <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <CreditCard className="w-4 h-4 text-gold" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">Initialize Escrow Payment</h4>
-                      <p className="text-[12px] text-white/45 leading-relaxed">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">Initialize Escrow Payment</h4>
+                      <p className="text-[12px] text-paper/45 leading-relaxed">
                         You have approved the tenancy agreement. Now pay your rent securely into escrow. Funds are held safely until you confirm move-in.
                       </p>
                     </div>
@@ -501,7 +501,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       href={agreementViewUrl || deal.agreement_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 mb-4 text-[12px] text-[#f0c040]/60 hover:text-[#f0c040] transition-colors"
+                      className="flex items-center gap-2 mb-4 text-[12px] text-gold/60 hover:text-gold transition-colors"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       View agreed tenancy agreement
@@ -509,12 +509,12 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   )}
 
                   {deal.inspection_fee_credit != null && deal.inspection_fee_credit > 0 && (
-                    <div className="flex items-center justify-between p-3 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl mb-4">
-                      <div className="flex items-center gap-2 text-[12px] font-semibold text-[#1a6b3c]">
+                    <div className="flex items-center justify-between p-3 bg-gold/10 border border-gold/20 rounded-xl mb-4">
+                      <div className="flex items-center gap-2 text-[12px] font-semibold text-gold">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Inspection fee credit applied
                       </div>
-                      <span className="text-[12px] font-bold text-[#1a6b3c]">
+                      <span className="text-[12px] font-bold text-gold">
                         -{formatNaira(deal.inspection_fee_credit)}
                       </span>
                     </div>
@@ -522,8 +522,8 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
                   {processing ? (
                     <div className="flex items-center justify-center gap-3 py-4">
-                      <div className="w-5 h-5 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
-                      <p className="text-[13px] text-white/50">Processing payment...</p>
+                      <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                      <p className="text-[13px] text-paper/50">Processing payment...</p>
                     </div>
                   ) : (
                     <PaystackButton
@@ -571,9 +571,9 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               {/* Agent waiting for payment */}
               {deal.status === 'pending_payment' && (isLandlord || isAgent) && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
-                  <Clock className="w-8 h-8 text-white/20 mx-auto mb-3" />
-                  <h4 className="text-[14px] font-bold text-white mb-2">Waiting for Escrow Payment</h4>
-                  <p className="text-[13px] text-white/40">
+                  <Clock className="w-8 h-8 text-paper/20 mx-auto mb-3" />
+                  <h4 className="text-[14px] font-bold text-paper mb-2">Waiting for Escrow Payment</h4>
+                  <p className="text-[13px] text-paper/40">
                     The tenant has approved the agreement and will now make their escrow payment.
                   </p>
                 </div>
@@ -583,14 +583,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
               {/* STEP 4 (skipped agreement path): tenant confirms move-in directly */}
               {deal.status === 'payment_received' && deal.agreement_skipped && isTenant && (
-                <div className="p-5 bg-[#1a6b3c]/8 border border-[#1a6b3c]/20 rounded-xl">
+                <div className="p-5 bg-gold/8 border border-gold/20 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-9 h-9 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Key className="w-4 h-4 text-[#1a6b3c]" />
+                    <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Key className="w-4 h-4 text-gold" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">{isSaleDeal ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
-                      <p className="text-[12px] text-white/45 leading-relaxed">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">{isSaleDeal ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
+                      <p className="text-[12px] text-paper/45 leading-relaxed">
                         {isSaleDeal
                           ? 'No written contract was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the property and all relevant documents. This will release funds to the seller.'
                           : 'No written tenancy agreement was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the keys and access to the property. This will release funds to the owner.'}
@@ -600,11 +600,11 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   <button
                     onClick={() => handleAction(isSaleDeal ? confirmHandover : confirmMoveIn)}
                     disabled={processing}
-                    className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
                   </button>
-                  <p className="text-[11px] text-white/25 text-center mt-3">
+                  <p className="text-[11px] text-paper/25 text-center mt-3">
                     {isSaleDeal ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
                   </p>
                 </div>
@@ -612,9 +612,9 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
               {deal.status === 'payment_received' && deal.agreement_skipped && (isLandlord || isAgent) && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
-                  <Key className="w-8 h-8 text-white/20 mx-auto mb-3" />
-                  <h4 className="text-[14px] font-bold text-white mb-2">Hand Over the Keys</h4>
-                  <p className="text-[13px] text-white/40 leading-relaxed">
+                  <Key className="w-8 h-8 text-paper/20 mx-auto mb-3" />
+                  <h4 className="text-[14px] font-bold text-paper mb-2">Hand Over the Keys</h4>
+                  <p className="text-[13px] text-paper/40 leading-relaxed">
                     Payment received in escrow. No written agreement was required for this deal. Please give the tenant access to the property — funds will be released once they confirm move-in.
                   </p>
                 </div>
@@ -623,11 +623,11 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-white/8 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-4 h-4 text-white/60" />
+                      <FileText className="w-4 h-4 text-paper/60" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">Sign Tenancy Agreement</h4>
-                      <p className="text-[12px] text-white/45">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">Sign Tenancy Agreement</h4>
+                      <p className="text-[12px] text-paper/45">
                         Payment received and secured in escrow. Both parties must now formally sign the agreement.
                       </p>
                     </div>
@@ -637,9 +637,9 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       type="checkbox"
                       checked={agreedToTerms}
                       onChange={(e) => setAgreedToTerms(e.target.checked)}
-                      className="mt-0.5 flex-shrink-0 accent-[#1a6b3c]"
+                      className="mt-0.5 flex-shrink-0 accent-gold"
                     />
-                    <span className="text-[12px] text-white/65 leading-relaxed">
+                    <span className="text-[12px] text-paper/65 leading-relaxed">
                       I confirm I have read and agree to all terms of this tenancy agreement
                     </span>
                   </label>
@@ -649,7 +649,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                         href={agreementViewUrl || deal.agreement_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-bold text-white/60 hover:text-white transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[13px] font-bold text-paper/60 hover:text-paper transition-colors"
                       >
                         <Download className="w-4 h-4" /> View
                       </a>
@@ -658,14 +658,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       <button
                         onClick={() => handleAction(signAgreement)}
                         disabled={processing || !agreedToTerms}
-                        className="flex-[2] bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                        className="flex-[2] bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                       >
                         {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Sign Agreement'}
                       </button>
                     )}
                   </div>
                   {((isTenant && deal.tenant_signed_at) || ((isLandlord || isAgent) && deal.landlord_signed_at)) && (
-                    <p className="mt-3 text-center text-[11px] font-bold text-[#1a6b3c]">
+                    <p className="mt-3 text-center text-[11px] font-bold text-gold">
                       ✓ You have signed — waiting for the other party
                     </p>
                   )}
@@ -674,14 +674,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
               {/* STEP 5: Confirm move-in */}
               {deal.status === 'payment_received' && !deal.agreement_skipped && isTenant && (
-                <div className="p-5 bg-[#1a6b3c]/8 border border-[#1a6b3c]/20 rounded-xl">
+                <div className="p-5 bg-gold/8 border border-gold/20 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-9 h-9 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Key className="w-4 h-4 text-[#1a6b3c]" />
+                    <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Key className="w-4 h-4 text-gold" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">{isSaleDeal ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
-                      <p className="text-[12px] text-white/45 leading-relaxed">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">{isSaleDeal ? 'Confirm Handover' : 'Confirm Move-in'}</h4>
+                      <p className="text-[12px] text-paper/45 leading-relaxed">
                         {isSaleDeal
                           ? 'Has the property been handed over successfully? Only confirm after you have physically received the property and all relevant documents. This will release funds to the seller.'
                           : 'Have you moved in successfully? Only confirm after you have physically received the keys and access to the property. This will release funds to the owner.'}
@@ -691,11 +691,11 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   <button
                     onClick={() => handleAction(isSaleDeal ? confirmHandover : confirmMoveIn)}
                     disabled={processing}
-                    className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
                   </button>
-                  <p className="text-[11px] text-white/25 text-center mt-3">
+                  <p className="text-[11px] text-paper/25 text-center mt-3">
                     {isSaleDeal ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
                   </p>
                 </div>
@@ -703,9 +703,9 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
               {deal.status === 'payment_received' && !deal.agreement_skipped && (isLandlord || isAgent) && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
-                  <Key className="w-8 h-8 text-white/20 mx-auto mb-3" />
-                  <h4 className="text-[14px] font-bold text-white mb-2">Hand Over the Keys</h4>
-                  <p className="text-[13px] text-white/40 leading-relaxed">
+                  <Key className="w-8 h-8 text-paper/20 mx-auto mb-3" />
+                  <h4 className="text-[14px] font-bold text-paper mb-2">Hand Over the Keys</h4>
+                  <p className="text-[13px] text-paper/40 leading-relaxed">
                     Both parties have signed. Please give the tenant access to the property. Funds will be released once they confirm move-in.
                   </p>
                 </div>
@@ -713,14 +713,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
               {/* STEP 6: Admin release funds */}
               {deal.status === 'move_in_confirmed' && (isAdmin || isModerator) && (
-                <div className="p-5 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl">
+                <div className="p-5 bg-gold/6 border border-gold/15 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-9 h-9 bg-[#f0c040]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Shield className="w-4 h-4 text-[#f0c040]" />
+                    <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-4 h-4 text-gold" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white mb-1">Admin: Release Funds</h4>
-                      <p className="text-[12px] text-white/45 leading-relaxed">
+                      <h4 className="text-[14px] font-bold text-paper mb-1">Admin: Release Funds</h4>
+                      <p className="text-[12px] text-paper/45 leading-relaxed">
                         Move-in confirmed by tenant. Verify everything is in order and release funds to the owner.
                       </p>
                     </div>
@@ -728,7 +728,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   <button
                     onClick={() => handleAction(releaseFunds)}
                     disabled={processing}
-                    className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Release Funds'}
                   </button>
@@ -736,10 +736,10 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               )}
 
               {deal.status === 'move_in_confirmed' && !isAdmin && !isModerator && (
-                <div className="p-5 bg-[#1a6b3c]/8 border border-[#1a6b3c]/20 rounded-xl text-center">
-                  <CheckCircle2 className="w-8 h-8 text-[#4ade80] mx-auto mb-3" />
-                  <h4 className="text-[14px] font-bold text-white mb-2">Move-in Confirmed!</h4>
-                  <p className="text-[13px] text-white/40">
+                <div className="p-5 bg-gold/8 border border-gold/20 rounded-xl text-center">
+                  <CheckCircle2 className="w-8 h-8 text-gold mx-auto mb-3" />
+                  <h4 className="text-[14px] font-bold text-paper mb-2">Move-in Confirmed!</h4>
+                  <p className="text-[13px] text-paper/40">
                     Funds are being reviewed for release by our team. This usually takes less than 24 hours.
                   </p>
                 </div>
@@ -748,12 +748,12 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               {/* Completed */}
               {deal.status === 'funds_released' && (
                 <div className="p-8 text-center">
-                  <div className="w-14 h-14 bg-[#1a6b3c] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="w-7 h-7 text-white" />
+                  <div className="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="w-7 h-7 text-paper" />
                   </div>
-                  <h4 className="text-[18px] font-bold text-white mb-2">Transaction Completed!</h4>
-                  <p className="text-[13px] text-white/40 max-w-xs mx-auto">
-                    All funds have been released. The tenancy is finalized. Thank you for using RentEasy!
+                  <h4 className="text-[18px] font-bold text-paper mb-2">Transaction Completed!</h4>
+                  <p className="text-[13px] text-paper/40 max-w-xs mx-auto">
+                    All funds have been released. The tenancy is finalized. Thank you for using Handova!
                   </p>
                 </div>
               )}
@@ -762,13 +762,13 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               {deal.status === 'cancelled' && (
                 <div className="p-8 text-center">
                   <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <X className="w-7 h-7 text-white/40" />
+                    <X className="w-7 h-7 text-paper/40" />
                   </div>
-                  <h4 className="text-[18px] font-bold text-white mb-2">Deal Cancelled</h4>
+                  <h4 className="text-[18px] font-bold text-paper mb-2">Deal Cancelled</h4>
                   {deal.cancellation_reason && (
                     <div className="mt-4 p-4 bg-white/4 border border-white/8 rounded-xl text-left max-w-xs mx-auto">
-                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-1">Reason</p>
-                      <p className="text-[12px] text-white/60 leading-relaxed">{deal.cancellation_reason}</p>
+                      <p className="text-[10px] font-bold text-paper/40 uppercase tracking-wider mb-1">Reason</p>
+                      <p className="text-[12px] text-paper/60 leading-relaxed">{deal.cancellation_reason}</p>
                     </div>
                   )}
                 </div>
@@ -777,17 +777,17 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               {/* Disputed */}
               {deal.status === 'disputed' && (
                 <div className="p-8 text-center">
-                  <div className="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <AlertTriangle className="w-7 h-7 text-red-400" />
+                  <div className="w-14 h-14 bg-danger/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <AlertTriangle className="w-7 h-7 text-danger" />
                   </div>
-                  <h4 className="text-[18px] font-bold text-white mb-2">Under Dispute</h4>
-                  <p className="text-[13px] text-white/40 max-w-xs mx-auto">
+                  <h4 className="text-[18px] font-bold text-paper mb-2">Under Dispute</h4>
+                  <p className="text-[13px] text-paper/40 max-w-xs mx-auto">
                     This transaction has been flagged. Our moderation team is reviewing the case within 3-5 business days.
                   </p>
                   {deal.dispute_reason && (
-                    <div className="mt-4 p-4 bg-red-500/6 border border-red-500/15 rounded-xl text-left max-w-xs mx-auto">
-                      <p className="text-[10px] font-bold text-red-400/70 uppercase tracking-wider mb-1">Reason</p>
-                      <p className="text-[12px] text-white/60 leading-relaxed">{deal.dispute_reason}</p>
+                    <div className="mt-4 p-4 bg-danger/6 border border-danger/15 rounded-xl text-left max-w-xs mx-auto">
+                      <p className="text-[10px] font-bold text-danger/70 uppercase tracking-wider mb-1">Reason</p>
+                      <p className="text-[12px] text-paper/60 leading-relaxed">{deal.dispute_reason}</p>
                     </div>
                   )}
                 </div>
@@ -799,20 +799,20 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
           <div className="space-y-5">
 
             {/* Parties */}
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+            <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <User className="w-4 h-4 text-[#1a6b3c]" />
-                <h3 className="text-[13px] font-bold text-white">Parties Involved</h3>
+                <User className="w-4 h-4 text-gold" />
+                <h3 className="text-[13px] font-bold text-paper">Parties Involved</h3>
               </div>
               <div className="space-y-3">
                 {parties.map((p) => (
                   <div key={p.label} className="flex items-center gap-3 p-3 bg-white/4 rounded-xl">
-                    <div className="w-8 h-8 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-[#1a6b3c] text-[12px] font-bold flex-shrink-0">
+                    <div className="w-8 h-8 bg-gold/20 rounded-xl flex items-center justify-center text-gold text-[12px] font-bold flex-shrink-0">
                       {p.initial}
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/30 uppercase tracking-wider">{p.label}</p>
-                      <p className="text-[12px] font-semibold text-white flex items-center gap-1"><span>{p.name}</span><VerifiedBadge status={p.verification_status} size={12} /></p>
+                      <p className="text-[10px] text-paper/30 uppercase tracking-wider">{p.label}</p>
+                      <p className="text-[12px] font-semibold text-paper flex items-center gap-1"><span>{p.name}</span><VerifiedBadge status={p.verification_status} size={12} /></p>
                     </div>
                   </div>
                 ))}
@@ -838,8 +838,8 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
             {/* Payout breakdown */}
             {(isLandlord || isAgent || isAdmin || isModerator) ? (
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-              <h3 className="text-[13px] font-bold text-white mb-4">Payout Breakdown</h3>
+            <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+              <h3 className="text-[13px] font-bold text-paper mb-4">Payout Breakdown</h3>
               <div className="space-y-2.5">
                 {[
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
@@ -867,10 +867,10 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   },
                 ].map((row) => (
                   <div key={row.label} className="flex items-center justify-between">
-                    <span className={`text-[12px] ${row.highlight ? 'font-bold text-white' : 'text-white/40'}`}>
+                    <span className={`text-[12px] ${row.highlight ? 'font-bold text-paper' : 'text-paper/40'}`}>
                       {row.label}
                     </span>
-                    <span className={`text-[12px] font-bold ${row.highlight ? 'text-[#f0c040]' : 'text-white/60'}`}>
+                    <span className={`text-[12px] font-bold ${row.highlight ? 'text-gold' : 'text-paper/60'}`}>
                       {row.value}
                     </span>
                   </div>
@@ -878,23 +878,23 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               </div>
             </div>
             ) : (
-              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-                <h3 className="text-[13px] font-bold text-white mb-2">Pricing</h3>
-                <p className="text-[12px] text-white/40 leading-relaxed">
-                  The amount shown includes all applicable fees. 
+              <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+                <h3 className="text-[13px] font-bold text-paper mb-2">Pricing</h3>
+                <p className="text-[12px] text-paper/40 leading-relaxed">
+                  The amount shown includes all applicable fees.
                 </p>
               </div>
             )}
 
             {!['agreement_draft', 'pending_payment'].includes(deal.status) && (
-              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-                <h3 className="text-[13px] font-bold text-white mb-2">Receipt</h3>
-                <p className="text-[12px] text-white/40 mb-3 leading-relaxed">
+              <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+                <h3 className="text-[13px] font-bold text-paper mb-2">Receipt</h3>
+                <p className="text-[12px] text-paper/40 mb-3 leading-relaxed">
                   Generate a shareable proof of this transaction.
                 </p>
                 <button
                   onClick={() => setShowReceiptPanel(true)}
-                  className="w-full bg-white/5 text-white/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors"
+                  className="w-full bg-white/5 text-paper/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors"
                 >
                   Generate Receipt
                 </button>
@@ -902,13 +902,13 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
             )}
 
             {/* Activity log */}
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+            <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <History className="w-4 h-4 text-[#1a6b3c]" />
-                <h3 className="text-[13px] font-bold text-white">Activity Log</h3>
+                <History className="w-4 h-4 text-gold" />
+                <h3 className="text-[13px] font-bold text-paper">Activity Log</h3>
               </div>
               {logs.length === 0 ? (
-                <p className="text-[12px] text-white/25 text-center py-4">No activity yet</p>
+                <p className="text-[12px] text-paper/25 text-center py-4">No activity yet</p>
               ) : (
                 <div className="space-y-4">
                   {logs.map((log, i) => (
@@ -917,13 +917,13 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                         <div className="absolute left-3.5 top-7 bottom-0 w-px bg-white/5" />
                       )}
                       <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 z-10">
-                        <Clock className="w-3.5 h-3.5 text-white/25" />
+                        <Clock className="w-3.5 h-3.5 text-paper/25" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-white capitalize">
+                        <p className="text-[12px] font-semibold text-paper capitalize">
                           {log.action.replace(/_/g, ' ')}
                         </p>
-                        <p className="text-[10px] text-white/25">
+                        <p className="text-[10px] text-paper/25">
                           {new Date(log.created_at).toLocaleDateString()} ·{' '}
                           {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
@@ -936,18 +936,18 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
 
             {/* Admin danger zone */}
             {isTenant && deal.status !== 'move_in_confirmed' && deal.status !== 'funds_released' && deal.status !== 'disputed' && deal.status !== 'cancelled' && (
-              <div className="bg-[#0a1f11] border border-red-500/15 rounded-2xl p-5">
-                <h3 className="text-[13px] font-bold text-red-400 mb-3 flex items-center gap-2">
+              <div className="bg-slate/20 border border-danger/15 rounded-2xl p-5">
+                <h3 className="text-[13px] font-bold text-danger mb-3 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" /> Cancel This Deal
                 </h3>
-                <p className="text-[12px] text-white/40 mb-3">
+                <p className="text-[12px] text-paper/40 mb-3">
                   {deal.status === 'agreement_draft' || deal.status === 'pending_payment'
                     ? 'No payment has been made yet — this deal can be cancelled free of charge.'
                     : 'A 5% cancellation fee applies. The rest of your payment will be refunded.'}
                 </p>
                 <button
                   onClick={() => setShowTenantCancelModal(true)}
-                  className="w-full bg-red-500/15 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-[13px] hover:bg-red-500/25 transition-colors"
+                  className="w-full bg-danger/15 text-danger border border-danger/20 py-3 rounded-xl font-bold text-[13px] hover:bg-danger/25 transition-colors"
                 >
                   Cancel Deal
                 </button>
@@ -955,20 +955,20 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
             )}
 
             {isAdmin && deal.status !== 'disputed' && deal.status !== 'funds_released' && (
-              <div className="bg-red-500/6 border border-red-500/15 rounded-2xl p-5">
-                <h3 className="text-[13px] font-bold text-red-400 mb-3 flex items-center gap-2">
+              <div className="bg-danger/6 border border-danger/15 rounded-2xl p-5">
+                <h3 className="text-[13px] font-bold text-danger mb-3 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" /> Danger Zone
                 </h3>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowDisputeModal(true)}
-                    className="flex-1 bg-red-500/15 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-[13px] hover:bg-red-500/25 transition-colors"
+                    className="flex-1 bg-danger/15 text-danger border border-danger/20 py-3 rounded-xl font-bold text-[13px] hover:bg-danger/25 transition-colors"
                   >
                     Mark as Disputed
                   </button>
                   <button
                     onClick={() => setShowCancelModal(true)}
-                    className="flex-1 bg-white/5 text-white/60 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors"
+                    className="flex-1 bg-white/5 text-paper/60 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors"
                   >
                     Cancel Deal
                   </button>
@@ -993,31 +993,31 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
               style={font}
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[16px] font-bold text-white">Request Agreement Changes</h3>
+                <h3 className="text-[16px] font-bold text-paper">Request Agreement Changes</h3>
                 <button
                   onClick={() => setShowChangeModal(false)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-[13px] text-white/45 mb-4 leading-relaxed">
+              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
                 Describe what you would like changed in the agreement. The agent/landlord will upload a revised version.
               </p>
               <textarea
                 value={changeReason}
                 onChange={(e) => setChangeReason(e.target.value)}
                 placeholder="e.g. Clause 3 mentions pets are not allowed but we agreed dogs are permitted..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/40 transition-colors resize-none mb-4"
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/40 transition-colors resize-none mb-4"
               />
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowChangeModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
                 >
                   Cancel
                 </button>
@@ -1029,7 +1029,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     setChangeReason('');
                   }}
                   disabled={!changeReason.trim() || processing}
-                  className="flex-1 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40"
+                  className="flex-1 bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40"
                 >
                   Send Request
                 </button>
@@ -1052,31 +1052,31 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
               style={font}
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[16px] font-bold text-white">Cancel This Deal</h3>
+                <h3 className="text-[16px] font-bold text-paper">Cancel This Deal</h3>
                 <button
                   onClick={() => setShowCancelModal(false)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-[13px] text-white/45 mb-4 leading-relaxed">
+              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
                 This voids the deal and frees the property back up for new deals. Cannot be undone.
               </p>
               <textarea
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
                 placeholder="Reason for cancellation..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none mb-4"
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-danger/40 transition-colors resize-none mb-4"
               />
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowCancelModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
                 >
                   Back
                 </button>
@@ -1086,7 +1086,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     setShowCancelModal(false);
                   }}
                   disabled={!cancelReason || processing}
-                  className="flex-1 bg-red-500 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-600 transition-all disabled:opacity-40"
+                  className="flex-1 bg-danger text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-danger-dark transition-all disabled:opacity-40"
                 >
                   Confirm Cancellation
                 </button>
@@ -1111,19 +1111,19 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 z-40"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
               onClick={() => setShowTenantCancelModal(false)}
             />
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:-translate-x-1/2 md:-translate-y-1/2 bg-[#0a1f11] border border-white/10 rounded-t-3xl md:rounded-3xl p-6 z-50 w-full md:max-w-md"
+              className="fixed bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:-translate-x-1/2 md:-translate-y-1/2 bg-slate/20 border border-white/10 rounded-t-3xl md:rounded-3xl p-6 z-[110] w-full md:max-w-md"
             >
-              <h3 className="text-[16px] font-bold text-white mb-2 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-400" /> Cancel Deal
+              <h3 className="text-[16px] font-bold text-paper mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-danger" /> Cancel Deal
               </h3>
-              <p className="text-[13px] text-white/45 mb-4 leading-relaxed">
+              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
                 {deal.status === 'agreement_draft' || deal.status === 'pending_payment'
                   ? 'No payment has been made on this deal, so this cancellation is free. This cannot be undone.'
                   : 'A 5% cancellation fee will be deducted from your refund. This cannot be undone.'}
@@ -1132,12 +1132,12 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 value={tenantCancelReason}
                 onChange={(e) => setTenantCancelReason(e.target.value)}
                 placeholder="Reason for cancellation..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none mb-4"
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-danger/40 transition-colors resize-none mb-4"
               />
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowTenantCancelModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
                 >
                   Back
                 </button>
@@ -1147,7 +1147,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     setShowTenantCancelModal(false);
                   }}
                   disabled={!tenantCancelReason || processing}
-                  className="flex-1 bg-red-500 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-600 transition-all disabled:opacity-40"
+                  className="flex-1 bg-danger text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-danger-dark transition-all disabled:opacity-40"
                 >
                   Confirm Cancellation
                 </button>
@@ -1170,31 +1170,31 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
               style={font}
             >
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[16px] font-bold text-white">Flag Transaction</h3>
+                <h3 className="text-[16px] font-bold text-paper">Flag Transaction</h3>
                 <button
                   onClick={() => setShowDisputeModal(false)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-[13px] text-white/45 mb-4 leading-relaxed">
+              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
                 Provide a reason for marking this as disputed. This will freeze all funds immediately.
               </p>
               <textarea
                 value={disputeReason}
                 onChange={(e) => setDisputeReason(e.target.value)}
                 placeholder="Reason for dispute..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none mb-4"
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-danger/40 transition-colors resize-none mb-4"
               />
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDisputeModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
                 >
                   Cancel
                 </button>
@@ -1204,7 +1204,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     setShowDisputeModal(false);
                   }}
                   disabled={!disputeReason || processing}
-                  className="flex-1 bg-red-500 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-600 transition-colors disabled:opacity-40"
+                  className="flex-1 bg-danger text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-danger-dark transition-colors disabled:opacity-40"
                 >
                   Confirm Dispute
                 </button>
