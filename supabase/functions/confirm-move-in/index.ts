@@ -100,7 +100,7 @@ serve(async (req) => {
       deal,
       'Move-in Confirmed',
       `The tenant has confirmed move-in for ${deal.properties.title}. Funds will be released soon.`,
-      `/dashboard/deals/${dealId}`,
+      `/deals/${dealId}`,
       'deal_state_change'
     );
 

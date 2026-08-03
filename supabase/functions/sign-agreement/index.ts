@@ -113,7 +113,7 @@ serve(async (req) => {
         deal,
         'Agreement Fully Signed',
         `Agreement for ${deal.properties.title} is fully signed. Move-in can now be scheduled.`,
-        `/dashboard/deals/${dealId}`,
+        `/deals/${dealId}`,
         'deal_state_change'
       );
     } else {
@@ -126,7 +126,7 @@ serve(async (req) => {
             user_id: targetId,
             title: 'Agreement Signed',
             body: `${isTenantSide ? 'Tenant' : 'Landlord'} side has signed the agreement for ${deal.properties.title}.`,
-            link: `/dashboard/deals/${dealId}`,
+            link: `/deals/${dealId}`,
             type: 'deal_state_change',
           }),
         });
@@ -138,7 +138,7 @@ serve(async (req) => {
               user_id: deal.agent_id,
               title: 'Agreement Signed',
               body: `${isTenantSide ? 'Tenant' : 'Landlord'} side has signed the agreement for ${deal.properties.title}.`,
-              link: `/dashboard/deals/${dealId}`,
+              link: `/deals/${dealId}`,
               type: 'deal_state_change',
             }),
           });

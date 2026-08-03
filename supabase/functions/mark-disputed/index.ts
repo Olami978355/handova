@@ -59,7 +59,7 @@ serve(async (req) => {
       deal,
       'Deal Disputed',
       `The deal for ${deal.properties.title} has been marked as disputed. Our support team will contact you.`,
-      `/dashboard/deals/${dealId}`,
+      `/deals/${dealId}`,
       'deal_state_change'
     );
     await sendDealStatusEmails(

@@ -89,7 +89,7 @@ serve(async (req) => {
       deal,
       'Handover Confirmed',
       `The buyer has confirmed handover for ${deal.properties.title}. Funds will be released soon.`,
-      `/dashboard/deals/${dealId}`,
+      `/deals/${dealId}`,
       'deal_state_change'
     );
 

@@ -70,7 +70,7 @@ async function handleTransferEvent(body: any, supabase: ReturnType<typeof create
       deal,
       'Payout Sent',
       `Your payout for ${deal.properties.title} has been sent to your bank account.`,
-      `/dashboard/deals/${deal.id}`,
+      `/deals/${deal.id}`,
       'deal_state_change'
     );
   } else {
@@ -79,7 +79,7 @@ async function handleTransferEvent(body: any, supabase: ReturnType<typeof create
       deal,
       'Payout Failed',
       `The payout for ${deal.properties.title} could not be completed. Our team has been notified.`,
-      `/dashboard/deals/${deal.id}`,
+      `/deals/${deal.id}`,
       'deal_state_change'
     );
   }
@@ -228,7 +228,7 @@ serve(async (req) => {
       deal,
       'Payment Received',
       `Payment of ₦${amountNaira.toLocaleString()} for ${deal.properties.title} has been confirmed.`,
-      `/dashboard/deals/${dealId}`,
+      `/deals/${dealId}`,
       'deal_state_change'
     );
 
@@ -238,7 +238,7 @@ serve(async (req) => {
         propertyTitle: deal.properties.title,
         status: 'Payment Received',
         message: `Your payment of ₦${amountNaira.toLocaleString()} has been confirmed. The funds are now held in escrow.`,
-        link: `https://renteasy.ng/dashboard/deals/${dealId}`,
+        link: `https://renteasy.ng/deals/${dealId}`,
       });
     }
 

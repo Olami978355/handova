@@ -95,7 +95,7 @@ serve(async (req) => {
           user_id: deal.tenant_id,
           title: 'Tenancy Agreement Ready',
           body: `Your tenancy agreement for ${deal.properties.title} is ready for review. Please review and sign.`,
-          link: `/dashboard/deals/${dealId}`,
+          link: `/deals/${dealId}`,
           type: 'deal_state_change',
         }),
       });
@@ -111,7 +111,7 @@ serve(async (req) => {
             user_id: deal.agent_id,
             title: 'Agreement Uploaded',
             body: `The tenancy agreement for ${deal.properties.title} has been uploaded.`,
-            link: `/dashboard/deals/${dealId}`,
+            link: `/deals/${dealId}`,
             type: 'deal_state_change',
           }),
         });

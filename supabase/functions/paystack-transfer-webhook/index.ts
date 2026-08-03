@@ -100,7 +100,7 @@ serve(async (req) => {
         deal,
         'Payout Sent',
         `Your payout for ${deal.properties.title} has been sent to your bank account.`,
-        `/dashboard/deals/${deal.id}`,
+        `/deals/${deal.id}`,
         'deal_state_change'
       );
     } else {
@@ -110,7 +110,7 @@ serve(async (req) => {
         deal,
         'Payout Failed',
         `The payout for ${deal.properties.title} could not be completed. Our team has been notified.`,
-        `/dashboard/deals/${deal.id}`,
+        `/deals/${deal.id}`,
         'deal_state_change'
       );
     }

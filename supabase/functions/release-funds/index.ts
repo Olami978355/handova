@@ -77,7 +77,7 @@ serve(async (req) => {
       deal,
       'Funds Released',
       `Funds for ${deal.properties.title} have been released to the landlord and agent.`,
-      `/dashboard/deals/${dealId}`,
+      `/deals/${dealId}`,
       'deal_state_change'
     );
     await sendDealStatusEmails(

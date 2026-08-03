@@ -200,7 +200,7 @@ serve(async (req) => {
           user_id: deal.tenant_id,
           title: isSale ? 'Contract of Sale Ready' : 'Tenancy Agreement Ready',
           body: `Your ${isSale ? 'contract' : 'agreement'} for ${property.title} is ready for review. Please review and sign.`,
-          link: `/dashboard/deals/${dealId}`,
+          link: `/deals/${dealId}`,
           type: 'deal_state_change',
         }),
       });
