@@ -543,7 +543,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                         <p className="text-[12px] text-gold/70">{deal.notes}</p>
                         <button
                           onClick={() => fileInputRef.current?.click()}
-                          className="mt-3 flex items-center gap-2 text-[12px] font-bold text-gold hover:text-[#e0b030] transition-colors"
+                          className="mt-3 flex items-center gap-2 text-[12px] font-bold text-gold hover:text-gold-dark transition-colors"
                         >
                           <Upload className="w-3.5 h-3.5" /> Upload Revised Agreement
                         </button>
@@ -692,14 +692,17 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
                   </button>
                   <p className="text-[11px] text-paper/25 text-center mt-3">
-                    {isSaleDeal ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
+                    <AlertTriangle className="w-3 h-3 flex-shrink-0 inline mr-1.5 -mt-0.5" />
+                    {isSaleDeal ? 'Only confirm after you have received the property. This action cannot be undone.' : 'Only confirm after you have received the keys. This action cannot be undone.'}
                   </p>
                 </div>
               )}
 
               {deal.status === 'payment_received' && deal.agreement_skipped && (isLandlord || isAgent) && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
-                  <Key className="w-8 h-8 text-paper/20 mx-auto mb-3" />
+                  <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Key className="w-6 h-6 text-paper/30" />
+                  </div>
                   <h4 className="text-[14px] font-bold text-paper mb-2">Hand Over the Keys</h4>
                   <p className="text-[13px] text-paper/40 leading-relaxed">
                     Payment received in escrow. No written agreement was required for this deal. Please give the tenant access to the property — funds will be released once they confirm move-in.
@@ -783,14 +786,17 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
                   </button>
                   <p className="text-[11px] text-paper/25 text-center mt-3">
-                    {isSaleDeal ? '⚠️ Only confirm after you have received the property. This action cannot be undone.' : '⚠️ Only confirm after you have received the keys. This action cannot be undone.'}
+                    <AlertTriangle className="w-3 h-3 flex-shrink-0 inline mr-1.5 -mt-0.5" />
+                    {isSaleDeal ? 'Only confirm after you have received the property. This action cannot be undone.' : 'Only confirm after you have received the keys. This action cannot be undone.'}
                   </p>
                 </div>
               )}
 
               {deal.status === 'payment_received' && !deal.agreement_skipped && (isLandlord || isAgent) && (
                 <div className="p-5 bg-white/4 border border-white/8 rounded-xl text-center">
-                  <Key className="w-8 h-8 text-paper/20 mx-auto mb-3" />
+                  <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Key className="w-6 h-6 text-paper/30" />
+                  </div>
                   <h4 className="text-[14px] font-bold text-paper mb-2">Hand Over the Keys</h4>
                   <p className="text-[13px] text-paper/40 leading-relaxed">
                     Both parties have signed. Please give the tenant access to the property. Funds will be released once they confirm move-in.
