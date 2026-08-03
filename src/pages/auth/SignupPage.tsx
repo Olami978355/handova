@@ -181,7 +181,6 @@ export default function SignupPage() {
   const roles = [
     { role: 'As a Tenant', desc: 'Find verified properties and pay rent safely via escrow', icon: Key },
     { role: 'As a Landlord', desc: 'List your property and receive guaranteed payments', icon: Home },
-    { role: 'As an Agent', desc: 'Set your own commission on every deal you close', icon: Handshake },
   ];
 
   if (success) {
