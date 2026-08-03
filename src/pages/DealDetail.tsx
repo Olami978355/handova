@@ -1067,121 +1067,46 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
       </div>
 
 
-      {/* Request Changes Modal */}
-      <AnimatePresence>
-        {showChangeModal && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowChangeModal(false)}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
-              style={font}
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[16px] font-bold text-paper">Request Agreement Changes</h3>
-                <button
-                  onClick={() => setShowChangeModal(false)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
-                Describe what you would like changed in the agreement. The agent/landlord will upload a revised version.
-              </p>
-              <textarea
-                value={changeReason}
-                onChange={(e) => setChangeReason(e.target.value)}
-                placeholder="e.g. Clause 3 mentions pets are not allowed but we agreed dogs are permitted..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/40 transition-colors resize-none mb-4"
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowChangeModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={async () => {
-                    if (!changeReason.trim()) return;
-                    await handleAction(() => requestAgreementChanges(changeReason));
-                    setShowChangeModal(false);
-                    setChangeReason('');
-                  }}
-                  disabled={!changeReason.trim() || processing}
-                  className="flex-1 bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40"
-                >
-                  Send Request
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        open={showChangeModal}
+        onClose={() => setShowChangeModal(false)}
+        title="Request agreement changes"
+        description="Describe what you would like changed in the agreement. The agent/landlord will upload a revised version."
+        showTextarea
+        textareaValue={changeReason}
+        onTextareaChange={setChangeReason}
+        textareaPlaceholder="e.g. Clause 3 mentions pets are not allowed but we agreed dogs are permitted..."
+        confirmLabel="Send request"
+        confirmDisabled={!changeReason.trim()}
+        processing={processing}
+        tone="gold"
+        onConfirm={async () => {
+          if (!changeReason.trim()) return;
+          await handleAction(() => requestAgreementChanges(changeReason));
+          setShowChangeModal(false);
+          setChangeReason('');
+        }}
+      />
 
-      {/* Cancel Deal Modal */}
-      <AnimatePresence>
-        {showCancelModal && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowCancelModal(false)}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
-              style={font}
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[16px] font-bold text-paper">Cancel This Deal</h3>
-                <button
-                  onClick={() => setShowCancelModal(false)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
-                This voids the deal and frees the property back up for new deals. Cannot be undone.
-              </p>
-              <textarea
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                placeholder="Reason for cancellation..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-danger/40 transition-colors resize-none mb-4"
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowCancelModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={() => {
-                    handleAction(() => cancelDeal(cancelReason));
-                    setShowCancelModal(false);
-                  }}
-                  disabled={!cancelReason || processing}
-                  className="flex-1 bg-danger text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-danger-dark transition-all disabled:opacity-40"
-                >
-                  Confirm Cancellation
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        open={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title="Cancel this deal"
+        description="This voids the deal and frees the property back up for new deals. Cannot be undone."
+        showTextarea
+        textareaValue={cancelReason}
+        onTextareaChange={setCancelReason}
+        textareaPlaceholder="Reason for cancellation..."
+        cancelLabel="Back"
+        confirmLabel="Confirm cancellation"
+        confirmDisabled={!cancelReason}
+        processing={processing}
+        tone="danger"
+        onConfirm={() => {
+          handleAction(() => cancelDeal(cancelReason));
+          setShowCancelModal(false);
+        }}
+      />
 
       {/* Receipt Panel */}
       <AnimatePresence>
@@ -1190,116 +1115,48 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
         )}
       </AnimatePresence>
 
-      {/* Tenant Cancel Modal */}
-      <AnimatePresence>
-        {showTenantCancelModal && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
-              onClick={() => setShowTenantCancelModal(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:-translate-x-1/2 md:-translate-y-1/2 bg-slate/20 border border-white/10 rounded-t-3xl md:rounded-3xl p-6 z-[110] w-full md:max-w-md"
-            >
-              <h3 className="text-[16px] font-bold text-paper mb-2 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-danger" /> Cancel Deal
-              </h3>
-              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
-                {deal.status === 'agreement_draft' || deal.status === 'pending_payment'
-                  ? 'No payment has been made on this deal, so this cancellation is free. This cannot be undone.'
-                  : 'A 5% cancellation fee will be deducted from your refund. This cannot be undone.'}
-              </p>
-              <textarea
-                value={tenantCancelReason}
-                onChange={(e) => setTenantCancelReason(e.target.value)}
-                placeholder="Reason for cancellation..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-danger/40 transition-colors resize-none mb-4"
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowTenantCancelModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={() => {
-                    handleAction(() => cancelDealAsTenant(tenantCancelReason));
-                    setShowTenantCancelModal(false);
-                  }}
-                  disabled={!tenantCancelReason || processing}
-                  className="flex-1 bg-danger text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-danger-dark transition-all disabled:opacity-40"
-                >
-                  Confirm Cancellation
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        open={showTenantCancelModal}
+        onClose={() => setShowTenantCancelModal(false)}
+        title="Cancel deal"
+        description={
+          deal.status === 'agreement_draft' || deal.status === 'pending_payment'
+            ? 'No payment has been made on this deal, so this cancellation is free. This cannot be undone.'
+            : 'A 5% cancellation fee will be deducted from your refund. This cannot be undone.'
+        }
+        showTextarea
+        textareaValue={tenantCancelReason}
+        onTextareaChange={setTenantCancelReason}
+        textareaPlaceholder="Reason for cancellation..."
+        cancelLabel="Back"
+        confirmLabel="Confirm cancellation"
+        confirmDisabled={!tenantCancelReason}
+        processing={processing}
+        tone="danger"
+        onConfirm={() => {
+          handleAction(() => cancelDealAsTenant(tenantCancelReason));
+          setShowTenantCancelModal(false);
+        }}
+      />
 
-      {/* Dispute Modal */}
-      <AnimatePresence>
-        {showDisputeModal && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowDisputeModal(false)}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
-              style={font}
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[16px] font-bold text-paper">Flag Transaction</h3>
-                <button
-                  onClick={() => setShowDisputeModal(false)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-[13px] text-paper/45 mb-4 leading-relaxed">
-                Provide a reason for marking this as disputed. This will freeze all funds immediately.
-              </p>
-              <textarea
-                value={disputeReason}
-                onChange={(e) => setDisputeReason(e.target.value)}
-                placeholder="Reason for dispute..."
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-danger/40 transition-colors resize-none mb-4"
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowDisputeModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    handleAction(() => markDisputed(disputeReason));
-                    setShowDisputeModal(false);
-                  }}
-                  disabled={!disputeReason || processing}
-                  className="flex-1 bg-danger text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-danger-dark transition-colors disabled:opacity-40"
-                >
-                  Confirm Dispute
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        open={showDisputeModal}
+        onClose={() => setShowDisputeModal(false)}
+        title="Flag transaction"
+        description="Provide a reason for marking this as disputed. This will freeze all funds immediately."
+        showTextarea
+        textareaValue={disputeReason}
+        onTextareaChange={setDisputeReason}
+        textareaPlaceholder="Reason for dispute..."
+        confirmLabel="Confirm dispute"
+        confirmDisabled={!disputeReason}
+        processing={processing}
+        tone="danger"
+        onConfirm={() => {
+          handleAction(() => markDisputed(disputeReason));
+          setShowDisputeModal(false);
+        }}
+      />
     </div>
   );
 }
