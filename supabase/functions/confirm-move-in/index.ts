@@ -25,7 +25,9 @@ serve(async (req) => {
 
     if (dealError || !deal) throw new Error('Deal not found');
 
-    // 2.1 Verify deal status — normally requires agreement_signed, but if the
+    // 2.1 Verify deal status — normally requires payment_received with both
+    // signatures already on file (agreement is signed before payment in this
+    // flow), but if the
     // landlord/agent chose to skip the tenancy agreement entirely, the deal
     // goes straight from payment_received to move-in confirmation instead.
     const skippedAgreement = deal.agreement_skipped === true;
