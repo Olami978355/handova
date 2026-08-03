@@ -3,6 +3,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { ListingFormData } from '../../../hooks/useListingForm';
 import { AMENITIES } from '../../../constants';
 import { AlertCircle } from 'lucide-react';
+import { Select } from '../../ui/Select';
 
 interface StepProps {
   form: UseFormReturn<ListingFormData>;
@@ -14,6 +15,10 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
   const transactionType = watch('transaction_type');
   const selectedAmenities = watch('amenities') || [];
   const houseRules = watch('house_rules') || '';
+  const category = watch('category') || '';
+  const landTitle = watch('land_title') || '';
+  const landSizeUnit = watch('land_size_unit') || 'sqm';
+  const minRentalDuration = watch('min_rental_duration') || '';
 
   const houseCategories = [
     'Apartment / Flat', 'Duplex', 'Bungalow', 'Terraced House',
@@ -40,17 +45,10 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
   };
 
   const inputClass = (hasError?: boolean) =>
-    `w-full px-4 py-3.5 bg-white/5 border rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none transition-colors ${
+    `w-full px-4 py-3.5 bg-white/5 border rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none transition-colors ${
       hasError
-        ? 'border-red-500/40 focus:border-red-500/60'
-        : 'border-white/10 focus:border-[#1a6b3c]'
-    }`;
-
-  const selectClass = (hasError?: boolean) =>
-    `w-full px-4 py-3.5 bg-[#0a1f11] border rounded-xl text-[14px] text-white focus:outline-none transition-colors appearance-none cursor-pointer ${
-      hasError
-        ? 'border-red-500/40 focus:border-red-500/60'
-        : 'border-white/10 focus:border-[#1a6b3c]'
+        ? 'border-danger/40 focus:border-danger/60'
+        : 'border-white/10 focus:border-gold'
     }`;
 
   return (
@@ -58,23 +56,21 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
       className="space-y-6"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      {/* Header */}
       <div className="text-center">
-        <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">
+        <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">
           Step 2 of 6
         </div>
-        <h2 className="text-[22px] font-black text-white tracking-tight mb-2">
+        <h2 className="font-serif text-[24px] font-semibold text-paper tracking-tight mb-2">
           Basic Details
         </h2>
-        <p className="text-[13px] text-white/45">
+        <p className="text-[13px] text-paper/45">
           Tell us more about the {listingType === 'house' ? 'property' : 'land'}
         </p>
       </div>
 
-      {/* Title */}
       <div>
-        <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
-          Listing Title <span className="text-red-400">*</span>
+        <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
+          Listing Title <span className="text-danger">*</span>
         </label>
         <input
           {...register('title')}
@@ -82,29 +78,26 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
           className={inputClass(!!errors.title)}
         />
         {errors.title && (
-          <p className="flex items-center gap-1.5 text-[11px] text-red-400 mt-1.5">
+          <p className="flex items-center gap-1.5 text-[11px] text-danger mt-1.5">
             <AlertCircle className="w-3 h-3" /> {errors.title.message}
           </p>
         )}
       </div>
 
-      {/* Category + bedrooms/bathrooms or land title */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
-            Category <span className="text-red-400">*</span>
+          <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
+            Category <span className="text-danger">*</span>
           </label>
-          <select
-            {...register('category')}
-            className={selectClass(!!errors.category)}
-          >
-            <option value="" className="bg-[#0a1f11]">Select category</option>
-            {(listingType === 'house' ? houseCategories : landCategories).map(cat => (
-              <option key={cat} value={cat} className="bg-[#0a1f11]">{cat}</option>
-            ))}
-          </select>
+          <Select
+            value={category}
+            onChange={(v) => setValue('category', v, { shouldValidate: true })}
+            placeholder="Select category"
+            hasError={!!errors.category}
+            options={(listingType === 'house' ? houseCategories : landCategories).map(cat => ({ value: cat, label: cat }))}
+          />
           {errors.category && (
-            <p className="flex items-center gap-1.5 text-[11px] text-red-400 mt-1.5">
+            <p className="flex items-center gap-1.5 text-[11px] text-danger mt-1.5">
               <AlertCircle className="w-3 h-3" /> {errors.category.message}
             </p>
           )}
@@ -113,7 +106,7 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
         {listingType === 'house' ? (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+              <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                 Bedrooms
               </label>
               <input
@@ -125,7 +118,7 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
               />
             </div>
             <div>
-              <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+              <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                 Bathrooms
               </label>
               <input
@@ -139,24 +132,23 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
           </div>
         ) : (
           <div>
-            <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+            <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
               Land Title
             </label>
-            <select {...register('land_title')} className={selectClass()}>
-              <option value="" className="bg-[#0a1f11]">Select title type</option>
-              {landTitles.map(t => (
-                <option key={t} value={t} className="bg-[#0a1f11]">{t}</option>
-              ))}
-            </select>
+            <Select
+              value={landTitle}
+              onChange={(v) => setValue('land_title', v as "C of O" | "Deed of Assignment" | "Governor's Consent" | "Gazette" | "Freehold")}
+              placeholder="Select title type"
+              options={landTitles.map(t => ({ value: t, label: t }))}
+            />
           </div>
         )}
       </div>
 
-      {/* Land size */}
       {listingType === 'land' && (
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+            <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
               Land Size
             </label>
             <input
@@ -168,22 +160,25 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
             />
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+            <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
               Unit
             </label>
-            <select {...register('land_size_unit')} className={selectClass()}>
-              <option value="sqm" className="bg-[#0a1f11]">Square Metres (sqm)</option>
-              <option value="plots" className="bg-[#0a1f11]">Plots</option>
-              <option value="acres" className="bg-[#0a1f11]">Acres</option>
-            </select>
+            <Select
+              value={landSizeUnit}
+              onChange={(v) => setValue('land_size_unit', v as 'sqm' | 'plots' | 'acres')}
+              options={[
+                { value: 'sqm', label: 'Square Metres (sqm)' },
+                { value: 'plots', label: 'Plots' },
+                { value: 'acres', label: 'Acres' },
+              ]}
+            />
           </div>
         </div>
       )}
 
-      {/* Description */}
       <div>
-        <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
-          Description <span className="text-red-400">*</span>
+        <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
+          Description <span className="text-danger">*</span>
         </label>
         <textarea
           {...register('description')}
@@ -192,32 +187,34 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
           className={`${inputClass(!!errors.description)} resize-none`}
         />
         {errors.description && (
-          <p className="flex items-center gap-1.5 text-[11px] text-red-400 mt-1.5">
+          <p className="flex items-center gap-1.5 text-[11px] text-danger mt-1.5">
             <AlertCircle className="w-3 h-3" /> {errors.description.message}
           </p>
         )}
       </div>
 
-      {/* Min rental duration */}
       {transactionType === 'rent' && (
         <div>
-          <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+          <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
             Minimum Rental Duration
           </label>
-          <select {...register('min_rental_duration')} className={selectClass()}>
-            <option value="" className="bg-[#0a1f11]">Select duration</option>
-            <option value="6 months" className="bg-[#0a1f11]">6 Months</option>
-            <option value="1 year" className="bg-[#0a1f11]">1 Year</option>
-            <option value="2 years" className="bg-[#0a1f11]">2 Years</option>
-            <option value="Flexible" className="bg-[#0a1f11]">Flexible</option>
-          </select>
+          <Select
+            value={minRentalDuration}
+            onChange={(v) => setValue('min_rental_duration', v)}
+            placeholder="Select duration"
+            options={[
+              { value: '6 months', label: '6 Months' },
+              { value: '1 year', label: '1 Year' },
+              { value: '2 years', label: '2 Years' },
+              { value: 'Flexible', label: 'Flexible' },
+            ]}
+          />
         </div>
       )}
 
-      {/* House rules */}
       <div>
-        <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
-          House Rules <span className="text-white/20 font-normal normal-case">(optional)</span>
+        <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
+          House Rules <span className="text-paper/20 font-normal normal-case">(optional)</span>
         </label>
         <textarea
           {...register('house_rules')}
@@ -227,15 +224,14 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
           className={`${inputClass()} resize-none`}
         />
         <div className="flex justify-end mt-1">
-          <span className="text-[11px] text-white/25">{houseRules.length}/500</span>
+          <span className="text-[11px] text-paper/25">{houseRules.length}/500</span>
         </div>
       </div>
 
-      {/* Amenities */}
       {listingType === 'house' && (
         <div>
-          <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-3">
-            Amenities <span className="text-white/20 font-normal normal-case">(select all that apply)</span>
+          <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-3">
+            Amenities <span className="text-paper/20 font-normal normal-case">(select all that apply)</span>
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {AMENITIES.map(amenity => {
@@ -247,16 +243,16 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
                   onClick={() => toggleAmenity(amenity)}
                   className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-[12px] font-semibold transition-all ${
                     selected
-                      ? 'bg-[#1a6b3c]/20 border-[#1a6b3c]/40 text-[#4ade80]'
-                      : 'bg-white/4 border-white/8 text-white/50 hover:bg-white/6 hover:text-white/70'
+                      ? 'bg-gold/12 border-gold/35 text-gold'
+                      : 'bg-white/4 border-white/8 text-paper/50 hover:bg-white/6 hover:text-paper/70'
                   }`}
                 >
                   <div className={`w-4 h-4 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                    selected ? 'bg-[#1a6b3c] border-[#1a6b3c]' : 'border-white/20'
+                    selected ? 'bg-gold border-gold' : 'border-white/20'
                   }`}>
                     {selected && (
                       <svg width="8" height="6" viewBox="0 0 10 8" fill="none">
-                        <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M1 4L3.5 6.5L9 1" stroke="#0B0D10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
                   </div>
@@ -266,7 +262,7 @@ export const Step2_BasicDetails: React.FC<StepProps> = ({ form }) => {
             })}
           </div>
           {selectedAmenities.length > 0 && (
-            <p className="text-[11px] text-white/35 mt-2">
+            <p className="text-[11px] text-paper/35 mt-2">
               {selectedAmenities.length} amenit{selectedAmenities.length === 1 ? 'y' : 'ies'} selected
             </p>
           )}

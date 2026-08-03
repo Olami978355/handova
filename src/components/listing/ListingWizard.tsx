@@ -41,11 +41,9 @@ export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId })
       {/* Step progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between relative">
-          {/* Progress line background */}
           <div className="absolute top-4 left-0 right-0 h-px bg-white/8 z-0" />
-          {/* Progress line filled */}
           <div
-            className="absolute top-4 left-0 h-px bg-[#1a6b3c] z-0 transition-all duration-500"
+            className="absolute top-4 left-0 h-px bg-gold z-0 transition-all duration-500"
             style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
           />
 
@@ -56,15 +54,15 @@ export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId })
               <div key={s.id} className="flex flex-col items-center gap-2 z-10">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-all ${
                   done
-                    ? 'bg-[#1a6b3c] text-white'
+                    ? 'bg-gold text-ink'
                     : active
-                    ? 'bg-[#f0c040] text-black'
-                    : 'bg-[#0a1f11] border border-white/15 text-white/30'
+                    ? 'bg-ink border-2 border-gold text-gold'
+                    : 'bg-ink border border-white/15 text-paper/30'
                 }`}>
                   {done ? <Check className="w-4 h-4" /> : s.id}
                 </div>
                 <span className={`text-[10px] font-semibold uppercase tracking-wider hidden sm:block ${
-                  active ? 'text-[#f0c040]' : done ? 'text-white/50' : 'text-white/25'
+                  active ? 'text-gold' : done ? 'text-paper/50' : 'text-paper/25'
                 }`}>
                   {s.title}
                 </span>
@@ -75,7 +73,7 @@ export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId })
       </div>
 
       {/* Form card */}
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+      <div className="bg-slate/25 border border-white/6 rounded-2xl overflow-hidden">
         <div className="p-5 lg:p-8 min-h-[480px]">
           <AnimatePresence mode="wait">
             <motion.div
@@ -98,8 +96,8 @@ export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId })
             disabled={step === 1 || isSubmitting}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-semibold transition-all ${
               step === 1
-                ? 'text-white/20 cursor-not-allowed'
-                : 'text-white/55 hover:bg-white/5 hover:text-white'
+                ? 'text-paper/20 cursor-not-allowed'
+                : 'text-paper/55 hover:bg-white/5 hover:text-paper'
             }`}
           >
             <ChevronLeft className="w-4 h-4" />
@@ -110,7 +108,7 @@ export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId })
             <button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 bg-[#f0c040] text-black px-8 py-2.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors active:scale-95"
+              className="flex items-center gap-2 bg-gold text-ink px-8 py-2.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors active:scale-95"
             >
               Continue
               <ChevronRight className="w-4 h-4" />
@@ -120,7 +118,7 @@ export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId })
               type="button"
               onClick={onSubmit}
               disabled={isSubmitting}
-              className="flex items-center gap-2 bg-[#1a6b3c] text-white px-8 py-2.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-gold text-ink px-8 py-2.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
@@ -140,7 +138,7 @@ export const ListingWizard: React.FC<{ propertyId?: string }> = ({ propertyId })
 
       {/* Draft note */}
       {!propertyId && (
-      <p className="text-[11px] text-white/20 text-center mt-4">
+      <p className="text-[11px] text-paper/20 text-center mt-4">
         Your progress is saved automatically as you go
       </p>
       )}

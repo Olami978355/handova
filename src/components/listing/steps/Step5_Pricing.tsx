@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ListingFormData } from '../../../hooks/useListingForm';
-import { AlertCircle, Shield, Calendar, Tag, Repeat, FileText } from 'lucide-react';
+import { AlertCircle, Shield, Calendar, Tag, Repeat, FileText, ChevronDown } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
 
 interface StepProps {
   form: UseFormReturn<ListingFormData>;
@@ -14,11 +15,13 @@ const formatNaira = (amount: number) =>
 
 export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
   const { register, watch, setValue, formState: { errors } } = form;
+  const { profile } = useAuth();
+  const isAgent = profile?.role === 'agent';
   const transactionType = watch('transaction_type');
   const listingType = watch('listing_type');
   const price = watch('price');
   const pricePeriod = watch('price_period');
-  const cautionFee = watch('caution_fee');
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
   const periods = [
     { id: 'yearly', label: 'Yearly', icon: Calendar },
@@ -34,60 +37,58 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
     return pricePeriod ? map[pricePeriod] || '' : '';
   };
 
-  const inspectionFee = price
-    ? Math.min(Math.max(price * 0.01, 2000), 15000)
-    : null;
-
-  const platformFee = price ? price * 0.02 : null;
+  const platformFeeAmount = price ? price * 0.02 : 0;
+  const agentCommissionAmount = price ? price * 0.10 : 0;
+  const landlordReceives = price
+    ? price - platformFeeAmount - (isAgent ? agentCommissionAmount : 0)
+    : 0;
+  const escrowFee = price ? Math.min(price * 0.015 + 100, 2000) : 0;
 
   return (
     <div
       className="space-y-6"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      {/* Header */}
       <div className="text-center">
-        <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">
+        <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">
           Step 5 of 6
         </div>
-        <h2 className="text-[22px] font-black text-white tracking-tight mb-2">
+        <h2 className="font-serif text-[24px] font-semibold text-paper tracking-tight mb-2">
           Pricing
         </h2>
-        <p className="text-[13px] text-white/45">
+        <p className="text-[13px] text-paper/45">
           Set a competitive price for your {listingType === 'house' ? 'property' : 'land'}
         </p>
       </div>
 
-      {/* Price input */}
       <div>
-        <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
-          Price (₦) <span className="text-red-400">*</span>
+        <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
+          Price (₦) <span className="text-danger">*</span>
         </label>
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-[18px] font-bold pointer-events-none">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-paper/30 text-[18px] font-bold pointer-events-none">
             ₦
           </span>
           <input
             type="number"
             {...register('price', { valueAsNumber: true })}
             placeholder="e.g. 1500000"
-            className={`w-full pl-10 pr-4 py-4 bg-white/5 border rounded-xl text-[18px] font-bold text-white placeholder:text-white/20 focus:outline-none transition-colors ${
-              errors.price ? 'border-red-500/40' : 'border-white/10 focus:border-[#1a6b3c]'
+            className={`w-full pl-10 pr-4 py-4 bg-white/5 border rounded-xl text-[18px] font-bold text-paper tabular-nums placeholder:text-paper/20 focus:outline-none transition-colors ${
+              errors.price ? 'border-danger/40' : 'border-white/10 focus:border-gold'
             }`}
           />
         </div>
         {errors.price && (
-          <p className="flex items-center gap-1.5 text-[11px] text-red-400 mt-1.5">
+          <p className="flex items-center gap-1.5 text-[11px] text-danger mt-1.5">
             <AlertCircle className="w-3 h-3" /> {errors.price.message}
           </p>
         )}
       </div>
 
-      {/* Period selector for rent */}
       {transactionType === 'rent' && (
         <div>
-          <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-3">
-            Price Period <span className="text-red-400">*</span>
+          <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-3">
+            Price Period <span className="text-danger">*</span>
           </label>
           <div className="grid grid-cols-3 gap-3">
             {periods.map(({ id, label, icon: Icon }) => {
@@ -99,12 +100,12 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
                   onClick={() => setValue('price_period', id as 'yearly' | 'monthly' | 'nightly')}
                   className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all ${
                     active
-                      ? 'bg-[#0a1f11] border-[#f0c040]/40'
+                      ? 'bg-ink border-gold/40'
                       : 'bg-white/4 border-white/8 hover:border-white/15'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${active ? 'text-[#f0c040]' : 'text-white/30'}`} />
-                  <span className={`text-[13px] font-bold ${active ? 'text-white' : 'text-white/50'}`}>
+                  <Icon className={`w-5 h-5 ${active ? 'text-gold' : 'text-paper/30'}`} />
+                  <span className={`text-[13px] font-bold ${active ? 'text-paper' : 'text-paper/50'}`}>
                     {label}
                   </span>
                 </button>
@@ -116,149 +117,102 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
 
       {transactionType === 'rent' && (
         <div>
-          <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
-            Caution / Security Deposit (₦) <span className="text-white/25 normal-case">(optional)</span>
+          <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
+            Caution / Security Deposit (₦) <span className="text-paper/25 normal-case">(optional)</span>
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-[16px] font-bold pointer-events-none">₦</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-paper/30 text-[16px] font-bold pointer-events-none">₦</span>
             <input
               type="number"
               {...register('caution_fee', { valueAsNumber: true })}
               placeholder="e.g. 100000"
-              className="w-full pl-10 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[15px] font-semibold text-white placeholder:text-white/20 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+              className="w-full pl-10 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[15px] font-semibold text-paper tabular-nums placeholder:text-paper/20 focus:outline-none focus:border-gold transition-colors"
             />
           </div>
-          <p className="text-[11px] text-white/25 mt-1.5">
-            If set, a written tenancy agreement becomes required for this listing, regardless of price.
-          </p>
         </div>
       )}
 
-      {/* Price preview */}
       {price > 0 && (
-        <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 text-center">
-          <p className="text-[11px] text-white/35 uppercase tracking-wider mb-2">
+        <div className="bg-slate/25 border border-white/6 rounded-2xl p-5 text-center">
+          <p className="text-[11px] text-paper/35 uppercase tracking-wider mb-2">
             Your listing will show as
           </p>
-          <div className="text-[28px] font-black text-[#f0c040] leading-none">
+          <div className="text-[28px] font-black text-gold tabular-nums leading-none">
             {formatNaira(price)}
           </div>
           {getPeriodLabel() && (
-            <span className="text-[14px] text-white/35 mt-1 block">
+            <span className="text-[14px] text-paper/35 mt-1 block">
               {getPeriodLabel()}
             </span>
           )}
         </div>
       )}
 
-    {price > 0 && (
-  <div className="space-y-3">
-    {/* What landlord receives */}
-    <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-      <p className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">
-        What you receive
-      </p>
-      <div className="space-y-0">
-        <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-          <span className="text-[13px] text-white/55">Listed price</span>
-          <span className="text-[13px] font-bold text-white">
-            {formatNaira(price)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-          <span className="text-[13px] text-white/55">
-            Rent Easy platform fee (2%)
-          </span>
-          <span className="text-[13px] font-bold text-red-400/70">
-            -{formatNaira(price * 0.02)}
-          </span>
-        </div>
-        {/* Show agent commission line only if agent */}
-        <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-          <span className="text-[13px] text-white/55">
-            Agent commission (10% if applicable)
-          </span>
-          <span className="text-[13px] font-bold text-white/35">
-            -{formatNaira(price * 0.10)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between pt-3">
-          <span className="text-[13px] font-bold text-white">
-            You receive
-          </span>
-          <span className="text-[16px] font-black text-[#4ade80]">
-            {formatNaira(price - (price * 0.02) - (price * 0.10))}
-          </span>
-        </div>
-      </div>
-      <p className="text-[10px] text-white/20 leading-relaxed pt-3 border-t border-white/5 mt-3">
-        Agent commission only applies if this listing is managed by an agent.
-        If you listed directly as a landlord with no agent the 10% line does not apply.
-      </p>
-    </div>
+      {price > 0 && (
+        <div className="bg-slate/25 border border-white/6 rounded-2xl overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setShowBreakdown(!showBreakdown)}
+            className="w-full flex items-center justify-between p-5 text-left"
+          >
+            <div>
+              <p className="text-[13px] font-bold text-paper">You will receive</p>
+              <p className="text-[18px] font-black text-gold tabular-nums mt-0.5">{formatNaira(landlordReceives)}</p>
+            </div>
+            <ChevronDown className={`w-4 h-4 text-paper/30 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} />
+          </button>
 
-    {/* What tenant pays */}
-    <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-      <p className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">
-        What tenant pays
-      </p>
-      <div className="space-y-0">
-        <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-          <span className="text-[13px] text-white/55">Rent</span>
-          <span className="text-[13px] font-bold text-white">
-            {formatNaira(price)}
-          </span>
+          {showBreakdown && (
+            <div className="px-5 pb-5 space-y-0 border-t border-white/5 pt-4">
+              <div className="flex items-center justify-between py-2.5 border-b border-white/5">
+                <span className="text-[13px] text-paper/55">Listed price</span>
+                <span className="text-[13px] font-bold text-paper tabular-nums">{formatNaira(price)}</span>
+              </div>
+              <div className="flex items-center justify-between py-2.5 border-b border-white/5">
+                <span className="text-[13px] text-paper/55">Handova platform fee (2%)</span>
+                <span className="text-[13px] font-bold text-danger tabular-nums">-{formatNaira(platformFeeAmount)}</span>
+              </div>
+              {isAgent && (
+                <div className="flex items-center justify-between py-2.5 border-b border-white/5">
+                  <span className="text-[13px] text-paper/55">Standard agent commission (10%)</span>
+                  <span className="text-[13px] font-bold text-paper/50 tabular-nums">-{formatNaira(agentCommissionAmount)}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between pt-3">
+                <span className="text-[13px] font-bold text-paper">You receive</span>
+                <span className="text-[16px] font-black text-gold tabular-nums">{formatNaira(landlordReceives)}</span>
+              </div>
+              {isAgent && (
+                <p className="text-[10px] text-paper/25 leading-relaxed pt-3 mt-3 border-t border-white/5">
+                  10% is the standard commission shown for reference. What you and the property owner agree to keep or pass on is between you.
+                </p>
+              )}
+              <div className="flex items-center justify-between py-2.5 mt-3 pt-3 border-t border-white/5">
+                <span className="text-[13px] text-paper/55">What the {transactionType === 'rent' ? 'tenant' : 'buyer'} pays in total</span>
+                <span className="text-[13px] font-bold text-paper tabular-nums">{formatNaira(price + escrowFee)}</span>
+              </div>
+              <p className="text-[10px] text-paper/25 leading-relaxed mt-1">
+                Includes a small escrow processing fee, capped at ₦2,000, shown clearly to them before they pay.
+              </p>
+            </div>
+          )}
         </div>
-        <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-          <div>
-            <span className="text-[13px] text-white/55">
-              Escrow processing fee
-            </span>
-            <p className="text-[10px] text-white/25 mt-0.5">
-              Paystack · capped at ₦2,000
-            </p>
-          </div>
-          <span className="text-[13px] font-bold text-white/55">
-            +{formatNaira(Math.min(price * 0.015 + 100, 2000))}
-          </span>
-        </div>
-        <div className="flex items-center justify-between pt-3">
-          <span className="text-[13px] font-bold text-white">
-            Total tenant pays
-          </span>
-          <span className="text-[16px] font-black text-[#f0c040]">
-            {formatNaira(price + Math.min(price * 0.015 + 100, 2000))}
-          </span>
-        </div>
-      </div>
-      <p className="text-[10px] text-white/20 leading-relaxed pt-3 border-t border-white/5 mt-3">
-        Tenant pays the listed rent plus a small escrow processing fee.
-        This fee is never more than ₦2,000 regardless of property price.
-        Shown clearly to tenant before they confirm payment.
-      </p>
-    </div>
-  </div>
-)}
-      {/* Escrow note */}
-      <div className="flex items-start gap-3 p-4 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl">
-        <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0 mt-0.5" />
-        <p className="text-[12px] text-white/50 leading-relaxed">
-          All payments for this listing are held in escrow by Rent Easy and only released after the{' '}
+      )}
+
+      <div className="flex items-start gap-3 p-4 bg-gold/8 border border-gold/15 rounded-xl">
+        <Shield className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
+        <p className="text-[12px] text-paper/55 leading-relaxed">
+          All payments for this listing are held in escrow by Handova and only released after the{' '}
           {transactionType === 'rent' ? 'tenant confirms move-in' : 'buyer confirms document receipt'}.
           This protects both parties.
         </p>
       </div>
 
-      {/* Tenancy agreement rule */}
       {price > 0 && (
-        <div className="flex items-start gap-3 p-4 bg-[#f0c040]/6 border border-[#f0c040]/15 rounded-xl">
-          <FileText className="w-4 h-4 text-[#f0c040] flex-shrink-0 mt-0.5" />
-          <p className="text-[12px] text-white/50 leading-relaxed">
-            {(price >= 1000000 || (cautionFee && cautionFee > 0)) ? (
-              <>A written tenancy agreement is <span className="text-white font-semibold">required</span> for deals ₦1,000,000 and above. Upload your own, or have RentEasy generate one for ₦10,000 (deducted from your payout once funds are released — no upfront cost).</>
-            ) : (
-              <>For deals under ₦1,000,000 with no caution fee, a written tenancy agreement is <span className="text-white font-semibold">optional</span>. You can proceed without one if you and the tenant agree directly. Adding a caution fee makes a written agreement required, regardless of price.</>
-            )}
+        <div className="flex items-start gap-3 p-4 bg-gold/6 border border-gold/15 rounded-xl">
+          <FileText className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
+          <p className="text-[12px] text-paper/55 leading-relaxed">
+            A written {transactionType === 'sell' ? 'contract of sale' : 'tenancy agreement'} is <span className="text-paper font-semibold">required</span> for every deal on Handova. Upload your own, or have Handova generate one for ₦10,000, deducted from your payout once funds are released, no upfront cost.
           </p>
         </div>
       )}

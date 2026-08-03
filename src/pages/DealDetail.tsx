@@ -26,7 +26,7 @@ export default function DealDetail() {
   const { user } = useAuth();
   const {
     deal, logs, loading, error, delegatePreview,
-    uploadAgreement, generateAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl, skipAgreement,
+    uploadAgreement, generateAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl,
     signAgreement, confirmMoveIn, confirmHandover, releaseFunds, markDisputed, cancelDeal, cancelDealAsTenant,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
@@ -64,7 +64,6 @@ export default function DealDetail() {
       .then(({ data }) => setCanPayAsDelegate(!!data));
   }, [deal?.id, user?.id, isTenant]);
   const [showChangeModal, setShowChangeModal] = useState(false);
-  const [showSkipModal, setShowSkipModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -352,15 +351,6 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   >
                     Generate {isSaleDeal ? 'Contract' : 'Agreement'} for Me (₦10,000 fee, deducted from payout)
                   </button>
-                  {(Number(deal.amount) < 1000000 && !(deal.properties?.caution_fee && Number(deal.properties.caution_fee) > 0)) && (
-                  <button
-                    onClick={() => setShowSkipModal(true)}
-                    disabled={processing}
-                    className="w-full mt-3 py-3 rounded-xl font-bold text-[13px] text-white/40 hover:text-white hover:bg-white/5 border border-white/8 transition-colors disabled:opacity-40"
-                  >
-                    Proceed Without Written Agreement
-                  </button>
-                  )}
                 </div>
               )}
 
@@ -988,58 +978,6 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
         </div>
       </div>
 
-      {/* Skip Agreement Confirmation Modal */}
-      <AnimatePresence>
-        {showSkipModal && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowSkipModal(false)}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl"
-              style={font}
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[16px] font-bold text-white">Proceed Without Written Agreement?</h3>
-                <button
-                  onClick={() => setShowSkipModal(false)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-[13px] text-white/45 mb-5 leading-relaxed">
-                Only do this if you and the tenant have already agreed on terms directly. The tenant will be told no
-                formal tenancy agreement was uploaded before they pay into escrow. This deal will skip straight to
-                escrow payment and, after that, move-in confirmation — no signing step.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowSkipModal(false)}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={async () => {
-                    await handleAction(skipAgreement);
-                    setShowSkipModal(false);
-                  }}
-                  disabled={processing}
-                  className="flex-1 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40"
-                >
-                  {processing ? 'Processing...' : 'Confirm — Skip Agreement'}
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* Request Changes Modal */}
       <AnimatePresence>

@@ -29,8 +29,8 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
 
   const Row = ({ label, value }: { label: string; value?: string | number }) => (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-white/5 last:border-0">
-      <span className="text-[12px] text-white/40 flex-shrink-0">{label}</span>
-      <span className="text-[13px] font-semibold text-white text-right">{value || '—'}</span>
+      <span className="text-[12px] text-paper/40 flex-shrink-0">{label}</span>
+      <span className="text-[13px] font-semibold text-paper text-right">{value || 'Not set'}</span>
     </div>
   );
 
@@ -39,46 +39,42 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
       className="space-y-5"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      {/* Header */}
       <div className="text-center">
-        <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">
+        <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">
           Step 6 of 6
         </div>
-        <h2 className="text-[22px] font-black text-white tracking-tight mb-2">
-          Review & Submit
+        <h2 className="font-serif text-[24px] font-semibold text-paper tracking-tight mb-2">
+          Review and Submit
         </h2>
-        <p className="text-[13px] text-white/45">
+        <p className="text-[13px] text-paper/45">
           Double-check your listing before submitting
         </p>
       </div>
 
-      {/* Main info */}
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
-        {/* Top bar */}
+      <div className="bg-slate/25 border border-white/6 rounded-2xl overflow-hidden">
         <div className="flex items-start justify-between gap-4 p-5 border-b border-white/5">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
               {v.listing_type === 'house'
-                ? <Home className="w-5 h-5 text-[#1a6b3c]" />
-                : <LandIcon className="w-5 h-5 text-[#1a6b3c]" />
+                ? <Home className="w-5 h-5 text-gold" />
+                : <LandIcon className="w-5 h-5 text-gold" />
               }
             </div>
             <div className="min-w-0">
-              <h3 className="text-[15px] font-bold text-white truncate">{v.title || 'Untitled listing'}</h3>
-              <p className="text-[12px] text-white/40">
+              <h3 className="text-[15px] font-bold text-paper truncate">{v.title || 'Untitled listing'}</h3>
+              <p className="text-[12px] text-paper/40">
                 {v.category} · {v.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
               </p>
             </div>
           </div>
           <div className="text-right flex-shrink-0">
-            <div className="text-[20px] font-black text-[#f0c040]">
-              {v.price ? formatNaira(v.price) : '—'}
+            <div className="text-[20px] font-black text-gold tabular-nums">
+              {v.price ? formatNaira(v.price) : 'Not set'}
             </div>
-            <p className="text-[11px] text-white/35">{getPeriodLabel()}</p>
+            <p className="text-[11px] text-paper/35">{getPeriodLabel()}</p>
           </div>
         </div>
 
-        {/* Details */}
         <div className="p-5 space-y-0">
           <Row label="Location" value={[v.address, v.lga, v.state].filter(Boolean).join(', ')} />
           {v.listing_type === 'house' ? (
@@ -101,17 +97,16 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
         </div>
       </div>
 
-      {/* Amenities */}
       {v.amenities && v.amenities.length > 0 && (
-        <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-          <p className="text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-3">
+        <div className="bg-slate/25 border border-white/6 rounded-2xl p-5">
+          <p className="text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-3">
             Amenities ({v.amenities.length})
           </p>
           <div className="flex flex-wrap gap-2">
             {v.amenities.map(a => (
               <span
                 key={a}
-                className="px-2.5 py-1 bg-[#1a6b3c]/15 border border-[#1a6b3c]/20 rounded-lg text-[11px] text-[#4ade80] font-medium"
+                className="px-2.5 py-1 bg-gold/12 border border-gold/25 rounded-lg text-[11px] text-gold font-medium"
               >
                 {a}
               </span>
@@ -120,11 +115,10 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
         </div>
       )}
 
-      {/* Media preview */}
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-        <p className="text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-3">
-          Media — {v.images?.length || 0} photo{(v.images?.length || 0) !== 1 ? 's' : ''}
-          {v.videos?.length ? ` · ${v.videos.length} video${v.videos.length > 1 ? 's' : ''}` : ''}
+      <div className="bg-slate/25 border border-white/6 rounded-2xl p-5">
+        <p className="text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-3">
+          Media: {v.images?.length || 0} photo{(v.images?.length || 0) !== 1 ? 's' : ''}
+          {v.videos?.length ? `, ${v.videos.length} video${v.videos.length > 1 ? 's' : ''}` : ''}
         </p>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {v.images?.map((url, i) => (
@@ -138,14 +132,14 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
           {v.videos?.map((_, i) => (
             <div
               key={`v-${i}`}
-              className="w-16 h-16 rounded-xl flex-shrink-0 bg-black border border-white/8 flex flex-col items-center justify-center gap-1"
+              className="w-16 h-16 rounded-xl flex-shrink-0 bg-ink border border-white/8 flex flex-col items-center justify-center gap-1"
             >
-              <Video className="w-5 h-5 text-white/40" />
-              <span className="text-[8px] text-white/25 font-bold uppercase">Video</span>
+              <Video className="w-5 h-5 text-paper/40" />
+              <span className="text-[8px] text-paper/25 font-bold uppercase">Video</span>
             </div>
           ))}
           {(!v.images || v.images.length === 0) && (
-            <div className="flex items-center gap-2 text-white/25">
+            <div className="flex items-center gap-2 text-paper/25">
               <ImageIcon className="w-5 h-5" />
               <span className="text-[12px]">No photos uploaded yet</span>
             </div>
@@ -153,12 +147,11 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
         </div>
       </div>
 
-      {/* Notices */}
-      <div className="flex items-start gap-3 p-4 bg-[#f0c040]/5 border border-[#f0c040]/15 rounded-xl">
-        <AlertCircle className="w-4 h-4 text-[#f0c040] flex-shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 bg-gold/5 border border-gold/15 rounded-xl">
+        <AlertCircle className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-[12px] font-bold text-[#f0c040] mb-0.5">Verification notice</p>
-          <p className="text-[11px] text-white/45 leading-relaxed">
+          <p className="text-[12px] font-bold text-gold mb-0.5">Verification notice</p>
+          <p className="text-[11px] text-paper/45 leading-relaxed">
             {v.listing_type === 'house'
               ? 'Verified accounts go live immediately. Unverified listings wait for moderator review (2-4 hours).'
               : 'Land listings require moderator review regardless of verification status.'
@@ -167,12 +160,12 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
         </div>
       </div>
 
-      <div className="flex items-start gap-3 p-4 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl">
-        <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 bg-gold/8 border border-gold/20 rounded-xl">
+        <Shield className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-[12px] font-bold text-[#4ade80] mb-0.5">Escrow enabled</p>
-          <p className="text-[11px] text-white/45 leading-relaxed">
-            By submitting this listing you agree to use the Rent Easy escrow system for all transactions. You receive funds after move-in is confirmed.
+          <p className="text-[12px] font-bold text-gold mb-0.5">Escrow enabled</p>
+          <p className="text-[11px] text-paper/45 leading-relaxed">
+            By submitting this listing you agree to use the Handova escrow system for all transactions. You receive funds after move-in is confirmed.
           </p>
         </div>
       </div>
