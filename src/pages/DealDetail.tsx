@@ -197,23 +197,26 @@ export default function DealDetail() {
               return (
                 <React.Fragment key={s.id}>
                   <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-                      done ? 'bg-gold text-paper' :
-                      active ? 'bg-gold text-ink scale-110' :
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      done ? 'bg-gold text-ink' :
+                      active ? 'bg-gold text-ink scale-110 ring-2 ring-gold/30 ring-offset-2 ring-offset-ink' :
                       'bg-white/5 text-paper/20'
                     }`}>
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className={`text-[9px] font-bold uppercase tracking-wider ${
-                      done ? 'text-gold' : active ? 'text-gold' : 'text-paper/20'
+                    <span className={`text-[9px] font-bold uppercase tracking-wider transition-colors duration-300 ${
+                      done || active ? 'text-gold' : 'text-paper/20'
                     }`}>
                       {s.label}
                     </span>
                   </div>
                   {i < statusSteps.length - 1 && (
-                    <div className={`flex-1 h-px mx-1 mb-4 min-w-[16px] ${
-                      i < currentStepIndex ? 'bg-gold' : 'bg-white/8'
-                    }`} />
+                    <div className="relative flex-1 h-[2px] mx-1 mb-4 min-w-[16px] bg-white/8 rounded-full overflow-hidden">
+                      <div
+                        className="absolute inset-y-0 left-0 bg-gold rounded-full transition-all duration-700 ease-out"
+                        style={{ width: i < currentStepIndex || deal.status === 'funds_released' ? '100%' : '0%' }}
+                      />
+                    </div>
                   )}
                 </React.Fragment>
               );
