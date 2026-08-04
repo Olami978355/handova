@@ -51,12 +51,32 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
 
   const fetchDelegates = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const { data: rows } = await supabase
       .from('deal_delegates')
-      .select('*, principal:principal_id(full_name), delegate:delegate_id(full_name)')
+      .select('*')
       .eq('deal_id', dealId)
       .order('created_at', { ascending: false });
-    setDelegates(data || []);
+
+    if (!rows || rows.length === 0) {
+      setDelegates([]);
+      setLoading(false);
+      return;
+    }
+
+    // Fetch names via public_profiles rather than an embedded join straight
+    // to profiles, since profiles' own RLS only permits reading your own row.
+    const ids = [...new Set(rows.flatMap(r => [r.principal_id, r.delegate_id]))];
+    const { data: profiles } = await supabase
+      .from('public_profiles')
+      .select('id, full_name')
+      .in('id', ids);
+    const nameById = new Map((profiles || []).map(p => [p.id, p.full_name]));
+
+    setDelegates(rows.map(r => ({
+      ...r,
+      principal: { full_name: nameById.get(r.principal_id) || 'Unknown' },
+      delegate: { full_name: nameById.get(r.delegate_id) || 'Unknown' },
+    })));
     setLoading(false);
   };
 
