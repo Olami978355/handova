@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Property, PropertyType, TransactionType } from '../types';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import PropertyCard from '../components/PropertyCard';
 
 // ─── Nigerian States ───────────────────────────────────────────────
 const NIGERIAN_STATES = [
@@ -32,119 +33,6 @@ const abbreviatePrice = (amount: number) => {
 };
 
 // ─── Property Card (dark horizontal style) ────────────────────────
-const PropertyCard = ({ property }: { property: Property }) => {
-  const navigate = useNavigate();
-  const img = property.images?.[0];
-  const periodLabel: Record<string, string> = {
-    yearly: '/yr', monthly: '/mo', nightly: '/night', outright: ''
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      onClick={() => navigate(`/property/${property.id}`)}
-      className="group bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden cursor-pointer hover:border-[#f0c040]/25 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/30"
-    >
-      {/* Image */}
-      <div className="relative h-44 bg-[#111a14] overflow-hidden">
-        {img ? (
-          <img
-            src={img}
-            alt={property.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Home className="w-10 h-10 text-white/10" />
-          </div>
-        )}
-
-        {/* Overlay badges */}
-        <div className="absolute top-3 left-3 flex gap-2">
-          <span className="bg-[#f0c040] text-black text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase">
-            {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
-          </span>
-          {property.escrow_verified && (
-            <span className="bg-[#1a6b3c] text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
-              <Shield className="w-2.5 h-2.5" /> Verified
-            </span>
-          )}
-          {(property as any).owner_role && (
-            <span className="bg-black/60 backdrop-blur-sm text-white/80 text-[10px] font-bold px-2.5 py-1 rounded-lg capitalize flex items-center gap-1">
-              {(property as any).owner_role}
-              <VerifiedBadge status={(property as any).owner_verification_status} size={11} />
-            </span>
-          )}
-        </div>
-
-        {/* Type badge */}
-        <div className="absolute top-3 right-3">
-          <span className="bg-black/50 backdrop-blur-sm text-white/70 text-[10px] font-medium px-2 py-1 rounded-lg capitalize flex items-center gap-1">
-            <Layers className="w-2.5 h-2.5" />
-            {property.listing_type}
-          </span>
-        </div>
-
-        {/* Video indicator */}
-        {property.videos && property.videos.length > 0 && (
-          <div className="absolute bottom-3 right-3">
-            <span className="bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-1 rounded-lg flex items-center gap-1">
-              ▶ {property.videos.length} video{property.videos.length > 1 ? 's' : ''}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="p-4">
-        <div className="mb-2">
-          <h3 className="text-[14px] font-semibold text-white line-clamp-1 leading-snug">
-            {property.title}
-          </h3>
-          <div className="flex items-center gap-1 mt-1">
-            <MapPin className="w-3 h-3 text-white/30 flex-shrink-0" />
-            <span className="text-[12px] text-white/40 truncate">
-              {property.lga}, {property.state}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
-          <div>
-            <span className="text-[17px] font-black text-[#f0c040]">
-              {formatNaira(property.price)}
-            </span>
-            {property.price_period && (
-              <span className="text-[11px] text-white/35 ml-1">
-                {periodLabel[property.price_period]}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            {property.bedrooms && (
-              <span className="text-[11px] text-white/35">
-                {property.bedrooms}bd · {property.bathrooms}ba
-              </span>
-            )}
-            {property.land_size_value && (
-              <span className="text-[11px] text-white/35">
-                {property.land_size_value} {property.land_size_unit}
-              </span>
-            )}
-            {property.inspection_fee && (
-              <span className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-lg">
-                Inspect: {formatNaira(property.inspection_fee)}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
 // ─── Filter toggle button ─────────────────────────────────────────
 const FilterBtn = ({
   label, active, onClick
