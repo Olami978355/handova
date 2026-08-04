@@ -8,6 +8,8 @@ interface AuthContextType {
   profile: Profile | null;
   session: Session | null;
   loading: boolean;
+  sessionExpired: boolean;
+  clearSessionExpired: () => void;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   updateProfile: (fields: Partial<Profile>) => Promise<{ success: boolean; error?: any }>;
@@ -22,6 +24,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const fetchingProfile = useRef(false);
   const initialised = useRef(false);
+  const manualSignOut = useRef(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const fetchProfile = async (userId: string, isRetry = false) => {
     if (fetchingProfile.current && !isRetry) return;
@@ -55,10 +59,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // ✅ Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // If we lost the session (SIGNED_OUT) but the user didn't click
+        // "Sign out" themselves, the token silently expired mid-use —
+        // surface that distinctly so Login.tsx can explain what happened
+        // instead of just quietly bouncing them with no context.
+        if (event === 'SIGNED_OUT' && initialised.current && !manualSignOut.current) {
+          setSessionExpired(true);
+        }
+        manualSignOut.current = false;
+
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          setSessionExpired(false);
           fetchProfile(session.user.id);
         } else {
           setProfile(null);
@@ -121,11 +135,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    manualSignOut.current = true;
     setProfile(null);
     setUser(null);
     setSession(null);
     await supabase.auth.signOut();
   };
+
+  const clearSessionExpired = () => setSessionExpired(false);
 
   // Safety timeout so the app never hangs forever waiting on Supabase,
   // but long enough that a normal slow connection doesn't get mistaken
@@ -205,7 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={{
-      user, profile, session, loading,
+      user, profile, session, loading, sessionExpired, clearSessionExpired,
       signOut, refreshProfile, updateProfile,
     }}>
       {children}

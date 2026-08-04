@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Eye, EyeOff, Shield, BadgeCheck, MessageSquare, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 const HandovaLogo = ({ size = 32 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none">
@@ -40,6 +41,11 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const fromMessage = location.state?.message;
+  const { clearSessionExpired } = useAuth();
+
+  useEffect(() => {
+    if (fromMessage) clearSessionExpired();
+  }, []);
 
   const getDashboardPath = (role?: string) => {
     if (!role) return '/dashboard';

@@ -33,6 +33,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LegalGuidePage from './pages/LegalGuidePage';
 import Directory from './pages/Directory';
+import SavedProperties from './pages/SavedProperties';
 import MyDelegates from './pages/MyDelegates';
 
 const SuspendedScreen = () => (
@@ -61,7 +62,7 @@ const SuspendedScreen = () => (
 );
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, sessionExpired } = useAuth();
   const location = useLocation();
 
   if (loading) return (
@@ -73,7 +74,16 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     </div>
   );
 
-  if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!user) return (
+    <Navigate
+      to="/login"
+      state={{
+        from: location,
+        message: sessionExpired ? 'Your session has expired. Please sign in again.' : undefined,
+      }}
+      replace
+    />
+  );
 
   // ✅ Block suspended accounts from everything except contact page
   if (profile?.account_status === 'suspended') {
@@ -109,6 +119,7 @@ function AppInner() {
             <Route path="property/:id" element={<PropertyDetail />} />
             <Route path="u/:username" element={<PublicProfile />} />
             <Route path="directory" element={<Directory />} />
+            <Route path="saved" element={<ProtectedRoute><SavedProperties /></ProtectedRoute>} />
             <Route path="legal" element={<LegalPage />} />
             <Route path="faq" element={<FAQPage />} />
             <Route path="about" element={<AboutPage />} />
