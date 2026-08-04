@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, X, Loader2, Shield, Home, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { supabase, requireValidSession } from '../../lib/supabase';
+import { parseFunctionError } from '../../lib/parseFunctionError';
 
 interface DealDelegatePreviewProps {
   preview: {
@@ -17,19 +18,6 @@ interface DealDelegatePreviewProps {
   };
   onResponded: () => void;
 }
-
-const parseFunctionError = async (error: unknown, fallback: string): Promise<string> => {
-  const err = error as { context?: { json?: () => Promise<{ error?: string }> }; message?: string };
-  try {
-    if (err?.context?.json) {
-      const body = await err.context.json();
-      if (body?.error) return body.error;
-    }
-  } catch {
-    // fall through to generic message below
-  }
-  return err?.message || fallback;
-};
 
 export const DealDelegatePreview: React.FC<DealDelegatePreviewProps> = ({ preview, onResponded }) => {
   const navigate = useNavigate();
