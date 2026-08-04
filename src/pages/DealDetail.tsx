@@ -232,11 +232,19 @@ export default function DealDetail() {
       ? [{ label: 'Agent', name: deal.agent?.full_name || 'Agent', initial: 'A', verification_status: deal.agent?.verification_status }]
       : []),
     ...(deal.accepted_delegates || []).map((d) => {
+      const delegateName = d.delegate?.full_name || 'Delegate';
+      if (d.delegate?.is_system_account) {
+        return {
+          label: 'Handova',
+          name: 'Handova',
+          initial: 'H',
+          verification_status: undefined,
+        };
+      }
       const principalRole =
         d.principal_id === deal.tenant_id ? 'Tenant' :
         d.principal_id === deal.landlord_id ? 'Landlord' :
         d.principal_id === deal.agent_id ? 'Agent' : 'Principal';
-      const delegateName = d.delegate?.full_name || 'Delegate';
       return {
         label: `${principalRole}'s Delegate`,
         name: delegateName,

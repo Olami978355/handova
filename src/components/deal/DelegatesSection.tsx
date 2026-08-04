@@ -55,6 +55,7 @@ export const DelegatesSection: React.FC<DelegatesSectionProps> = ({ dealId, isPr
       .from('deal_delegates')
       .select('*')
       .eq('deal_id', dealId)
+      .neq('delegate_id', '46d3aed8-71dc-4505-b413-c24aac8b07e7') // Handova system account shows in Parties Involved only, not here
       .order('created_at', { ascending: false });
 
     if (!rows || rows.length === 0) {
