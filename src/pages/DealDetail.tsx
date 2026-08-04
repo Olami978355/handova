@@ -14,7 +14,8 @@ import { DealDelegatePreview } from '../components/deal/DealDelegatePreview';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
-import { supabase } from '../lib/supabase';
+import { supabase, requireValidSession } from '../lib/supabase';
+import { parseFunctionError } from '../lib/parseFunctionError';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useAuth } from '../context/AuthContext';
 
@@ -115,6 +116,44 @@ export default function DealDetail() {
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
   } = useDeal(id || '');
+
+  const [handovaProcessing, setHandovaProcessing] = useState(false);
+  const [handovaError, setHandovaError] = useState<string | null>(null);
+  const handovaDelegateRow = deal?.accepted_delegates?.find((d) => d.delegate?.is_system_account);
+
+  const handleAddHandova = async () => {
+    setHandovaProcessing(true);
+    setHandovaError(null);
+    try {
+      if (!(await requireValidSession())) return;
+      const { error } = await supabase.functions.invoke('add-handova-to-deal', {
+        body: { dealId: id },
+      });
+      if (error) throw error;
+      await refresh();
+    } catch (err: unknown) {
+      setHandovaError(await parseFunctionError(err, 'Failed to add Handova'));
+    } finally {
+      setHandovaProcessing(false);
+    }
+  };
+
+  const handleRemoveHandova = async () => {
+    setHandovaProcessing(true);
+    setHandovaError(null);
+    try {
+      if (!(await requireValidSession())) return;
+      const { error } = await supabase.functions.invoke('remove-handova-from-deal', {
+        body: { dealId: id },
+      });
+      if (error) throw error;
+      await refresh();
+    } catch (err: unknown) {
+      setHandovaError(await parseFunctionError(err, 'Failed to remove Handova'));
+    } finally {
+      setHandovaProcessing(false);
+    }
+  };
 
   const [processing, setProcessing] = useState(false);
   const [agreementViewUrl, setAgreementViewUrl] = useState<string | null>(null);
@@ -1063,6 +1102,44 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 >
                   Cancel Deal
                 </button>
+              </div>
+            )}
+
+            {(isAdmin || isModerator) && (
+              <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-9 h-9 bg-gold/12 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-gold" />
+                  </div>
+                  <div>
+                    <h3 className="text-[13px] font-bold text-paper mb-1">Handova presence</h3>
+                    <p className="text-[11px] text-paper/40 leading-relaxed">
+                      {handovaDelegateRow
+                        ? 'Handova is currently shown as a party on this deal.'
+                        : 'Add Handova to show the platform is actively involved in this deal.'}
+                    </p>
+                  </div>
+                </div>
+                {handovaError && (
+                  <p className="text-[11px] text-danger mb-3">{handovaError}</p>
+                )}
+                {handovaDelegateRow ? (
+                  <button
+                    onClick={handleRemoveHandova}
+                    disabled={handovaProcessing}
+                    className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-paper/60 hover:text-paper hover:bg-white/8 transition-colors disabled:opacity-40"
+                  >
+                    {handovaProcessing ? 'Removing...' : 'Remove Handova from Deal'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleAddHandova}
+                    disabled={handovaProcessing}
+                    className="w-full py-3 bg-gold text-ink rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors disabled:opacity-40"
+                  >
+                    {handovaProcessing ? 'Adding...' : 'Add Handova to Deal'}
+                  </button>
+                )}
               </div>
             )}
 
