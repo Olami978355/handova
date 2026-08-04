@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePaystackPayment } from 'react-paystack';
-import { CreditCard, Loader2 } from 'lucide-react';
+import { CreditCard, Loader2, AlertCircle } from 'lucide-react';
 
 interface PaystackButtonProps {
   amount: number;
@@ -20,6 +20,7 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [configError, setConfigError] = useState<string | null>(null);
+
   const config = {
     reference,
     email,
@@ -28,6 +29,7 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
     metadata: { custom_fields: [], ...(metadata || {}) },
   };
   const initializePayment = usePaystackPayment(config);
+
   const handlePayment = () => {
     if (disabled || isProcessing) return;
     if (!import.meta.env.VITE_PAYSTACK_PUBLIC_KEY) {
@@ -36,7 +38,6 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
       return;
     }
     setConfigError(null);
-    
     setIsProcessing(true);
     initializePayment({
       onSuccess: async (response: { reference: string }) => {
@@ -54,30 +55,36 @@ export const PaystackButton: React.FC<PaystackButtonProps> = ({
       },
     });
   };
+
   const formattedAmount = new Intl.NumberFormat('en-NG', {
     style: 'currency', currency: 'NGN', minimumFractionDigits: 0,
   }).format(amount);
+
   return (
-    <button
-      onClick={handlePayment}
-      disabled={disabled || isProcessing}
-      className={`flex items-center justify-center gap-2 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] ${className}`}
-      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-    >
+    <div className={className} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       {configError && (
-        <span className="block text-[11px] text-red-400 mb-1">{configError}</span>
+        <div className="flex items-start gap-2 mb-2 p-2.5 bg-danger/8 border border-danger/20 rounded-lg">
+          <AlertCircle className="w-3.5 h-3.5 text-danger flex-shrink-0 mt-0.5" />
+          <span className="text-[11px] text-danger">{configError}</span>
+        </div>
       )}
-      {isProcessing ? (
-        <>
-          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-          <span>Processing...</span>
-        </>
-      ) : (
-        <>
-          <CreditCard className="w-4 h-4 flex-shrink-0" />
-          <span>{label} — {formattedAmount}</span>
-        </>
-      )}
-    </button>
+      <button
+        onClick={handlePayment}
+        disabled={disabled || isProcessing}
+        className="w-full flex items-center justify-center gap-2 bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+            <span>Processing...</span>
+          </>
+        ) : (
+          <>
+            <CreditCard className="w-4 h-4 flex-shrink-0" />
+            <span>{label} <span className="tabular-nums">{formattedAmount}</span></span>
+          </>
+        )}
+      </button>
+    </div>
   );
 };
