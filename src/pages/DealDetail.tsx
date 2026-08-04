@@ -133,19 +133,27 @@ export default function DealDetail() {
   const [tenantCancelReason, setTenantCancelReason] = useState('');
   const [showReceiptPanel, setShowReceiptPanel] = useState(false);
   const [canPayAsDelegate, setCanPayAsDelegate] = useState(false);
+  const [canSignAsDelegate, setCanSignAsDelegate] = useState(false);
+  const [canConfirmMoveInAsDelegate, setCanConfirmMoveInAsDelegate] = useState(false);
+  const [delegateRepresentsTenant, setDelegateRepresentsTenant] = useState(false);
 
   useEffect(() => {
     if (!deal || !user || isTenant) return;
     supabase
       .from('deal_delegates')
-      .select('id')
+      .select('can_sign, can_pay, can_confirm_movein, principal_id')
       .eq('deal_id', deal.id)
       .eq('delegate_id', user.id)
-      .eq('principal_id', deal.tenant_id)
       .eq('status', 'accepted')
-      .eq('can_pay', true)
       .maybeSingle()
-      .then(({ data }) => setCanPayAsDelegate(!!data));
+      .then(({ data }) => {
+        if (!data) return;
+        const representsTenant = data.principal_id === deal.tenant_id;
+        setCanPayAsDelegate(!!(data.can_pay && representsTenant));
+        setCanConfirmMoveInAsDelegate(!!(data.can_confirm_movein && representsTenant));
+        setCanSignAsDelegate(!!data.can_sign);
+        setDelegateRepresentsTenant(representsTenant);
+      });
   }, [deal?.id, user?.id, isTenant]);
   const [showChangeModal, setShowChangeModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -672,7 +680,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               {/* STEP 4: Payment received — both parties sign */}
 
               {/* STEP 4 (skipped agreement path): tenant confirms move-in directly */}
-              {deal.status === 'payment_received' && deal.agreement_skipped && isTenant && (
+              {deal.status === 'payment_received' && deal.agreement_skipped && (isTenant || canConfirmMoveInAsDelegate) && (
                 <div className="p-5 bg-gold/8 border border-gold/20 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -747,7 +755,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                         <Download className="w-4 h-4" /> View
                       </a>
                     )}
-                    {((isTenant && !deal.tenant_signed_at) || ((isLandlord || isAgent) && !deal.landlord_signed_at)) && (
+                    {((isTenant && !deal.tenant_signed_at) || ((isLandlord || isAgent) && !deal.landlord_signed_at) || (canSignAsDelegate && delegateRepresentsTenant && !deal.tenant_signed_at) || (canSignAsDelegate && !delegateRepresentsTenant && !deal.landlord_signed_at)) && (
                       <button
                         onClick={() => handleAction(signAgreement)}
                         disabled={processing || !agreedToTerms}
@@ -757,7 +765,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       </button>
                     )}
                   </div>
-                  {((isTenant && deal.tenant_signed_at) || ((isLandlord || isAgent) && deal.landlord_signed_at)) && (
+                  {((isTenant && deal.tenant_signed_at) || ((isLandlord || isAgent) && deal.landlord_signed_at) || (canSignAsDelegate && delegateRepresentsTenant && deal.tenant_signed_at) || (canSignAsDelegate && !delegateRepresentsTenant && deal.landlord_signed_at)) && (
                     <p className="mt-3 text-center text-[11px] font-bold text-gold">
                       ✓ You have signed — waiting for the other party
                     </p>
@@ -766,7 +774,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               )}
 
               {/* STEP 5: Confirm move-in */}
-              {deal.status === 'payment_received' && !deal.agreement_skipped && isTenant && (
+              {deal.status === 'payment_received' && !deal.agreement_skipped && (isTenant || canConfirmMoveInAsDelegate) && (
                 <div className="p-5 bg-gold/8 border border-gold/20 rounded-xl">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
