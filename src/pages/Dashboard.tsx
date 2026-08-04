@@ -1222,7 +1222,6 @@ return (
         )}
       </div>
 
-      <BottomTabBar active="dashboard" role={profile?.role} />
     </div>
   );
 }
@@ -1248,53 +1247,3 @@ const QuickAction = ({
     {label}
   </Link>
 );
-
-const BottomTabBar = ({
-  active, role,
-}: {
-  active: string;
-  role?: string;
-}) => {
-  const navigate = useNavigate();
-  const tabs = [
-    {
-      id: 'dashboard',
-      icon: Home,
-      label: 'Home',
-      path: role === 'landlord'
-        ? '/landlord/dashboard'
-        : role === 'agent'
-        ? '/agent/dashboard'
-        : '/dashboard',
-    },
-    { id: 'search',   icon: Search,       label: 'Search',   path: '/listings' },
-    { id: 'messages', icon: MessageSquare, label: 'Messages', path: '/messages' },
-    { id: 'profile',  icon: User,          label: 'Profile',  path: '/profile'  },
-  ];
-
-  return (
-    <div className="bottom-tab-bar lg:hidden">
-      {tabs.map(tab => {
-        const isActive = active === tab.id;
-        return (
-          <button
-            key={tab.id}
-            onClick={() => navigate(tab.path)}
-            className="flex-1 flex flex-col items-center gap-1 pt-1"
-          >
-            <tab.icon
-              className="w-5 h-5 transition-colors"
-              style={{ color: isActive ? '#f0c040' : 'rgba(255,255,255,0.3)' }}
-            />
-            <span
-              className="text-[10px] font-semibold transition-colors"
-              style={{ color: isActive ? '#f0c040' : 'rgba(255,255,255,0.3)' }}
-            >
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-};
