@@ -263,12 +263,12 @@ export default function DealDetail() {
   const isLandlordDeal = !!deal.landlord_id && deal.landlord_id !== deal.agent_id;
 
   const parties = [
-    { label: 'Tenant', name: deal.profiles?.full_name || 'Tenant', initial: 'T', verification_status: deal.profiles?.verification_status },
+    { label: 'Tenant', name: deal.profiles?.full_name || 'Tenant', initial: 'T', verification_status: deal.profiles?.verification_status, avatar_url: deal.profiles?.avatar_url },
     ...(isLandlordDeal
-      ? [{ label: 'Landlord', name: deal.landlord?.full_name || 'Landlord', initial: 'L', verification_status: deal.landlord?.verification_status }]
+      ? [{ label: 'Landlord', name: deal.landlord?.full_name || 'Landlord', initial: 'L', verification_status: deal.landlord?.verification_status, avatar_url: deal.landlord?.avatar_url }]
       : []),
     ...(isAgentDeal
-      ? [{ label: 'Agent', name: deal.agent?.full_name || 'Agent', initial: 'A', verification_status: deal.agent?.verification_status }]
+      ? [{ label: 'Agent', name: deal.agent?.full_name || 'Agent', initial: 'A', verification_status: deal.agent?.verification_status, avatar_url: deal.agent?.avatar_url }]
       : []),
     ...(deal.accepted_delegates || []).map((d) => {
       const delegateName = d.delegate?.full_name || 'Delegate';
@@ -277,7 +277,8 @@ export default function DealDetail() {
           label: 'Handova',
           name: 'Handova',
           initial: 'H',
-          verification_status: undefined,
+          verification_status: 'verified',
+          avatar_url: d.delegate?.avatar_url,
         };
       }
       const principalRole =
@@ -289,6 +290,7 @@ export default function DealDetail() {
         name: delegateName,
         initial: delegateName.charAt(0).toUpperCase(),
         verification_status: d.delegate?.verification_status,
+        avatar_url: d.delegate?.avatar_url,
       };
     }),
   ];
@@ -958,8 +960,12 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               <div className="space-y-3">
                 {parties.map((p) => (
                   <div key={p.label} className="flex items-center gap-3 p-3 bg-white/4 rounded-xl">
-                    <div className="w-8 h-8 bg-gold/20 rounded-xl flex items-center justify-center text-gold text-[12px] font-bold flex-shrink-0">
-                      {p.initial}
+                    <div className="w-8 h-8 bg-gold/20 rounded-xl flex items-center justify-center text-gold text-[12px] font-bold flex-shrink-0 overflow-hidden">
+                      {p.avatar_url ? (
+                        <img src={p.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        p.initial
+                      )}
                     </div>
                     <div>
                       <p className="text-[10px] text-paper/30 uppercase tracking-wider">{p.label}</p>
