@@ -489,27 +489,30 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                     </div>
                   )}
 
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setShowChangeModal(true)}
-                      disabled={processing}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-paper/60 hover:text-paper hover:bg-white/8 transition-colors"
-                    >
-                      <ThumbsDown className="w-4 h-4" />
-                      Request Changes
-                    </button>
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => handleAction(approveDraftAgreement)}
                       disabled={processing}
-                      className="flex-[2] flex items-center justify-center gap-2 bg-gold text-ink py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors disabled:opacity-40"
+                      className="w-full sm:flex-[2] order-1 flex items-center justify-center gap-2 bg-gold text-ink py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors disabled:opacity-40"
                     >
                       {processing
                         ? <Loader2 className="w-4 h-4 animate-spin" />
                         : <ThumbsUp className="w-4 h-4" />
                       }
-                      Approve & Proceed to Payment
+                      Approve Agreement
+                    </button>
+                    <button
+                      onClick={() => setShowChangeModal(true)}
+                      disabled={processing}
+                      className="w-full sm:flex-1 order-2 flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-bold text-paper/60 hover:text-paper hover:bg-white/8 transition-colors"
+                    >
+                      <ThumbsDown className="w-4 h-4" />
+                      Request Changes
                     </button>
                   </div>
+                  <p className="text-[11px] text-paper/30 text-center mt-2.5">
+                    You'll be taken to payment next.
+                  </p>
                 </div>
               )}
 
