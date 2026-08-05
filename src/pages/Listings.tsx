@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { Property, PropertyType, TransactionType } from '../types';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import PropertyCard from '../components/PropertyCard';
+import { FilterBtn } from '../components/ui/FilterBtn';
 
 // ─── Nigerian States ───────────────────────────────────────────────
 const NIGERIAN_STATES = [
@@ -34,20 +35,6 @@ const abbreviatePrice = (amount: number) => {
 
 // ─── Property Card (dark horizontal style) ────────────────────────
 // ─── Filter toggle button ─────────────────────────────────────────
-const FilterBtn = ({
-  label, active, onClick
-}: { label: string; active: boolean; onClick: () => void }) => (
-  <button
-    onClick={onClick}
-    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all whitespace-nowrap ${
-      active
-        ? 'bg-[#f0c040] text-black'
-        : 'bg-white/5 text-white/55 hover:bg-white/8 hover:text-white border border-white/8'
-    }`}
-  >
-    {label}
-  </button>
-);
 
 // ─── Skeleton card ────────────────────────────────────────────────
 const SkeletonCard = () => (
@@ -304,7 +291,7 @@ export default function Listings() {
                         onClick={() => setType(t)}
                         className={`py-2 rounded-xl text-[12px] font-semibold capitalize transition-all ${
                           type === t
-                            ? 'bg-[#1a6b3c] text-white'
+                            ? 'bg-gold text-white'
                             : 'bg-white/5 text-white/45 hover:bg-white/8 hover:text-white'
                         }`}
                       >
@@ -330,7 +317,7 @@ export default function Listings() {
                         onClick={() => setTransaction(value)}
                         className={`py-2 rounded-xl text-[12px] font-semibold transition-all ${
                           transaction === value
-                            ? 'bg-[#1a6b3c] text-white'
+                            ? 'bg-gold text-white'
                             : 'bg-white/5 text-white/45 hover:bg-white/8 hover:text-white'
                         }`}
                       >
@@ -352,7 +339,7 @@ export default function Listings() {
                         onClick={() => setBedrooms(b)}
                         className={`flex-1 py-2 rounded-xl text-[12px] font-semibold transition-all ${
                           bedrooms === b
-                            ? 'bg-[#1a6b3c] text-white'
+                            ? 'bg-gold text-white'
                             : 'bg-white/5 text-white/45 hover:bg-white/8'
                         }`}
                       >
@@ -385,21 +372,6 @@ export default function Listings() {
                   </div>
                 </div>
 
-                {/* Verified only */}
-                <div className="pt-4 border-t border-white/5">
-                  <button
-                    onClick={() => setVerifiedOnly(!verifiedOnly)}
-                    className="flex items-center justify-between w-full"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-[#1a6b3c]" />
-                      <span className="text-[13px] font-semibold text-white/70">Verified only</span>
-                    </div>
-                    <div className={`w-10 h-6 rounded-full transition-colors relative ${verifiedOnly ? 'bg-[#1a6b3c]' : 'bg-white/10'}`}>
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${verifiedOnly ? 'left-5' : 'left-1'}`} />
-                    </div>
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -439,7 +411,7 @@ export default function Listings() {
                 <p className="text-[13px] text-white/40 mb-6">{error}</p>
                 <button
                   onClick={fetchProperties}
-                  className="flex items-center gap-2 bg-[#1a6b3c] text-white px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-[#0f4a2a] transition-colors mx-auto"
+                  className="flex items-center gap-2 bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-[#0f4a2a] transition-colors mx-auto"
                 >
                   <RefreshCw className="w-4 h-4" /> Try Again
                 </button>
@@ -523,7 +495,7 @@ export default function Listings() {
                     <div className="grid grid-cols-3 gap-2">
                       {(['all', 'house', 'land'] as const).map(t => (
                         <button key={t} onClick={() => setType(t)}
-                          className={`py-3 rounded-xl text-[13px] font-semibold capitalize transition-all ${type === t ? 'bg-[#1a6b3c] text-white' : 'bg-white/5 text-white/45'}`}>
+                          className={`py-3 rounded-xl text-[13px] font-semibold capitalize transition-all ${type === t ? 'bg-gold text-white' : 'bg-white/5 text-white/45'}`}>
                           {t}
                         </button>
                       ))}
@@ -536,7 +508,7 @@ export default function Listings() {
                     <div className="grid grid-cols-3 gap-2">
                       {[{ value: 'all', label: 'All' }, { value: 'rent', label: 'Rent' }, { value: 'sell', label: 'Buy' }].map(({ value, label }) => (
                         <button key={value} onClick={() => setTransaction(value as TransactionType | 'all')}
-                          className={`py-3 rounded-xl text-[13px] font-semibold transition-all ${transaction === value ? 'bg-[#1a6b3c] text-white' : 'bg-white/5 text-white/45'}`}>
+                          className={`py-3 rounded-xl text-[13px] font-semibold transition-all ${transaction === value ? 'bg-gold text-white' : 'bg-white/5 text-white/45'}`}>
                           {label}
                         </button>
                       ))}
@@ -549,7 +521,7 @@ export default function Listings() {
                     <div className="flex gap-2">
                       {['', '1', '2', '3', '4'].map(b => (
                         <button key={b} onClick={() => setBedrooms(b)}
-                          className={`flex-1 py-3 rounded-xl text-[13px] font-semibold transition-all ${bedrooms === b ? 'bg-[#1a6b3c] text-white' : 'bg-white/5 text-white/45'}`}>
+                          className={`flex-1 py-3 rounded-xl text-[13px] font-semibold transition-all ${bedrooms === b ? 'bg-gold text-white' : 'bg-white/5 text-white/45'}`}>
                           {b || 'Any'}
                         </button>
                       ))}
@@ -567,17 +539,6 @@ export default function Listings() {
                     </div>
                   </div>
 
-                  {/* Verified */}
-                  <button onClick={() => setVerifiedOnly(!verifiedOnly)}
-                    className="flex items-center justify-between w-full py-3 px-4 bg-white/5 rounded-xl border border-white/8">
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-[#1a6b3c]" />
-                      <span className="text-[13px] font-semibold text-white/70">Verified listings only</span>
-                    </div>
-                    <div className={`w-10 h-6 rounded-full transition-colors relative ${verifiedOnly ? 'bg-[#1a6b3c]' : 'bg-white/10'}`}>
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${verifiedOnly ? 'left-5' : 'left-1'}`} />
-                    </div>
-                  </button>
 
                   {/* Actions */}
                   <div className="flex gap-3 pt-2">

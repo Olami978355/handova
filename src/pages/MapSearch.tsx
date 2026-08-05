@@ -10,6 +10,7 @@ import { PropertyMap } from '../components/map/PropertyMap';
 import { usePropertyMap } from '../hooks/usePropertyMap';
 import { Property, PropertyType, TransactionType } from '../types';
 import { Link } from 'react-router-dom';
+import { FilterBtn } from '../components/ui/FilterBtn';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -174,17 +175,8 @@ export default function MapSearch() {
         </div>
       </div>
 
-      {/* Verified toggle */}
-      <button onClick={() => setVerifiedOnly(!verifiedOnly)}
-        className="flex items-center justify-between w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl">
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4 text-[#1a6b3c]" />
-          <span className="text-[13px] font-semibold text-white/70">Verified listings only</span>
-        </div>
-        <div className={`w-10 h-6 rounded-full transition-colors relative ${verifiedOnly ? 'bg-[#1a6b3c]' : 'bg-white/10'}`}>
-          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${verifiedOnly ? 'left-5' : 'left-1'}`} />
-        </div>
-      </button>
+      {/* Verified filter */}
+      <FilterBtn label="✓ Verified only" active={verifiedOnly} onClick={() => setVerifiedOnly(!verifiedOnly)} />
     </div>
   );
 
