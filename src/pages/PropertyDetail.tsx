@@ -6,12 +6,12 @@ import {
   Share2, Heart, AlertCircle, Maximize, FileText,
   Clock, ScrollText, Tag, Video, ChevronLeft, ChevronRight,
   Eye, Layers, MessageCircle, Twitter, Copy, Check,
-  Download, QrCode, X, Loader2
+  Download, QrCode, X, Loader2, Trash2, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode';
-import { supabase } from '../lib/supabase';
+import { supabase, requireValidSession } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Property, Profile } from '../types';
 import { VerifiedBadge } from '../components/VerifiedBadge';
@@ -399,6 +399,27 @@ export default function PropertyDetail() {
   const goNext = () => setActiveIndex(i => (i + 1) % allMedia.length);
   const goPrev = () => setActiveIndex(i => (i - 1 + allMedia.length) % allMedia.length);
   const isOwner = user?.id === property?.owner_id;
+  const isOwnerOrAgent = user?.id === property?.owner_id || user?.id === property?.agent_id;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingProperty, setDeletingProperty] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const handleDeleteProperty = async () => {
+    if (!property) return;
+    setDeletingProperty(true);
+    setDeleteError(null);
+    try {
+      if (!(await requireValidSession())) return;
+      const { error } = await supabase.functions.invoke('delete-listing', {
+        body: { propertyId: property.id },
+      });
+      if (error) throw error;
+      navigate('/dashboard');
+    } catch (err: unknown) {
+      setDeleteError(err instanceof Error ? err.message : 'Failed to delete listing');
+    } finally {
+      setDeletingProperty(false);
+    }
+  };
 
   const periodLabel: Record<string, string> = { yearly: '/ year', monthly: '/ month', nightly: '/ night', outright: '' };
 
@@ -976,6 +997,50 @@ export default function PropertyDetail() {
             </>
           )}
         </AnimatePresence>
+        {isOwnerOrAgent && (
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-12">
+            <div className="border-t border-white/8 pt-6 mt-6">
+              <button
+                onClick={() => { setDeleteError(null); setShowDeleteModal(true); }}
+                className="flex items-center gap-2 text-[13px] font-semibold text-danger/70 hover:text-danger transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete this listing
+              </button>
+            </div>
+          </div>
+        )}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5">
+            <div className="bg-slate/20 border border-white/10 rounded-2xl p-6 w-full max-w-sm">
+              <h3 className="text-[15px] font-bold text-paper mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-danger" /> Delete Listing
+              </h3>
+              <p className="text-[13px] text-paper/45 mb-2 leading-relaxed">
+                Are you sure you want to delete "{property?.title}"? This cannot be undone.
+              </p>
+              {deleteError && (
+                <p className="text-[12px] text-danger mb-3">{deleteError}</p>
+              )}
+              <div className="flex gap-3 mt-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deletingProperty}
+                  className="flex-1 py-3 rounded-xl font-bold text-[13px] text-paper/40 hover:bg-white/5 transition-colors disabled:opacity-40"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteProperty}
+                  disabled={deletingProperty}
+                  className="flex-1 bg-danger text-paper py-3 rounded-xl font-bold text-[13px] hover:bg-danger-dark transition-all disabled:opacity-40"
+                >
+                  {deletingProperty ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
