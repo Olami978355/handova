@@ -6,7 +6,6 @@ import { NotificationsProvider } from './context/NotificationsContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { HelmetProvider } from 'react-helmet-async';
 import Layout from './components/Layout';
-import Landing from './pages/Landing';
 import Login from './pages/Login';
 import SignupPage from './pages/auth/SignupPage';
 import ConfirmEmail from './pages/auth/ConfirmEmail';
@@ -16,6 +15,7 @@ import OnboardingWizard from './pages/onboarding/OnboardingWizard';
 import VerificationPage from './pages/verification/VerificationPage';
 import Listings from './pages/Listings';
 import PropertyDetail from './pages/PropertyDetail';
+import HowItWorks from './pages/HowItWorks';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import MessagesPage from './pages/MessagesPage';
@@ -108,13 +108,14 @@ function AppInner() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Landing />} />
+            <Route index element={<Listings />} />
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<SignupPage />} />
             <Route path="auth/confirm" element={<ConfirmEmail />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="listings" element={<Listings />} />
+            <Route path="how-it-works" element={<HowItWorks />} />
             <Route path="map" element={<MapSearch />} />
             <Route path="property/:id" element={<PropertyDetail />} />
             <Route path="u/:username" element={<PublicProfile />} />

@@ -28,7 +28,6 @@ export default function Navbar() {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
   const { totalUnreadCount } = useConversationsContext();
-  const isLandingPage = location.pathname === '/';
   const isAuthPage = ['/login', '/signup', '/onboarding'].includes(location.pathname);
 
   useEffect(() => {
@@ -56,14 +55,12 @@ export default function Navbar() {
     { name: 'Properties', path: '/listings', icon: Home },
     { name: 'Map View', path: '/map', icon: MapPin },
     { name: 'Find an Agent', path: '/directory', icon: Users },
-    { name: 'How it Works', path: '/#how-it-works', icon: FileText },
+    { name: 'How it Works', path: '/how-it-works', icon: FileText },
   ];
 
   if (isAuthPage) return null;
 
-  const navBg = scrolled || !isLandingPage
-    ? 'bg-slate/20 backdrop-blur-xl border-b border-white/5'
-    : 'bg-transparent';
+  const navBg = 'bg-slate/20 backdrop-blur-xl border-b border-white/5';
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
