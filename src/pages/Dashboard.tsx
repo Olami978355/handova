@@ -994,8 +994,9 @@ export default function Dashboard() {
                     </div>
                     <div className="divide-y divide-white/4">
                       {(showAllProperties ? properties : properties.slice(0, 5)).map(property => (
-                        <div
+                        <Link
                           key={property.id}
+                          to={`/property/${property.id}`}
                           className="flex items-center gap-4 px-5 py-4 hover:bg-white/2 transition-colors"
                         >
                           <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden flex-shrink-0">
@@ -1039,11 +1040,8 @@ export default function Dashboard() {
                             }`}>
                               {property.is_rented ? 'rented/sold' : property.status.replace(/_/g, ' ')}
                             </span>
-                            <Link to={`/property/${property.id}`}>
-                              <Eye className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
-                            </Link>
                             <button
-                              onClick={() => navigate(`/edit-property/${property.id}`)}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/edit-property/${property.id}`); }}
                               title="Edit listing"
                             >
                               <Pencil className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
@@ -1057,14 +1055,8 @@ export default function Dashboard() {
                                 : <Ban className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
                               }
                             </button>
-                            <button
-                              onClick={() => setDeleteTarget(property)}
-                              title="Delete listing"
-                            >
-                              <Trash2 className="w-4 h-4 text-paper/20 hover:text-danger transition-colors" />
-                            </button>
                           </div>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                     {properties.length > 5 && (
