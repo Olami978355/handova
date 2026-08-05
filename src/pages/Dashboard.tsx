@@ -4,7 +4,7 @@ import {
   Home, Shield, MessageSquare, Plus, Loader2,
   AlertCircle, CheckCircle, Clock, ArrowRight,
   User, CreditCard, Calendar, Search, Settings,
-  MapPin, RefreshCw, Eye, EyeOff, Heart, Pencil, Trash2, AlertTriangle, Users, Scale
+  MapPin, RefreshCw, Eye, EyeOff, Heart, Pencil, Trash2, AlertTriangle, Users, Scale, Ban, Megaphone
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase, requireValidSession } from '../lib/supabase';
@@ -327,6 +327,8 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Property | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [delistTarget, setDelistTarget] = useState<Property | null>(null);
+  const [delisting, setDelisting] = useState(false);
 
   const handleDeleteListing = async () => {
     if (!deleteTarget) return;
@@ -1047,12 +1049,12 @@ export default function Dashboard() {
                               <Pencil className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
                             </button>
                             <button
-                              onClick={() => handleToggleDelist(property)}
+                              onClick={(e) => { e.stopPropagation(); setDelistTarget(property); }}
                               title={property.is_delisted ? 'Re-list' : 'Delist'}
                             >
                               {property.is_delisted
-                                ? <Eye className="w-4 h-4 text-gold hover:text-gold-dark transition-colors" />
-                                : <EyeOff className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
+                                ? <Megaphone className="w-4 h-4 text-gold hover:text-gold-dark transition-colors" />
+                                : <Ban className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
                               }
                             </button>
                             <button
@@ -1076,6 +1078,44 @@ export default function Dashboard() {
                   </div>
                 )}
 
+                {delistTarget && (
+                  <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5">
+                    <div className="bg-slate/20 border border-white/10 rounded-2xl p-6 w-full max-w-sm">
+                      <h3 className="text-[15px] font-bold text-paper mb-2 flex items-center gap-2">
+                        {delistTarget.is_delisted
+                          ? <><Megaphone className="w-5 h-5 text-gold" /> Re-list this property?</>
+                          : <><Ban className="w-5 h-5 text-danger" /> Delist this property?</>}
+                      </h3>
+                      <p className="text-[13px] text-paper/45 mb-5 leading-relaxed">
+                        {delistTarget.is_delisted
+                          ? `"${delistTarget.title}" will become visible to browsers again.`
+                          : `"${delistTarget.title}" will be hidden from listings until you re-list it. Active deals are not affected.`}
+                      </p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setDelistTarget(null)}
+                          disabled={delisting}
+                          className="flex-1 py-3 rounded-xl font-bold text-[13px] text-paper/40 hover:bg-white/5 transition-colors disabled:opacity-40"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!delistTarget) return;
+                            setDelisting(true);
+                            await handleToggleDelist(delistTarget);
+                            setDelisting(false);
+                            setDelistTarget(null);
+                          }}
+                          disabled={delisting}
+                          className="flex-1 bg-gold text-ink py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-all disabled:opacity-40"
+                        >
+                          {delisting ? 'Working...' : (delistTarget.is_delisted ? 'Re-list' : 'Delist')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {deleteTarget && (
                   <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5">
                     <div className="bg-slate/20 border border-white/10 rounded-2xl p-6 w-full max-w-sm">
