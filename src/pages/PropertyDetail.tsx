@@ -483,7 +483,7 @@ export default function PropertyDetail() {
                   } catch { }
                   finally { setSavingProperty(false); }
                 }}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${saved ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/8'}`}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${saved ? 'bg-gold/25 text-gold' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/8'}`}
               >
                 {savingProperty
                   ? <Loader2 className="w-4 h-4 animate-spin" />
