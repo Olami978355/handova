@@ -8,16 +8,17 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgentCardRequest } from '../components/profile/AgentCardRequest';
+import { PayoutSettings } from '../components/profile/PayoutSettings';
+import { ChangePasswordSection } from '../components/profile/ChangePasswordSection';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
-type Tab = 'profile' | 'security' | 'notifications' | 'billing';
+type Tab = 'profile' | 'security' | 'payments';
 
 const tabs: { id: Tab; icon: React.ElementType; label: string }[] = [
   { id: 'profile', icon: User, label: 'Profile Info' },
   { id: 'security', icon: Lock, label: 'Security' },
-  { id: 'notifications', icon: Bell, label: 'Notifications' },
-  { id: 'billing', icon: CreditCard, label: 'Billing' },
+  { id: 'payments', icon: CreditCard, label: 'Payments & Payouts' },
 ];
 
 export default function Profile() {
@@ -460,25 +461,26 @@ export default function Profile() {
                   </motion.div>
                 )}
 
-                {/* Coming soon tabs */}
-                {activeTab !== 'profile' && (
+                {activeTab === 'security' && (
                   <motion.div
-                    key={activeTab}
+                    key="security"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.2 }}
-                    className="text-center py-14"
                   >
-                    <div className="w-14 h-14 bg-white/4 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      {activeTab === 'security' && <Lock className="w-7 h-7 text-white/20" />}
-                      {activeTab === 'notifications' && <Bell className="w-7 h-7 text-white/20" />}
-                      {activeTab === 'billing' && <CreditCard className="w-7 h-7 text-white/20" />}
-                    </div>
-                    <h3 className="text-[16px] font-bold text-white mb-2 capitalize">{activeTab}</h3>
-                    <p className="text-[13px] text-white/35 max-w-xs mx-auto">
-                      We're building this section. Check back soon.
-                    </p>
+                    <ChangePasswordSection />
+                  </motion.div>
+                )}
+                {activeTab === 'payments' && (
+                  <motion.div
+                    key="payments"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <PayoutSettings />
                   </motion.div>
                 )}
 
