@@ -41,7 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
           </div>
           <h2 className="text-2xl font-bold text-zinc-900 mb-2 tracking-tight">Something went wrong</h2>
           <p className="text-zinc-500 mb-8 max-w-md mx-auto">
-            We encountered an unexpected error. Our team has been notified.
+            We encountered an unexpected error. Try reloading, or head back to the homepage.
             {this.state.error && (
               <span className="block mt-2 text-xs font-mono bg-zinc-100 p-2 rounded border border-zinc-200 overflow-auto max-h-24">
                 {this.state.error.message}

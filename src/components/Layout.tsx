@@ -7,6 +7,7 @@ import { PushPermissionBanner } from './notifications/PushPermissionBanner';
 import { ChangelogBanner } from './ChangelogBanner';
 import { OfflineBanner } from './OfflineBanner';
 import { useAuth } from '../context/AuthContext';
+import { ErrorBoundary } from './ErrorBoundary';
 
 const noFooterRoutes = [
   '/messages',
@@ -38,7 +39,9 @@ export default function Layout() {
       <PushPermissionBanner />
       <ChangelogBanner />
       <main className={`flex-grow ${showNav ? 'pt-16' : ''} ${showBottomTabs ? 'page-with-tabs' : ''}`}>
-        <Outlet />
+        <ErrorBoundary key={location.pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
       {showFooter && <Footer />}
       {showBottomTabs && <BottomTabBar role={profile?.role} />}
