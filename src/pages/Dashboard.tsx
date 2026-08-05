@@ -318,7 +318,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const [properties, setProperties] = useState<Property[]>([]);
+  const [showAllProperties, setShowAllProperties] = useState(false);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [showAllDeals, setShowAllDeals] = useState(false);
   const [bookings, setBookings] = useState<InspectionBooking[]>([]);
   const [savedProperties, setSavedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -934,7 +936,7 @@ export default function Dashboard() {
                     />
                   ) : (
                     <div className="divide-y divide-white/4">
-                      {deals.map(deal => (
+                      {(showAllDeals ? deals : deals.slice(0, 5)).map(deal => (
                         <Link
                           key={deal.id}
                           to={`/deals/${deal.id}`}
@@ -989,7 +991,7 @@ export default function Dashboard() {
                       </Link>
                     </div>
                     <div className="divide-y divide-white/4">
-                      {properties.slice(0, 5).map(property => (
+                      {(showAllProperties ? properties : properties.slice(0, 5)).map(property => (
                         <div
                           key={property.id}
                           className="flex items-center gap-4 px-5 py-4 hover:bg-white/2 transition-colors"
@@ -1063,6 +1065,14 @@ export default function Dashboard() {
                         </div>
                       ))}
                     </div>
+                    {properties.length > 5 && (
+                      <button
+                        onClick={() => setShowAllProperties(v => !v)}
+                        className="w-full py-3 text-[12px] font-semibold text-gold hover:text-gold-dark transition-colors border-t border-white/5"
+                      >
+                        {showAllProperties ? 'Show less' : `Show all ${properties.length} listings`}
+                      </button>
+                    )}
                   </div>
                 )}
 
