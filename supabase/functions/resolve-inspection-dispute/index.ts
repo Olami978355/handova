@@ -128,7 +128,7 @@ serve(async (req) => {
           propertyTitle: booking.properties.title,
           status: 'Resolved',
           message: `The dispute for ${booking.properties.title} has been resolved. Resolution: ${resolution}`,
-          link: `https://renteasy.ng/dashboard/bookings`
+          link: `https://handova.ng/dashboard`
         }
       );
     }
@@ -142,7 +142,7 @@ serve(async (req) => {
           propertyTitle: booking.properties.title,
           status: 'Resolved',
           message: `The dispute for ${booking.properties.title} has been resolved. Resolution: ${resolution}`,
-          link: `https://renteasy.ng/dashboard/bookings`
+          link: `https://handova.ng/dashboard`
         }
       );
     }

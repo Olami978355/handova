@@ -80,7 +80,7 @@ serve(async (req) => {
             propertyTitle: booking.properties.title,
             status: 'Tenant Interested',
             message: `The tenant who inspected your property is interested! You have 72 hours to start the escrow process.`,
-            link: `https://renteasy.ng/dashboard/bookings`
+            link: `https://handova.ng/dashboard`
           }
         );
       }
@@ -151,7 +151,7 @@ serve(async (req) => {
             name: booking.tenant.full_name,
             propertyTitle: booking.properties.title,
             amount: refundAmount,
-            link: `https://renteasy.ng/dashboard/bookings`
+            link: `https://handova.ng/dashboard`
           }
         );
       }

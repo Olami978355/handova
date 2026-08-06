@@ -71,7 +71,7 @@ serve(async (req) => {
           propertyTitle: booking.properties.title,
           date: confirmedDate,
           time: confirmedTime,
-          link: `https://renteasy.ng/dashboard/bookings`
+          link: `https://handova.ng/dashboard`
         }
       );
     }

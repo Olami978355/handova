@@ -32,7 +32,7 @@ const getTemplate = (template: string, data: Record<string, any>) => {
       <body>
         <div class="container">
           <div class="header">
-            <a href="https://renteasy.ng" class="logo">RentEasy</a>
+            <a href="https://handova.ng" class="logo">RentEasy</a>
           </div>
           <div class="content">
             ${content}
