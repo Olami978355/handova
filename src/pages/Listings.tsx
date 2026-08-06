@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   Search, Home, Shield, Loader2, AlertCircle,
   X, SlidersHorizontal, Map as MapIcon, ArrowRight,
-  RefreshCw, ChevronDown, Check, Layers
+  RefreshCw, ChevronDown, Check, Layers, BookmarkPlus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
@@ -13,6 +13,7 @@ import PropertyCard from '../components/PropertyCard';
 import { FilterBtn } from '../components/ui/FilterBtn';
 import { Select } from '../components/ui/Select';
 import { PropertyMap } from '../components/map/PropertyMap';
+import { useAuth } from '../context/AuthContext';
 
 // ─── Nigerian States ───────────────────────────────────────────────
 const NIGERIAN_STATES = [
@@ -55,6 +56,11 @@ const SkeletonCard = () => (
 // ═══════════════════════════════════════════════════════════════
 export default function Listings() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [saveSearchOpen, setSaveSearchOpen] = useState(false);
+  const [searchName, setSearchName] = useState('');
+  const [savingSearch, setSavingSearch] = useState(false);
+  const [saveSearchMsg, setSaveSearchMsg] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── Filter state ──
@@ -162,6 +168,22 @@ export default function Listings() {
     };
   }, [fetchProperties]);
 
+  const handleSaveSearch = async () => {
+    if (!user || !searchName.trim()) return;
+    setSavingSearch(true);
+    const filters = { search, state, type, transaction, minPrice, maxPrice, verifiedOnly, bedrooms };
+    const { error: saveError } = await supabase
+      .from('saved_searches')
+      .insert({ user_id: user.id, name: searchName.trim(), filters });
+    setSavingSearch(false);
+    if (!saveError) {
+      setSaveSearchMsg('Search saved');
+      setSearchName('');
+      setSaveSearchOpen(false);
+      setTimeout(() => setSaveSearchMsg(null), 2500);
+    }
+  };
+
   const clearFilters = () => {
     setSearch('');
     setState('');
@@ -238,6 +260,15 @@ export default function Listings() {
               {view === 'list' ? <MapIcon className="w-3.5 h-3.5" /> : <Home className="w-3.5 h-3.5" />}
               {view === 'list' ? 'Map View' : 'List View'}
             </button>
+            {user && (
+              <button
+                onClick={() => setSaveSearchOpen(true)}
+                className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 hover:text-paper transition-all whitespace-nowrap flex-shrink-0"
+              >
+                <BookmarkPlus className="w-3.5 h-3.5" />
+                Save search
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -442,6 +473,55 @@ export default function Listings() {
           </div>
         </div>
       </div>
+
+      {/* Save search modal */}
+      <AnimatePresence>
+        {saveSearchOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSaveSearchOpen(false)}
+              className="fixed inset-0 bg-black z-50"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-5"
+            >
+              <div className="bg-slate/95 border border-paper/10 rounded-2xl p-6 max-w-sm w-full">
+                <h3 className="font-sans text-[16px] font-bold text-paper mb-1">Save this search</h3>
+                <p className="font-sans text-[13px] text-paper/45 mb-4">Give it a name so you can find it again later.</p>
+                <input
+                  type="text"
+                  value={searchName}
+                  onChange={e => setSearchName(e.target.value)}
+                  placeholder="e.g. 2-bed in Lekki under ₦2M"
+                  autoFocus
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors mb-4"
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setSaveSearchOpen(false)}
+                    className="flex-1 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveSearch}
+                    disabled={!searchName.trim() || savingSearch}
+                    className="flex-1 py-3 bg-gold text-ink rounded-xl text-[13px] font-bold hover:bg-gold-dark transition-colors disabled:opacity-50"
+                  >
+                    {savingSearch ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── Mobile filter drawer ── */}
       <AnimatePresence>
