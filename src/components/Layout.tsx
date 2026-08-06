@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
-import Footer from './Footer';
 import { BottomTabBar } from './BottomTabBar';
 import { PushPermissionBanner } from './notifications/PushPermissionBanner';
 import { ChangelogBanner } from './ChangelogBanner';
@@ -9,11 +8,6 @@ import { OfflineBanner } from './OfflineBanner';
 import { useAuth } from '../context/AuthContext';
 import { ErrorBoundary } from './ErrorBoundary';
 
-const noFooterRoutes = [
-  '/messages',
-  '/onboarding',
-  '/admin',
-];
 const noNavRoutes = [
   '/login',
   '/signup',
@@ -28,7 +22,6 @@ const noBottomTabRoutes = [
 export default function Layout() {
   const location = useLocation();
   const { user, profile } = useAuth();
-  const showFooter = !noFooterRoutes.some(r => location.pathname.startsWith(r));
   const showNav = !noNavRoutes.includes(location.pathname);
   const showBottomTabs = !!user && !noBottomTabRoutes.some(r => location.pathname.startsWith(r));
 
@@ -43,7 +36,6 @@ export default function Layout() {
           <Outlet />
         </ErrorBoundary>
       </main>
-      {showFooter && <Footer />}
       {showBottomTabs && <BottomTabBar role={profile?.role} />}
     </div>
   );
