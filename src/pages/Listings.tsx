@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
-  Search, MapPin, Home, Shield, Loader2, AlertCircle,
+  Search, Home, Shield, Loader2, AlertCircle,
   X, SlidersHorizontal, Map as MapIcon, ArrowRight,
   RefreshCw, ChevronDown, Check, Layers
 } from 'lucide-react';
@@ -11,6 +11,7 @@ import { Property, PropertyType, TransactionType } from '../types';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import PropertyCard from '../components/PropertyCard';
 import { FilterBtn } from '../components/ui/FilterBtn';
+import { Select } from '../components/ui/Select';
 
 // ─── Nigerian States ───────────────────────────────────────────────
 const NIGERIAN_STATES = [
@@ -38,7 +39,7 @@ const abbreviatePrice = (amount: number) => {
 
 // ─── Skeleton card ────────────────────────────────────────────────
 const SkeletonCard = () => (
-  <div className="bg-[#0a1f11] rounded-2xl overflow-hidden border border-white/5">
+  <div className="bg-slate/25 rounded-2xl overflow-hidden border border-white/5">
     <div className="skeleton h-44" />
     <div className="p-4 space-y-3">
       <div className="skeleton h-4 w-3/4" />
@@ -176,30 +177,30 @@ export default function Listings() {
   // ─────────────────────────────────────────────────────────────
   return (
     <div
-      className="min-h-screen bg-[#0a0a0a] page-with-tabs"
+      className="min-h-screen bg-ink page-with-tabs"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* ── Search header ── */}
-      <div className="bg-[#0a1f11] border-b border-white/5 pt-8 pb-6 px-5">
+      <div className="bg-slate/25 border-b border-white/5 pt-8 pb-6 px-5">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-[22px] font-black text-white tracking-tight mb-5">
+          <h1 className="text-[22px] font-black text-paper tracking-tight mb-5">
             Find your property
           </h1>
 
           {/* Search input */}
           <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/30 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by title, area, address..."
-              className="w-full pl-11 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+              className="w-full pl-11 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-paper/30 hover:text-paper transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -219,18 +220,18 @@ export default function Listings() {
 
             <button
               onClick={() => setShowFilters(true)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-white/55 hover:bg-white/8 hover:text-white transition-all whitespace-nowrap flex-shrink-0"
+              className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 hover:text-paper transition-all whitespace-nowrap flex-shrink-0"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
               More filters
               {hasActiveFilters && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#f0c040]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-gold" />
               )}
             </button>
 
             <Link
               to="/map"
-              className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-white/55 hover:bg-white/8 hover:text-white transition-all whitespace-nowrap flex-shrink-0"
+              className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 hover:text-paper transition-all whitespace-nowrap flex-shrink-0"
             >
               <MapIcon className="w-3.5 h-3.5" />
               Map View
@@ -245,13 +246,13 @@ export default function Listings() {
 
           {/* ── Desktop sidebar filters ── */}
           <div className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 sticky top-24">
+            <div className="bg-slate/25 border border-white/6 rounded-2xl p-5 sticky top-24">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-[13px] font-bold text-white">Filters</h2>
+                <h2 className="text-[13px] font-bold text-paper">Filters</h2>
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="text-[11px] text-[#f0c040]/70 hover:text-[#f0c040] transition-colors font-semibold"
+                    className="text-[11px] text-gold/70 hover:text-gold transition-colors font-semibold"
                   >
                     Clear all
                   </button>
@@ -261,27 +262,20 @@ export default function Listings() {
               <div className="space-y-5">
                 {/* State */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                     State
                   </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/25 pointer-events-none" />
-                    <select
+                    <Select
                       value={state}
-                      onChange={e => setState(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[13px] text-white focus:outline-none focus:border-[#1a6b3c] transition-colors appearance-none cursor-pointer"
-                    >
-                      <option value="" className="bg-[#0a1f11]">All states</option>
-                      {NIGERIAN_STATES.map(s => (
-                        <option key={s} value={s} className="bg-[#0a1f11]">{s}</option>
-                      ))}
-                    </select>
-                  </div>
+                      onChange={setState}
+                      placeholder="All states"
+                      options={[{ value: '', label: 'All states' }, ...NIGERIAN_STATES.map(s => ({ value: s, label: s }))]}
+                    />
                 </div>
 
                 {/* Property type */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                     Property Type
                   </label>
                   <div className="grid grid-cols-3 gap-1.5">
@@ -291,8 +285,8 @@ export default function Listings() {
                         onClick={() => setType(t)}
                         className={`py-2 rounded-xl text-[12px] font-semibold capitalize transition-all ${
                           type === t
-                            ? 'bg-gold text-white'
-                            : 'bg-white/5 text-white/45 hover:bg-white/8 hover:text-white'
+                            ? 'bg-gold text-ink'
+                            : 'bg-white/5 text-paper/45 hover:bg-white/8 hover:text-paper'
                         }`}
                       >
                         {t}
@@ -303,7 +297,7 @@ export default function Listings() {
 
                 {/* Transaction */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                     Listing Type
                   </label>
                   <div className="grid grid-cols-3 gap-1.5">
@@ -317,8 +311,8 @@ export default function Listings() {
                         onClick={() => setTransaction(value)}
                         className={`py-2 rounded-xl text-[12px] font-semibold transition-all ${
                           transaction === value
-                            ? 'bg-gold text-white'
-                            : 'bg-white/5 text-white/45 hover:bg-white/8 hover:text-white'
+                            ? 'bg-gold text-ink'
+                            : 'bg-white/5 text-paper/45 hover:bg-white/8 hover:text-paper'
                         }`}
                       >
                         {label}
@@ -329,7 +323,7 @@ export default function Listings() {
 
                 {/* Bedrooms */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                     Min Bedrooms
                   </label>
                   <div className="flex gap-1.5">
@@ -339,8 +333,8 @@ export default function Listings() {
                         onClick={() => setBedrooms(b)}
                         className={`flex-1 py-2 rounded-xl text-[12px] font-semibold transition-all ${
                           bedrooms === b
-                            ? 'bg-gold text-white'
-                            : 'bg-white/5 text-white/45 hover:bg-white/8'
+                            ? 'bg-gold text-ink'
+                            : 'bg-white/5 text-paper/45 hover:bg-white/8'
                         }`}
                       >
                         {b || 'Any'}
@@ -351,7 +345,7 @@ export default function Listings() {
 
                 {/* Price range */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                     Price Range (₦)
                   </label>
                   <div className="space-y-2">
@@ -360,14 +354,14 @@ export default function Listings() {
                       placeholder="Min price"
                       value={minPrice}
                       onChange={e => setMinPrice(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[13px] text-white placeholder:text-white/20 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[13px] text-paper placeholder:text-paper/20 focus:outline-none focus:border-gold transition-colors"
                     />
                     <input
                       type="number"
                       placeholder="Max price"
                       value={maxPrice}
                       onChange={e => setMaxPrice(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[13px] text-white placeholder:text-white/20 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[13px] text-paper placeholder:text-paper/20 focus:outline-none focus:border-gold transition-colors"
                     />
                   </div>
                 </div>
@@ -380,19 +374,19 @@ export default function Listings() {
           <div className="flex-1 min-w-0">
             {/* Results count */}
             <div className="flex items-center justify-between mb-5">
-              <p className="text-[13px] text-white/45">
+              <p className="text-[13px] text-paper/45">
                 {loading ? 'Searching...' : (
                   <>
-                    <span className="text-white font-semibold">{totalCount}</span>
+                    <span className="text-paper font-semibold">{totalCount}</span>
                     {' '}propert{totalCount === 1 ? 'y' : 'ies'} found
-                    {state && <span className="text-white/30"> in {state}</span>}
+                    {state && <span className="text-paper/30"> in {state}</span>}
                   </>
                 )}
               </p>
               {hasActiveFilters && !loading && (
                 <button
                   onClick={clearFilters}
-                  className="text-[12px] text-white/35 hover:text-[#f0c040] transition-colors flex items-center gap-1"
+                  className="text-[12px] text-paper/35 hover:text-gold transition-colors flex items-center gap-1"
                 >
                   <X className="w-3 h-3" /> Clear filters
                 </button>
@@ -405,27 +399,27 @@ export default function Listings() {
                 {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
             ) : error ? (
-              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-12 text-center">
-                <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-4" />
-                <h3 className="text-[16px] font-bold text-white mb-2">Failed to load properties</h3>
-                <p className="text-[13px] text-white/40 mb-6">{error}</p>
+              <div className="bg-slate/25 border border-white/6 rounded-2xl p-12 text-center">
+                <AlertCircle className="w-10 h-10 text-danger mx-auto mb-4" />
+                <h3 className="text-[16px] font-bold text-paper mb-2">Failed to load properties</h3>
+                <p className="text-[13px] text-paper/40 mb-6">{error}</p>
                 <button
                   onClick={fetchProperties}
-                  className="flex items-center gap-2 bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-[#0f4a2a] transition-colors mx-auto"
+                  className="flex items-center gap-2 bg-gold text-ink px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-gold-dark transition-colors mx-auto"
                 >
                   <RefreshCw className="w-4 h-4" /> Try Again
                 </button>
               </div>
             ) : properties.length === 0 ? (
-              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-14 text-center">
-                <Home className="w-10 h-10 text-white/15 mx-auto mb-4" />
-                <h3 className="text-[16px] font-bold text-white mb-2">No properties found</h3>
-                <p className="text-[13px] text-white/40 mb-6">
+              <div className="bg-slate/25 border border-white/6 rounded-2xl p-14 text-center">
+                <Home className="w-10 h-10 text-paper/15 mx-auto mb-4" />
+                <h3 className="text-[16px] font-bold text-paper mb-2">No properties found</h3>
+                <p className="text-[13px] text-paper/40 mb-6">
                   Try adjusting your filters or search in a different area.
                 </p>
                 <button
                   onClick={clearFilters}
-                  className="text-[13px] font-semibold text-[#f0c040] hover:text-[#e0b030] transition-colors flex items-center gap-1 mx-auto"
+                  className="text-[13px] font-semibold text-gold hover:text-gold-dark transition-colors flex items-center gap-1 mx-auto"
                 >
                   Clear all filters <ArrowRight className="w-4 h-4" />
                 </button>
@@ -457,17 +451,17 @@ export default function Listings() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed inset-x-0 bottom-0 bg-[#0a1f11] border-t border-white/8 rounded-t-3xl z-50 max-h-[90vh] overflow-y-auto"
+              className="fixed inset-x-0 bottom-0 bg-slate/25 border-t border-white/8 rounded-t-3xl z-50 max-h-[90vh] overflow-y-auto"
             >
               <div className="p-5">
                 {/* Handle */}
                 <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-5" />
 
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-[17px] font-bold text-white">Filters</h2>
+                  <h2 className="text-[17px] font-bold text-paper">Filters</h2>
                   <button
                     onClick={() => setShowFilters(false)}
-                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-colors"
+                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/50 hover:text-paper transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -476,26 +470,22 @@ export default function Listings() {
                 <div className="space-y-5">
                   {/* State */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">State</label>
-                    <select
+                    <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">State</label>
+                    <Select
                       value={state}
-                      onChange={e => setState(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-[#1a6b3c] transition-colors"
-                    >
-                      <option value="" className="bg-[#0a1f11]">All states</option>
-                      {NIGERIAN_STATES.map(s => (
-                        <option key={s} value={s} className="bg-[#0a1f11]">{s}</option>
-                      ))}
-                    </select>
+                      onChange={setState}
+                      placeholder="All states"
+                      options={[{ value: '', label: 'All states' }, ...NIGERIAN_STATES.map(s => ({ value: s, label: s }))]}
+                    />
                   </div>
 
                   {/* Type */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">Property Type</label>
+                    <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">Property Type</label>
                     <div className="grid grid-cols-3 gap-2">
                       {(['all', 'house', 'land'] as const).map(t => (
                         <button key={t} onClick={() => setType(t)}
-                          className={`py-3 rounded-xl text-[13px] font-semibold capitalize transition-all ${type === t ? 'bg-gold text-white' : 'bg-white/5 text-white/45'}`}>
+                          className={`py-3 rounded-xl text-[13px] font-semibold capitalize transition-all ${type === t ? 'bg-gold text-ink' : 'bg-white/5 text-paper/45'}`}>
                           {t}
                         </button>
                       ))}
@@ -504,11 +494,11 @@ export default function Listings() {
 
                   {/* Transaction */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">Listing Type</label>
+                    <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">Listing Type</label>
                     <div className="grid grid-cols-3 gap-2">
                       {[{ value: 'all', label: 'All' }, { value: 'rent', label: 'Rent' }, { value: 'sell', label: 'Buy' }].map(({ value, label }) => (
                         <button key={value} onClick={() => setTransaction(value as TransactionType | 'all')}
-                          className={`py-3 rounded-xl text-[13px] font-semibold transition-all ${transaction === value ? 'bg-gold text-white' : 'bg-white/5 text-white/45'}`}>
+                          className={`py-3 rounded-xl text-[13px] font-semibold transition-all ${transaction === value ? 'bg-gold text-ink' : 'bg-white/5 text-paper/45'}`}>
                           {label}
                         </button>
                       ))}
@@ -517,11 +507,11 @@ export default function Listings() {
 
                   {/* Bedrooms */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">Min Bedrooms</label>
+                    <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">Min Bedrooms</label>
                     <div className="flex gap-2">
                       {['', '1', '2', '3', '4'].map(b => (
                         <button key={b} onClick={() => setBedrooms(b)}
-                          className={`flex-1 py-3 rounded-xl text-[13px] font-semibold transition-all ${bedrooms === b ? 'bg-gold text-white' : 'bg-white/5 text-white/45'}`}>
+                          className={`flex-1 py-3 rounded-xl text-[13px] font-semibold transition-all ${bedrooms === b ? 'bg-gold text-ink' : 'bg-white/5 text-paper/45'}`}>
                           {b || 'Any'}
                         </button>
                       ))}
@@ -530,12 +520,12 @@ export default function Listings() {
 
                   {/* Price */}
                   <div>
-                    <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">Price Range (₦)</label>
+                    <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">Price Range (₦)</label>
                     <div className="grid grid-cols-2 gap-2">
                       <input type="number" placeholder="Min" value={minPrice} onChange={e => setMinPrice(e.target.value)}
-                        className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/20 focus:outline-none focus:border-[#1a6b3c]" />
+                        className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/20 focus:outline-none focus:border-gold" />
                       <input type="number" placeholder="Max" value={maxPrice} onChange={e => setMaxPrice(e.target.value)}
-                        className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/20 focus:outline-none focus:border-[#1a6b3c]" />
+                        className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/20 focus:outline-none focus:border-gold" />
                     </div>
                   </div>
 
@@ -543,11 +533,11 @@ export default function Listings() {
                   {/* Actions */}
                   <div className="flex gap-3 pt-2">
                     <button onClick={clearFilters}
-                      className="flex-1 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[14px] font-semibold text-white/55 hover:bg-white/8 transition-colors">
+                      className="flex-1 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[14px] font-semibold text-paper/55 hover:bg-white/8 transition-colors">
                       Clear all
                     </button>
                     <button onClick={() => setShowFilters(false)}
-                      className="flex-1 py-3.5 bg-[#f0c040] text-black rounded-xl text-[14px] font-bold hover:bg-[#e0b030] transition-colors">
+                      className="flex-1 py-3.5 bg-gold text-ink rounded-xl text-[14px] font-bold hover:bg-gold-dark transition-colors">
                       Show {totalCount} result{totalCount !== 1 ? 's' : ''}
                     </button>
                   </div>
