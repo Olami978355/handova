@@ -35,7 +35,8 @@ const StarInput: React.FC<{ value: number; onChange: (v: number) => void }> = ({
         key={n}
         type="button"
         onClick={() => onChange(n)}
-        className="p-0.5"
+        aria-label={`Rate ${n} star${n > 1 ? 's' : ''}`}
+        className="w-10 h-10 flex items-center justify-center -m-1"
       >
         <Star
           className={`w-5 h-5 ${n <= value ? 'fill-gold text-gold' : 'text-paper/15'}`}
