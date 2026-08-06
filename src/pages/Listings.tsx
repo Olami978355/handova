@@ -12,6 +12,7 @@ import { VerifiedBadge } from '../components/VerifiedBadge';
 import PropertyCard from '../components/PropertyCard';
 import { FilterBtn } from '../components/ui/FilterBtn';
 import { Select } from '../components/ui/Select';
+import { PropertyMap } from '../components/map/PropertyMap';
 
 // ─── Nigerian States ───────────────────────────────────────────────
 const NIGERIAN_STATES = [
@@ -77,6 +78,7 @@ export default function Listings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [view, setView] = useState<'list' | 'map'>('list');
   const [totalCount, setTotalCount] = useState(0);
 
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -229,13 +231,13 @@ export default function Listings() {
               )}
             </button>
 
-            <Link
-              to="/map"
+            <button
+              onClick={() => setView(view === 'list' ? 'map' : 'list')}
               className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 hover:text-paper transition-all whitespace-nowrap flex-shrink-0"
             >
-              <MapIcon className="w-3.5 h-3.5" />
-              Map View
-            </Link>
+              {view === 'list' ? <MapIcon className="w-3.5 h-3.5" /> : <Home className="w-3.5 h-3.5" />}
+              {view === 'list' ? 'Map View' : 'List View'}
+            </button>
           </div>
         </div>
       </div>
@@ -394,7 +396,8 @@ export default function Listings() {
             </div>
 
             {/* Loading */}
-            {loading ? (
+            {view === 'list' ? (
+            loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
@@ -429,6 +432,11 @@ export default function Listings() {
                 {properties.map(property => (
                   <PropertyCard key={property.id} property={property} />
                 ))}
+              </div>
+            )
+            ) : (
+              <div className="h-[70vh] rounded-2xl overflow-hidden border border-paper/10">
+                <PropertyMap properties={properties} loading={loading} error={error} />
               </div>
             )}
           </div>
