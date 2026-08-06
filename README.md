@@ -1,4 +1,4 @@
-# Rent Easy 🏡
+# Handova 🏡
 
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
@@ -7,7 +7,7 @@
 
 **Nigeria's most trusted property rental and sale marketplace.**
 
-Rent Easy is a revolutionary real estate platform designed for the Nigerian market. It addresses the lack of trust between tenants, landlords, and agents through a secure escrow payment system, verified listings, and a transparent inspection booking process.
+Handova is a secure escrow platform for renting and buying property in Nigeria. It addresses the lack of trust between tenants, landlords, and agents through a secure escrow payment system, verified listings, and a transparent inspection booking process.
 
 ---
 
@@ -19,7 +19,7 @@ Rent Easy is a revolutionary real estate platform designed for the Nigerian mark
 
 ## ✨ Features
 
-- **🛡️ Safe Deal Escrow**: Payments are held securely by Rent Easy and only released after a successful inspection and confirmation.
+- **🛡️ Safe Deal Escrow**: Payments are held securely by Handova and only released after a successful inspection and confirmation.
 - **📍 Map-Based Search**: Integrated Google Maps for intuitive property discovery by location.
 - **🤳 Verified Listings**: Multi-tier verification for Landlords and Agents (LASRERA, NIN check).
 - **📅 Inspection Booking**: Secure inspection fee management with Paystack.
@@ -53,8 +53,8 @@ Rent Easy is a revolutionary real estate platform designed for the Nigerian mark
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/rent-easy.git
-   cd rent-easy
+   git clone https://github.com/Olami978355/handova.git
+   cd handova
    ```
 
 2. **Install dependencies**:
@@ -123,5 +123,6 @@ This project is licensed under the MIT License.
 
 ## 📞 Contact
 
-- **Email**: joinrenteasy@gmail.com
-- **Twitter**: [@Renteasyapp](https://x.com/Renteasyapp)
+- **X (Twitter)**: [@gohandova](https://x.com/gohandova)
+- **Instagram**: [@gohandova](https://instagram.com/gohandova)
+- **TikTok**: [@gohandova](https://tiktok.com/@gohandova)
