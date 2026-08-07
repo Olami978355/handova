@@ -1,14 +1,15 @@
 {
-  "name": "RentEasy - Nigeria's Property Platform",
-  "short_name": "RentEasy",
+  "name": "Handova - Nigeria's Property Platform",
+  "short_name": "Handova",
   "description": "Find verified properties and pay rent safely via escrow in Nigeria",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#1a6b3c",
+  "background_color": "#0B0D10",
+  "theme_color": "#0B0D10",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
