@@ -91,6 +91,12 @@ export default function Listings() {
   );
   const [bedrooms, setBedrooms] = useState(searchParams.get('beds') || '');
 
+  // Bedrooms doesn't apply to land — clear it so it can't silently
+  // keep filtering results after the control is hidden.
+  useEffect(() => {
+    if (type === 'land' && bedrooms) setBedrooms('');
+  }, [type, bedrooms]);
+
   // ── UI state ──
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -375,7 +381,8 @@ export default function Listings() {
                   </div>
                 </div>
 
-                {/* Bedrooms */}
+                {/* Bedrooms — doesn't apply to land */}
+                {type !== 'land' && (
                 <div>
                   <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
                     Min Bedrooms
@@ -396,6 +403,7 @@ export default function Listings() {
                     ))}
                   </div>
                 </div>
+                )}
 
                 {/* Price range */}
                 <div>
@@ -614,7 +622,8 @@ export default function Listings() {
                     </div>
                   </div>
 
-                  {/* Bedrooms */}
+                  {/* Bedrooms — doesn't apply to land */}
+                  {type !== 'land' && (
                   <div>
                     <label className="block text-[11px] font-semibold text-paper/40 uppercase tracking-wider mb-2">Min Bedrooms</label>
                     <div className="flex gap-2">
@@ -626,6 +635,7 @@ export default function Listings() {
                       ))}
                     </div>
                   </div>
+                  )}
 
                   {/* Price */}
                   <div>
