@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, MapPin, Bed, Bath, Shield, Layers, Video, Heart, Loader2 } from 'lucide-react';
+import { Home, MapPin, Bed, Bath, Shield, Layers, Video, Heart, Loader2, Check } from 'lucide-react';
 import { Property } from '../types';
 import { formatNaira } from '../utils/format';
 import { supabase } from '../lib/supabase';
@@ -15,9 +15,12 @@ interface PropertyCardProps {
   property: Property;
   showOwnerBadge?: boolean;
   onSaveChange?: (saved: boolean) => void;
+  compareMode?: boolean;
+  isComparing?: boolean;
+  onToggleCompare?: (id: string) => void;
 }
 
-export default function PropertyCard({ property, showOwnerBadge = true, onSaveChange }: PropertyCardProps) {
+export default function PropertyCard({ property, showOwnerBadge = true, onSaveChange, compareMode = false, isComparing = false, onToggleCompare }: PropertyCardProps) {
   const { user } = useAuth();
   const img = property.images?.[0];
   const [saved, setSaved] = useState(false);
@@ -61,6 +64,12 @@ export default function PropertyCard({ property, showOwnerBadge = true, onSaveCh
   return (
     <Link
       to={`/property/${property.id}`}
+        onClick={(e) => {
+          if (compareMode) {
+            e.preventDefault();
+            onToggleCompare?.(property.id);
+          }
+        }}
       className="group block bg-slate/25 border border-white/6 rounded-2xl overflow-hidden hover:border-gold/25 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/30 transition-all duration-200"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
@@ -79,6 +88,18 @@ export default function PropertyCard({ property, showOwnerBadge = true, onSaveCh
           </div>
         )}
 
+        {compareMode && (
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleCompare?.(property.id); }}
+            aria-label={isComparing ? "Remove from compare" : "Add to compare"}
+            className={`absolute top-3 left-3 z-10 w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-colors ${
+              isComparing ? 'bg-gold border-gold text-ink' : 'bg-ink/60 border-paper/30 text-transparent'
+            }`}
+          >
+            <Check className="w-3.5 h-3.5" />
+          </button>
+        )}
         <div className="absolute top-3 left-3 flex gap-1.5">
           <span className="bg-gold text-ink text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase">
             {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}

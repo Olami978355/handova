@@ -3,13 +3,14 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   Search, Home, Shield, Loader2, AlertCircle,
   X, SlidersHorizontal, Map as MapIcon, ArrowRight,
-  RefreshCw, ChevronDown, Check, Layers, BookmarkPlus
+  RefreshCw, ChevronDown, Check, Layers, BookmarkPlus, Scale
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Property, PropertyType, TransactionType } from '../types';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import PropertyCard from '../components/PropertyCard';
+import { CompareModal } from '../components/CompareModal';
 import { FilterBtn } from '../components/ui/FilterBtn';
 import { Select } from '../components/ui/Select';
 import { PropertyMap } from '../components/map/PropertyMap';
@@ -61,6 +62,17 @@ export default function Listings() {
   const [searchName, setSearchName] = useState('');
   const [savingSearch, setSavingSearch] = useState(false);
   const [saveSearchMsg, setSaveSearchMsg] = useState<string | null>(null);
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+
+  const toggleCompare = (id: string) => {
+    setCompareIds(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 3) return prev;
+      return [...prev, id];
+    });
+  };
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── Filter state ──
@@ -269,6 +281,15 @@ export default function Listings() {
                 Save search
               </button>
             )}
+            <button
+              onClick={() => { setCompareMode(!compareMode); setCompareIds([]); }}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
+                compareMode ? 'bg-gold text-ink' : 'bg-white/5 border border-white/8 text-paper/55 hover:bg-white/8 hover:text-paper'
+              }`}
+            >
+              <Scale className="w-3.5 h-3.5" />
+              {compareMode ? 'Cancel compare' : 'Compare'}
+            </button>
           </div>
         </div>
       </div>
@@ -461,7 +482,7 @@ export default function Listings() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {properties.map(property => (
-                  <PropertyCard key={property.id} property={property} />
+                  <PropertyCard key={property.id} property={property} compareMode={compareMode} isComparing={compareIds.includes(property.id)} onToggleCompare={toggleCompare} />
                 ))}
               </div>
             )
@@ -635,6 +656,26 @@ export default function Listings() {
           </>
         )}
       </AnimatePresence>
+      {compareMode && compareIds.length > 0 && (
+        <div className="fixed bottom-20 lg:bottom-6 inset-x-0 z-40 flex justify-center px-5">
+          <div className="bg-slate/95 backdrop-blur border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-4 shadow-xl">
+            <span className="text-[13px] text-paper/70">{compareIds.length} selected</span>
+            <button
+              onClick={() => setShowCompareModal(true)}
+              className="bg-gold text-ink px-5 py-2 rounded-xl text-[13px] font-bold hover:bg-gold-dark transition-colors"
+            >
+              Compare
+            </button>
+          </div>
+        </div>
+      )}
+      {showCompareModal && (
+        <CompareModal
+          properties={properties.filter(p => compareIds.includes(p.id))}
+          onClose={() => setShowCompareModal(false)}
+          onRemove={(id) => setCompareIds(prev => prev.filter(x => x !== id))}
+        />
+      )}
     </div>
   );
 }
