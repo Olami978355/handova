@@ -42,12 +42,13 @@ export function useAdminStats() {
       // Total Revenue (Funds Released)
       const { data: revenueData, error: revenueError } = await supabase
         .from('deals')
-        .select('amount, platform_fee')
+        .select('amount, platform_fee, agreement_fee')
         .eq('status', 'funds_released');
       if (revenueError) throw revenueError;
-      
+
+      // Revenue = platform fee + any agreement-generation fees retained
       const totalRevenue = revenueData?.reduce(
-        (sum, deal) => sum + (deal.platform_fee || (deal.amount || 0) * 0.02), 
+        (sum, deal) => sum + (deal.platform_fee || (deal.amount || 0) * 0.02) + (Number(deal.agreement_fee) || 0),
         0
       ) || 0;
 
