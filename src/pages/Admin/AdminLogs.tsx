@@ -61,7 +61,7 @@ export default function AdminLogs() {
   if (loading && logs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3" style={font}>
-        <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
         <p className="text-[13px] text-paper/30">Loading system logs...</p>
       </div>
     );
