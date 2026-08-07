@@ -305,6 +305,8 @@ export function useDeal(dealId: string) {
   const releaseFunds = () => callEdgeFunction('release-funds');
   const generateAgreement = () => callEdgeFunction('generate-agreement');
   const markDisputed = (reason: string) => callEdgeFunction('mark-disputed', { reason });
+  const retryTransfer = () => callEdgeFunction('retry-deal-transfer');
+  const markTransferPaidManually = (note?: string) => callEdgeFunction('mark-transfer-paid-manually', { note });
 
   return {
     deal,
@@ -324,6 +326,8 @@ export function useDeal(dealId: string) {
     releaseFunds,
     generateAgreement,
     markDisputed,
+    retryTransfer,
+    markTransferPaidManually,
     cancelDeal,
     cancelDealAsTenant,
     isTenant: user?.id === deal?.tenant_id,
