@@ -45,7 +45,7 @@ export default function AnalyticsDashboard() {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 aspect-square animate-pulse" />
+          <div key={i} className="bg-slate/20 border border-white/6 rounded-2xl p-5 aspect-square animate-pulse" />
         ))}
       </div>
     );
@@ -53,11 +53,11 @@ export default function AnalyticsDashboard() {
 
   if (error) {
     return (
-      <div className="p-8 bg-red-500/8 border border-red-500/15 rounded-2xl text-center">
-        <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-        <h3 className="text-[15px] font-bold text-white mb-2">Error loading analytics</h3>
-        <p className="text-[12px] text-white/40 mb-4">{error}</p>
-        <button onClick={fetchDeals} className="bg-[#1a6b3c] text-white px-6 py-2.5 rounded-xl font-bold text-[13px] hover:bg-[#0f4a2a] transition-colors">
+      <div className="p-8 bg-danger/8 border border-danger/15 rounded-2xl text-center">
+        <AlertCircle className="w-10 h-10 text-danger mx-auto mb-3" />
+        <h3 className="text-[15px] font-bold text-paper mb-2">Error loading analytics</h3>
+        <p className="text-[12px] text-paper/40 mb-4">{error}</p>
+        <button onClick={fetchDeals} className="bg-gold text-paper px-6 py-2.5 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors">
           Retry
         </button>
       </div>
@@ -84,29 +84,29 @@ export default function AnalyticsDashboard() {
 
   const revenueByType = Object.keys(DEAL_TYPE_LABELS).map(type => {
     const typeDeals = deals.filter(d => getDealType(d) === type && d.status === 'funds_released');
-    const revenue = typeDeals.reduce((sum, d) => sum + (d.platform_fee || (d.amount || 0) * 0.02), 0);
+    const revenue = typeDeals.reduce((sum, d) => sum + (d.platform_fee || (d.amount || 0) * 0.02) + (Number((d as any).agreement_fee) || 0), 0);
     return { type, label: DEAL_TYPE_LABELS[type], revenue, count: typeDeals.length };
   }).sort((a, b) => b.revenue - a.revenue);
 
   const maxRevenue = Math.max(...revenueByType.map(r => r.revenue), 1);
 
   const statCards = [
-    { label: 'Total Deals', value: totalDeals.toLocaleString(), icon: TrendingUp, color: '#60a5fa' },
-    { label: 'Completed Rate', value: `${pct(completedCount)}%`, icon: CheckCircle2, color: '#4ade80' },
-    { label: 'Dispute Rate', value: `${pct(disputedCount)}%`, icon: AlertCircle, color: '#f0c040' },
-    { label: 'Cancellation Rate', value: `${pct(cancelledCount)}%`, icon: XCircle, color: '#ef4444' },
+    { label: 'Total Deals', value: totalDeals.toLocaleString(), icon: TrendingUp, color: '#D4AF37' },
+    { label: 'Completed Rate', value: `${pct(completedCount)}%`, icon: CheckCircle2, color: '#D4AF37' },
+    { label: 'Dispute Rate', value: `${pct(disputedCount)}%`, icon: AlertCircle, color: '#D4AF37' },
+    { label: 'Cancellation Rate', value: `${pct(cancelledCount)}%`, icon: XCircle, color: '#D4AF37' },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-[20px] font-black text-white">Analytics</h3>
-          <p className="text-[12px] text-white/30 mt-1">Revenue, disputes, and deal outcomes across the platform</p>
+          <h3 className="text-[20px] font-black text-paper">Analytics</h3>
+          <p className="text-[12px] text-paper/30 mt-1">Revenue, disputes, and deal outcomes across the platform</p>
         </div>
         <button
           onClick={fetchDeals}
-          className="flex items-center gap-1.5 text-[11px] font-bold text-white/40 hover:text-white transition-colors"
+          className="flex items-center gap-1.5 text-[11px] font-bold text-paper/40 hover:text-paper transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" /> Refresh
         </button>
@@ -115,37 +115,37 @@ export default function AnalyticsDashboard() {
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map(stat => (
-          <div key={stat.label} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+          <div key={stat.label} className="bg-slate/20 border border-white/6 rounded-2xl p-5">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center mb-3"
               style={{ backgroundColor: `${stat.color}1a` }}
             >
               <stat.icon className="w-4 h-4" style={{ color: stat.color }} />
             </div>
-            <p className="text-[22px] font-black text-white">{stat.value}</p>
-            <p className="text-[11px] text-white/35 mt-1">{stat.label}</p>
+            <p className="text-[22px] font-black text-paper">{stat.value}</p>
+            <p className="text-[11px] text-paper/35 mt-1">{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* Revenue by deal type */}
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-        <h3 className="text-[13px] font-bold text-white mb-4">Revenue by Transaction Type</h3>
+      <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+        <h3 className="text-[13px] font-bold text-paper mb-4">Revenue by Transaction Type</h3>
         {revenueByType.every(r => r.revenue === 0) ? (
-          <p className="text-[12px] text-white/25 text-center py-6">No completed deals yet.</p>
+          <p className="text-[12px] text-paper/25 text-center py-6">No completed deals yet.</p>
         ) : (
           <div className="space-y-3">
             {revenueByType.map(r => (
               <div key={r.type}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[12px] font-semibold text-white/70">{r.label}</span>
-                  <span className="text-[12px] font-bold text-white">
-                    ₦{r.revenue.toLocaleString('en-NG')} <span className="text-white/25 font-normal">({r.count})</span>
+                  <span className="text-[12px] font-semibold text-paper/70">{r.label}</span>
+                  <span className="text-[12px] font-bold text-paper">
+                    ₦{r.revenue.toLocaleString('en-NG')} <span className="text-paper/25 font-normal">({r.count})</span>
                   </span>
                 </div>
                 <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#1a6b3c] rounded-full transition-all"
+                    className="h-full bg-gold rounded-full transition-all"
                     style={{ width: `${(r.revenue / maxRevenue) * 100}%` }}
                   />
                 </div>
@@ -156,30 +156,30 @@ export default function AnalyticsDashboard() {
       </div>
 
       {/* Deal outcome breakdown */}
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-        <h3 className="text-[13px] font-bold text-white mb-4">Deal Outcomes</h3>
+      <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+        <h3 className="text-[13px] font-bold text-paper mb-4">Deal Outcomes</h3>
         {totalDeals === 0 ? (
-          <p className="text-[12px] text-white/25 text-center py-6">No deals yet.</p>
+          <p className="text-[12px] text-paper/25 text-center py-6">No deals yet.</p>
         ) : (
           <>
             <div className="h-3 bg-white/5 rounded-full overflow-hidden flex mb-4">
-              <div className="h-full bg-[#4ade80]" style={{ width: `${pct(completedCount)}%` }} title="Completed" />
-              <div className="h-full bg-[#60a5fa]" style={{ width: `${pct(Math.max(inProgressCount, 0))}%` }} title="In Progress" />
-              <div className="h-full bg-[#f0c040]" style={{ width: `${pct(disputedCount)}%` }} title="Disputed" />
-              <div className="h-full bg-[#ef4444]" style={{ width: `${pct(abandonedCount)}%` }} title="Cancelled/Refunded" />
+              <div className="h-full bg-gold" style={{ width: `${pct(completedCount)}%` }} title="Completed" />
+              <div className="h-full bg-white/25" style={{ width: `${pct(Math.max(inProgressCount, 0))}%` }} title="In Progress" />
+              <div className="h-full bg-danger" style={{ width: `${pct(disputedCount)}%` }} title="Disputed" />
+              <div className="h-full bg-white/10" style={{ width: `${pct(abandonedCount)}%` }} title="Cancelled/Refunded" />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Completed', value: completedCount, color: '#4ade80' },
-                { label: 'In Progress', value: Math.max(inProgressCount, 0), color: '#60a5fa' },
-                { label: 'Disputed', value: disputedCount, color: '#f0c040' },
-                { label: 'Cancelled/Refunded', value: abandonedCount, color: '#ef4444' },
+                { label: 'Completed', value: completedCount, color: '#D4AF37' },
+                { label: 'In Progress', value: Math.max(inProgressCount, 0), color: 'rgba(255,255,255,0.4)' },
+                { label: 'Disputed', value: disputedCount, color: '#E5484D' },
+                { label: 'Cancelled/Refunded', value: abandonedCount, color: 'rgba(255,255,255,0.18)' },
               ].map(item => (
                 <div key={item.label} className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
                   <div>
-                    <p className="text-[13px] font-bold text-white">{item.value}</p>
-                    <p className="text-[10px] text-white/35">{item.label}</p>
+                    <p className="text-[13px] font-bold text-paper">{item.value}</p>
+                    <p className="text-[10px] text-paper/35">{item.label}</p>
                   </div>
                 </div>
               ))}
