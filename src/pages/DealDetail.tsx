@@ -112,7 +112,7 @@ export default function DealDetail() {
   const {
     deal, logs, loading, error, delegatePreview,
     uploadAgreement, generateAgreement, approveDraftAgreement, requestAgreementChanges, getAgreementViewUrl,
-    signAgreement, confirmMoveIn, confirmHandover, releaseFunds, markDisputed, cancelDeal, cancelDealAsTenant,
+    signAgreement, confirmMoveIn, confirmHandover, releaseFunds, markDisputed, retryTransfer, markTransferPaidManually, cancelDeal, cancelDealAsTenant,
     isTenant, isLandlord, isAgent, isAdmin, isModerator,
     refresh,
   } = useDeal(id || '');
@@ -898,8 +898,40 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 </div>
               )}
 
+              {/* Funds released, but the payout failed or has not confirmed -- admin/moderator only */}
+              {deal.status === 'funds_released' && deal.transfer_status === 'failed' && (isAdmin || isModerator) && (
+                <div className="p-6 bg-danger/8 border border-danger/25 rounded-xl mx-2 my-2">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-9 h-9 bg-danger/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <AlertTriangle className="w-4 h-4 text-danger" />
+                    </div>
+                    <div>
+                      <h4 className="text-[14px] font-bold text-danger mb-1">Payout Transfer Failed</h4>
+                      <p className="text-[12px] text-paper/50 leading-relaxed">
+                        The deal is marked completed, but the bank transfer to the landlord or agent did not go through. Retry the automated transfer, or mark it paid if you sent the funds manually.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => handleAction(retryTransfer)}
+                      disabled={processing}
+                      className="flex-1 flex items-center justify-center gap-2 bg-gold text-ink py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors disabled:opacity-40"
+                    >
+                      {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Retry Transfer'}
+                    </button>
+                    <button
+                      onClick={() => { if (window.confirm('Confirm you have sent this payout manually by bank transfer? This will mark it as paid.')) handleAction(() => markTransferPaidManually()); }}
+                      disabled={processing}
+                      className="flex-1 py-3 bg-white/5 border border-white/10 text-paper/60 rounded-xl font-bold text-[13px] hover:bg-white/8 hover:text-paper transition-colors disabled:opacity-40"
+                    >
+                      Mark as Paid Manually
+                    </button>
+                  </div>
+                </div>
+              )}
               {/* Completed */}
-              {deal.status === 'funds_released' && (
+              {deal.status === 'funds_released' && deal.transfer_status !== 'failed' && (
                 <div className="p-8 text-center">
                   <div className="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="w-7 h-7 text-paper" />
