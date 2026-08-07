@@ -76,17 +76,17 @@ export default function FunnelSection() {
 
   return (
     <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
           <h3 className="text-[13px] font-bold text-white">Conversion Funnel</h3>
           <p className="text-[11px] text-white/30 mt-0.5">Where people drop off, from viewing a listing to completing a deal</p>
         </div>
-        <div className="flex items-center gap-1.5 bg-white/5 rounded-xl p-1">
+        <div className="flex flex-wrap items-center gap-1.5 bg-white/5 rounded-xl p-1">
           {RANGE_OPTIONS.map(opt => (
             <button
               key={opt.key}
               onClick={() => setRange(opt.key)}
-              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors ${
+              className={`px-3 py-2.5 rounded-lg text-[11px] font-bold transition-colors ${
                 range === opt.key ? 'bg-[#1a6b3c] text-white' : 'text-white/40 hover:text-white/70'
               }`}
             >
