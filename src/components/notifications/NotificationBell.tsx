@@ -34,7 +34,7 @@ export const NotificationBell: React.FC = () => {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              className="absolute top-1 right-1 w-4 h-4 bg-[#f0c040] text-black text-[9px] font-black rounded-full flex items-center justify-center"
+              className="absolute top-1 right-1 w-4 h-4 bg-gold text-black text-[9px] font-black rounded-full flex items-center justify-center"
             >
               {unreadCount > 9 ? '9+' : unreadCount}
             </motion.div>

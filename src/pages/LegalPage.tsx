@@ -201,7 +201,7 @@ export default function LegalPage() {
 
         {/* Header */}
         <div className="mb-10">
-          <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">Legal</div>
+          <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">Legal</div>
           <h1 className="text-[32px] font-black text-white mb-3">Legal Documents</h1>
           <p className="text-[14px] text-white/45 max-w-xl">
             Please read these documents carefully. By using RentEasy Nigeria you agree to all terms outlined below.
@@ -212,7 +212,7 @@ export default function LegalPage() {
 
           {/* Sidebar */}
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4 lg:sticky lg:top-24">
+            <div className="bg-ink border border-white/6 rounded-2xl p-4 lg:sticky lg:top-24">
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 px-2">Documents</p>
               <div className="space-y-1">
                 {sections.map(section => {
@@ -227,7 +227,7 @@ export default function LegalPage() {
                       }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all text-left ${
                         activeSection === section.id
-                          ? 'bg-[#1a6b3c] text-white'
+                          ? 'bg-gold text-white'
                           : 'text-white/50 hover:bg-white/5 hover:text-white'
                       }`}
                     >
@@ -242,10 +242,10 @@ export default function LegalPage() {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 lg:p-8">
+            <div className="bg-ink border border-white/6 rounded-2xl p-6 lg:p-8">
               <div className="flex items-start gap-4 mb-8 pb-6 border-b border-white/5">
-                <div className="w-12 h-12 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <active.icon className="w-6 h-6 text-[#1a6b3c]" />
+                <div className="w-12 h-12 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <active.icon className="w-6 h-6 text-gold" />
                 </div>
                 <div>
                   <h2 className="text-[22px] font-black text-white">{active.title}</h2>
@@ -256,7 +256,7 @@ export default function LegalPage() {
               <div className="space-y-6">
                 {active.content.map((item, i) => (
                   <div key={i}>
-                    <h3 className="text-[14px] font-bold text-[#f0c040] mb-2">{item.heading}</h3>
+                    <h3 className="text-[14px] font-bold text-gold mb-2">{item.heading}</h3>
                     <p className="text-[13px] text-white/55 leading-relaxed">{item.body}</p>
                   </div>
                 ))}
@@ -265,7 +265,7 @@ export default function LegalPage() {
               <div className="mt-10 pt-6 border-t border-white/5">
                 <p className="text-[12px] text-white/25 leading-relaxed">
                   Questions about this document? Contact us at{' '}
-                  <a href="mailto:joinrenteasy@gmail.com" className="text-[#f0c040]/70 hover:text-[#f0c040] transition-colors">
+                  <a href="mailto:joinrenteasy@gmail.com" className="text-gold/70 hover:text-gold transition-colors">
                     joinrenteasy@gmail.com
                   </a>
                 </p>

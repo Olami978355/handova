@@ -31,7 +31,7 @@ const permissionLabels = (d: DelegateRelation) => {
 const statusBadge = (status: DelegateRelation['status']) => {
   const styles: Record<string, string> = {
     accepted: 'bg-[#4ade80]/10 text-[#4ade80]',
-    pending: 'bg-[#f0c040]/10 text-[#f0c040]',
+    pending: 'bg-gold/10 text-gold',
     declined: 'bg-red-500/10 text-red-400',
     revoked: 'bg-white/8 text-white/35',
   };
@@ -48,7 +48,7 @@ const RelationCard: React.FC<{ relation: DelegateRelation; mode: 'granted' | 're
   return (
     <button
       onClick={onClick}
-      className="w-full p-4 bg-[#0a1f11] border border-white/6 rounded-2xl flex items-center justify-between gap-3 text-left hover:border-white/12 transition-all"
+      className="w-full p-4 bg-ink border border-white/6 rounded-2xl flex items-center justify-between gap-3 text-left hover:border-white/12 transition-all"
     >
       <div className="min-w-0">
         <p className="text-[13px] font-bold text-white truncate">
@@ -110,7 +110,7 @@ export default function MyDelegates() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             <p className="text-[13px] text-white/30">Loading delegates...</p>
           </div>
         ) : relations.length === 0 ? (
@@ -124,7 +124,7 @@ export default function MyDelegates() {
             </p>
             <button
               onClick={() => navigate('/dashboard')}
-              className="text-[12px] font-semibold text-[#f0c040] hover:text-[#e0b030] transition-colors"
+              className="text-[12px] font-semibold text-gold hover:text-[#e0b030] transition-colors"
             >
               View Your Deals
             </button>
@@ -134,7 +134,7 @@ export default function MyDelegates() {
             {granted.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Shield className="w-4 h-4 text-[#1a6b3c]" />
+                  <Shield className="w-4 h-4 text-gold" />
                   <h2 className="text-[13px] font-bold text-white/50 uppercase tracking-wider">Delegates You've Granted</h2>
                 </div>
                 <div className="space-y-2">
@@ -153,7 +153,7 @@ export default function MyDelegates() {
             {received.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Users className="w-4 h-4 text-[#f0c040]" />
+                  <Users className="w-4 h-4 text-gold" />
                   <h2 className="text-[13px] font-bold text-white/50 uppercase tracking-wider">Deals You're a Delegate On</h2>
                 </div>
                 <div className="space-y-2">

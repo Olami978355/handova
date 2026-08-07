@@ -73,7 +73,7 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
-            className="fixed inset-x-4 bottom-4 sm:inset-0 sm:m-auto sm:w-full sm:max-w-lg sm:h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[160] overflow-hidden shadow-2xl"
+            className="fixed inset-x-4 bottom-4 sm:inset-0 sm:m-auto sm:w-full sm:max-w-lg sm:h-fit bg-ink border border-white/8 rounded-2xl z-[160] overflow-hidden shadow-2xl"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             {/* Header */}
@@ -120,9 +120,9 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                       onChange={e => { setReason(e.target.value); setError(null); }}
                       className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-red-500/50 transition-colors appearance-none cursor-pointer"
                     >
-                      <option value="" className="bg-[#0a1f11]">Select a reason</option>
+                      <option value="" className="bg-ink">Select a reason</option>
                       {disputeReasons.map(r => (
-                        <option key={r} value={r} className="bg-[#0a1f11]">{r}</option>
+                        <option key={r} value={r} className="bg-ink">{r}</option>
                       ))}
                     </select>
                   </div>

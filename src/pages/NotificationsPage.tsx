@@ -10,15 +10,15 @@ const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 const getIcon = (type: Notification['type']) => {
   switch (type) {
     case 'inspection_requested':
-    case 'inspection_booked': return <Calendar className="text-[#f0c040]" size={16} />;
-    case 'inspection_confirmed': return <CheckCircle className="text-[#1a6b3c]" size={16} />;
-    case 'verification_approved': return <ShieldCheck className="text-[#1a6b3c]" size={16} />;
+    case 'inspection_booked': return <Calendar className="text-gold" size={16} />;
+    case 'inspection_confirmed': return <CheckCircle className="text-gold" size={16} />;
+    case 'verification_approved': return <ShieldCheck className="text-gold" size={16} />;
     case 'verification_rejected': return <ShieldX className="text-red-400" size={16} />;
-    case 'listing_approved': return <Home className="text-[#1a6b3c]" size={16} />;
+    case 'listing_approved': return <Home className="text-gold" size={16} />;
     case 'listing_rejected': return <XCircle className="text-red-400" size={16} />;
     case 'deal_state_change':
-    case 'custom_deal_offer': return <DollarSign className="text-[#f0c040]" size={16} />;
-    case 'new_message': return <MessageCircle className="text-[#1a6b3c]" size={16} />;
+    case 'custom_deal_offer': return <DollarSign className="text-gold" size={16} />;
+    case 'new_message': return <MessageCircle className="text-gold" size={16} />;
     case 'refund_processed': return <CheckCircle className="text-[#4ade80]" size={16} />;
     default: return <Info className="text-white/30" size={16} />;
   }
@@ -56,7 +56,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
-              className="flex items-center gap-1.5 text-[12px] font-bold text-[#f0c040]/70 hover:text-[#f0c040] transition-colors"
+              className="flex items-center gap-1.5 text-[12px] font-bold text-gold/70 hover:text-gold transition-colors"
             >
               <Check size={14} />
               Mark all read
@@ -67,7 +67,7 @@ export default function NotificationsPage() {
         {/* Content */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             <p className="text-[13px] text-white/30">Loading notifications...</p>
           </div>
         ) : notifications.length === 0 ? (
@@ -86,8 +86,8 @@ export default function NotificationsPage() {
                 onClick={() => handleClick(notif)}
                 className={`w-full p-4 rounded-2xl border flex items-start gap-3 text-left transition-all hover:border-white/12 ${
                   !notif.read
-                    ? 'bg-[#1a6b3c]/8 border-[#1a6b3c]/20'
-                    : 'bg-[#0a1f11] border-white/6'
+                    ? 'bg-gold/8 border-gold/20'
+                    : 'bg-ink border-white/6'
                 }`}
               >
                 <div className="w-9 h-9 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -107,7 +107,7 @@ export default function NotificationsPage() {
                   </p>
                 </div>
                 {!notif.read && (
-                  <div className="w-2 h-2 bg-[#f0c040] rounded-full flex-shrink-0 mt-1.5" />
+                  <div className="w-2 h-2 bg-gold rounded-full flex-shrink-0 mt-1.5" />
                 )}
               </button>
             ))}

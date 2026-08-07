@@ -179,7 +179,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         <div style={{
           width: 32,
           height: 32,
-          border: '3px solid #1a6b3c',
+          border: '3px solid #D4AF37',
           borderTopColor: 'transparent',
           borderRadius: '50%',
           animation: 'spin 0.8s linear infinite',
@@ -210,7 +210,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         <button
           onClick={() => window.location.reload()}
           style={{
-            background: '#1a6b3c', color: '#fff', padding: '10px 24px',
+            background: '#D4AF37', color: '#fff', padding: '10px 24px',
             borderRadius: 12, fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer',
           }}
         >

@@ -109,7 +109,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
             placeholder="Search conversations..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/6 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/50 transition-colors"
+            className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/6 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/50 transition-colors"
           />
         </div>
       </div>
@@ -130,7 +130,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
             {!search && (
               <button
                 onClick={() => navigate('/listings')}
-                className="text-[12px] font-semibold text-[#f0c040] hover:text-[#e0b030] transition-colors"
+                className="text-[12px] font-semibold text-gold hover:text-[#e0b030] transition-colors"
               >
                 Browse Properties
               </button>
@@ -159,7 +159,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
                   onTouchEnd={handleLongPressEnd}
                   className={`w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors relative ${
                     isSelected
-                      ? 'bg-[#1a6b3c]/15 border-l-2 border-[#1a6b3c]'
+                      ? 'bg-gold/15 border-l-2 border-gold'
                       : 'hover:bg-white/4'
                   }`}
                 >
@@ -193,7 +193,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
                         {formatRelativeTime(conv.last_message_at || conv.created_at)}
                       </span>
                     </div>
-                    <p className="text-[10px] text-[#1a6b3c] font-bold uppercase tracking-wider mb-0.5 truncate">
+                    <p className="text-[10px] text-gold font-bold uppercase tracking-wider mb-0.5 truncate">
                       {prop?.title || 'Property'}
                     </p>
                     <p className={`text-[11px] truncate ${
@@ -207,7 +207,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
 
                   {/* Unread badge — only show when count > 0 and not selected */}
                   {hasUnread && (
-                    <div className="absolute top-3.5 right-3.5 w-5 h-5 bg-[#f0c040] text-black text-[9px] font-black rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="absolute top-3.5 right-3.5 w-5 h-5 bg-gold text-black text-[9px] font-black rounded-full flex items-center justify-center flex-shrink-0">
                       {unreadCount! > 9 ? '9+' : unreadCount}
                     </div>
                   )}
@@ -223,14 +223,14 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
       {/* Delete confirmation modal */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-          <div className="bg-[#0a1f11] border border-white/10 rounded-2xl p-6 max-w-xs w-full">
+          <div className="bg-ink border border-white/10 rounded-2xl p-6 max-w-xs w-full">
             <div className="w-11 h-11 bg-red-500/10 rounded-xl flex items-center justify-center mb-4">
               <Trash2 className="w-5 h-5 text-red-400" />
             </div>
             <h3 className="text-[15px] font-black text-white mb-1">Delete Conversation?</h3>
             <p className="text-[12px] text-white/60 mb-1">
               With <span className="font-bold text-white">{deleteTarget.participants?.[0]?.full_name || 'this user'}</span>
-              {deleteTarget.properties?.title ? <> · <span className="text-[#1a6b3c] font-semibold">{deleteTarget.properties.title}</span></> : null}
+              {deleteTarget.properties?.title ? <> · <span className="text-gold font-semibold">{deleteTarget.properties.title}</span></> : null}
             </p>
             <p className="text-[12px] text-white/40 mb-5">This will permanently delete all messages in this conversation.</p>
             <div className="flex gap-3">

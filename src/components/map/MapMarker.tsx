@@ -20,14 +20,14 @@ export const MapMarker: React.FC<MapMarkerProps> = ({ property, onClick, isSelec
       <div className={`
         relative px-3 py-1.5 rounded-full font-bold text-sm shadow-lg transition-all transform hover:scale-110 cursor-pointer
         ${isSelected 
-          ? 'bg-[#1a6b3c] text-white scale-110 z-10' 
-          : 'bg-white text-zinc-900 border-2 border-[#1a6b3c]'
+          ? 'bg-gold text-white scale-110 z-10' 
+          : 'bg-white text-zinc-900 border-2 border-gold'
         }
       `}>
         {abbreviatePrice(property.price)}
         <div className={`
           absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 border-r-2 border-b-2
-          ${isSelected ? 'bg-[#1a6b3c] border-[#1a6b3c]' : 'bg-white border-[#1a6b3c]'}
+          ${isSelected ? 'bg-gold border-gold' : 'bg-white border-gold'}
         `} />
       </div>
     </AdvancedMarker>

@@ -24,11 +24,11 @@ export const PropertyPopup: React.FC<PropertyPopupProps> = ({ property }) => {
           referrerPolicy="no-referrer"
         />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-          <div className="bg-white/90 backdrop-blur px-2 py-0.5 rounded-lg text-[10px] font-bold text-[#1a6b3c] uppercase tracking-wider">
+          <div className="bg-white/90 backdrop-blur px-2 py-0.5 rounded-lg text-[10px] font-bold text-gold uppercase tracking-wider">
             {property.transaction_type === 'rent' ? 'Rent' : 'Sale'}
           </div>
           {property.escrow_verified && (
-            <div className="bg-[#1a6b3c] text-white px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center">
+            <div className="bg-gold text-white px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center">
               <Shield className="w-3 h-3 mr-1" fill="currentColor" /> Verified
             </div>
           )}
@@ -38,12 +38,12 @@ export const PropertyPopup: React.FC<PropertyPopupProps> = ({ property }) => {
       <div className="p-4">
         <h3 className="font-bold text-zinc-900 truncate mb-1">{property.title}</h3>
         <div className="flex items-center text-zinc-500 text-[10px] mb-3">
-          <MapPin className="w-3 h-3 mr-1 text-[#1a6b3c]" />
+          <MapPin className="w-3 h-3 mr-1 text-gold" />
           <span className="truncate">{property.address}</span>
         </div>
         
         <div className="flex items-center justify-between mb-4">
-          <div className="text-lg font-black text-[#1a6b3c]">
+          <div className="text-lg font-black text-gold">
             {formatNaira(property.price)}
           </div>
           <div className="flex items-center gap-2 text-zinc-400">
@@ -66,7 +66,7 @@ export const PropertyPopup: React.FC<PropertyPopupProps> = ({ property }) => {
         
         <Link 
           to={`/property/${property.id}`}
-          className="w-full bg-zinc-50 text-[#1a6b3c] py-2 rounded-xl font-bold text-xs flex items-center justify-center hover:bg-[#1a6b3c] hover:text-white transition-all group"
+          className="w-full bg-zinc-50 text-gold py-2 rounded-xl font-bold text-xs flex items-center justify-center hover:bg-gold hover:text-white transition-all group"
         >
           View Details <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
         </Link>

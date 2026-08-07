@@ -42,10 +42,10 @@ export const ChangelogBanner: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="fixed top-20 inset-x-4 sm:inset-x-auto sm:right-5 sm:w-96 z-[60] bg-[#0a1f11] border border-[#1a6b3c]/30 rounded-2xl p-4 shadow-2xl"
+        className="fixed top-20 inset-x-4 sm:inset-x-auto sm:right-5 sm:w-96 z-[60] bg-ink border border-gold/30 rounded-2xl p-4 shadow-2xl"
       >
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 bg-gold/20 rounded-xl flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-4 h-4 text-[#4ade80]" />
           </div>
           <div className="flex-1 min-w-0">
@@ -60,7 +60,7 @@ export const ChangelogBanner: React.FC = () => {
             </ul>
             <button
               onClick={handleDismiss}
-              className="bg-[#1a6b3c] text-white px-4 py-1.5 rounded-lg font-bold text-[11px] hover:bg-[#0f4a2a] transition-colors"
+              className="bg-gold text-white px-4 py-1.5 rounded-lg font-bold text-[11px] hover:bg-gold-dark transition-colors"
             >
               Got it
             </button>

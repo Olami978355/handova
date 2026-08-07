@@ -40,14 +40,14 @@ const PropertySkeleton = () => (
 
 const AmenityChip = ({ text }: { text: string }) => (
   <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/8 rounded-xl">
-    <div className="w-1.5 h-1.5 rounded-full bg-[#1a6b3c] flex-shrink-0" />
+    <div className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0" />
     <span className="text-[12px] text-white/65 font-medium">{text}</span>
   </div>
 );
 
 const StatBox = ({ icon: Icon, value, label }: { icon: React.ElementType; value: string | number; label: string }) => (
   <div className="bg-white/4 border border-white/6 rounded-xl p-4 text-center">
-    <Icon className="w-5 h-5 mx-auto mb-2 text-[#1a6b3c]" />
+    <Icon className="w-5 h-5 mx-auto mb-2 text-gold" />
     <div className="text-[15px] font-bold text-white">{value}</div>
     <div className="text-[10px] text-white/35 font-medium uppercase tracking-wider mt-0.5">{label}</div>
   </div>
@@ -64,7 +64,7 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
         style={{
           width: '1080px', height: '1080px', position: 'fixed',
           left: '-9999px', top: '-9999px', fontFamily: "'Plus Jakarta Sans', sans-serif",
-          background: '#0a1f11', display: 'flex', flexDirection: 'column',
+          background: '#0B0D10', display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
         }}
       >
@@ -72,13 +72,13 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
           {property.images?.[0] ? (
             <img src={property.images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
           ) : (
-            <div style={{ width: '100%', height: '100%', background: '#0a1f11', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '100%', height: '100%', background: '#0B0D10', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               
             </div>
           )}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to top, #0a1f11, transparent)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to top, #0B0D10, transparent)' }} />
           <div style={{ position: 'absolute', top: '32px', left: '32px', display: 'flex', gap: '12px' }}>
-            <div style={{ background: '#f0c040', color: '#000', padding: '8px 18px', borderRadius: '12px', fontSize: '20px', fontWeight: '800', textTransform: 'uppercase' }}>
+            <div style={{ background: '#D4AF37', color: '#000', padding: '8px 18px', borderRadius: '12px', fontSize: '20px', fontWeight: '800', textTransform: 'uppercase' }}>
               {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
             </div>
             <div style={{ color: '#fff', fontSize: '18px', fontWeight: '700' }}>
@@ -94,7 +94,7 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
             <p style={{ fontSize: '24px', color: 'rgba(255,255,255,0.5)', margin: '0 0 20px' }}>
               {property.lga}, {property.state}
             </p>
-            <p style={{ fontSize: '52px', fontWeight: '900', color: '#f0c040', margin: '0 0 8px' }}>
+            <p style={{ fontSize: '52px', fontWeight: '900', color: '#D4AF37', margin: '0 0 8px' }}>
               {formatPrice(property.price)}
               {property.price_period && property.price_period !== 'outright' && (
                 <span style={{ fontSize: '28px', color: 'rgba(255,255,255,0.4)', fontWeight: '600' }}>
@@ -108,14 +108,14 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
               <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.4)', margin: '0 0 4px' }}>Listed by</p>
               <p style={{ fontSize: '22px', fontWeight: '700', color: '#ffffff', margin: 0 }}>{owner?.full_name}</p>
               {owner?.lasrera_id && (
-                <p style={{ fontSize: '16px', color: '#f0c040', fontFamily: 'monospace', margin: '4px 0 0' }}>
+                <p style={{ fontSize: '16px', color: '#D4AF37', fontFamily: 'monospace', margin: '4px 0 0' }}>
                   {owner.lasrera_id}
                 </p>
               )}
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: '36px', fontWeight: '900', color: '#ffffff', margin: '0 0 4px' }}>
-                Rent<span style={{ color: '#f0c040' }}>Easy</span>
+                Rent<span style={{ color: '#D4AF37' }}>Easy</span>
               </p>
               <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
                 renteasyapp.com/property/{property.id.slice(0, 8)}
@@ -160,7 +160,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
     setGeneratingCard(true);
     try {
       const canvas = await html2canvas(shareCardRef.current, {
-        scale: 1, useCORS: true, allowTaint: true, backgroundColor: '#0a1f11',
+        scale: 1, useCORS: true, allowTaint: true, backgroundColor: '#0B0D10',
       });
       const link = document.createElement('a');
       link.download = `renteasy-${property.id.slice(0, 8)}.png`;
@@ -179,7 +179,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
     try {
       const dataUrl = await QRCode.toDataURL(propertyUrl, {
         width: 400, margin: 2,
-        color: { dark: '#ffffff', light: '#0a1f11' },
+        color: { dark: '#ffffff', light: '#0B0D10' },
       });
       setQrDataUrl(dataUrl);
       trackShare('qr_code');
@@ -211,7 +211,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 40, scale: 0.97 }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl"
+        className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-ink border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
         <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
@@ -253,7 +253,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
             onClick={handleCopy}
             className="flex items-center gap-3 w-full p-4 bg-white/4 border border-white/8 rounded-xl hover:bg-white/6 transition-colors"
           >
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${copied ? 'bg-[#1a6b3c]' : 'bg-white/8'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${copied ? 'bg-gold' : 'bg-white/8'}`}>
               {copied ? <Check className="w-5 h-5 text-white" /> : <Copy className="w-5 h-5 text-white/60" />}
             </div>
             <div className="text-left">
@@ -268,8 +268,8 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               className="flex flex-col items-center gap-2 p-4 bg-white/4 border border-white/8 rounded-xl hover:bg-white/6 transition-colors disabled:opacity-50"
             >
               {generatingCard
-                ? <div className="w-6 h-6 border-2 border-[#f0c040] border-t-transparent rounded-full animate-spin" />
-                : <Download className="w-6 h-6 text-[#f0c040]" />
+                ? <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                : <Download className="w-6 h-6 text-gold" />
               }
               <p className="text-[12px] font-bold text-white">Save as Image</p>
               <p className="text-[10px] text-white/30 text-center">1080×1080 card</p>
@@ -280,10 +280,10 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               className="flex flex-col items-center gap-2 p-4 bg-white/4 border border-white/8 rounded-xl hover:bg-white/6 transition-colors disabled:opacity-50"
             >
               {generatingQR
-                ? <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+                ? <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                 : qrDataUrl
                 ? <img src={qrDataUrl} alt="QR" className="w-10 h-10 rounded-lg" />
-                : <QrCode className="w-6 h-6 text-[#1a6b3c]" />
+                : <QrCode className="w-6 h-6 text-gold" />
               }
               <p className="text-[12px] font-bold text-white">
                 {qrDataUrl ? 'Download QR' : 'Generate QR'}
@@ -445,7 +445,7 @@ export default function PropertyDetail() {
         <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
         <h1 className="text-[20px] font-bold text-white mb-2">Property not found</h1>
         <p className="text-[13px] text-white/40 mb-6 max-w-xs">{error || "This property doesn't exist or has been removed."}</p>
-        <button onClick={() => navigate('/listings')} className="bg-[#1a6b3c] text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors">
+        <button onClick={() => navigate('/listings')} className="bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors">
           Back to Listings
         </button>
       </div>
@@ -455,10 +455,10 @@ export default function PropertyDetail() {
   if (property.status === 'inactive' || property.status === 'flagged' || property.deleted_at || (property.is_delisted && !isOwner)) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <AlertCircle className="w-12 h-12 text-[#f0c040] mb-4" />
+        <AlertCircle className="w-12 h-12 text-gold mb-4" />
         <h1 className="text-[20px] font-bold text-white mb-2">Listing Unavailable</h1>
         <p className="text-[13px] text-white/40 mb-6 max-w-xs">This listing has been suspended and is currently unavailable.</p>
-        <button onClick={() => navigate('/listings')} className="bg-[#1a6b3c] text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors">
+        <button onClick={() => navigate('/listings')} className="bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors">
           Back to Listings
         </button>
       </div>
@@ -526,7 +526,7 @@ export default function PropertyDetail() {
           {/* ── Media gallery ── */}
           <div className="mb-6">
             <div
-              className="relative aspect-[16/9] lg:aspect-[21/9] bg-[#0a1f11] rounded-2xl overflow-hidden cursor-pointer group"
+              className="relative aspect-[16/9] lg:aspect-[21/9] bg-ink rounded-2xl overflow-hidden cursor-pointer group"
               onClick={() => currentMedia?.type === 'image' && setLightboxOpen(true)}
             >
               {currentMedia?.type === 'image' ? (
@@ -539,11 +539,11 @@ export default function PropertyDetail() {
                 </div>
               )}
               <div className="absolute top-4 left-4 flex gap-2">
-                <span className="bg-[#f0c040] text-black text-[11px] font-bold px-3 py-1.5 rounded-xl uppercase">
+                <span className="bg-gold text-black text-[11px] font-bold px-3 py-1.5 rounded-xl uppercase">
                   {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
                 </span>
                 {property.escrow_verified && (
-                  <span className="bg-[#1a6b3c] text-white text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                  <span className="bg-gold text-white text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
                     <Shield className="w-3 h-3" /> Escrow Verified
                   </span>
                 )}
@@ -567,12 +567,12 @@ export default function PropertyDetail() {
               <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
                 {allMedia.map((media, i) => (
                   <button key={i} onClick={() => setActiveIndex(i)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${activeIndex === i ? 'border-[#f0c040] opacity-100' : 'border-transparent opacity-40 hover:opacity-70'}`}
+                    className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${activeIndex === i ? 'border-gold opacity-100' : 'border-transparent opacity-40 hover:opacity-70'}`}
                   >
                     {media.type === 'image' ? (
                       <img src={media.url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[#0a1f11] flex flex-col items-center justify-center gap-1">
+                      <div className="w-full h-full bg-ink flex flex-col items-center justify-center gap-1">
                         <Video className="w-5 h-5 text-white/60" />
                         <span className="text-[8px] text-white/40 font-bold uppercase">Video</span>
                       </div>
@@ -605,7 +605,7 @@ export default function PropertyDetail() {
                 </a>
                 <button
                   onClick={() => setShowSharePanel(true)}
-                  className="text-[11px] text-[#f0c040]/60 hover:text-[#f0c040] font-semibold transition-colors"
+                  className="text-[11px] text-gold/60 hover:text-gold font-semibold transition-colors"
                 >
                   More →
                 </button>
@@ -620,14 +620,14 @@ export default function PropertyDetail() {
             <div className="lg:col-span-2 space-y-5">
 
               {/* Title + Price */}
-              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 lg:p-6">
+              <div className="bg-ink border border-white/6 rounded-2xl p-5 lg:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <h1 className="text-[22px] lg:text-[26px] font-black text-white tracking-tight leading-snug mb-2">
                       {property.title}
                     </h1>
                     <div className="flex items-center gap-1.5 text-white/45">
-                      <MapPin className="w-4 h-4 flex-shrink-0 text-[#1a6b3c]" />
+                      <MapPin className="w-4 h-4 flex-shrink-0 text-gold" />
                       <span className="text-[13px]">{property.address}, {property.lga}, {property.state}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
@@ -641,7 +641,7 @@ export default function PropertyDetail() {
                     </div>
                   </div>
                   <div className="sm:text-right flex-shrink-0">
-                    <div className="text-[28px] font-black text-[#f0c040] leading-none">{formatNaira(property.price)}</div>
+                    <div className="text-[28px] font-black text-gold leading-none">{formatNaira(property.price)}</div>
                     {property.price_period && (
                       <div className="text-[12px] text-white/35 mt-1">{periodLabel[property.price_period]}</div>
                     )}
@@ -689,17 +689,17 @@ export default function PropertyDetail() {
 
               {/* Rental terms */}
               {property.transaction_type === 'rent' && (property.min_rental_duration || property.house_rules) && (
-                <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+                <div className="bg-ink border border-white/6 rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <ScrollText className="w-4 h-4 text-[#1a6b3c]" />
+                    <ScrollText className="w-4 h-4 text-gold" />
                     <h3 className="text-[14px] font-bold text-white">Rental Terms</h3>
                     <span className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-lg">Public info</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {property.min_rental_duration && (
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Clock className="w-4 h-4 text-[#1a6b3c]" />
+                        <div className="w-8 h-8 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Clock className="w-4 h-4 text-gold" />
                         </div>
                         <div>
                           <p className="text-[11px] text-white/35 uppercase tracking-wider font-medium mb-0.5">Min Duration</p>
@@ -709,8 +709,8 @@ export default function PropertyDetail() {
                     )}
                     {property.house_rules && (
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Tag className="w-4 h-4 text-[#1a6b3c]" />
+                        <div className="w-8 h-8 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Tag className="w-4 h-4 text-gold" />
                         </div>
                         <div>
                           <p className="text-[11px] text-white/35 uppercase tracking-wider font-medium mb-0.5">House Rules</p>
@@ -724,7 +724,7 @@ export default function PropertyDetail() {
 
               {/* Description */}
               {property.description && (
-                <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+                <div className="bg-ink border border-white/6 rounded-2xl p-5">
                   <h3 className="text-[14px] font-bold text-white mb-3">About this property</h3>
                   <p className="text-[13px] text-white/55 leading-relaxed whitespace-pre-wrap">{property.description}</p>
                 </div>
@@ -732,7 +732,7 @@ export default function PropertyDetail() {
 
               {/* Amenities */}
               {property.amenities && property.amenities.length > 0 && (
-                <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+                <div className="bg-ink border border-white/6 rounded-2xl p-5">
                   <h3 className="text-[14px] font-bold text-white mb-4">Amenities & Features</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {property.amenities.map((amenity, i) => <AmenityChip key={i} text={amenity} />)}
@@ -742,25 +742,25 @@ export default function PropertyDetail() {
 
               {/* Survey plan */}
               {property.listing_type === 'land' && property.survey_plan_url && (
-                <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+                <div className="bg-ink border border-white/6 rounded-2xl p-5">
                   <h3 className="text-[14px] font-bold text-white mb-3">Survey Plan</h3>
                   <a href={property.survey_plan_url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 bg-white/4 border border-white/8 rounded-xl hover:border-[#f0c040]/25 transition-colors group"
+                    className="flex items-center gap-3 p-4 bg-white/4 border border-white/8 rounded-xl hover:border-gold/25 transition-colors group"
                   >
-                    <div className="w-10 h-10 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-[#1a6b3c]" />
+                    <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-gold" />
                     </div>
                     <div className="flex-1">
                       <p className="text-[13px] font-semibold text-white">View Survey Plan</p>
                       <p className="text-[11px] text-white/35">Opens in new tab</p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#f0c040] transition-colors" />
+                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-gold transition-colors" />
                   </a>
                 </div>
               )}
 
               {/* Barrister Amaka */}
-              <div className="bg-[#0a1f11] border border-[#f0c040]/10 rounded-2xl overflow-hidden">
+              <div className="bg-ink border border-gold/10 rounded-2xl overflow-hidden">
                 <div className="px-5 pt-4 pb-3 flex items-start gap-3">
                   <svg width="44" height="58" viewBox="0 0 80 110" fill="none" className="flex-shrink-0">
                     <rect x="18" y="55" width="44" height="55" rx="6" fill="#1a1a2e" />
@@ -775,18 +775,18 @@ export default function PropertyDetail() {
                     <path d="M36 63 Q40 66 44 63" stroke="#c07060" strokeWidth="1.5" fill="none" strokeLinecap="round" />
                     <rect x="14" y="65" width="12" height="30" rx="4" fill="#1a1a2e" />
                     <rect x="54" y="65" width="12" height="30" rx="4" fill="#1a1a2e" />
-                    <rect x="24" y="80" width="32" height="6" rx="2" fill="#1a6b3c" />
+                    <rect x="24" y="80" width="32" height="6" rx="2" fill="#D4AF37" />
                     <text x="40" y="85" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="#fff">BARRISTER AMAKA</text>
                   </svg>
                   <div className="flex-1">
-                    <div className="text-[9px] font-bold text-[#f0c040] uppercase tracking-widest mb-1">Know Your Rights</div>
+                    <div className="text-[9px] font-bold text-gold uppercase tracking-widest mb-1">Know Your Rights</div>
                     <p className="text-[12px] font-semibold text-white leading-snug mb-0.5">
                       Always sign a tenancy agreement before making any payment
                     </p>
                     <p className="text-[11px] text-white/30">Tenancy Law of Lagos State 2011</p>
                   </div>
                 </div>
-                <Link to="/legal-guide" className="flex items-center justify-between px-5 py-3 border-t border-white/5 text-[11px] font-semibold text-[#f0c040]/50 hover:text-[#f0c040] transition-colors">
+                <Link to="/legal-guide" className="flex items-center justify-between px-5 py-3 border-t border-white/5 text-[11px] font-semibold text-gold/50 hover:text-gold transition-colors">
                   Learn your full rights as a tenant
                   <ChevronRight className="w-3 h-3" />
                 </Link>
@@ -797,10 +797,10 @@ export default function PropertyDetail() {
             <div className="space-y-4">
 
               {/* Owner card */}
-              <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+              <div className="bg-ink border border-white/6 rounded-2xl p-5">
                 <h3 className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">Listed by</h3>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 bg-[#1a6b3c] rounded-xl overflow-hidden flex items-center justify-center text-white font-bold text-[16px] flex-shrink-0">
+                  <div className="w-12 h-12 bg-gold rounded-xl overflow-hidden flex items-center justify-center text-white font-bold text-[16px] flex-shrink-0">
                     {owner?.avatar_url ? (
                       <img src={owner.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -840,9 +840,9 @@ export default function PropertyDetail() {
               {property.status === 'active' && !isOwner && <InspectionFeeDisplay property={property} />}
 
               {/* Escrow info */}
-              <div className="bg-[#0a1f11] border border-[#1a6b3c]/25 rounded-2xl p-5">
+              <div className="bg-ink border border-gold/25 rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Shield className="w-5 h-5 text-[#1a6b3c]" />
+                  <Shield className="w-5 h-5 text-gold" />
                   <h3 className="text-[14px] font-bold text-white">Escrow Protected</h3>
                 </div>
                 <p className="text-[12px] text-white/45 leading-relaxed mb-4">
@@ -911,19 +911,19 @@ export default function PropertyDetail() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl p-6"
+                className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-ink border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl p-6"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 {reportSubmitted ? (
                   <div className="text-center py-4">
-                    <div className="w-12 h-12 bg-[#1a6b3c]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-12 h-12 bg-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <CheckCircle className="w-6 h-6 text-[#4ade80]" />
                     </div>
                     <h3 className="text-[16px] font-bold text-white mb-2">Report submitted</h3>
                     <p className="text-[13px] text-white/40 mb-6">Thanks for flagging this. Our team will review it shortly.</p>
                     <button
                       onClick={() => { setShowReportModal(false); setReportSubmitted(false); setReportReason(''); setReportDetails(''); }}
-                      className="w-full bg-[#1a6b3c] text-white py-3 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+                      className="w-full bg-gold text-white py-3 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
                     >
                       Close
                     </button>
@@ -953,7 +953,7 @@ export default function PropertyDetail() {
                           onClick={() => setReportReason(r)}
                           className={`w-full text-left px-4 py-3 rounded-xl text-[13px] font-medium transition-colors border ${
                             reportReason === r
-                              ? 'bg-[#f0c040]/10 border-[#f0c040]/30 text-white'
+                              ? 'bg-gold/10 border-gold/30 text-white'
                               : 'bg-white/4 border-white/8 text-white/60 hover:bg-white/6'
                           }`}
                         >
@@ -966,7 +966,7 @@ export default function PropertyDetail() {
                       onChange={(e) => setReportDetails(e.target.value)}
                       placeholder="Any extra details (optional)..."
                       rows={3}
-                      className="w-full p-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/40 transition-colors resize-none mb-4"
+                      className="w-full p-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/40 transition-colors resize-none mb-4"
                     />
                     <button
                       onClick={async () => {

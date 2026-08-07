@@ -14,17 +14,17 @@ import { useAuth } from '../context/AuthContext';
 // ─── Logo SVG ────────────────────────────────────────────────────
 const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#1a6b3c" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
+    <rect width="80" height="80" rx="18" fill="#D4AF37" />
+    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#D4AF37" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+    <path d="M16 54 L28 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
+    <path d="M54 54 L64 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
     <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
     <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
     <path d="M32 54 L32 50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
     <path d="M36 54 L36 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
     <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
     <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#f0c040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -70,7 +70,7 @@ const FeaturedCard = ({ property }: { property: Property }) => {
   return (
     <Link
       to={`/property/${property.id}`}
-      className="group block bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden hover:border-[#f0c040]/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/40"
+      className="group block bg-ink border border-white/6 rounded-2xl overflow-hidden hover:border-gold/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/40"
     >
       {/* Image */}
       <div className="relative h-44 bg-[#111a14] overflow-hidden">
@@ -88,11 +88,11 @@ const FeaturedCard = ({ property }: { property: Property }) => {
         )}
         {/* Badges */}
         <div className="absolute top-3 left-3 flex gap-2">
-          <span className="bg-[#f0c040] text-black text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase">
+          <span className="bg-gold text-black text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase">
             {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
           </span>
           {property.escrow_verified && (
-            <span className="bg-[#1a6b3c] text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+            <span className="bg-gold text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
               <Shield className="w-2.5 h-2.5" /> Verified
             </span>
           )}
@@ -118,7 +118,7 @@ const FeaturedCard = ({ property }: { property: Property }) => {
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[16px] font-bold text-[#f0c040]">
+            <span className="text-[16px] font-bold text-gold">
               {formatNaira(property.price)}
             </span>
             {property.price_period && (
@@ -143,7 +143,7 @@ const StatItem = ({
   value, label
 }: { value: string; label: string }) => (
   <div className="text-center">
-    <div className="text-[28px] lg:text-[36px] font-black text-[#f0c040] leading-none mb-1">
+    <div className="text-[28px] lg:text-[36px] font-black text-gold leading-none mb-1">
       {value}
     </div>
     <div className="text-[12px] text-white/50 font-medium uppercase tracking-wider">
@@ -160,15 +160,15 @@ const HowStep = ({
 }) => (
   <FadeUp delay={delay}>
     <div className="relative">
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 h-full hover:border-[#f0c040]/20 transition-colors">
+      <div className="bg-ink border border-white/6 rounded-2xl p-6 h-full hover:border-gold/20 transition-colors">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 bg-[#1a6b3c]/20 border border-[#1a6b3c]/30 rounded-xl flex items-center justify-center">
-              <Icon className="w-5 h-5 text-[#f0c040]" />
+            <div className="w-10 h-10 bg-gold/20 border border-gold/30 rounded-xl flex items-center justify-center">
+              <Icon className="w-5 h-5 text-gold" />
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] font-bold text-[#f0c040]/60 uppercase tracking-widest mb-1">
+            <div className="text-[10px] font-bold text-gold/60 uppercase tracking-widest mb-1">
               Step {num}
             </div>
             <h3 className="text-[15px] font-bold text-white mb-2">{title}</h3>
@@ -187,9 +187,9 @@ const FeatureCard = ({
   icon: React.ElementType; title: string; desc: string; delay: number;
 }) => (
   <FadeUp delay={delay}>
-    <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 hover:border-[#f0c040]/15 transition-colors group">
-      <div className="w-10 h-10 bg-[#f0c040]/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#f0c040]/15 transition-colors">
-        <Icon className="w-5 h-5 text-[#f0c040]" />
+    <div className="bg-ink border border-white/6 rounded-2xl p-5 hover:border-gold/15 transition-colors group">
+      <div className="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-gold/15 transition-colors">
+        <Icon className="w-5 h-5 text-gold" />
       </div>
       <h3 className="text-[14px] font-bold text-white mb-2">{title}</h3>
       <p className="text-[13px] text-white/45 leading-relaxed">{desc}</p>
@@ -233,11 +233,11 @@ const BarristerAmakaCard = () => {
   }, []);
 
   return (
-    <div className="bg-[#0a1f11] border border-[#f0c040]/15 rounded-2xl overflow-hidden">
+    <div className="bg-ink border border-gold/15 rounded-2xl overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between">
         <div>
-          <div className="text-[9px] font-bold text-[#f0c040] uppercase tracking-widest mb-1">
+          <div className="text-[9px] font-bold text-gold uppercase tracking-widest mb-1">
             Know Your Rights
           </div>
           <div className="text-[15px] font-bold text-white leading-snug">
@@ -266,7 +266,7 @@ const BarristerAmakaCard = () => {
             <rect x="54" y="65" width="12" height="30" rx="4" fill="#1a1a2e" />
             <rect x="16" y="92" width="16" height="18" rx="3" fill="#f5c5a3" />
             <rect x="48" y="92" width="16" height="18" rx="3" fill="#f5c5a3" />
-            <rect x="24" y="80" width="32" height="6" rx="2" fill="#1a6b3c" />
+            <rect x="24" y="80" width="32" height="6" rx="2" fill="#D4AF37" />
             <text x="40" y="85" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="#fff">BARRISTER AMAKA</text>
           </svg>
         </div>
@@ -278,8 +278,8 @@ const BarristerAmakaCard = () => {
           <div key={i} className="flex items-start gap-2.5">
             <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-[8px] font-black ${
               pt.type === 'right'
-                ? 'bg-[#1a6b3c]/25 text-[#4ade80]'
-                : 'bg-[#f0c040]/15 text-[#f0c040]'
+                ? 'bg-gold/25 text-[#4ade80]'
+                : 'bg-gold/15 text-gold'
             }`}>
               {pt.type === 'right' ? '✓' : '!'}
             </div>
@@ -296,12 +296,12 @@ const BarristerAmakaCard = () => {
               key={i}
               onClick={() => setCurrent(i)}
               className={`h-1.5 rounded-full transition-all ${
-                i === current ? 'w-6 bg-[#f0c040]' : 'w-1.5 bg-white/20'
+                i === current ? 'w-6 bg-gold' : 'w-1.5 bg-white/20'
               }`}
             />
           ))}
         </div>
-        <Link to="/legal-guide" className="text-[11px] text-[#f0c040]/70 font-semibold hover:text-[#f0c040] transition-colors flex items-center gap-1">
+        <Link to="/legal-guide" className="text-[11px] text-gold/70 font-semibold hover:text-gold transition-colors flex items-center gap-1">
           View all rights <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
@@ -333,10 +333,10 @@ const WaitlistSection = () => {
   };
 
   return (
-    <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 lg:p-8">
+    <div className="bg-ink border border-white/6 rounded-2xl p-6 lg:p-8">
       {joined ? (
         <div className="text-center py-4">
-          <div className="w-12 h-12 bg-[#1a6b3c]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-6 h-6 text-[#4ade80]" />
           </div>
           <h3 className="text-[18px] font-bold text-white mb-2">You're on the list!</h3>
@@ -347,7 +347,7 @@ const WaitlistSection = () => {
       ) : (
         <>
           <div className="mb-5">
-            <div className="text-[10px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">
+            <div className="text-[10px] font-bold text-gold uppercase tracking-widest mb-2">
               Early Access
             </div>
             <h3 className="text-[20px] font-bold text-white mb-2">
@@ -367,7 +367,7 @@ const WaitlistSection = () => {
                 onClick={() => setRole(r)}
                 className={`flex-1 py-2 rounded-xl text-[12px] font-semibold capitalize transition-all ${
                   role === r
-                    ? 'bg-[#1a6b3c] text-white'
+                    ? 'bg-gold text-white'
                     : 'bg-white/5 text-white/45 hover:bg-white/8 hover:text-white/70'
                 }`}
               >
@@ -383,12 +383,12 @@ const WaitlistSection = () => {
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
             />
             <button
               type="submit"
               disabled={loading}
-              className="bg-[#f0c040] text-black px-5 py-3 rounded-xl font-bold text-[13px] hover:bg-[#e0b030] transition-colors disabled:opacity-60 flex items-center gap-2 whitespace-nowrap"
+              className="bg-gold text-black px-5 py-3 rounded-xl font-bold text-[13px] hover:bg-[#e0b030] transition-colors disabled:opacity-60 flex items-center gap-2 whitespace-nowrap"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
@@ -483,12 +483,12 @@ export default function Landing() {
       {/* ─────────────────────────────────────────────────────── */}
       {/* HERO SECTION */}
       {/* ─────────────────────────────────────────────────────── */}
-      <section className="relative bg-[#0a1f11] overflow-hidden">
+      <section className="relative bg-ink overflow-hidden">
         {/* Background texture */}
         <div className="absolute inset-0 opacity-20"
           style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, #1a6b3c 0%, transparent 50%),
-                              radial-gradient(circle at 80% 20%, #f0c040 0%, transparent 40%)`
+            backgroundImage: `radial-gradient(circle at 20% 50%, #D4AF37 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, #D4AF37 0%, transparent 40%)`
           }}
         />
         <div className="absolute inset-0"
@@ -511,10 +511,10 @@ export default function Landing() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-2 bg-[#f0c040]/10 border border-[#f0c040]/20 rounded-full px-4 py-2 mb-8"
+              className="inline-flex items-center gap-2 bg-gold/10 border border-gold/20 rounded-full px-4 py-2 mb-8"
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-[#f0c040] animate-pulse" />
-              <span className="text-[12px] font-semibold text-[#f0c040]">
+              <div className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+              <span className="text-[12px] font-semibold text-gold">
                 Nigeria's first escrow-protected real estate platform
               </span>
             </motion.div>
@@ -527,7 +527,7 @@ export default function Landing() {
               className="text-[40px] lg:text-[64px] font-black text-white leading-[1.05] tracking-tight mb-6"
             >
               Rent or Buy<br />
-              <span className="text-[#f0c040]">Safely</span> in Nigeria.
+              <span className="text-gold">Safely</span> in Nigeria.
             </motion.h1>
 
             {/* Subheadline */}
@@ -551,7 +551,7 @@ export default function Landing() {
                 <div className="flex flex-col lg:flex-row">
                   {/* State select */}
                   <div className="flex-1 flex items-center gap-3 px-5 py-4 border-b lg:border-b-0 lg:border-r border-white/8">
-                    <MapPin className="w-4 h-4 text-[#1a6b3c] flex-shrink-0" />
+                    <MapPin className="w-4 h-4 text-gold flex-shrink-0" />
                     <select
                       value={state}
                       onChange={e => setState(e.target.value)}
@@ -559,22 +559,22 @@ export default function Landing() {
                     >
                       <option value="">All states</option>
                       {NIGERIAN_STATES.map(s => (
-                        <option key={s} value={s} className="bg-[#0a1f11] text-white">{s}</option>
+                        <option key={s} value={s} className="bg-ink text-white">{s}</option>
                       ))}
                     </select>
                   </div>
 
                   {/* Property type */}
                   <div className="flex items-center gap-3 px-5 py-4 border-b lg:border-b-0 lg:border-r border-white/8">
-                    <Layers className="w-4 h-4 text-[#1a6b3c] flex-shrink-0" />
+                    <Layers className="w-4 h-4 text-gold flex-shrink-0" />
                     <select
                       value={propertyType}
                       onChange={e => setPropertyType(e.target.value)}
                       className="bg-transparent text-[14px] text-white focus:outline-none appearance-none cursor-pointer"
                     >
-                      <option value="all" className="bg-[#0a1f11]">All types</option>
-                      <option value="house" className="bg-[#0a1f11]">House</option>
-                      <option value="land" className="bg-[#0a1f11]">Land</option>
+                      <option value="all" className="bg-ink">All types</option>
+                      <option value="house" className="bg-ink">House</option>
+                      <option value="land" className="bg-ink">Land</option>
                     </select>
                   </div>
 
@@ -587,7 +587,7 @@ export default function Landing() {
                         onClick={() => setTransaction(t)}
                         className={`px-4 py-2 rounded-xl text-[13px] font-semibold capitalize transition-all ${
                           transaction === t
-                            ? 'bg-[#1a6b3c] text-white'
+                            ? 'bg-gold text-white'
                             : 'text-white/45 hover:text-white'
                         }`}
                       >
@@ -600,7 +600,7 @@ export default function Landing() {
                   <div className="p-3">
                     <button
                       type="submit"
-                      className="w-full lg:w-auto bg-[#f0c040] text-black px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
+                      className="w-full lg:w-auto bg-gold text-black px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
                     >
                       <Search className="w-4 h-4" />
                       Search
@@ -617,7 +617,7 @@ export default function Landing() {
                   { icon: Lock, text: 'Fair Inspections' },
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-2">
-                    <Icon className="w-3.5 h-3.5 text-[#f0c040]" />
+                    <Icon className="w-3.5 h-3.5 text-gold" />
                     <span className="text-[12px] text-white/50 font-medium">{text}</span>
                   </div>
                 ))}
@@ -635,7 +635,7 @@ export default function Landing() {
       {/* ─────────────────────────────────────────────────────── */}
       {/* LIVE STATS BAR */}
       {/* ─────────────────────────────────────────────────────── */}
-      <section className="bg-[#0a1f11] border-y border-white/5">
+      <section className="bg-ink border-y border-white/5">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 py-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             <StatItem
@@ -659,7 +659,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-5 lg:px-8">
           <FadeUp>
             <div className="text-center mb-14">
-              <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">
+              <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                 The Process
               </div>
               <h2 className="text-[28px] lg:text-[40px] font-black text-white tracking-tight">
@@ -704,7 +704,7 @@ export default function Landing() {
           <FadeUp>
             <div className="flex items-end justify-between mb-10">
               <div>
-                <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">
+                <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">
                   Latest Listings
                 </div>
                 <h2 className="text-[24px] lg:text-[32px] font-black text-white tracking-tight">
@@ -713,7 +713,7 @@ export default function Landing() {
               </div>
               <Link
                 to="/listings"
-                className="hidden sm:flex items-center gap-2 text-[13px] font-semibold text-white/50 hover:text-[#f0c040] transition-colors"
+                className="hidden sm:flex items-center gap-2 text-[13px] font-semibold text-white/50 hover:text-gold transition-colors"
               >
                 View all <ArrowRight className="w-4 h-4" />
               </Link>
@@ -723,7 +723,7 @@ export default function Landing() {
           {loadingProperties ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-[#0a1f11] rounded-2xl overflow-hidden border border-white/5">
+                <div key={i} className="bg-ink rounded-2xl overflow-hidden border border-white/5">
                   <div className="skeleton h-44" />
                   <div className="p-4 space-y-3">
                     <div className="skeleton h-4 w-3/4" />
@@ -742,7 +742,7 @@ export default function Landing() {
               ))}
             </div>
           ) : (
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-14 text-center">
+            <div className="bg-ink border border-white/6 rounded-2xl p-14 text-center">
               <Home className="w-10 h-10 text-white/15 mx-auto mb-4" />
               <p className="text-[15px] font-semibold text-white/40 mb-2">
                 Properties coming soon
@@ -752,7 +752,7 @@ export default function Landing() {
               </p>
               <Link
                 to="/signup"
-                className="inline-flex items-center gap-2 mt-6 bg-[#1a6b3c] text-white px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-[#0f4a2a] transition-colors"
+                className="inline-flex items-center gap-2 mt-6 bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-gold-dark transition-colors"
               >
                 List your property <ArrowRight className="w-4 h-4" />
               </Link>
@@ -762,7 +762,7 @@ export default function Landing() {
           <div className="mt-8 text-center sm:hidden">
             <Link
               to="/listings"
-              className="inline-flex items-center gap-2 text-[13px] font-semibold text-white/50 hover:text-[#f0c040] transition-colors"
+              className="inline-flex items-center gap-2 text-[13px] font-semibold text-white/50 hover:text-gold transition-colors"
             >
               View all properties <ArrowRight className="w-4 h-4" />
             </Link>
@@ -789,11 +789,11 @@ export default function Landing() {
       {/* ─────────────────────────────────────────────────────── */}
       {/* WHY RENT EASY */}
       {/* ─────────────────────────────────────────────────────── */}
-      <section className="pb-20 lg:pb-28 bg-[#0a1f11]/40">
+      <section className="pb-20 lg:pb-28 bg-ink/40">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 py-20">
           <FadeUp>
             <div className="text-center mb-14">
-              <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">
+              <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                 Why Choose Us
               </div>
               <h2 className="text-[28px] lg:text-[40px] font-black text-white tracking-tight">
@@ -841,14 +841,14 @@ export default function Landing() {
       <section className="pb-20 lg:pb-28">
         <div className="max-w-7xl mx-auto px-5 lg:px-8">
           <FadeUp>
-            <div className="bg-[#0a1f11] border border-[#f0c040]/15 rounded-3xl p-8 lg:p-12 relative overflow-hidden">
+            <div className="bg-ink border border-gold/15 rounded-3xl p-8 lg:p-12 relative overflow-hidden">
               {/* Background glow */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#f0c040]/5 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#1a6b3c]/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
                 <div>
-                  <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-4">
+                  <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">
                     For Landlords & Agents
                   </div>
                   <h2 className="text-[28px] lg:text-[36px] font-black text-white tracking-tight mb-5">
@@ -871,7 +871,7 @@ export default function Landing() {
                   <div className="flex flex-wrap gap-3">
                     <Link
                       to="/signup"
-                      className="bg-[#f0c040] text-black px-8 py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors flex items-center gap-2"
+                      className="bg-gold text-black px-8 py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors flex items-center gap-2"
                     >
                       Start Listing Free <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -893,7 +893,7 @@ export default function Landing() {
                     { value: '24h', label: 'Verification', sub: 'Fast approval' },
                   ].map(({ value, label, sub }) => (
                     <div key={label} className="bg-[#111a14] border border-white/5 rounded-2xl p-5 text-center aspect-square flex flex-col items-center justify-center">
-                      <div className="text-[26px] font-black text-[#f0c040] leading-none mb-1">{value}</div>
+                      <div className="text-[26px] font-black text-gold leading-none mb-1">{value}</div>
                       <div className="text-[12px] font-semibold text-white mb-1">{label}</div>
                       <div className="text-[10px] text-white/35">{sub}</div>
                     </div>
@@ -924,13 +924,13 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/signup"
-                className="bg-[#f0c040] text-black px-10 py-4 rounded-xl font-bold text-[15px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
+                className="bg-gold text-black px-10 py-4 rounded-xl font-bold text-[15px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
               >
                 Create Free Account <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 to="/listings"
-                className="bg-[#0a1f11] text-white px-10 py-4 rounded-xl font-bold text-[15px] hover:bg-[#111a14] transition-colors border border-white/8"
+                className="bg-ink text-white px-10 py-4 rounded-xl font-bold text-[15px] hover:bg-[#111a14] transition-colors border border-white/8"
               >
                 Browse Properties
               </Link>

@@ -24,7 +24,7 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   pending_payment: {
     label: 'Payment Pending',
     description: 'Your booking is waiting for payment confirmation.',
-    color: 'text-[#f0c040]',
+    color: 'text-gold',
   },
   payment_confirmed: {
     label: 'Payment Confirmed',
@@ -39,12 +39,12 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   inspection_done: {
     label: 'Inspection Completed',
     description: 'You have completed your inspection. Please let us know if you want to proceed.',
-    color: 'text-[#f0c040]',
+    color: 'text-gold',
   },
   tenant_interested: {
     label: 'Interested — Awaiting Escrow',
     description: 'You expressed interest. The landlord will initiate the escrow deal within 72 hours.',
-    color: 'text-[#f0c040]',
+    color: 'text-gold',
   },
   escrow_started: {
     label: 'Escrow Started',
@@ -127,7 +127,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
   // Property no longer available
   if (property.status === 'rented' || property.status === 'sold') {
     return (
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 text-center"
+      <div className="bg-ink border border-white/6 rounded-2xl p-5 text-center"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <AlertCircle className="w-8 h-8 text-white/20 mx-auto mb-2" />
         <p className="text-[13px] font-semibold text-white/40 mb-1">
@@ -136,7 +136,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
         <p className="text-[11px] text-white/25 mb-4">It is no longer accepting new bookings.</p>
         <button
           onClick={() => navigate('/listings')}
-          className="text-[12px] text-[#f0c040]/60 hover:text-[#f0c040] transition-colors flex items-center gap-1 mx-auto"
+          className="text-[12px] text-gold/60 hover:text-gold transition-colors flex items-center gap-1 mx-auto"
         >
           Browse similar properties <ArrowRight className="w-3 h-3" />
         </button>
@@ -147,12 +147,12 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
   // Active escrow deal on property
   if (property.has_active_deal) {
     return (
-      <div className="bg-[#0a1f11] border border-[#f0c040]/15 rounded-2xl p-5 text-center"
+      <div className="bg-ink border border-gold/15 rounded-2xl p-5 text-center"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <div className="w-10 h-10 bg-[#f0c040]/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
-          <Clock className="w-5 h-5 text-[#f0c040]" />
+        <div className="w-10 h-10 bg-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <Clock className="w-5 h-5 text-gold" />
         </div>
-        <p className="text-[12px] font-bold text-[#f0c040] uppercase tracking-wider mb-1">
+        <p className="text-[12px] font-bold text-gold uppercase tracking-wider mb-1">
           Deal In Progress
         </p>
         <p className="text-[12px] text-white/40 leading-relaxed">
@@ -165,10 +165,10 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
   // Not logged in
   if (!user) {
     return (
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5"
+      <div className="bg-ink border border-white/6 rounded-2xl p-5"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div className="flex items-center gap-2 mb-3">
-          <Shield className="w-4 h-4 text-[#1a6b3c]" />
+          <Shield className="w-4 h-4 text-gold" />
           <p className="text-[13px] font-bold text-white">Book an Inspection</p>
         </div>
         <p className="text-[12px] text-white/40 mb-4 leading-relaxed">
@@ -176,7 +176,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
         </p>
         <button
           onClick={() => navigate('/login')}
-          className="w-full bg-[#f0c040] text-black py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+          className="w-full bg-gold text-black py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
         >
           Sign In to Continue
         </button>
@@ -186,9 +186,9 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
 
   if (loading) {
     return (
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-8 flex items-center justify-center"
+      <div className="bg-ink border border-white/6 rounded-2xl p-8 flex items-center justify-center"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <Loader2 className="w-6 h-6 text-[#1a6b3c] animate-spin" />
+        <Loader2 className="w-6 h-6 text-gold animate-spin" />
       </div>
     );
   }
@@ -205,7 +205,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
     const isPending = ['payment_confirmed', 'inspection_scheduled', 'inspection_done', 'tenant_interested'].includes(existingBooking.status);
 
     return (
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden"
+      <div className="bg-ink border border-white/6 rounded-2xl overflow-hidden"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div className="px-5 pt-5 pb-4 border-b border-white/5">
           <h3 className="text-[14px] font-bold text-white">Your Inspection</h3>
@@ -213,8 +213,8 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
         <div className="p-5 space-y-4">
           {/* Status card */}
           <div className={`p-4 rounded-xl border ${
-            isPending ? 'bg-[#1a6b3c]/8 border-[#1a6b3c]/20' :
-            canGoToDeal ? 'bg-[#f0c040]/8 border-[#f0c040]/20' :
+            isPending ? 'bg-gold/8 border-gold/20' :
+            canGoToDeal ? 'bg-gold/8 border-gold/20' :
             'bg-white/4 border-white/8'
           }`}>
             <p className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${statusInfo.color}`}>
@@ -225,7 +225,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             </p>
             {existingBooking.confirmed_date && (
               <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/8">
-                <Calendar className="w-3.5 h-3.5 text-[#1a6b3c]" />
+                <Calendar className="w-3.5 h-3.5 text-gold" />
                 <span className="text-[12px] font-semibold text-white">
                   {new Date(existingBooking.confirmed_date).toLocaleDateString('en-NG', {
                     weekday: 'long', day: 'numeric', month: 'long'
@@ -251,7 +251,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             onClick={() => navigate(canGoToDeal ? '/dashboard' : '/dashboard')}
             className={`w-full py-3 rounded-xl font-bold text-[13px] transition-colors flex items-center justify-center gap-2 ${
               canGoToDeal
-                ? 'bg-[#f0c040] text-black hover:bg-[#e0b030]'
+                ? 'bg-gold text-black hover:bg-[#e0b030]'
                 : 'bg-white/5 border border-white/8 text-white hover:bg-white/8'
             }`}
           >
@@ -265,7 +265,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
 
   // No booking yet — show options
   return (
-    <div className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden"
+    <div className="bg-ink border border-white/6 rounded-2xl overflow-hidden"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="px-5 pt-5 pb-4 border-b border-white/5">
         <h3 className="text-[15px] font-bold text-white mb-0.5">Ready to proceed?</h3>
@@ -283,7 +283,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           className="w-full flex items-center gap-3 p-3 bg-white/3 border border-white/6 rounded-xl hover:bg-white/5 transition-colors disabled:opacity-50 text-left"
         >
           {startingChat
-            ? <Loader2 className="w-4 h-4 text-[#1a6b3c] animate-spin flex-shrink-0" />
+            ? <Loader2 className="w-4 h-4 text-gold animate-spin flex-shrink-0" />
             : <MessageCircle className="w-4 h-4 text-white/30 flex-shrink-0" />
           }
           <div>
@@ -293,10 +293,10 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
         </button>
 
         {/* OPTION 1 — Book inspection */}
-        <div className="bg-[#111a14] border border-[#1a6b3c]/25 rounded-xl p-4">
+        <div className="bg-[#111a14] border border-gold/25 rounded-xl p-4">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1">
-              <span className="text-[10px] font-bold text-[#f0c040] bg-[#f0c040]/10 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold text-gold bg-gold/10 px-2 py-0.5 rounded-full">
                 Recommended
               </span>
               <h4 className="text-[14px] font-bold text-white mt-1.5 mb-0.5">
@@ -307,7 +307,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
               </p>
             </div>
             <div className="text-right flex-shrink-0">
-              <div className="text-[18px] font-black text-[#f0c040]">{formatFee(inspectionFee)}</div>
+              <div className="text-[18px] font-black text-gold">{formatFee(inspectionFee)}</div>
               <div className="text-[10px] text-white/30">fee</div>
             </div>
           </div>
@@ -327,7 +327,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="w-full bg-[#1a6b3c] text-white py-3 rounded-xl font-bold text-[13px] hover:bg-[#0f4a2a] transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-gold text-white py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors flex items-center justify-center gap-2"
           >
             <Calendar className="w-4 h-4" />
             Book Inspection — {formatFee(inspectionFee)}
@@ -349,7 +349,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             Skip the inspection and pay rent directly. Your money is still held in escrow and only released after you confirm move-in.
           </p>
 
-          <div className="bg-[#0a1f11] border border-white/6 rounded-xl p-3 mb-3 space-y-1.5">
+          <div className="bg-ink border border-white/6 rounded-xl p-3 mb-3 space-y-1.5">
             {[
               { label: `Rent (${property.price_period || 'outright'})`, value: formatNaira(property.price) },
               
@@ -362,12 +362,12 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             ))}
             <div className="flex justify-between pt-1.5 border-t border-white/5">
               <span className="text-[12px] font-bold text-white">Total</span>
-              <span className="text-[13px] font-black text-[#f0c040]">{formatNaira(totalTenantPays)}</span>
+              <span className="text-[13px] font-black text-gold">{formatNaira(totalTenantPays)}</span>
             </div>
           </div>
 
-          <div className="flex items-start gap-2 mb-3 p-3 bg-[#f0c040]/5 border border-[#f0c040]/10 rounded-xl">
-            <Info className="w-3.5 h-3.5 text-[#f0c040]/50 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 mb-3 p-3 bg-gold/5 border border-gold/10 rounded-xl">
+            <Info className="w-3.5 h-3.5 text-gold/50 flex-shrink-0 mt-0.5" />
             <p className="text-[11px] text-white/35 mb-3 leading-relaxed">
   Already viewed this property? Contact the owner via chat. They can send you a custom deal offer which you can accept and pay securely via escrow.
 </p>

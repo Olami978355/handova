@@ -75,7 +75,7 @@ export default function FunnelSection() {
   const maxValue = stages.length > 0 ? Math.max(stages[0].value, 1) : 1;
 
   return (
-    <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+    <div className="bg-ink border border-white/6 rounded-2xl p-5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
           <h3 className="text-[13px] font-bold text-white">Conversion Funnel</h3>
@@ -87,7 +87,7 @@ export default function FunnelSection() {
               key={opt.key}
               onClick={() => setRange(opt.key)}
               className={`px-3 py-2.5 rounded-lg text-[11px] font-bold transition-colors ${
-                range === opt.key ? 'bg-[#1a6b3c] text-white' : 'text-white/40 hover:text-white/70'
+                range === opt.key ? 'bg-gold text-white' : 'text-white/40 hover:text-white/70'
               }`}
             >
               {opt.label}
@@ -126,7 +126,7 @@ export default function FunnelSection() {
                 </div>
                 <div className="h-3 bg-white/5 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#1a6b3c] rounded-full transition-all"
+                    className="h-full bg-gold rounded-full transition-all"
                     style={{ width: `${Math.max(widthPct, stage.value > 0 ? 2 : 0)}%` }}
                   />
                 </div>

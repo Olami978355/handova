@@ -100,7 +100,7 @@ export const LandlordBookingsList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 text-[#1a6b3c] animate-spin mb-3" />
+        <Loader2 className="w-8 h-8 text-gold animate-spin mb-3" />
         <p className="text-[13px] text-white/40">Loading bookings...</p>
       </div>
     );
@@ -110,7 +110,7 @@ export const LandlordBookingsList: React.FC = () => {
 
   if (propertiesWithBookings.length === 0) {
     return (
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-14 text-center">
+      <div className="bg-ink border border-white/6 rounded-2xl p-14 text-center">
         <div className="w-14 h-14 bg-white/4 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Calendar className="w-7 h-7 text-white/15" />
         </div>
@@ -125,7 +125,7 @@ export const LandlordBookingsList: React.FC = () => {
   }
 
   const bookingStatusColor: Record<string, string> = {
-    payment_confirmed: '#f0c040',
+    payment_confirmed: '#D4AF37',
     inspection_scheduled: '#60a5fa',
     inspection_done: '#a78bfa',
     tenant_interested: '#4ade80',
@@ -157,7 +157,7 @@ export const LandlordBookingsList: React.FC = () => {
         return (
           <div
             key={property.id}
-            className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden"
+            className="bg-ink border border-white/6 rounded-2xl overflow-hidden"
           >
             {/* Property header */}
             <button
@@ -187,12 +187,12 @@ export const LandlordBookingsList: React.FC = () => {
                       {bookings.length} booking{bookings.length !== 1 ? 's' : ''}
                     </span>
                     {pendingCount > 0 && (
-                      <span className="text-[10px] font-bold text-black bg-[#f0c040] px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-black bg-gold px-2 py-0.5 rounded-full">
                         {pendingCount} needs action
                       </span>
                     )}
                     {property.has_active_deal && (
-                      <span className="text-[10px] font-bold text-[#4ade80] bg-[#1a6b3c]/20 px-2 py-0.5 rounded-full border border-[#1a6b3c]/30">
+                      <span className="text-[10px] font-bold text-[#4ade80] bg-gold/20 px-2 py-0.5 rounded-full border border-gold/30">
                         Deal active
                       </span>
                     )}
@@ -223,7 +223,7 @@ export const LandlordBookingsList: React.FC = () => {
                         <div className="flex items-start justify-between gap-3 mb-3">
                           {/* Tenant info */}
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-9 h-9 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-white text-[13px] font-bold flex-shrink-0">
+                            <div className="w-9 h-9 bg-gold/20 rounded-xl flex items-center justify-center text-white text-[13px] font-bold flex-shrink-0">
                               {booking.profiles?.full_name
                                 ? booking.profiles.full_name.charAt(0).toUpperCase()
                                 : <User className="w-4 h-4 text-white/40" />
@@ -284,7 +284,7 @@ export const LandlordBookingsList: React.FC = () => {
                                 booking.preferred_time!
                               )}
                               disabled={confirming === booking.id}
-                              className="flex-1 bg-[#1a6b3c] text-white py-2.5 rounded-xl text-[12px] font-bold hover:bg-[#0f4a2a] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                              className="flex-1 bg-gold text-white py-2.5 rounded-xl text-[12px] font-bold hover:bg-gold-dark transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                             >
                               {confirming === booking.id
                                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -299,7 +299,7 @@ export const LandlordBookingsList: React.FC = () => {
                             <button
                               onClick={() => handleStartEscrow(booking.id)}
                               disabled={startingEscrow === booking.id}
-                              className="flex-1 bg-[#f0c040] text-black py-2.5 rounded-xl text-[12px] font-bold hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                              className="flex-1 bg-gold text-black py-2.5 rounded-xl text-[12px] font-bold hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                             >
                               {startingEscrow === booking.id
                                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -318,7 +318,7 @@ export const LandlordBookingsList: React.FC = () => {
                         </div>
 
                         {booking.status === 'escrow_started' && (
-                          <div className="flex items-center gap-2 mt-3 p-3 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl">
+                          <div className="flex items-center gap-2 mt-3 p-3 bg-gold/10 border border-gold/20 rounded-xl">
                             <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0" />
                             <p className="text-[11px] text-[#4ade80] font-semibold">
                               Escrow deal is active with this tenant

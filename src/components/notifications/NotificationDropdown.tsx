@@ -28,22 +28,22 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     switch (type) {
       case 'inspection_requested':
       case 'inspection_booked':
-        return <Calendar className="text-[#f0c040]" size={16} />;
+        return <Calendar className="text-gold" size={16} />;
       case 'inspection_confirmed':
-        return <CheckCircle className="text-[#1a6b3c]" size={16} />;
+        return <CheckCircle className="text-gold" size={16} />;
       case 'verification_approved':
-        return <ShieldCheck className="text-[#1a6b3c]" size={16} />;
+        return <ShieldCheck className="text-gold" size={16} />;
       case 'verification_rejected':
         return <ShieldX className="text-red-400" size={16} />;
       case 'listing_approved':
-        return <Home className="text-[#1a6b3c]" size={16} />;
+        return <Home className="text-gold" size={16} />;
       case 'listing_rejected':
         return <XCircle className="text-red-400" size={16} />;
       case 'deal_state_change':
       case 'custom_deal_offer':
-        return <DollarSign className="text-[#f0c040]" size={16} />;
+        return <DollarSign className="text-gold" size={16} />;
       case 'new_message':
-        return <MessageCircle className="text-[#1a6b3c]" size={16} />;
+        return <MessageCircle className="text-gold" size={16} />;
       case 'refund_processed':
         return <CheckCircle className="text-[#4ade80]" size={16} />;
       default:
@@ -66,7 +66,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   return (
     <div
-      className="bg-[#0a1f11] border border-white/8 rounded-2xl overflow-hidden flex flex-col shadow-2xl"
+      className="bg-ink border border-white/8 rounded-2xl overflow-hidden flex flex-col shadow-2xl"
       style={{ maxHeight: 480, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* Header */}
@@ -74,7 +74,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-[13px] font-bold text-white">Notifications</span>
           {unreadCount > 0 && (
-            <span className="text-[10px] font-black text-black bg-[#f0c040] px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-black text-black bg-gold px-2 py-0.5 rounded-full">
               {unreadCount} new
             </span>
           )}
@@ -82,7 +82,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center gap-1 text-[11px] font-semibold text-[#f0c040]/60 hover:text-[#f0c040] transition-colors"
+            className="flex items-center gap-1 text-[11px] font-semibold text-gold/60 hover:text-gold transition-colors"
           >
             <Check size={12} />
             Mark all read
@@ -94,7 +94,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             <p className="text-[12px] text-white/30">Loading...</p>
           </div>
         ) : notifications.length === 0 ? (
@@ -116,7 +116,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 key={notif.id}
                 onClick={() => handleClick(notif)}
                 className={`w-full px-5 py-3.5 flex items-start gap-3 text-left hover:bg-white/4 transition-colors relative ${
-                  !notif.read ? 'bg-[#1a6b3c]/8' : ''
+                  !notif.read ? 'bg-gold/8' : ''
                 }`}
               >
                 <div className="w-8 h-8 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -141,7 +141,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 </div>
                 {/* Unread dot */}
                 {!notif.read && (
-                  <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-[#f0c040] rounded-full flex-shrink-0" />
+                  <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0" />
                 )}
               </button>
             ))}

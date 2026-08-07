@@ -60,7 +60,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
   };
 
   const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
-    pending_payment:      { label: 'Pending Payment',      color: '#f0c040', bg: 'rgba(240,192,64,0.1)' },
+    pending_payment:      { label: 'Pending Payment',      color: '#D4AF37', bg: 'rgba(240,192,64,0.1)' },
     payment_confirmed:    { label: 'Payment Confirmed',    color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
     inspection_scheduled: { label: 'Inspection Scheduled', color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
     inspection_done:      { label: 'Inspection Done',      color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
@@ -80,7 +80,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
 
   return (
     <div
-      className="bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden hover:border-white/10 transition-colors"
+      className="bg-ink border border-white/6 rounded-2xl overflow-hidden hover:border-white/10 transition-colors"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       <div className="p-5">
@@ -124,7 +124,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
             <p className="text-[10px] text-white/35 font-semibold uppercase tracking-wider mb-1">
               Inspection Fee
             </p>
-            <p className="text-[14px] font-black text-[#f0c040]">
+            <p className="text-[14px] font-black text-gold">
               {formatFee(booking.inspection_fee)}
             </p>
           </div>
@@ -153,7 +153,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
                   Decision deadline
                 </span>
               </div>
-              <span className="text-[13px] font-black text-[#f0c040]">
+              <span className="text-[13px] font-black text-gold">
                 {timeLeft}
               </span>
             </div>
@@ -164,7 +164,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setShowConfirm({ type: 'interested', show: true })}
-                className="py-2.5 bg-[#1a6b3c] text-white rounded-xl text-[12px] font-bold hover:bg-[#0f4a2a] transition-colors flex items-center justify-center gap-1.5"
+                className="py-2.5 bg-gold text-white rounded-xl text-[12px] font-bold hover:bg-gold-dark transition-colors flex items-center justify-center gap-1.5"
               >
                 <CheckCircle className="w-3.5 h-3.5" />
                 Interested
@@ -195,7 +195,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
 
         {/* Escrow started */}
         {booking.status === 'escrow_started' && (
-          <div className="flex items-center gap-2 p-3 bg-[#1a6b3c]/15 border border-[#1a6b3c]/25 rounded-xl mb-4">
+          <div className="flex items-center gap-2 p-3 bg-gold/15 border border-gold/25 rounded-xl mb-4">
             <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0" />
             <p className="text-[12px] text-[#4ade80] font-semibold">
               Escrow deal is active for this property
@@ -208,7 +208,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
           <span className="text-[10px] text-white/20 font-mono">
             Ref: {booking.paystack_reference?.slice(-8) || '—'}
           </span>
-          <button className="text-[12px] font-semibold text-[#f0c040]/50 hover:text-[#f0c040] transition-colors flex items-center gap-1">
+          <button className="text-[12px] font-semibold text-gold/50 hover:text-gold transition-colors flex items-center gap-1">
             View Details <ArrowRight className="w-3 h-3" />
           </button>
         </div>
@@ -229,11 +229,11 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 16 }}
-              className="fixed inset-x-5 bottom-8 sm:inset-0 sm:m-auto sm:w-full sm:max-w-sm sm:h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[130] p-6 shadow-2xl"
+              className="fixed inset-x-5 bottom-8 sm:inset-0 sm:m-auto sm:w-full sm:max-w-sm sm:h-fit bg-ink border border-white/8 rounded-2xl z-[130] p-6 shadow-2xl"
             >
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
                 showConfirm.type === 'interested'
-                  ? 'bg-[#1a6b3c]/20'
+                  ? 'bg-gold/20'
                   : 'bg-red-500/15'
               }`}>
                 {showConfirm.type === 'interested'
@@ -265,7 +265,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
                   disabled={loading}
                   className={`flex-1 py-3 rounded-xl font-bold text-[13px] text-white transition-colors flex items-center justify-center gap-2 ${
                     showConfirm.type === 'interested'
-                      ? 'bg-[#1a6b3c] hover:bg-[#0f4a2a]'
+                      ? 'bg-gold hover:bg-gold-dark'
                       : 'bg-red-500 hover:bg-red-600'
                   }`}
                 >

@@ -6,15 +6,15 @@ const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 const RentEasyLogo = ({ size = 28 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#1a6b3c" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
+    <rect width="80" height="80" rx="18" fill="#D4AF37" />
+    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#D4AF37" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+    <path d="M16 54 L28 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
+    <path d="M54 54 L64 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
     <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
     <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
     <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
     <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#f0c040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -23,7 +23,7 @@ const rights = [
     id: 'tenant',
     icon: Home,
     title: "Tenant Rights",
-    color: '#f0c040',
+    color: '#D4AF37',
     law: 'Tenancy Law of Lagos State 2011 & Recovery of Premises Act',
     items: [
       { title: 'Right to Quiet Enjoyment', desc: 'Once you have a valid tenancy agreement and have paid your rent, your landlord cannot interfere with your peaceful use of the property. Landlords cannot enter without notice or your permission except in genuine emergencies.' },
@@ -38,7 +38,7 @@ const rights = [
     id: 'landlord',
     icon: Shield,
     title: "Landlord Rights",
-    color: '#1a6b3c',
+    color: '#D4AF37',
     law: 'Recovery of Premises Act & Property Law',
     items: [
       { title: 'Right to Receive Rent', desc: 'Landlords have the right to receive the agreed rent on time. If a tenant fails to pay rent, the landlord can begin legal proceedings after proper notice has been served.' },
@@ -118,11 +118,11 @@ export default function LegalGuidePage() {
 
         {/* Header */}
         <div className="flex items-start gap-5 mb-12">
-          <div className="w-16 h-16 bg-[#0a1f11] border border-[#f0c040]/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <Scale className="w-8 h-8 text-[#f0c040]" />
+          <div className="w-16 h-16 bg-ink border border-gold/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <Scale className="w-8 h-8 text-gold" />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">Know Your Rights</div>
+            <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">Know Your Rights</div>
             <h1 className="text-[32px] font-black text-white mb-3">Nigerian Real Estate Legal Guide</h1>
             <p className="text-[14px] text-white/45 max-w-2xl">
               Understanding your rights as a tenant or landlord in Nigeria can protect you from exploitation, 
@@ -132,7 +132,7 @@ export default function LegalGuidePage() {
         </div>
 
         {/* Barrister Amaka intro */}
-        <div className="bg-[#0a1f11] border border-[#f0c040]/15 rounded-2xl p-6 mb-10 flex items-start gap-5">
+        <div className="bg-ink border border-gold/15 rounded-2xl p-6 mb-10 flex items-start gap-5">
           <svg width="60" height="78" viewBox="0 0 80 110" fill="none" className="flex-shrink-0">
             <rect x="18" y="55" width="44" height="55" rx="6" fill="#1a1a2e" />
             <rect x="22" y="58" width="36" height="50" rx="4" fill="#16213e" />
@@ -146,11 +146,11 @@ export default function LegalGuidePage() {
             <path d="M36 63 Q40 66 44 63" stroke="#c07060" strokeWidth="1.5" fill="none" strokeLinecap="round" />
             <rect x="14" y="65" width="12" height="30" rx="4" fill="#1a1a2e" />
             <rect x="54" y="65" width="12" height="30" rx="4" fill="#1a1a2e" />
-            <rect x="24" y="80" width="32" height="6" rx="2" fill="#1a6b3c" />
+            <rect x="24" y="80" width="32" height="6" rx="2" fill="#D4AF37" />
             <text x="40" y="85" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="#fff">BARRISTER AMAKA</text>
           </svg>
           <div>
-            <div className="text-[10px] font-bold text-[#f0c040] uppercase tracking-widest mb-2">A word from Barrister Amaka</div>
+            <div className="text-[10px] font-bold text-gold uppercase tracking-widest mb-2">A word from Barrister Amaka</div>
             <p className="text-[14px] font-semibold text-white leading-snug mb-2">
               "Knowledge is your first line of defence. A tenant who knows their rights cannot be easily exploited. 
               A landlord who understands the law protects their investment."
@@ -163,7 +163,7 @@ export default function LegalGuidePage() {
 
           {/* Sidebar */}
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4 lg:sticky lg:top-24">
+            <div className="bg-ink border border-white/6 rounded-2xl p-4 lg:sticky lg:top-24">
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 px-2">Sections</p>
               <div className="space-y-1">
                 {rights.map(right => {
@@ -174,7 +174,7 @@ export default function LegalGuidePage() {
                       onClick={() => setActiveSection(right.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all text-left ${
                         activeSection === right.id
-                          ? 'bg-[#1a6b3c] text-white'
+                          ? 'bg-gold text-white'
                           : 'text-white/50 hover:bg-white/5 hover:text-white'
                       }`}
                     >
@@ -191,7 +191,7 @@ export default function LegalGuidePage() {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 lg:p-8">
+            <div className="bg-ink border border-white/6 rounded-2xl p-6 lg:p-8">
               <div className="flex items-start gap-4 mb-8 pb-6 border-b border-white/5">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -211,9 +211,9 @@ export default function LegalGuidePage() {
                 ))}
               </div>
 
-              <div className="mt-8 p-4 bg-[#f0c040]/5 border border-[#f0c040]/15 rounded-xl">
-                <p className="text-[12px] text-[#f0c040]/70 leading-relaxed">
-                  <strong className="text-[#f0c040]">Disclaimer:</strong> This guide is for general information only and does not constitute legal advice. 
+              <div className="mt-8 p-4 bg-gold/5 border border-gold/15 rounded-xl">
+                <p className="text-[12px] text-gold/70 leading-relaxed">
+                  <strong className="text-gold">Disclaimer:</strong> This guide is for general information only and does not constitute legal advice. 
                   For specific legal issues, please consult a qualified Nigerian lawyer.
                 </p>
               </div>

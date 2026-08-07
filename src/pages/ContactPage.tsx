@@ -38,7 +38,7 @@ export default function ContactPage() {
       <div className="max-w-5xl mx-auto px-5">
 
         <div className="text-center mb-12">
-          <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">Contact</div>
+          <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">Contact</div>
           <h1 className="text-[32px] font-black text-white mb-4">Get in Touch</h1>
           <p className="text-[14px] text-white/45 max-w-lg mx-auto">
             Have a question, complaint, or partnership inquiry? We'd love to hear from you.
@@ -49,30 +49,30 @@ export default function ContactPage() {
 
           {/* Info */}
           <div className="space-y-4">
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-              <div className="w-10 h-10 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center mb-4">
-                <Mail className="w-5 h-5 text-[#1a6b3c]" />
+            <div className="bg-ink border border-white/6 rounded-2xl p-5">
+              <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center mb-4">
+                <Mail className="w-5 h-5 text-gold" />
               </div>
               <h3 className="text-[14px] font-bold text-white mb-2">Email Us</h3>
-              <a href="mailto:joinrenteasy@gmail.com" className="text-[13px] text-[#f0c040]/70 hover:text-[#f0c040] transition-colors">
+              <a href="mailto:joinrenteasy@gmail.com" className="text-[13px] text-gold/70 hover:text-gold transition-colors">
                 joinrenteasy@gmail.com
               </a>
               <p className="text-[12px] text-white/30 mt-2">We respond within 48 hours</p>
             </div>
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
-              <div className="w-10 h-10 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center mb-4">
-                <MessageSquare className="w-5 h-5 text-[#1a6b3c]" />
+            <div className="bg-ink border border-white/6 rounded-2xl p-5">
+              <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center mb-4">
+                <MessageSquare className="w-5 h-5 text-gold" />
               </div>
               <h3 className="text-[14px] font-bold text-white mb-2">Support Hours</h3>
               <p className="text-[13px] text-white/50">Monday — Friday</p>
               <p className="text-[13px] text-white/50">9:00 AM — 6:00 PM WAT</p>
             </div>
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5">
+            <div className="bg-ink border border-white/6 rounded-2xl p-5">
               <h3 className="text-[14px] font-bold text-white mb-3">Common Topics</h3>
               <div className="space-y-2">
                 {['Refund requests', 'Listing disputes', 'Account verification', 'Partnership inquiries', 'Bug reports'].map(t => (
                   <div key={t} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-[#1a6b3c] rounded-full" />
+                    <div className="w-1.5 h-1.5 bg-gold rounded-full" />
                     <span className="text-[13px] text-white/45">{t}</span>
                   </div>
                 ))}
@@ -82,10 +82,10 @@ export default function ContactPage() {
 
           {/* Form */}
           <div className="lg:col-span-2">
-            <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 lg:p-8">
+            <div className="bg-ink border border-white/6 rounded-2xl p-6 lg:p-8">
               {success ? (
                 <div className="text-center py-10">
-                  <div className="w-16 h-16 bg-[#1a6b3c]/20 border border-[#1a6b3c]/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <div className="w-16 h-16 bg-gold/20 border border-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="w-8 h-8 text-[#4ade80]" />
                   </div>
                   <h3 className="text-[22px] font-black text-white mb-3">Message sent!</h3>
@@ -94,7 +94,7 @@ export default function ContactPage() {
                   </p>
                   <button
                     onClick={() => setSuccess(false)}
-                    className="bg-[#f0c040] text-black px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+                    className="bg-gold text-black px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
                   >
                     Send Another Message
                   </button>
@@ -118,7 +118,7 @@ export default function ContactPage() {
                           onChange={e => setForm({ ...form, name: e.target.value })}
                           required
                           placeholder="Your full name"
-                          className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                          className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
                         />
                       </div>
                       <div>
@@ -129,7 +129,7 @@ export default function ContactPage() {
                           onChange={e => setForm({ ...form, email: e.target.value })}
                           required
                           placeholder="your@email.com"
-                          className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                          className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
                         />
                       </div>
                     </div>
@@ -140,7 +140,7 @@ export default function ContactPage() {
                         value={form.subject}
                         onChange={e => setForm({ ...form, subject: e.target.value })}
                         placeholder="What is this about?"
-                        className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
                     <div>
@@ -151,13 +151,13 @@ export default function ContactPage() {
                         required
                         rows={6}
                         placeholder="Tell us how we can help..."
-                        className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors resize-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors resize-none"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full bg-[#f0c040] text-black py-4 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                      className="w-full bg-gold text-black py-4 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                     >
                       {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Send Message'}
                     </button>

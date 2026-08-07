@@ -155,7 +155,7 @@ export default function FAQPage() {
       <div className="max-w-3xl mx-auto px-5">
 
         <div className="text-center mb-12">
-          <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">FAQ</div>
+          <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">FAQ</div>
           <h1 className="text-[32px] font-black text-white mb-4">Frequently Asked Questions</h1>
           <p className="text-[14px] text-white/45 max-w-lg mx-auto">
             Everything you need to know about renting, listing, and transacting safely on RentEasy Nigeria.
@@ -170,14 +170,14 @@ export default function FAQPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search questions..."
-            className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+            className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
           />
         </div>
 
         {filtered.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-[14px] text-white/30">No questions found for "{search}"</p>
-            <button onClick={() => setSearch('')} className="mt-4 text-[#f0c040] text-[13px] font-semibold">
+            <button onClick={() => setSearch('')} className="mt-4 text-gold text-[13px] font-semibold">
               Clear search
             </button>
           </div>
@@ -185,7 +185,7 @@ export default function FAQPage() {
           <div className="space-y-10">
             {filtered.map(cat => (
               <div key={cat.category}>
-                <h2 className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-4">
+                <h2 className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">
                   {cat.category}
                 </h2>
                 <div className="space-y-2">
@@ -198,7 +198,7 @@ export default function FAQPage() {
           </div>
         )}
 
-        <div className="mt-16 bg-[#0a1f11] border border-white/6 rounded-2xl p-8 text-center">
+        <div className="mt-16 bg-ink border border-white/6 rounded-2xl p-8 text-center">
           <h3 className="text-[18px] font-bold text-white mb-2">Still have questions?</h3>
           <p className="text-[13px] text-white/45 mb-6">
             Our support team is available Monday to Friday, 9am to 6pm WAT.
@@ -206,7 +206,7 @@ export default function FAQPage() {
           
           <a
             href="mailto:joinrenteasy@gmail.com"
-            className="inline-flex items-center gap-2 bg-[#f0c040] text-black px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+            className="inline-flex items-center gap-2 bg-gold text-black px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
           >
             Email Us
           </a>

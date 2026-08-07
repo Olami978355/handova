@@ -4,8 +4,8 @@ import { MapPin, AlertCircle } from 'lucide-react';
 export const MapFallback: React.FC = () => {
   return (
     <div className="w-full h-full bg-zinc-100 flex flex-col items-center justify-center p-8 text-center rounded-[40px] border-2 border-dashed border-zinc-200">
-      <div className="w-16 h-16 bg-[#1a6b3c]/10 rounded-full flex items-center justify-center mb-6">
-        <MapPin className="w-8 h-8 text-[#1a6b3c]" />
+      <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6">
+        <MapPin className="w-8 h-8 text-gold" />
       </div>
       <h3 className="text-xl font-bold text-zinc-900 mb-2">Interactive Map Unavailable</h3>
       <p className="text-zinc-500 max-w-md mb-6">

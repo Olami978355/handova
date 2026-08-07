@@ -107,14 +107,14 @@ export default function CardRequestQueue() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20" style={font}>
-        <Loader2 className="w-6 h-6 text-[#1a6b3c] animate-spin" />
+        <Loader2 className="w-6 h-6 text-gold animate-spin" />
       </div>
     );
   }
 
   if (requests.length === 0) {
     return (
-      <div className="text-center py-20 bg-[#0a1f11] border border-white/6 rounded-2xl" style={font}>
+      <div className="text-center py-20 bg-ink border border-white/6 rounded-2xl" style={font}>
         <CreditCard className="w-10 h-10 text-white/15 mx-auto mb-4" />
         <h3 className="text-[16px] font-bold text-white mb-2">No pending requests</h3>
         <p className="text-[12px] text-white/35">Digital ID card requests will appear here.</p>
@@ -125,9 +125,9 @@ export default function CardRequestQueue() {
   return (
     <div className="space-y-3" style={font}>
       {requests.map((req) => (
-        <div key={req.id} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-5 flex items-center justify-between gap-4">
+        <div key={req.id} className="bg-ink border border-white/6 rounded-2xl p-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#1a6b3c]/20 rounded-xl overflow-hidden flex items-center justify-center text-[#1a6b3c] font-bold text-[13px] flex-shrink-0">
+            <div className="w-10 h-10 bg-gold/20 rounded-xl overflow-hidden flex items-center justify-center text-gold font-bold text-[13px] flex-shrink-0">
               {req.profile?.avatar_url
                 ? <img src={req.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 : (req.profile?.full_name || 'A').charAt(0).toUpperCase()
@@ -149,7 +149,7 @@ export default function CardRequestQueue() {
             <button
               onClick={() => handleApprove(req.id, req.agent_id)}
               disabled={actionLoading === req.id}
-              className="px-4 py-2 bg-[#f0c040] text-black rounded-xl font-bold text-[12px] hover:bg-[#e0b030] transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              className="px-4 py-2 bg-gold text-black rounded-xl font-bold text-[12px] hover:bg-[#e0b030] transition-colors disabled:opacity-50 flex items-center gap-1.5"
             >
               {actionLoading === req.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
               Approve

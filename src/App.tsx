@@ -54,7 +54,7 @@ const SuspendedScreen = () => (
     </p>
     
     <a
-      className="bg-[#1a6b3c] text-white px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+      className="bg-gold text-white px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
     >
       Contact Support
     </a>
@@ -70,7 +70,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
       className="h-screen flex items-center justify-center bg-[#0a0a0a]"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
     </div>
   );
 

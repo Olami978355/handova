@@ -20,10 +20,10 @@ export const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
       title="Verified account"
     >
       <BadgeCheck
-        className="text-[#1a6b3c] fill-[#1a6b3c]"
+        className="text-gold fill-gold"
         size={size}
         strokeWidth={2.5}
-        style={{ color: '#0a1f11' }}
+        style={{ color: '#0B0D10' }}
       />
     </span>
   );

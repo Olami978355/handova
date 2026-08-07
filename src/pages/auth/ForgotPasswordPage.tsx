@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
       <div className="flex items-center gap-2.5 mb-10">
         <HandovaLogo size={32} />
         <span className="text-[18px] font-extrabold tracking-tight text-white">
-          Hand<span className="text-[#f0c040]">ova</span>
+          Hand<span className="text-gold">ova</span>
         </span>
       </div>
 
@@ -57,11 +57,11 @@ export default function ForgotPasswordPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-[#0a1f11] border border-white/8 rounded-2xl p-8"
+        className="w-full max-w-md bg-ink border border-white/8 rounded-2xl p-8"
       >
         {sent ? (
           <div className="text-center">
-            <div className="w-12 h-12 bg-[#1a6b3c]/15 border border-[#1a6b3c]/25 rounded-full flex items-center justify-center mx-auto mb-5">
+            <div className="w-12 h-12 bg-gold/15 border border-gold/25 rounded-full flex items-center justify-center mx-auto mb-5">
               <CheckCircle2 className="w-6 h-6 text-[#4ade80]" />
             </div>
             <h1 className="text-[20px] font-black text-white mb-2">Check your email</h1>
@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
             </p>
             <Link
               to="/login"
-              className="text-[13px] font-semibold text-[#f0c040] hover:text-[#e0b030] transition-colors"
+              className="text-[13px] font-semibold text-gold hover:text-[#e0b030] transition-colors"
             >
               Back to sign in
             </Link>
@@ -109,7 +109,7 @@ export default function ForgotPasswordPage() {
                     required
                     placeholder="your@email.com"
                     autoComplete="email"
-                    className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                    className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
                   />
                 </div>
               </div>
@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#1a6b3c] text-white py-4 rounded-xl font-bold text-[15px] hover:bg-[#0f4a2a] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                className="w-full bg-gold text-white py-4 rounded-xl font-bold text-[15px] hover:bg-gold-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -132,7 +132,7 @@ export default function ForgotPasswordPage() {
 
             <p className="mt-6 text-[13px] text-white/45 text-center">
               Remembered it?{' '}
-              <Link to="/login" className="text-[#f0c040] font-semibold hover:text-[#e0b030] transition-colors">
+              <Link to="/login" className="text-gold font-semibold hover:text-[#e0b030] transition-colors">
                 Back to sign in
               </Link>
             </p>

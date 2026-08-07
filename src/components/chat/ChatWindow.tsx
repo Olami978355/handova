@@ -65,28 +65,28 @@ const DealOfferCard = ({
   return (
     <div className={`w-72 rounded-2xl overflow-hidden border ${
       isAccepted
-        ? 'border-[#1a6b3c]/40 bg-[#1a6b3c]/8'
+        ? 'border-gold/40 bg-gold/8'
         : isDeclined || isExpired
         ? 'border-white/8 bg-white/4 opacity-60'
-        : 'border-[#f0c040]/25 bg-[#f0c040]/5'
+        : 'border-gold/25 bg-gold/5'
     }`}>
       <div className={`px-4 py-3 border-b ${
         isAccepted
-          ? 'border-[#1a6b3c]/20 bg-[#1a6b3c]/10'
+          ? 'border-gold/20 bg-gold/10'
           : isDeclined || isExpired
           ? 'border-white/5 bg-white/4'
-          : 'border-[#f0c040]/15 bg-[#f0c040]/8'
+          : 'border-gold/15 bg-gold/8'
       }`}>
         <div className="flex items-center gap-2">
           <Tag className={`w-3.5 h-3.5 ${
-            isAccepted ? 'text-[#1a6b3c]'
+            isAccepted ? 'text-gold'
             : isDeclined || isExpired ? 'text-white/30'
-            : 'text-[#f0c040]'
+            : 'text-gold'
           }`} />
           <span className={`text-[11px] font-bold uppercase tracking-wider ${
-            isAccepted ? 'text-[#1a6b3c]'
+            isAccepted ? 'text-gold'
             : isDeclined || isExpired ? 'text-white/30'
-            : 'text-[#f0c040]'
+            : 'text-gold'
           }`}>
             {isAccepted ? 'Deal Accepted'
               : isDeclined ? 'Deal Declined'
@@ -99,7 +99,7 @@ const DealOfferCard = ({
       <div className="p-4 space-y-3">
         <div>
           <p className="text-[11px] text-white/30 mb-0.5">Agreed Price</p>
-          <p className="text-[22px] font-black text-[#f0c040]">
+          <p className="text-[22px] font-black text-gold">
             {formatNaira(offer.agreed_price)}
           </p>
         </div>
@@ -128,7 +128,7 @@ const DealOfferCard = ({
           <div className="flex gap-2 pt-1">
             <button
               onClick={onAccept}
-              className="flex-1 bg-[#f0c040] text-black py-2.5 rounded-xl font-bold text-[12px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 bg-gold text-black py-2.5 rounded-xl font-bold text-[12px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-1.5"
             >
               <CheckCircle className="w-3.5 h-3.5" />
               Accept & Pay
@@ -150,7 +150,7 @@ const DealOfferCard = ({
           <button
             onClick={handleViewDeal}
             disabled={navigating}
-            className="w-full bg-[#1a6b3c] text-white py-2.5 rounded-xl font-bold text-[12px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full bg-gold text-white py-2.5 rounded-xl font-bold text-[12px] hover:bg-gold-dark transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {navigating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'View Deal'}
           </button>
@@ -206,7 +206,7 @@ const CreateDealModal = ({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 30, scale: 0.97 }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl"
+        className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-ink border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
         <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
@@ -232,28 +232,28 @@ const CreateDealModal = ({
               value={agreedPrice}
               onChange={e => { setAgreedPrice(e.target.value); setLocalError(null); }}
               placeholder="e.g. 900000"
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/50 transition-colors"
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/50 transition-colors"
             />
             {agreedPrice && !isNaN(parseInt(agreedPrice)) && (
-              <p className="text-[11px] text-[#f0c040] mt-1 ml-1">= {formatNaira(parseInt(agreedPrice))}</p>
+              <p className="text-[11px] text-gold mt-1 ml-1">= {formatNaira(parseInt(agreedPrice))}</p>
             )}
           </div>
           <div>
             <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Duration</label>
             <select value={duration} onChange={e => setDuration(e.target.value)}
-              className="w-full px-4 py-3 bg-[#0a1f11] border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50 transition-colors appearance-none">
-              <option value="6 months" className="bg-[#0a1f11]">6 months</option>
-              <option value="1 year" className="bg-[#0a1f11]">1 year</option>
-              <option value="2 years" className="bg-[#0a1f11]">2 years</option>
-              <option value="3 years" className="bg-[#0a1f11]">3 years</option>
-              <option value="Outright purchase" className="bg-[#0a1f11]">Outright purchase</option>
+              className="w-full px-4 py-3 bg-ink border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-gold/50 transition-colors appearance-none">
+              <option value="6 months" className="bg-ink">6 months</option>
+              <option value="1 year" className="bg-ink">1 year</option>
+              <option value="2 years" className="bg-ink">2 years</option>
+              <option value="3 years" className="bg-ink">3 years</option>
+              <option value="Outright purchase" className="bg-ink">Outright purchase</option>
             </select>
           </div>
           <div>
             <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Proposed Move-in Date *</label>
             <input type="date" value={moveInDate} onChange={e => setMoveInDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-[#f0c040]/50 transition-colors" />
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-gold/50 transition-colors" />
           </div>
           <div>
             <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
@@ -261,13 +261,13 @@ const CreateDealModal = ({
             </label>
             <textarea value={note} onChange={e => setNote(e.target.value)}
               placeholder="Any additional terms or conditions..." rows={2}
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#f0c040]/50 transition-colors resize-none" />
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/50 transition-colors resize-none" />
           </div>
           <p className="text-[11px] text-white/25 text-center">This offer expires in 3 days if not accepted</p>
           <div className="flex gap-3 pt-1">
             <button onClick={onClose} className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors">Cancel</button>
             <button onClick={handleSubmit} disabled={!agreedPrice || sending}
-              className="flex-[2] bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+              className="flex-[2] bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
               {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tag className="w-4 h-4" />}
               Send Deal Offer
             </button>
@@ -537,7 +537,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-[#0a0a0a]">
           {loading && resolvedConversationId ? (
             <div className="flex flex-col items-center justify-center h-full gap-3">
-              <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
               <p className="text-[12px] text-white/25">Loading messages...</p>
             </div>
           ) : messages.length === 0 ? (
@@ -582,7 +582,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             value={editText}
                             onChange={e => setEditText(e.target.value)}
                             rows={2}
-                            className="w-full px-3 py-2 bg-white/5 border border-[#f0c040]/40 rounded-xl text-[13px] text-white outline-none resize-none"
+                            className="w-full px-3 py-2 bg-white/5 border border-gold/40 rounded-xl text-[13px] text-white outline-none resize-none"
                             autoFocus
                           />
                           <div className="flex gap-2 mt-1.5">
@@ -595,7 +595,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             <button
                               onClick={saveEdit}
                               disabled={!editText.trim()}
-                              className="flex-1 py-1.5 rounded-lg text-[11px] font-bold text-black bg-[#f0c040] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-1"
+                              className="flex-1 py-1.5 rounded-lg text-[11px] font-bold text-black bg-gold hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-1"
                             >
                               <Check className="w-3 h-3" /> Save
                             </button>
@@ -610,12 +610,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                           onTouchEnd={endLongPress}
                           className={`px-4 py-2.5 text-[13px] leading-relaxed break-words cursor-pointer select-none ${
                             isMe
-                              ? 'bg-[#1a6b3c] text-white rounded-2xl rounded-tr-sm'
-                              : 'bg-[#0a1f11] border border-white/8 text-white/85 rounded-2xl rounded-tl-sm'
+                              ? 'bg-gold text-white rounded-2xl rounded-tr-sm'
+                              : 'bg-ink border border-white/8 text-white/85 rounded-2xl rounded-tl-sm'
                           } ${isDeleted ? 'italic opacity-50' : ''}`}
                         >
                           {msg.quoted_message && !isDeleted && (
-                            <div className={`mb-1.5 pl-2 border-l-2 ${isMe ? 'border-white/30' : 'border-[#1a6b3c]/50'} text-[11px] opacity-70 truncate max-w-[220px]`}>
+                            <div className={`mb-1.5 pl-2 border-l-2 ${isMe ? 'border-white/30' : 'border-gold/50'} text-[11px] opacity-70 truncate max-w-[220px]`}>
                               {msg.quoted_message.deleted_for_everyone ? 'This message was deleted' : msg.quoted_message.content}
                             </div>
                           )}
@@ -704,11 +704,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           )}
         </AnimatePresence>
 
-        <div className="flex-shrink-0 px-4 py-3 bg-[#0a1f11] border-t border-white/5">
+        <div className="flex-shrink-0 px-4 py-3 bg-ink border-t border-white/5">
           {quotedMessage && (
-            <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 bg-white/5 border-l-2 border-[#f0c040] rounded-lg">
+            <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 bg-white/5 border-l-2 border-gold rounded-lg">
               <div className="min-w-0">
-                <p className="text-[10px] font-bold text-[#f0c040] uppercase tracking-wider mb-0.5">
+                <p className="text-[10px] font-bold text-gold uppercase tracking-wider mb-0.5">
                   Replying to {quotedMessage.sender_id === user?.id ? 'yourself' : (otherParticipantName || 'them')}
                 </p>
                 <p className="text-[12px] text-white/50 truncate">{quotedMessage.content}</p>
@@ -731,7 +731,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                   }
                   setShowDealModal(true);
                 }}
-                className="flex items-center gap-2 px-3 py-2 bg-[#f0c040]/8 border border-[#f0c040]/20 rounded-xl text-[12px] font-bold text-[#f0c040]/80 hover:text-[#f0c040] hover:bg-[#f0c040]/12 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-gold/8 border border-gold/20 rounded-xl text-[12px] font-bold text-gold/80 hover:text-gold hover:bg-gold/12 transition-colors"
               >
                 <Tag className="w-3.5 h-3.5" />
                 Create Custom Deal Offer
@@ -754,7 +754,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             >
               {uploadingMedia ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
             </button>
-            <div className="flex-1 bg-white/5 border border-white/8 rounded-full px-4 py-2.5 focus-within:border-[#1a6b3c]/50 transition-colors">
+            <div className="flex-1 bg-white/5 border border-white/8 rounded-full px-4 py-2.5 focus-within:border-gold/50 transition-colors">
               <textarea
                 ref={textareaRef}
                 value={newMessage}
@@ -769,7 +769,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             <button
               onClick={() => handleSend()}
               disabled={!newMessage.trim() || isSending}
-              className="w-10 h-10 bg-[#1a6b3c] rounded-full flex items-center justify-center text-white hover:bg-[#0f4a2a] disabled:opacity-35 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
+              className="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-white hover:bg-gold-dark disabled:opacity-35 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
             >
               {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>

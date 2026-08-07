@@ -67,7 +67,7 @@ export default function Directory() {
 
   const CardContent = ({ p }: { p: DirectoryProfile }) => (
     <>
-      <div className="w-12 h-12 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-[#1a6b3c] text-[16px] font-bold flex-shrink-0 overflow-hidden">
+      <div className="w-12 h-12 bg-gold/20 rounded-xl flex items-center justify-center text-gold text-[16px] font-bold flex-shrink-0 overflow-hidden">
         {p.avatar_url ? (
           <img src={p.avatar_url} alt="" className="w-full h-full object-cover" />
         ) : (
@@ -108,7 +108,7 @@ export default function Directory() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name or username..."
-              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
             />
           </div>
           <div className="flex gap-2">
@@ -122,7 +122,7 @@ export default function Directory() {
                 onClick={() => setRoleFilter(opt.key)}
                 className={`px-4 py-3 rounded-xl text-[13px] font-bold whitespace-nowrap transition-colors ${
                   roleFilter === opt.key
-                    ? 'bg-[#1a6b3c] text-white'
+                    ? 'bg-gold text-white'
                     : 'bg-white/5 text-white/40 hover:text-white/70'
                 }`}
               >
@@ -135,7 +135,7 @@ export default function Directory() {
         {/* Results */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             <p className="text-[13px] text-white/30">Loading...</p>
           </div>
         ) : profiles.length === 0 ? (
@@ -154,14 +154,14 @@ export default function Directory() {
                   <Link
                     key={p.id}
                     to={`/u/${p.username}`}
-                    className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4 flex items-center gap-3 hover:border-white/12 transition-all"
+                    className="bg-ink border border-white/6 rounded-2xl p-4 flex items-center gap-3 hover:border-white/12 transition-all"
                   >
                     <CardContent p={p} />
                   </Link>
                 ) : (
                   <div
                     key={p.id}
-                    className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4 flex items-center gap-3 opacity-70"
+                    className="bg-ink border border-white/6 rounded-2xl p-4 flex items-center gap-3 opacity-70"
                   >
                     <CardContent p={p} />
                   </div>

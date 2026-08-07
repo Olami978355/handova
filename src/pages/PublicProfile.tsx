@@ -88,7 +88,7 @@ export default function PublicProfile() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3" style={font}>
-        <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
         <p className="text-[13px] text-white/30">Loading profile...</p>
       </div>
     );
@@ -109,9 +109,9 @@ export default function PublicProfile() {
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : null;
   return (
     <div className="max-w-4xl mx-auto px-5 py-8" style={font}>
-      <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 mb-6">
+      <div className="bg-ink border border-white/6 rounded-2xl p-6 mb-6">
         <div className="flex items-start gap-4">
-          <div className="w-20 h-20 bg-[#1a6b3c] rounded-2xl overflow-hidden flex items-center justify-center text-white text-[26px] font-black flex-shrink-0">
+          <div className="w-20 h-20 bg-gold rounded-2xl overflow-hidden flex items-center justify-center text-white text-[26px] font-black flex-shrink-0">
             {profile.avatar_url
               ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
               : (profile.full_name || '?').charAt(0).toUpperCase()
@@ -126,8 +126,8 @@ export default function PublicProfile() {
                 </span>
               )}
               {avgRating !== null && (
-                <span className="flex items-center gap-1 text-[11px] font-bold text-[#f0c040] bg-[#f0c040]/10 px-2 py-1 rounded-lg">
-                  <Star className="w-3 h-3 fill-[#f0c040]" /> {avgRating.toFixed(1)} ({reviews.length})
+                <span className="flex items-center gap-1 text-[11px] font-bold text-gold bg-gold/10 px-2 py-1 rounded-lg">
+                  <Star className="w-3 h-3 fill-gold" /> {avgRating.toFixed(1)} ({reviews.length})
                 </span>
               )}
             </div>
@@ -156,10 +156,10 @@ export default function PublicProfile() {
           </h2>
           <div className="space-y-3">
             {reviews.map(r => (
-              <div key={r.id} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-4">
+              <div key={r.id} className="bg-ink border border-white/6 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-[#1a6b3c]/20 rounded-xl flex items-center justify-center text-[#1a6b3c] text-[11px] font-bold flex-shrink-0 overflow-hidden">
+                    <div className="w-8 h-8 bg-gold/20 rounded-xl flex items-center justify-center text-gold text-[11px] font-bold flex-shrink-0 overflow-hidden">
                       {r.reviewer?.avatar_url ? (
                         <img src={r.reviewer.avatar_url} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -170,7 +170,7 @@ export default function PublicProfile() {
                   </div>
                   <div className="flex gap-0.5">
                     {[1, 2, 3, 4, 5].map(n => (
-                      <Star key={n} className={`w-3 h-3 ${n <= r.rating ? 'fill-[#f0c040] text-[#f0c040]' : 'text-white/15'}`} />
+                      <Star key={n} className={`w-3 h-3 ${n <= r.rating ? 'fill-gold text-gold' : 'text-white/15'}`} />
                     ))}
                   </div>
                 </div>
@@ -188,7 +188,7 @@ export default function PublicProfile() {
           {listings.length > 0 ? `${listings.length} Active Listing${listings.length !== 1 ? 's' : ''}` : 'Listings'}
         </h2>
         {listings.length === 0 ? (
-          <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-12 text-center">
+          <div className="bg-ink border border-white/6 rounded-2xl p-12 text-center">
             <p className="text-[13px] text-white/25">No active listings right now.</p>
           </div>
         ) : (

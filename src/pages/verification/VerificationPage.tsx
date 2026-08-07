@@ -147,8 +147,8 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
   if (profile?.verification_status === 'verified') {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-5" style={font}>
-        <div className="max-w-md w-full bg-[#0a1f11] border border-white/8 rounded-2xl p-10 text-center">
-          <div className="w-16 h-16 bg-[#1a6b3c] rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <div className="max-w-md w-full bg-ink border border-white/8 rounded-2xl p-10 text-center">
+          <div className="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-[24px] font-black text-white mb-3">You're Verified!</h2>
@@ -157,7 +157,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
           </p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+            className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
           >
             Go to Dashboard
           </button>
@@ -170,9 +170,9 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
   if (success) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-5" style={font}>
-        <div className="max-w-md w-full bg-[#0a1f11] border border-white/8 rounded-2xl p-10 text-center">
-          <div className="w-16 h-16 bg-[#f0c040]/10 border border-[#f0c040]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Loader2 className="w-8 h-8 text-[#f0c040] animate-spin" />
+        <div className="max-w-md w-full bg-ink border border-white/8 rounded-2xl p-10 text-center">
+          <div className="w-16 h-16 bg-gold/10 border border-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Loader2 className="w-8 h-8 text-gold animate-spin" />
           </div>
           <h2 className="text-[24px] font-black text-white mb-3">Under Review</h2>
           <p className="text-[13px] text-white/45 mb-8 leading-relaxed">
@@ -180,7 +180,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
           </p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+            className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
           >
             Go to Dashboard
           </button>
@@ -203,8 +203,8 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center">
-            <Shield className="w-6 h-6 text-[#1a6b3c]" />
+          <div className="w-12 h-12 bg-gold/15 rounded-xl flex items-center justify-center">
+            <Shield className="w-6 h-6 text-gold" />
           </div>
           <div>
             <h1 className="text-[22px] font-black text-white tracking-tight">Identity Verification</h1>
@@ -214,10 +214,10 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
 
         {/* Pending banner */}
         {verificationRequest?.status === 'pending' && (
-          <div className="mb-5 flex items-center gap-3 p-4 bg-[#f0c040]/8 border border-[#f0c040]/20 rounded-xl">
-            <Loader2 className="w-4 h-4 text-[#f0c040] animate-spin flex-shrink-0" />
+          <div className="mb-5 flex items-center gap-3 p-4 bg-gold/8 border border-gold/20 rounded-xl">
+            <Loader2 className="w-4 h-4 text-gold animate-spin flex-shrink-0" />
             <div>
-              <p className="text-[12px] font-bold text-[#f0c040]">Verification Pending</p>
+              <p className="text-[12px] font-bold text-gold">Verification Pending</p>
               <p className="text-[11px] text-white/35">We're reviewing your documents.</p>
             </div>
           </div>
@@ -259,15 +259,15 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                 <React.Fragment key={s}>
                   <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[12px] font-black transition-all ${
                     step === s
-                      ? 'bg-[#f0c040] text-black'
+                      ? 'bg-gold text-black'
                       : step > s
-                      ? 'bg-[#1a6b3c] text-white'
+                      ? 'bg-gold text-white'
                       : 'bg-white/5 text-white/30'
                   }`}>
                     {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
                   </div>
                   {s < (profile?.role === 'agent' ? 3 : 2) && (
-                    <div className={`flex-1 h-px ${step > s ? 'bg-[#1a6b3c]' : 'bg-white/8'}`} />
+                    <div className={`flex-1 h-px ${step > s ? 'bg-gold' : 'bg-white/8'}`} />
                   )}
                 </React.Fragment>
               ))}
@@ -282,7 +282,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 space-y-5"
+                  className="bg-ink border border-white/6 rounded-2xl p-6 space-y-5"
                 >
                   <div>
                     <h3 className="text-[16px] font-bold text-white mb-1">Enter your NIN</h3>
@@ -299,12 +299,12 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                         setFormData({ ...formData, nin: e.target.value.replace(/\D/g, '') })
                       }
                       placeholder="11-digit NIN"
-                      className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/60 transition-colors"
+                      className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/60 transition-colors"
                     />
                   </div>
 
-                  <div className="flex items-center gap-2 p-3 bg-[#f0c040]/5 border border-[#f0c040]/10 rounded-xl">
-                    <Shield className="w-3.5 h-3.5 text-[#f0c040] flex-shrink-0" />
+                  <div className="flex items-center gap-2 p-3 bg-gold/5 border border-gold/10 rounded-xl">
+                    <Shield className="w-3.5 h-3.5 text-gold flex-shrink-0" />
                     <p className="text-[11px] text-white/40">
                       Your NIN is encrypted and stored securely. It cannot be changed after submission.
                     </p>
@@ -313,7 +313,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   <button
                     disabled={formData.nin.length !== 11}
                     onClick={() => setStep(2)}
-                    className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Next — Upload ID
                   </button>
@@ -327,7 +327,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 space-y-5"
+                  className="bg-ink border border-white/6 rounded-2xl p-6 space-y-5"
                 >
                   <div>
                     <h3 className="text-[16px] font-bold text-white mb-1">Upload Government ID</h3>
@@ -347,19 +347,19 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                     htmlFor="nin-upload"
                     className={`flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed rounded-xl cursor-pointer transition-all ${
                       formData.ninDocUrl
-                        ? 'border-[#1a6b3c] bg-[#1a6b3c]/8'
-                        : 'border-white/10 hover:border-[#1a6b3c]/50 hover:bg-white/4'
+                        ? 'border-gold bg-gold/8'
+                        : 'border-white/10 hover:border-gold/50 hover:bg-white/4'
                     }`}
                   >
                     {uploading === 'ninDocUrl' ? (
                       <div className="flex flex-col items-center gap-2">
-                        <div className="w-6 h-6 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                         <span className="text-[12px] text-white/40">Uploading...</span>
                       </div>
                     ) : formData.ninDocUrl ? (
                       <div className="flex flex-col items-center gap-2">
-                        <CheckCircle2 className="w-10 h-10 text-[#1a6b3c]" />
-                        <span className="text-[13px] font-bold text-[#1a6b3c]">ID Uploaded</span>
+                        <CheckCircle2 className="w-10 h-10 text-gold" />
+                        <span className="text-[13px] font-bold text-gold">ID Uploaded</span>
                         <span className="text-[11px] text-white/30">Click to replace</span>
                       </div>
                     ) : (
@@ -381,7 +381,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                     <button
                       disabled={!formData.ninDocUrl}
                       onClick={() => (profile?.role === 'agent' ? setStep(3) : handleSubmit())}
-                      className="flex-[2] bg-[#1a6b3c] text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="flex-[2] bg-gold text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                       {profile?.role === 'agent' ? 'Next — Agent Credentials' : 'Submit Verification'}
@@ -397,7 +397,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 space-y-5"
+                  className="bg-ink border border-white/6 rounded-2xl p-6 space-y-5"
                 >
                   <div>
                     <h3 className="text-[16px] font-bold text-white mb-1">Agent Credentials</h3>
@@ -416,7 +416,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                       value={formData.lasreraId}
                       onChange={(e) => setFormData({ ...formData, lasreraId: e.target.value })}
                       placeholder="AG/2024/0001"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-[#1a6b3c]/60 transition-colors"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/60 transition-colors"
                     />
                   </div>
 
@@ -436,24 +436,24 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                       htmlFor="biz-upload"
                       className={`flex items-center justify-between w-full p-4 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
                         formData.businessRegUrl
-                          ? 'border-[#1a6b3c] bg-[#1a6b3c]/8'
-                          : 'border-white/10 hover:border-[#1a6b3c]/50'
+                          ? 'border-gold bg-gold/8'
+                          : 'border-white/10 hover:border-gold/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <Building2
-                          className={`w-5 h-5 ${formData.businessRegUrl ? 'text-[#1a6b3c]' : 'text-white/25'}`}
+                          className={`w-5 h-5 ${formData.businessRegUrl ? 'text-gold' : 'text-white/25'}`}
                         />
                         <span
                           className={`text-[13px] font-semibold ${
-                            formData.businessRegUrl ? 'text-[#1a6b3c]' : 'text-white/40'
+                            formData.businessRegUrl ? 'text-gold' : 'text-white/40'
                           }`}
                         >
                           {formData.businessRegUrl ? 'Certificate Uploaded' : 'Upload CAC Certificate'}
                         </span>
                       </div>
                       {uploading === 'businessRegUrl' ? (
-                        <div className="w-4 h-4 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <Upload className="w-4 h-4 text-white/25" />
                       )}
@@ -470,7 +470,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                     <button
                       disabled={loading || !formData.businessRegUrl}
                       onClick={handleSubmit}
-                      className="flex-[2] bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="flex-[2] bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                       Submit Verification

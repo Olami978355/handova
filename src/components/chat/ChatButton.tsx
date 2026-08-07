@@ -83,7 +83,7 @@ export const ChatButton: React.FC<ChatButtonProps> = ({
     <button
       onClick={handleMessage}
       disabled={loading}
-      className="w-full flex items-center justify-center gap-2 bg-[#1a6b3c] text-white py-3 px-6 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-all relative disabled:opacity-60"
+      className="w-full flex items-center justify-center gap-2 bg-gold text-white py-3 px-6 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-all relative disabled:opacity-60"
     >
       {loading ? (
         <Loader2 className="w-5 h-5 animate-spin" />
@@ -94,7 +94,7 @@ export const ChatButton: React.FC<ChatButtonProps> = ({
         </>
       )}
       {unreadCount > 0 && (
-        <div className="absolute -top-2 -right-2 w-5 h-5 bg-[#f0c040] text-black text-[9px] font-black rounded-full flex items-center justify-center">
+        <div className="absolute -top-2 -right-2 w-5 h-5 bg-gold text-black text-[9px] font-black rounded-full flex items-center justify-center">
           {unreadCount}
         </div>
       )}

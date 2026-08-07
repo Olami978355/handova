@@ -36,11 +36,11 @@ export const PushPermissionBanner: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="fixed top-20 inset-x-4 sm:inset-x-auto sm:right-5 sm:w-80 z-[60] bg-[#0a1f11] border border-[#f0c040]/20 rounded-2xl p-4 shadow-2xl"
+        className="fixed top-20 inset-x-4 sm:inset-x-auto sm:right-5 sm:w-80 z-[60] bg-ink border border-gold/20 rounded-2xl p-4 shadow-2xl"
       >
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 bg-[#f0c040]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Bell className="w-4 h-4 text-[#f0c040]" />
+          <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Bell className="w-4 h-4 text-gold" />
           </div>
           <div className="flex-1">
             <p className="text-[13px] font-bold text-white mb-1">Enable notifications</p>
@@ -51,7 +51,7 @@ export const PushPermissionBanner: React.FC = () => {
               <button
                 onClick={handleEnable}
                 disabled={loading}
-                className="flex-1 bg-[#f0c040] text-black py-2 rounded-lg font-bold text-[12px] hover:bg-[#e0b030] transition-colors disabled:opacity-50"
+                className="flex-1 bg-gold text-black py-2 rounded-lg font-bold text-[12px] hover:bg-[#e0b030] transition-colors disabled:opacity-50"
               >
                 {loading ? 'Enabling...' : 'Enable'}
               </button>

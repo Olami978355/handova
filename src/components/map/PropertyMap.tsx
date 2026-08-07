@@ -42,7 +42,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
   if (loading) {
     return (
       <div className="w-full h-full bg-zinc-50 flex flex-col items-center justify-center rounded-[40px] border border-zinc-100">
-        <Loader2 className="w-10 h-10 text-[#1a6b3c] animate-spin mb-4" />
+        <Loader2 className="w-10 h-10 text-gold animate-spin mb-4" />
         <p className="text-zinc-500 font-bold">Loading property map...</p>
       </div>
     );

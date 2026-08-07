@@ -31,9 +31,9 @@ const StepDots = ({ current, total }: { current: number; total: number }) => (
         key={i}
         className={`rounded-full transition-all ${
           i + 1 === current
-            ? 'w-5 h-1.5 bg-[#f0c040]'
+            ? 'w-5 h-1.5 bg-gold'
             : i + 1 < current
-            ? 'w-1.5 h-1.5 bg-[#1a6b3c]'
+            ? 'w-1.5 h-1.5 bg-gold'
             : 'w-1.5 h-1.5 bg-white/15'
         }`}
       />
@@ -98,8 +98,8 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Not Available">
         <div className="p-6 text-center">
-          <div className="w-14 h-14 bg-[#f0c040]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Clock className="w-7 h-7 text-[#f0c040]" />
+          <div className="w-14 h-14 bg-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Clock className="w-7 h-7 text-gold" />
           </div>
           <h3 className="text-[18px] font-bold text-white mb-2">
             {property.has_active_deal ? 'Deal In Progress' : 'No Longer Available'}
@@ -112,7 +112,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
           </p>
           <button
             onClick={onClose}
-            className="w-full bg-[#1a6b3c] text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+            className="w-full bg-gold text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
           >
             Close
           </button>
@@ -160,13 +160,13 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
       return (
         <Modal isOpen={isOpen} onClose={onClose} title="Booking Status">
           <div className="p-6 text-center">
-            <Info className="w-14 h-14 text-[#f0c040] mx-auto mb-4" />
+            <Info className="w-14 h-14 text-gold mx-auto mb-4" />
             <p className="text-[13px] text-white/50 mb-6 max-w-xs mx-auto leading-relaxed">
               {message}
             </p>
             <button
               onClick={actionFn}
-              className="w-full bg-[#1a6b3c] text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+              className="w-full bg-gold text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
             >
               {actionLabel}
             </button>
@@ -254,7 +254,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
       <div className="p-5">
         {checkingBooking ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <div className="w-8 h-8 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             <p className="text-[13px] text-white/40">Checking your bookings...</p>
           </div>
         ) : (
@@ -308,9 +308,9 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between px-4 py-3 bg-[#1a6b3c]/10 border border-[#1a6b3c]/20 rounded-xl">
+                <div className="flex items-center justify-between px-4 py-3 bg-gold/10 border border-gold/20 rounded-xl">
                   <span className="text-[13px] text-white/60">Inspection fee</span>
-                  <span className="text-[18px] font-black text-[#f0c040]">
+                  <span className="text-[18px] font-black text-gold">
                     {formatFee(inspectionFee)}
                   </span>
                 </div>
@@ -319,7 +319,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   <button
                     onClick={startChat}
                     disabled={startingChat}
-                    className="w-full flex items-center justify-center gap-2 py-3 border border-white/10 text-white/50 rounded-xl text-[13px] font-semibold hover:border-[#1a6b3c]/40 hover:text-white hover:bg-[#1a6b3c]/5 transition-all disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-2 py-3 border border-white/10 text-white/50 rounded-xl text-[13px] font-semibold hover:border-gold/40 hover:text-white hover:bg-gold/5 transition-all disabled:opacity-50"
                   >
                     {startingChat
                       ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -329,7 +329,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   </button>
                   <button
                     onClick={() => setStep(2)}
-                    className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+                    className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
                   >
                     Book Inspection — {formatFee(inspectionFee)}
                   </button>
@@ -360,7 +360,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
 
                 <div>
                   <label className="flex items-center gap-1.5 text-[11px] font-bold text-white/50 uppercase tracking-wider mb-2">
-                    <Calendar className="w-3.5 h-3.5 text-[#1a6b3c]" />
+                    <Calendar className="w-3.5 h-3.5 text-gold" />
                     Preferred Date
                   </label>
                   <input
@@ -368,7 +368,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                     min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
                     value={preferredDate}
                     onChange={e => setPreferredDate(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-white text-[13px] outline-none focus:border-[#1a6b3c]/60 transition-colors"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-white text-[13px] outline-none focus:border-gold/60 transition-colors"
                   />
                   <p className="text-[10px] text-white/25 mt-1 ml-1">
                     Must be at least 1 day from today
@@ -377,29 +377,29 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
 
                 <div>
                   <label className="flex items-center gap-1.5 text-[11px] font-bold text-white/50 uppercase tracking-wider mb-2">
-                    <Clock className="w-3.5 h-3.5 text-[#1a6b3c]" />
+                    <Clock className="w-3.5 h-3.5 text-gold" />
                     Preferred Time
                   </label>
                   <select
                     value={preferredTime}
                     onChange={e => setPreferredTime(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#0a1f11] border border-white/8 rounded-xl text-white text-[13px] outline-none focus:border-[#1a6b3c]/60 transition-colors"
+                    className="w-full px-4 py-3 bg-ink border border-white/8 rounded-xl text-white text-[13px] outline-none focus:border-gold/60 transition-colors"
                   >
-                    <option value="" className="bg-[#0a1f11]">Select a time window</option>
-                    <option value="Morning (9AM - 12PM)" className="bg-[#0a1f11]">
+                    <option value="" className="bg-ink">Select a time window</option>
+                    <option value="Morning (9AM - 12PM)" className="bg-ink">
                       Morning (9AM – 12PM)
                     </option>
-                    <option value="Afternoon (12PM - 3PM)" className="bg-[#0a1f11]">
+                    <option value="Afternoon (12PM - 3PM)" className="bg-ink">
                       Afternoon (12PM – 3PM)
                     </option>
-                    <option value="Late Afternoon (3PM - 6PM)" className="bg-[#0a1f11]">
+                    <option value="Late Afternoon (3PM - 6PM)" className="bg-ink">
                       Late Afternoon (3PM – 6PM)
                     </option>
                   </select>
                 </div>
 
-                <div className="flex items-start gap-2 p-3 bg-[#f0c040]/5 border border-[#f0c040]/10 rounded-xl">
-                  <Info className="w-3.5 h-3.5 text-[#f0c040]/50 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 p-3 bg-gold/5 border border-gold/10 rounded-xl">
+                  <Info className="w-3.5 h-3.5 text-gold/50 flex-shrink-0 mt-0.5" />
                   <p className="text-[11px] text-white/35 leading-relaxed">
                     The landlord may confirm a different time. You'll be notified immediately.
                   </p>
@@ -415,7 +415,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   <button
                     onClick={() => setStep(3)}
                     disabled={!preferredDate || !preferredTime}
-                    className="flex-1 bg-[#1a6b3c] text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#0f4a2a] transition-colors disabled:opacity-40"
+                    className="flex-1 bg-gold text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40"
                   >
                     Review & Pay
                   </button>
@@ -476,16 +476,16 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   </div>
                   <div className="flex items-center justify-between px-4 py-3 bg-white/3">
                     <span className="text-[13px] font-bold text-white flex items-center gap-1.5">
-                      <CreditCard className="w-3.5 h-3.5 text-[#f0c040]" /> You pay
+                      <CreditCard className="w-3.5 h-3.5 text-gold" /> You pay
                     </span>
-                    <span className="text-[18px] font-black text-[#f0c040]">
+                    <span className="text-[18px] font-black text-gold">
                       {formatFee(inspectionFee)}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 p-3 bg-[#1a6b3c]/8 border border-[#1a6b3c]/15 rounded-xl">
-                  <Shield className="w-3.5 h-3.5 text-[#1a6b3c] flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 p-3 bg-gold/8 border border-gold/15 rounded-xl">
+                  <Shield className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
                   <p className="text-[11px] text-white/40 leading-relaxed">
                     <span className="text-white/60 font-semibold">Your money is protected. </span>
                     70% refund if you decline. 100% refund if the property is taken.
@@ -501,7 +501,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
 
                 {processingPayment ? (
                   <div className="flex items-center justify-center gap-3 py-4">
-                    <div className="w-5 h-5 border-2 border-[#1a6b3c] border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                     <p className="text-[13px] text-white/50">Confirming your booking...</p>
                   </div>
                 ) : (
@@ -542,7 +542,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.1, type: 'spring', damping: 12 }}
-                  className="w-16 h-16 bg-[#1a6b3c] rounded-2xl flex items-center justify-center mx-auto mb-5"
+                  className="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center mx-auto mb-5"
                 >
                   <CheckCircle className="w-8 h-8 text-white" />
                 </motion.div>
@@ -557,7 +557,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                 <div className="space-y-2.5">
                   <button
                     onClick={() => { onClose(); navigate('/dashboard'); }}
-                    className="w-full bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+                    className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
                   >
                     View in Dashboard
                   </button>
@@ -599,7 +599,7 @@ const Modal: React.FC<{
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 60, scale: 0.97 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-[#0a1f11] border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl"
+          className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-md h-fit bg-ink border border-white/8 rounded-2xl z-[110] overflow-hidden shadow-2xl"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">

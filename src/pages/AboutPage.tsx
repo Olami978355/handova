@@ -9,10 +9,10 @@ export default function AboutPage() {
 
       {/* Hero */}
       <div className="max-w-4xl mx-auto px-5 text-center mb-20">
-        <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-4">About Us</div>
+        <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">About Us</div>
         <h1 className="text-[36px] lg:text-[48px] font-black text-white leading-tight mb-6">
           Nigeria's first escrow-protected<br />
-          <span className="text-[#f0c040]">real estate marketplace</span>
+          <span className="text-gold">real estate marketplace</span>
         </h1>
         <p className="text-[16px] text-white/50 leading-relaxed max-w-2xl mx-auto">
           We built RentEasy because we were tired of seeing Nigerians lose their hard-earned money to property scams, 
@@ -22,10 +22,10 @@ export default function AboutPage() {
 
       {/* Mission */}
       <div className="max-w-6xl mx-auto px-5 mb-20">
-        <div className="bg-[#0a1f11] border border-[#1a6b3c]/25 rounded-2xl p-8 lg:p-12">
+        <div className="bg-ink border border-gold/25 rounded-2xl p-8 lg:p-12">
           <div className="flex items-center gap-3 mb-6">
-            <Target className="w-6 h-6 text-[#f0c040]" />
-            <span className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest">Our Mission</span>
+            <Target className="w-6 h-6 text-gold" />
+            <span className="text-[11px] font-bold text-gold uppercase tracking-widest">Our Mission</span>
           </div>
           <h2 className="text-[28px] font-black text-white mb-4 max-w-2xl">
             To make renting and letting property in Nigeria safe, transparent, and stress-free for everyone.
@@ -64,7 +64,7 @@ export default function AboutPage() {
               solution: 'Our inspection fee system ensures you physically see the property before committing to pay rent.',
             },
           ].map(({ emoji, problem, solution }) => (
-            <div key={problem} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6">
+            <div key={problem} className="bg-ink border border-white/6 rounded-2xl p-6">
               <div className="text-3xl mb-4">{emoji}</div>
               <h3 className="text-[16px] font-bold text-red-400 mb-3">{problem}</h3>
               <p className="text-[13px] text-white/50 leading-relaxed">{solution}</p>
@@ -86,14 +86,14 @@ export default function AboutPage() {
               icon: Search,
               title: 'Find & Inspect',
               desc: 'Browse verified listings, pay a small inspection fee, and physically visit the property before committing.',
-              color: '#f0c040',
+              color: '#D4AF37',
             },
             {
               step: '02',
               icon: Shield,
               title: 'Pay into Escrow',
               desc: 'Once you find the right property, pay your rent securely into our escrow. Your money is protected until you move in.',
-              color: '#1a6b3c',
+              color: '#D4AF37',
             },
             {
               step: '03',
@@ -103,7 +103,7 @@ export default function AboutPage() {
               color: '#4ade80',
             },
           ].map(({ step, icon: Icon, title, desc, color }) => (
-            <div key={step} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 relative overflow-hidden">
+            <div key={step} className="bg-ink border border-white/6 rounded-2xl p-6 relative overflow-hidden">
               <div className="absolute top-4 right-4 text-[40px] font-black text-white/4">{step}</div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
@@ -130,9 +130,9 @@ export default function AboutPage() {
             { icon: Users, title: 'Community Trust', desc: 'We build trust between strangers. A tenant from Imo state can safely rent from a landlord in Lagos without ever worrying about being scammed.' },
             { icon: Heart, title: 'Built for Nigerians', desc: 'We understand the Nigerian market — from agency fees to inspection wahala. We built RentEasy to solve real Nigerian problems with real solutions.' },
           ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 flex gap-4">
-              <div className="w-10 h-10 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Icon className="w-5 h-5 text-[#1a6b3c]" />
+            <div key={title} className="bg-ink border border-white/6 rounded-2xl p-6 flex gap-4">
+              <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Icon className="w-5 h-5 text-gold" />
               </div>
               <div>
                 <h3 className="text-[14px] font-bold text-white mb-2">{title}</h3>
@@ -145,7 +145,7 @@ export default function AboutPage() {
 
       {/* CTA */}
       <div className="max-w-3xl mx-auto px-5 text-center">
-        <div className="bg-[#0a1f11] border border-[#1a6b3c]/25 rounded-2xl p-10">
+        <div className="bg-ink border border-gold/25 rounded-2xl p-10">
           <h2 className="text-[24px] font-black text-white mb-4">Ready to rent safely?</h2>
           <p className="text-[14px] text-white/45 mb-8">
             Join thousands of Nigerians already using RentEasy to find and let properties without the stress.
@@ -153,7 +153,7 @@ export default function AboutPage() {
           <div className="flex gap-3 justify-center">
             <a
               href="/listings"
-              className="bg-[#f0c040] text-black px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+              className="bg-gold text-black px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
             >
               Browse Properties
             </a>

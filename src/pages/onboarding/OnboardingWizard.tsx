@@ -21,17 +21,17 @@ const NIGERIAN_STATES = [
 // ─── Logo ─────────────────────────────────────────────────────────
 const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#1a6b3c" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#f0c040" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#f0c040" strokeWidth="4" strokeLinecap="round" />
+    <rect width="80" height="80" rx="18" fill="#D4AF37" />
+    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#D4AF37" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+    <path d="M16 54 L28 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
+    <path d="M54 54 L64 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
     <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
     <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
     <path d="M32 54 L32 50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
     <path d="M36 54 L36 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
     <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
     <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#f0c040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -49,19 +49,19 @@ const RoleCard = ({
     onClick={onClick}
     className={`relative w-full text-left rounded-2xl p-6 border transition-all duration-200 hover:-translate-y-1 ${
       active
-        ? 'bg-[#0a1f11] border-[#f0c040]/40 shadow-lg shadow-[#f0c040]/5'
-        : 'bg-[#0a1f11] border-white/8 hover:border-white/15'
+        ? 'bg-ink border-gold/40 shadow-lg shadow-gold/5'
+        : 'bg-ink border-white/8 hover:border-white/15'
     }`}
   >
     {active && (
-      <div className="absolute top-4 right-4 w-5 h-5 bg-[#f0c040] rounded-full flex items-center justify-center">
+      <div className="absolute top-4 right-4 w-5 h-5 bg-gold rounded-full flex items-center justify-center">
         <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
           <path d="M1 4L3.5 6.5L9 1" stroke="black" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
     )}
     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-colors ${
-      active ? 'bg-[#f0c040] text-black' : 'bg-white/5 text-white/40'
+      active ? 'bg-gold text-black' : 'bg-white/5 text-white/40'
     }`}>
       {icon}
     </div>
@@ -73,7 +73,7 @@ const RoleCard = ({
 // ─── Feature bullet ───────────────────────────────────────────────
 const FeatureBullet = ({ text }: { text: string }) => (
   <div className="flex items-start gap-3">
-    <div className="w-5 h-5 bg-[#1a6b3c]/20 border border-[#1a6b3c]/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+    <div className="w-5 h-5 bg-gold/20 border border-gold/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
       <div className="w-1.5 h-1.5 bg-[#4ade80] rounded-full" />
     </div>
     <span className="text-[13px] text-white/60 leading-relaxed">{text}</span>
@@ -245,13 +245,13 @@ export default function OnboardingWizard() {
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* ── Top bar ── */}
-      <div className="bg-[#0a1f11] border-b border-white/5 px-5 py-4">
+      <div className="bg-ink border-b border-white/5 px-5 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             <RentEasyLogo size={30} />
             <span className="text-[18px] font-extrabold tracking-tight text-white">
-              Rent<span className="text-[#f0c040]">Easy</span>
+              Rent<span className="text-gold">Easy</span>
             </span>
           </div>
 
@@ -263,7 +263,7 @@ export default function OnboardingWizard() {
                   step > s
                     ? 'bg-[#4ade80] text-black'
                     : step === s
-                    ? 'bg-[#f0c040] text-black'
+                    ? 'bg-gold text-black'
                     : 'bg-white/10 text-white/30'
                 }`}>
                   {step > s ? (
@@ -296,7 +296,7 @@ export default function OnboardingWizard() {
                 transition={{ duration: 0.3 }}
               >
                 <div className="text-center mb-10">
-                  <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">
+                  <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                     Step 1 of 3
                   </div>
                   <h1 className="text-[28px] lg:text-[36px] font-black text-white tracking-tight mb-3">
@@ -345,7 +345,7 @@ export default function OnboardingWizard() {
                 className="max-w-lg mx-auto"
               >
                 <div className="text-center mb-8">
-                  <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">
+                  <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                     Step 2 of 3
                   </div>
                   <h2 className="text-[26px] font-black text-white tracking-tight mb-2">
@@ -372,7 +372,7 @@ export default function OnboardingWizard() {
                   {/* Avatar */}
                   <div className="flex flex-col items-center gap-3 pb-2">
                     <div className="relative">
-                      <div className="w-24 h-24 rounded-2xl bg-[#0a1f11] border border-white/10 overflow-hidden flex items-center justify-center">
+                      <div className="w-24 h-24 rounded-2xl bg-ink border border-white/10 overflow-hidden flex items-center justify-center">
                         {formData.avatarUrl ? (
                           <img
                             src={formData.avatarUrl}
@@ -388,7 +388,7 @@ export default function OnboardingWizard() {
                           </div>
                         )}
                       </div>
-                      <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#f0c040] rounded-xl flex items-center justify-center cursor-pointer hover:bg-[#e0b030] transition-colors">
+                      <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-gold rounded-xl flex items-center justify-center cursor-pointer hover:bg-[#e0b030] transition-colors">
                         <Camera className="w-4 h-4 text-black" />
                         <input
                           type="file"
@@ -418,7 +418,7 @@ export default function OnboardingWizard() {
                           if (error) setError(null);
                         }}
                         placeholder="Your full name"
-                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
                   </div>
@@ -438,7 +438,7 @@ export default function OnboardingWizard() {
                           if (error) setError(null);
                         }}
                         placeholder="+234 800 000 0000"
-                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
                   </div>
@@ -456,11 +456,11 @@ export default function OnboardingWizard() {
                           setFormData(prev => ({ ...prev, state: e.target.value }));
                           if (error) setError(null);
                         }}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-[#1a6b3c] transition-colors appearance-none cursor-pointer"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-gold transition-colors appearance-none cursor-pointer"
                       >
-                        <option value="" className="bg-[#0a1f11]">Select your state</option>
+                        <option value="" className="bg-ink">Select your state</option>
                         {NIGERIAN_STATES.map(s => (
-                          <option key={s} value={s} className="bg-[#0a1f11]">{s}</option>
+                          <option key={s} value={s} className="bg-ink">{s}</option>
                         ))}
                       </select>
                     </div>
@@ -483,7 +483,7 @@ export default function OnboardingWizard() {
                           : 'Tell tenants about yourself and your properties...'
                       }
                       rows={3}
-                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#1a6b3c] transition-colors resize-none"
+                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors resize-none"
                     />
                     <div className="flex justify-end mt-1">
                       <span className="text-[11px] text-white/25">{formData.bio.length}/200</span>
@@ -502,7 +502,7 @@ export default function OnboardingWizard() {
                     <button
                       onClick={handleCompleteProfile}
                       disabled={loading || !formData.fullName || !formData.phone || !formData.state}
-                      className="flex-1 bg-[#f0c040] text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="flex-1 bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {loading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
@@ -529,10 +529,10 @@ export default function OnboardingWizard() {
                 className="max-w-lg mx-auto"
               >
                 <div className="text-center mb-8">
-                  <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-3">
+                  <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                     Step 3 of 3
                   </div>
-                  <div className="w-14 h-14 bg-[#1a6b3c]/20 border border-[#1a6b3c]/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-14 h-14 bg-gold/20 border border-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-7 h-7 text-[#4ade80]" />
                   </div>
                   <h2 className="text-[26px] font-black text-white tracking-tight mb-2">
@@ -543,10 +543,10 @@ export default function OnboardingWizard() {
                   </p>
                 </div>
 
-                <div className="bg-[#0a1f11] border border-white/6 rounded-2xl p-6 mb-4">
+                <div className="bg-ink border border-white/6 rounded-2xl p-6 mb-4">
                   {formData.role === 'tenant' && (
                     <>
-                      <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-4">
+                      <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">
                         As a Tenant
                       </div>
                       <div className="space-y-3">
@@ -561,7 +561,7 @@ export default function OnboardingWizard() {
 
                   {formData.role === 'landlord' && (
                     <>
-                      <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-4">
+                      <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">
                         As a Landlord
                       </div>
                       <div className="space-y-3 mb-5">
@@ -572,10 +572,10 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div className="border-t border-white/5 pt-5">
-                        <div className="flex items-start gap-3 p-4 bg-[#f0c040]/5 border border-[#f0c040]/15 rounded-xl mb-4">
-                          <Shield className="w-4 h-4 text-[#f0c040] flex-shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-3 p-4 bg-gold/5 border border-gold/15 rounded-xl mb-4">
+                          <Shield className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-[12px] font-semibold text-[#f0c040] mb-1">
+                            <p className="text-[12px] font-semibold text-gold mb-1">
                               Get verified for instant listing approval
                             </p>
                             <p className="text-[11px] text-white/40 leading-relaxed">
@@ -590,7 +590,7 @@ export default function OnboardingWizard() {
 
                   {formData.role === 'agent' && (
                     <>
-                      <div className="text-[11px] font-bold text-[#f0c040] uppercase tracking-widest mb-4">
+                      <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">
                         As an Agent
                       </div>
                       <div className="space-y-3 mb-5">
@@ -602,10 +602,10 @@ export default function OnboardingWizard() {
                       </div>
 
                       <div className="border-t border-white/5 pt-5">
-                        <div className="flex items-start gap-3 p-4 bg-[#f0c040]/5 border border-[#f0c040]/15 rounded-xl mb-4">
-                          <Shield className="w-4 h-4 text-[#f0c040] flex-shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-3 p-4 bg-gold/5 border border-gold/15 rounded-xl mb-4">
+                          <Shield className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-[12px] font-semibold text-[#f0c040] mb-1">
+                            <p className="text-[12px] font-semibold text-gold mb-1">
                               Verification required to list properties
                             </p>
                             <p className="text-[11px] text-white/40 leading-relaxed">
@@ -622,7 +622,7 @@ export default function OnboardingWizard() {
                 {formData.role === 'tenant' ? (
                   <button
                     onClick={handleFinish}
-                    className="w-full bg-[#f0c040] text-black py-4 rounded-xl font-bold text-[15px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-gold text-black py-4 rounded-xl font-bold text-[15px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
                   >
                     Start Browsing Properties
                     <ArrowRight className="w-5 h-5" />
@@ -631,7 +631,7 @@ export default function OnboardingWizard() {
                   <div className="space-y-3">
                     <button
                       onClick={() => navigate('/verification')}
-                      className="w-full bg-[#f0c040] text-black py-4 rounded-xl font-bold text-[15px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
+                      className="w-full bg-gold text-black py-4 rounded-xl font-bold text-[15px] hover:bg-[#e0b030] transition-colors flex items-center justify-center gap-2"
                     >
                       <Shield className="w-5 h-5" />
                       Get Verified Now

@@ -17,8 +17,8 @@ export const AMENITIES = [
 ];
 
 export const COLORS = {
-  primary: '#1a6b3c', // Forest Green
-  accent: '#f0c040', // Warm Gold
+  primary: '#D4AF37', // Forest Green
+  accent: '#D4AF37', // Warm Gold
   accentDark: '#c97d0e',
   background: '#ffffff',
 };

@@ -96,7 +96,7 @@ const chatWindowProps = {
         className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
-        <div className="w-14 h-14 bg-[#0a1f11] border border-white/6 rounded-2xl flex items-center justify-center mb-5">
+        <div className="w-14 h-14 bg-ink border border-white/6 rounded-2xl flex items-center justify-center mb-5">
           <User className="w-7 h-7 text-white/20" />
         </div>
         <h2 className="text-[20px] font-bold text-white mb-2">Sign in to view messages</h2>
@@ -105,7 +105,7 @@ const chatWindowProps = {
         </p>
         <Link
           to="/login"
-          className="bg-[#1a6b3c] text-white px-8 py-3 rounded-xl font-semibold text-[14px] hover:bg-[#0f4a2a] transition-colors"
+          className="bg-gold text-white px-8 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors"
         >
           Sign In
         </Link>
@@ -123,7 +123,7 @@ const chatWindowProps = {
           {conversationId ? (
             <div className="flex-1 flex flex-col h-full">
               {/* Mobile chat header */}
-              <div className="px-4 py-3 bg-[#0a1f11] border-b border-white/5 flex items-center gap-3 flex-shrink-0">
+              <div className="px-4 py-3 bg-ink border-b border-white/5 flex items-center gap-3 flex-shrink-0">
                 <button
                   onClick={handleBack}
                   className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-colors"
@@ -135,7 +135,7 @@ const chatWindowProps = {
                     <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
                     <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                   </h3>
-                  <p className="text-[11px] text-[#1a6b3c] font-medium truncate">
+                  <p className="text-[11px] text-gold font-medium truncate">
                     {selectedConversation?.properties?.title || 'Property'}
                   </p>
                 </div>
@@ -143,7 +143,7 @@ const chatWindowProps = {
                   
                     <a
                     href={`tel:${selectedConversation.participants[0].phone}`}
-                    className="w-8 h-8 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center text-[#1a6b3c] hover:bg-[#1a6b3c]/25 transition-colors flex-shrink-0"
+                    className="w-8 h-8 bg-gold/15 rounded-xl flex items-center justify-center text-gold hover:bg-gold/25 transition-colors flex-shrink-0"
                   >
                     <Phone className="w-4 h-4" />
                   </a>
@@ -154,7 +154,7 @@ const chatWindowProps = {
                 >
                   <MoreVertical className="w-4 h-4" />
                   {showChatMenu && (
-                    <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-[#0a1f11] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                    <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-ink border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
                       <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-white/70 hover:bg-white/5 transition-colors text-left">
                         <Ban className="w-3.5 h-3.5" /> Block user
                       </button>
@@ -169,7 +169,7 @@ const chatWindowProps = {
             </div>
           ) : (
             <div className="flex-1 flex flex-col h-full">
-              <div className="px-5 py-4 bg-[#0a1f11] border-b border-white/5 flex-shrink-0">
+              <div className="px-5 py-4 bg-ink border-b border-white/5 flex-shrink-0">
                 <h2 className="text-[18px] font-bold text-white">Messages</h2>
                 <p className="text-[12px] text-white/35 mt-0.5">
                   {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
@@ -183,7 +183,7 @@ const chatWindowProps = {
         <div className="flex-1 flex h-full max-w-7xl mx-auto w-full my-4 px-5 gap-4 overflow-hidden">
 
           {/* Left panel */}
-          <div className="w-80 flex-shrink-0 flex flex-col bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+          <div className="w-80 flex-shrink-0 flex flex-col bg-ink border border-white/6 rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-white/5 flex-shrink-0">
               <h2 className="text-[16px] font-bold text-white">Messages</h2>
               <p className="text-[12px] text-white/35 mt-0.5">
@@ -199,12 +199,12 @@ const chatWindowProps = {
           </div>
 
           {/* Right panel */}
-          <div className="flex-1 flex flex-col bg-[#0a1f11] border border-white/6 rounded-2xl overflow-hidden">
+          <div className="flex-1 flex flex-col bg-ink border border-white/6 rounded-2xl overflow-hidden">
             {conversationId ? (
               <>
                 {/* Desktop chat header */}
                 <div className="px-5 py-3.5 border-b border-white/5 flex items-center gap-3 flex-shrink-0">
-                  <div className="w-8 h-8 bg-[#1a6b3c] rounded-xl flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-gold rounded-xl flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
                     {(selectedConversation?.participants?.[0]?.full_name || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -212,7 +212,7 @@ const chatWindowProps = {
                       <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
                       <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                     </h3>
-                    <p className="text-[11px] text-[#1a6b3c] font-medium truncate">
+                    <p className="text-[11px] text-gold font-medium truncate">
                       {selectedConversation?.properties?.title || 'Property'}
                     </p>
                   </div>
@@ -220,7 +220,7 @@ const chatWindowProps = {
                     
                     <a
                       href={`tel:${selectedConversation.participants[0].phone}`}
-                      className="w-8 h-8 bg-[#1a6b3c]/15 rounded-xl flex items-center justify-center text-[#1a6b3c] hover:bg-[#1a6b3c]/25 transition-colors flex-shrink-0"
+                      className="w-8 h-8 bg-gold/15 rounded-xl flex items-center justify-center text-gold hover:bg-gold/25 transition-colors flex-shrink-0"
                     >
                       <Phone className="w-4 h-4" />
                     </a>
@@ -231,7 +231,7 @@ const chatWindowProps = {
                   >
                     <MoreVertical className="w-4 h-4" />
                     {showChatMenu && (
-                      <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-[#0a1f11] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                      <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-ink border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
                         <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-white/70 hover:bg-white/5 transition-colors text-left">
                           <Ban className="w-3.5 h-3.5" /> Block user
                         </button>
@@ -263,7 +263,7 @@ const chatWindowProps = {
       {showReportModal && (
         <>
           <div onClick={() => setShowReportModal(false)} className="fixed inset-0 bg-black/70 z-[100]" />
-          <div className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-sm h-fit bg-[#0a1f11] border border-white/10 rounded-2xl z-[110] overflow-hidden">
+          <div className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-sm h-fit bg-ink border border-white/10 rounded-2xl z-[110] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
               <h3 className="text-[15px] font-bold text-white">Report User</h3>
               <button onClick={() => setShowReportModal(false)} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
