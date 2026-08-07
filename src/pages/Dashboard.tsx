@@ -682,12 +682,13 @@ export default function Dashboard() {
               </motion.div>
             )}
 
+            <div id="deals-section" />
             {/* Stat cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {isTenant ? (
                 <>
                   <StatCard icon={Calendar} value={bookings.length} label="Inspections" />
-                  <StatCard icon={CreditCard} value={deals.length} label="Escrow deals" />
+                  <StatCard icon={CreditCard} value={deals.length} label="Escrow deals" onClick={() => document.getElementById('deals-section')?.scrollIntoView({ behavior: 'smooth' })} />
                   <StatCard
                     icon={Heart}
                     value={savedProperties.length}
@@ -705,7 +706,7 @@ export default function Dashboard() {
                     onClick={() => navigate('/listings')}
                   />
                   <StatCard icon={Clock} value={pendingListings} label="Pending review" />
-                  <StatCard icon={CreditCard} value={deals.length} label="Escrow deals" />
+                  <StatCard icon={CreditCard} value={deals.length} label="Escrow deals" onClick={() => document.getElementById('deals-section')?.scrollIntoView({ behavior: 'smooth' })} />
                   <StatCard icon={Calendar} value={newBookings} label="New bookings" />
                 </>
               )}
@@ -713,6 +714,54 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
+
+                {/* Landlord/Agent: Recent Deals */}
+                {isLandlordOrAgent && (
+                <div className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                    <h2 className="text-[15px] font-bold text-paper">Recent Deals</h2>
+                    <CreditCard className="w-4 h-4 text-gold" />
+                  </div>
+                  {deals.length === 0 ? (
+                    <EmptyState
+                      icon={CreditCard}
+                      title="No deals yet"
+                      desc="Deals on your properties will show up here."
+                    />
+                  ) : (
+                    <div className="divide-y divide-white/4">
+                      {deals.map(deal => (
+                        <button
+                          key={deal.id}
+                          onClick={() => navigate(`/deals/${deal.id}`)}
+                          className="w-full flex items-center gap-3 px-5 py-4 hover:bg-white/4 transition-colors text-left"
+                        >
+                          <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden flex-shrink-0">
+                            {(deal as any).properties?.images?.[0] ? (
+                              <img src={(deal as any).properties.images[0]} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Home className="w-5 h-5 text-paper/15" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-semibold text-paper truncate">
+                              {(deal as any).properties?.title || 'Property'}
+                            </p>
+                            <p className="text-[11px] text-paper/35">
+                              {(deal as any).properties?.lga}, {(deal as any).properties?.state}
+                            </p>
+                          </div>
+                          <span className="text-[11px] font-semibold text-gold bg-gold/10 px-2.5 py-1 rounded-lg capitalize flex-shrink-0">
+                            {deal.status}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                )}
 
                 {/* Landlord: Inspection Requests */}
                 {isLandlordOrAgent && (
@@ -752,6 +801,54 @@ export default function Dashboard() {
                       </div>
                     )}
                   </div>
+                )}
+
+                {/* Tenant: My Deals */}
+                {isTenant && (
+                <div className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                    <h2 className="text-[15px] font-bold text-paper">My Deals</h2>
+                    <CreditCard className="w-4 h-4 text-gold" />
+                  </div>
+                  {deals.length === 0 ? (
+                    <EmptyState
+                      icon={CreditCard}
+                      title="No deals yet"
+                      desc="Once you start a deal on a property, it will show up here."
+                    />
+                  ) : (
+                    <div className="divide-y divide-white/4">
+                      {deals.map(deal => (
+                        <button
+                          key={deal.id}
+                          onClick={() => navigate(`/deals/${deal.id}`)}
+                          className="w-full flex items-center gap-3 px-5 py-4 hover:bg-white/4 transition-colors text-left"
+                        >
+                          <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden flex-shrink-0">
+                            {(deal as any).properties?.images?.[0] ? (
+                              <img src={(deal as any).properties.images[0]} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Home className="w-5 h-5 text-paper/15" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-semibold text-paper truncate">
+                              {(deal as any).properties?.title || 'Property'}
+                            </p>
+                            <p className="text-[11px] text-paper/35">
+                              {(deal as any).properties?.lga}, {(deal as any).properties?.state}
+                            </p>
+                          </div>
+                          <span className="text-[11px] font-semibold text-gold bg-gold/10 px-2.5 py-1 rounded-lg capitalize flex-shrink-0">
+                            {deal.status}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 )}
 
                 {/* Tenant: My Inspection Bookings */}
