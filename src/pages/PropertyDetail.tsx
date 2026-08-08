@@ -41,15 +41,15 @@ const PropertySkeleton = () => (
 const AmenityChip = ({ text }: { text: string }) => (
   <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/8 rounded-xl">
     <div className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0" />
-    <span className="text-[12px] text-white/65 font-medium">{text}</span>
+    <span className="text-[12px] text-paper/65 font-medium">{text}</span>
   </div>
 );
 
 const StatBox = ({ icon: Icon, value, label }: { icon: React.ElementType; value: string | number; label: string }) => (
   <div className="bg-white/4 border border-white/6 rounded-xl p-4 text-center">
     <Icon className="w-5 h-5 mx-auto mb-2 text-gold" />
-    <div className="text-[15px] font-bold text-white">{value}</div>
-    <div className="text-[10px] text-white/35 font-medium uppercase tracking-wider mt-0.5">{label}</div>
+    <div className="text-[15px] font-bold text-paper">{value}</div>
+    <div className="text-[10px] text-paper/35 font-medium uppercase tracking-wider mt-0.5">{label}</div>
   </div>
 );
 
@@ -215,8 +215,8 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
         <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
-          <h3 className="text-[15px] font-bold text-white">Share this listing</h3>
-          <button onClick={onClose} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
+          <h3 className="text-[15px] font-bold text-paper">Share this listing</h3>
+          <button onClick={onClose} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -228,11 +228,11 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
             className="flex items-center gap-3 w-full p-4 bg-[#25D366]/10 border border-[#25D366]/20 rounded-xl hover:bg-[#25D366]/15 transition-colors"
           >
             <div className="w-10 h-10 bg-[#25D366] rounded-xl flex items-center justify-center flex-shrink-0">
-              <MessageCircle className="w-5 h-5 text-white" />
+              <MessageCircle className="w-5 h-5 text-paper" />
             </div>
             <div>
-              <p className="text-[13px] font-bold text-white">Share on WhatsApp</p>
-              <p className="text-[11px] text-white/35">Send with pre-filled property details</p>
+              <p className="text-[13px] font-bold text-paper">Share on WhatsApp</p>
+              <p className="text-[11px] text-paper/35">Send with pre-filled property details</p>
             </div>
           </a>
           <a
@@ -242,11 +242,11 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
             className="flex items-center gap-3 w-full p-4 bg-white/4 border border-white/8 rounded-xl hover:bg-white/6 transition-colors"
           >
             <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10">
-              <Twitter className="w-5 h-5 text-white" />
+              <Twitter className="w-5 h-5 text-paper" />
             </div>
             <div>
-              <p className="text-[13px] font-bold text-white">Share on X</p>
-              <p className="text-[11px] text-white/35">Post to your followers</p>
+              <p className="text-[13px] font-bold text-paper">Share on X</p>
+              <p className="text-[11px] text-paper/35">Post to your followers</p>
             </div>
           </a>
           <button
@@ -254,11 +254,11 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
             className="flex items-center gap-3 w-full p-4 bg-white/4 border border-white/8 rounded-xl hover:bg-white/6 transition-colors"
           >
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${copied ? 'bg-gold' : 'bg-white/8'}`}>
-              {copied ? <Check className="w-5 h-5 text-white" /> : <Copy className="w-5 h-5 text-white/60" />}
+              {copied ? <Check className="w-5 h-5 text-paper" /> : <Copy className="w-5 h-5 text-paper/60" />}
             </div>
             <div className="text-left">
-              <p className="text-[13px] font-bold text-white">{copied ? 'Link Copied!' : 'Copy Link'}</p>
-              <p className="text-[11px] text-white/35 truncate max-w-[220px]">{propertyUrl}</p>
+              <p className="text-[13px] font-bold text-paper">{copied ? 'Link Copied!' : 'Copy Link'}</p>
+              <p className="text-[11px] text-paper/35 truncate max-w-[220px]">{propertyUrl}</p>
             </div>
           </button>
           <div className="grid grid-cols-2 gap-3">
@@ -271,8 +271,8 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
                 ? <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                 : <Download className="w-6 h-6 text-gold" />
               }
-              <p className="text-[12px] font-bold text-white">Save as Image</p>
-              <p className="text-[10px] text-white/30 text-center">1080×1080 card</p>
+              <p className="text-[12px] font-bold text-paper">Save as Image</p>
+              <p className="text-[10px] text-paper/30 text-center">1080×1080 card</p>
             </button>
             <button
               onClick={qrDataUrl ? handleDownloadQR : handleGenerateQR}
@@ -285,10 +285,10 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
                 ? <img src={qrDataUrl} alt="QR" className="w-10 h-10 rounded-lg" />
                 : <QrCode className="w-6 h-6 text-gold" />
               }
-              <p className="text-[12px] font-bold text-white">
+              <p className="text-[12px] font-bold text-paper">
                 {qrDataUrl ? 'Download QR' : 'Generate QR'}
               </p>
-              <p className="text-[10px] text-white/30 text-center">Print-ready QR code</p>
+              <p className="text-[10px] text-paper/30 text-center">Print-ready QR code</p>
             </button>
           </div>
         </div>
@@ -430,7 +430,7 @@ export default function PropertyDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] px-5 py-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="min-h-screen bg-ink px-5 py-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div className="max-w-7xl mx-auto">
           <div className="skeleton h-8 w-24 mb-6 rounded-xl" />
           <PropertySkeleton />
@@ -441,11 +441,11 @@ export default function PropertyDetail() {
 
   if (error || !property) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="min-h-screen bg-ink flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
-        <h1 className="text-[20px] font-bold text-white mb-2">Property not found</h1>
-        <p className="text-[13px] text-white/40 mb-6 max-w-xs">{error || "This property doesn't exist or has been removed."}</p>
-        <button onClick={() => navigate('/listings')} className="bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors">
+        <h1 className="text-[20px] font-bold text-paper mb-2">Property not found</h1>
+        <p className="text-[13px] text-paper/40 mb-6 max-w-xs">{error || "This property doesn't exist or has been removed."}</p>
+        <button onClick={() => navigate('/listings')} className="bg-gold text-paper px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors">
           Back to Listings
         </button>
       </div>
@@ -454,11 +454,11 @@ export default function PropertyDetail() {
 
   if (property.status === 'inactive' || property.status === 'flagged' || property.deleted_at || (property.is_delisted && !isOwner)) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="min-h-screen bg-ink flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <AlertCircle className="w-12 h-12 text-gold mb-4" />
-        <h1 className="text-[20px] font-bold text-white mb-2">Listing Unavailable</h1>
-        <p className="text-[13px] text-white/40 mb-6 max-w-xs">This listing has been suspended and is currently unavailable.</p>
-        <button onClick={() => navigate('/listings')} className="bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors">
+        <h1 className="text-[20px] font-bold text-paper mb-2">Listing Unavailable</h1>
+        <p className="text-[13px] text-paper/40 mb-6 max-w-xs">This listing has been suspended and is currently unavailable.</p>
+        <button onClick={() => navigate('/listings')} className="bg-gold text-paper px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors">
           Back to Listings
         </button>
       </div>
@@ -480,12 +480,12 @@ export default function PropertyDetail() {
         <meta name="twitter:image" content={property.images?.[0] || 'https://renteasyapp.com/og-image.png'} />
       </Helmet>
 
-      <div className="min-h-screen bg-[#0a0a0a] page-with-tabs" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="min-h-screen bg-ink page-with-tabs" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
         {/* ── Sticky top bar ── */}
-        <div className="sticky top-16 z-40 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5">
+        <div className="sticky top-16 z-40 bg-ink/90 backdrop-blur-xl border-b border-white/5">
           <div className="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[13px] font-semibold text-white/55 hover:text-white transition-colors">
+            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[13px] font-semibold text-paper/55 hover:text-paper transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
             <div className="flex items-center gap-2">
@@ -504,7 +504,7 @@ export default function PropertyDetail() {
                   } catch { }
                   finally { setSavingProperty(false); }
                 }}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${saved ? 'bg-gold/25 text-gold' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/8'}`}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${saved ? 'bg-gold/25 text-gold' : 'bg-white/5 text-paper/40 hover:text-paper hover:bg-white/8'}`}
               >
                 {savingProperty
                   ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -513,7 +513,7 @@ export default function PropertyDetail() {
               </button>
               <button
                 onClick={() => setShowSharePanel(true)}
-                className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-all"
+                className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper hover:bg-white/8 transition-all"
               >
                 <Share2 className="w-4 h-4" />
               </button>
@@ -535,7 +535,7 @@ export default function PropertyDetail() {
                 <video src={currentMedia.url} className="w-full h-full object-cover" controls autoPlay />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Home className="w-14 h-14 text-white/10" />
+                  <Home className="w-14 h-14 text-paper/10" />
                 </div>
               )}
               <div className="absolute top-4 left-4 flex gap-2">
@@ -543,20 +543,20 @@ export default function PropertyDetail() {
                   {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
                 </span>
                 {property.escrow_verified && (
-                  <span className="bg-gold text-white text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                  <span className="bg-gold text-paper text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
                     <Shield className="w-3 h-3" /> Escrow Verified
                   </span>
                 )}
               </div>
-              <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white text-[11px] font-medium px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+              <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-paper text-[11px] font-medium px-3 py-1.5 rounded-xl flex items-center gap-1.5">
                 <Eye className="w-3 h-3" /> {activeIndex + 1} / {allMedia.length}
               </div>
               {allMedia.length > 1 && (
                 <>
-                  <button onClick={e => { e.stopPropagation(); goPrev(); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center text-white hover:bg-black/70 transition-colors">
+                  <button onClick={e => { e.stopPropagation(); goPrev(); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center text-paper hover:bg-black/70 transition-colors">
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <button onClick={e => { e.stopPropagation(); goNext(); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center text-white hover:bg-black/70 transition-colors">
+                  <button onClick={e => { e.stopPropagation(); goNext(); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center text-paper hover:bg-black/70 transition-colors">
                     <ChevronRight className="w-5 h-5" />
                   </button>
                 </>
@@ -573,8 +573,8 @@ export default function PropertyDetail() {
                       <img src={media.url} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-ink flex flex-col items-center justify-center gap-1">
-                        <Video className="w-5 h-5 text-white/60" />
-                        <span className="text-[8px] text-white/40 font-bold uppercase">Video</span>
+                        <Video className="w-5 h-5 text-paper/60" />
+                        <span className="text-[8px] text-paper/40 font-bold uppercase">Video</span>
                       </div>
                     )}
                   </button>
@@ -583,12 +583,12 @@ export default function PropertyDetail() {
             )}
 
             <div className="flex items-center justify-between mt-3">
-              <span className="text-[12px] text-white/35">
+              <span className="text-[12px] text-paper/35">
                 {property.images?.length || 0} photo{(property.images?.length || 0) !== 1 ? 's' : ''}
                 {property.videos?.length ? ` · ${property.videos.length} video${property.videos.length > 1 ? 's' : ''}` : ''}
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-white/25">Share:</span>
+                <span className="text-[11px] text-paper/25">Share:</span>
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(`🏠 ${property.title}\n📍 ${property.lga}, ${property.state}\n💰 ${formatNaira(property.price)}\n\n${propertyUrl}`)}`}
                   target="_blank" rel="noopener noreferrer"
@@ -599,7 +599,7 @@ export default function PropertyDetail() {
                 <a
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${property.title} · ${formatNaira(property.price)} · ${propertyUrl} #RentEasy`)}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-colors"
+                  className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-paper/40 hover:text-paper hover:bg-white/8 transition-colors"
                 >
                   <Twitter className="w-3.5 h-3.5" />
                 </a>
@@ -623,19 +623,19 @@ export default function PropertyDetail() {
               <div className="bg-ink border border-white/6 rounded-2xl p-5 lg:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-[22px] lg:text-[26px] font-black text-white tracking-tight leading-snug mb-2">
+                    <h1 className="text-[22px] lg:text-[26px] font-black text-paper tracking-tight leading-snug mb-2">
                       {property.title}
                     </h1>
-                    <div className="flex items-center gap-1.5 text-white/45">
+                    <div className="flex items-center gap-1.5 text-paper/45">
                       <MapPin className="w-4 h-4 flex-shrink-0 text-gold" />
                       <span className="text-[13px]">{property.address}, {property.lga}, {property.state}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      <span className="text-[11px] text-white/30 bg-white/5 px-2.5 py-1 rounded-lg capitalize flex items-center gap-1">
+                      <span className="text-[11px] text-paper/30 bg-white/5 px-2.5 py-1 rounded-lg capitalize flex items-center gap-1">
                         <Layers className="w-3 h-3" />{property.listing_type}
                       </span>
-                      <span className="text-[11px] text-white/30 bg-white/5 px-2.5 py-1 rounded-lg capitalize">{property.category}</span>
-                      <span className="text-[11px] text-white/30 bg-white/5 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                      <span className="text-[11px] text-paper/30 bg-white/5 px-2.5 py-1 rounded-lg capitalize">{property.category}</span>
+                      <span className="text-[11px] text-paper/30 bg-white/5 px-2.5 py-1 rounded-lg flex items-center gap-1">
                         <Eye className="w-3 h-3" />{property.view_count || 0} views
                       </span>
                     </div>
@@ -643,12 +643,12 @@ export default function PropertyDetail() {
                   <div className="sm:text-right flex-shrink-0">
                     <div className="text-[28px] font-black text-gold leading-none">{formatNaira(property.price)}</div>
                     {property.price_period && (
-                      <div className="text-[12px] text-white/35 mt-1">{periodLabel[property.price_period]}</div>
+                      <div className="text-[12px] text-paper/35 mt-1">{periodLabel[property.price_period]}</div>
                     )}
                     {priceHistory.length > 0 && (
                       <button
                         onClick={() => setShowPriceHistory(!showPriceHistory)}
-                        className="text-[11px] text-white/30 hover:text-white/55 underline mt-1 transition-colors"
+                        className="text-[11px] text-paper/30 hover:text-paper/55 underline mt-1 transition-colors"
                       >
                         Price history
                       </button>
@@ -656,9 +656,9 @@ export default function PropertyDetail() {
                     {showPriceHistory && priceHistory.length > 0 && (
                       <div className="mt-2 space-y-1 text-right">
                         {priceHistory.map((h, i) => (
-                          <div key={i} className="text-[11px] text-white/35">
+                          <div key={i} className="text-[11px] text-paper/35">
                             {formatNaira(h.old_price)} {'\u2192'} {formatNaira(h.new_price)}
-                            <span className="text-white/20"> · {new Date(h.changed_at).toLocaleDateString()}</span>
+                            <span className="text-paper/20"> · {new Date(h.changed_at).toLocaleDateString()}</span>
                           </div>
                         ))}
                       </div>
@@ -692,8 +692,8 @@ export default function PropertyDetail() {
                 <div className="bg-ink border border-white/6 rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <ScrollText className="w-4 h-4 text-gold" />
-                    <h3 className="text-[14px] font-bold text-white">Rental Terms</h3>
-                    <span className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-lg">Public info</span>
+                    <h3 className="text-[14px] font-bold text-paper">Rental Terms</h3>
+                    <span className="text-[10px] text-paper/30 bg-white/5 px-2 py-0.5 rounded-lg">Public info</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {property.min_rental_duration && (
@@ -702,8 +702,8 @@ export default function PropertyDetail() {
                           <Clock className="w-4 h-4 text-gold" />
                         </div>
                         <div>
-                          <p className="text-[11px] text-white/35 uppercase tracking-wider font-medium mb-0.5">Min Duration</p>
-                          <p className="text-[13px] font-semibold text-white">{property.min_rental_duration}</p>
+                          <p className="text-[11px] text-paper/35 uppercase tracking-wider font-medium mb-0.5">Min Duration</p>
+                          <p className="text-[13px] font-semibold text-paper">{property.min_rental_duration}</p>
                         </div>
                       </div>
                     )}
@@ -713,8 +713,8 @@ export default function PropertyDetail() {
                           <Tag className="w-4 h-4 text-gold" />
                         </div>
                         <div>
-                          <p className="text-[11px] text-white/35 uppercase tracking-wider font-medium mb-0.5">House Rules</p>
-                          <p className="text-[13px] text-white/65 leading-relaxed">{property.house_rules}</p>
+                          <p className="text-[11px] text-paper/35 uppercase tracking-wider font-medium mb-0.5">House Rules</p>
+                          <p className="text-[13px] text-paper/65 leading-relaxed">{property.house_rules}</p>
                         </div>
                       </div>
                     )}
@@ -725,15 +725,15 @@ export default function PropertyDetail() {
               {/* Description */}
               {property.description && (
                 <div className="bg-ink border border-white/6 rounded-2xl p-5">
-                  <h3 className="text-[14px] font-bold text-white mb-3">About this property</h3>
-                  <p className="text-[13px] text-white/55 leading-relaxed whitespace-pre-wrap">{property.description}</p>
+                  <h3 className="text-[14px] font-bold text-paper mb-3">About this property</h3>
+                  <p className="text-[13px] text-paper/55 leading-relaxed whitespace-pre-wrap">{property.description}</p>
                 </div>
               )}
 
               {/* Amenities */}
               {property.amenities && property.amenities.length > 0 && (
                 <div className="bg-ink border border-white/6 rounded-2xl p-5">
-                  <h3 className="text-[14px] font-bold text-white mb-4">Amenities & Features</h3>
+                  <h3 className="text-[14px] font-bold text-paper mb-4">Amenities & Features</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {property.amenities.map((amenity, i) => <AmenityChip key={i} text={amenity} />)}
                   </div>
@@ -743,7 +743,7 @@ export default function PropertyDetail() {
               {/* Survey plan */}
               {property.listing_type === 'land' && property.survey_plan_url && (
                 <div className="bg-ink border border-white/6 rounded-2xl p-5">
-                  <h3 className="text-[14px] font-bold text-white mb-3">Survey Plan</h3>
+                  <h3 className="text-[14px] font-bold text-paper mb-3">Survey Plan</h3>
                   <a href={property.survey_plan_url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-3 p-4 bg-white/4 border border-white/8 rounded-xl hover:border-gold/25 transition-colors group"
                   >
@@ -751,10 +751,10 @@ export default function PropertyDetail() {
                       <FileText className="w-5 h-5 text-gold" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[13px] font-semibold text-white">View Survey Plan</p>
-                      <p className="text-[11px] text-white/35">Opens in new tab</p>
+                      <p className="text-[13px] font-semibold text-paper">View Survey Plan</p>
+                      <p className="text-[11px] text-paper/35">Opens in new tab</p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-gold transition-colors" />
+                    <ChevronRight className="w-4 h-4 text-paper/20 group-hover:text-gold transition-colors" />
                   </a>
                 </div>
               )}
@@ -780,10 +780,10 @@ export default function PropertyDetail() {
                   </svg>
                   <div className="flex-1">
                     <div className="text-[9px] font-bold text-gold uppercase tracking-widest mb-1">Know Your Rights</div>
-                    <p className="text-[12px] font-semibold text-white leading-snug mb-0.5">
+                    <p className="text-[12px] font-semibold text-paper leading-snug mb-0.5">
                       Always sign a tenancy agreement before making any payment
                     </p>
-                    <p className="text-[11px] text-white/30">Tenancy Law of Lagos State 2011</p>
+                    <p className="text-[11px] text-paper/30">Tenancy Law of Lagos State 2011</p>
                   </div>
                 </div>
                 <Link to="/legal-guide" className="flex items-center justify-between px-5 py-3 border-t border-white/5 text-[11px] font-semibold text-gold/50 hover:text-gold transition-colors">
@@ -798,9 +798,9 @@ export default function PropertyDetail() {
 
               {/* Owner card */}
               <div className="bg-ink border border-white/6 rounded-2xl p-5">
-                <h3 className="text-[12px] font-bold text-white/40 uppercase tracking-wider mb-4">Listed by</h3>
+                <h3 className="text-[12px] font-bold text-paper/40 uppercase tracking-wider mb-4">Listed by</h3>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 bg-gold rounded-xl overflow-hidden flex items-center justify-center text-white font-bold text-[16px] flex-shrink-0">
+                  <div className="w-12 h-12 bg-gold rounded-xl overflow-hidden flex items-center justify-center text-paper font-bold text-[16px] flex-shrink-0">
                     {owner?.avatar_url ? (
                       <img src={owner.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -809,16 +809,16 @@ export default function PropertyDetail() {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[14px] font-bold text-white truncate">{owner?.full_name}</span>
+                      <span className="text-[14px] font-bold text-paper truncate">{owner?.full_name}</span>
                       <VerifiedBadge status={owner?.verification_status} size={14} />
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[11px] text-white/35 capitalize font-medium">
+                      <span className="text-[11px] text-paper/35 capitalize font-medium">
                         {owner?.role === 'agent' ? 'Agent' : owner?.role === 'landlord' ? 'Landlord' : owner?.role}
-                        {owner?.verification_status === 'verified' && <span className="text-white/25"> · Verified</span>}
+                        {owner?.verification_status === 'verified' && <span className="text-paper/25"> · Verified</span>}
                       </span>
                       {owner?.lasrera_id && (
-                        <span className="text-[10px] text-white/25 font-mono">
+                        <span className="text-[10px] text-paper/25 font-mono">
                           {owner.lasrera_id}
                         </span>
                       )}
@@ -832,7 +832,7 @@ export default function PropertyDetail() {
                   />
                 )}
                 {isOwner && (
-                  <div className="text-[12px] text-white/30 text-center py-2">This is your listing</div>
+                  <div className="text-[12px] text-paper/30 text-center py-2">This is your listing</div>
                 )}
               </div>
 
@@ -843,23 +843,23 @@ export default function PropertyDetail() {
               <div className="bg-ink border border-gold/25 rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Shield className="w-5 h-5 text-gold" />
-                  <h3 className="text-[14px] font-bold text-white">Escrow Protected</h3>
+                  <h3 className="text-[14px] font-bold text-paper">Escrow Protected</h3>
                 </div>
-                <p className="text-[12px] text-white/45 leading-relaxed mb-4">
+                <p className="text-[12px] text-paper/45 leading-relaxed mb-4">
                   Your payment is held securely by RentEasy and only released to the {owner?.role} after you've confirmed everything is right.
                 </p>
                 <div className="space-y-2">
                   {['Payment held until move-in confirmed', 'Full refund if property is misrepresented', 'Permanent transaction audit trail'].map((item, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <CheckCircle className="w-3.5 h-3.5 text-[#4ade80] flex-shrink-0 mt-0.5" />
-                      <span className="text-[12px] text-white/50">{item}</span>
+                      <span className="text-[12px] text-paper/50">{item}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {user && !isOwner && (
-                <button className="w-full text-[12px] text-white/25 hover:text-white/50 transition-colors py-2 text-center">
+                <button className="w-full text-[12px] text-paper/25 hover:text-paper/50 transition-colors py-2 text-center">
                   🚩 Report this listing
                 </button>
               )}
@@ -874,17 +874,17 @@ export default function PropertyDetail() {
               onClick={() => setLightboxOpen(false)}
               className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4"
             >
-              <button onClick={e => { e.stopPropagation(); goPrev(); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+              <button onClick={e => { e.stopPropagation(); goPrev(); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-paper hover:bg-white/20 transition-colors">
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <img src={currentMedia.url} alt={property.title} className="max-w-full max-h-full object-contain rounded-xl" onClick={e => e.stopPropagation()} />
-              <button onClick={e => { e.stopPropagation(); goNext(); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+              <button onClick={e => { e.stopPropagation(); goNext(); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-paper hover:bg-white/20 transition-colors">
                 <ChevronRight className="w-5 h-5" />
               </button>
-              <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+              <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-paper hover:bg-white/20 transition-colors">
                 <ArrowLeft className="w-4 h-4 rotate-[135deg]" />
               </button>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[12px] text-white/40">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[12px] text-paper/40">
                 {activeIndex + 1} / {allMedia.length}
               </div>
             </motion.div>
@@ -919,11 +919,11 @@ export default function PropertyDetail() {
                     <div className="w-12 h-12 bg-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <CheckCircle className="w-6 h-6 text-[#4ade80]" />
                     </div>
-                    <h3 className="text-[16px] font-bold text-white mb-2">Report submitted</h3>
-                    <p className="text-[13px] text-white/40 mb-6">Thanks for flagging this. Our team will review it shortly.</p>
+                    <h3 className="text-[16px] font-bold text-paper mb-2">Report submitted</h3>
+                    <p className="text-[13px] text-paper/40 mb-6">Thanks for flagging this. Our team will review it shortly.</p>
                     <button
                       onClick={() => { setShowReportModal(false); setReportSubmitted(false); setReportReason(''); setReportDetails(''); }}
-                      className="w-full bg-gold text-white py-3 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
+                      className="w-full bg-gold text-paper py-3 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
                     >
                       Close
                     </button>
@@ -931,10 +931,10 @@ export default function PropertyDetail() {
                 ) : (
                   <>
                     <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-[15px] font-bold text-white">Report this listing</h3>
+                      <h3 className="text-[15px] font-bold text-paper">Report this listing</h3>
                       <button
                         onClick={() => setShowReportModal(false)}
-                        className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                        className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -953,8 +953,8 @@ export default function PropertyDetail() {
                           onClick={() => setReportReason(r)}
                           className={`w-full text-left px-4 py-3 rounded-xl text-[13px] font-medium transition-colors border ${
                             reportReason === r
-                              ? 'bg-gold/10 border-gold/30 text-white'
-                              : 'bg-white/4 border-white/8 text-white/60 hover:bg-white/6'
+                              ? 'bg-gold/10 border-gold/30 text-paper'
+                              : 'bg-white/4 border-white/8 text-paper/60 hover:bg-white/6'
                           }`}
                         >
                           {r}
@@ -966,7 +966,7 @@ export default function PropertyDetail() {
                       onChange={(e) => setReportDetails(e.target.value)}
                       placeholder="Any extra details (optional)..."
                       rows={3}
-                      className="w-full p-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/40 transition-colors resize-none mb-4"
+                      className="w-full p-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/40 transition-colors resize-none mb-4"
                     />
                     <button
                       onClick={async () => {
@@ -987,7 +987,7 @@ export default function PropertyDetail() {
                         }
                       }}
                       disabled={!reportReason || submittingReport}
-                      className="w-full bg-red-500/90 text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-500 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                      className="w-full bg-red-500/90 text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-500 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                     >
                       {submittingReport ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Report'}
                     </button>

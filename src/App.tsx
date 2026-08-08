@@ -38,7 +38,7 @@ import MyDelegates from './pages/MyDelegates';
 
 const SuspendedScreen = () => (
   <div
-    className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center"
+    className="min-h-screen bg-ink flex flex-col items-center justify-center p-5 text-center"
     style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
   >
     <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mb-6">
@@ -47,14 +47,14 @@ const SuspendedScreen = () => (
         <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
       </svg>
     </div>
-    <h1 className="text-[24px] font-black text-white mb-3">Account Suspended</h1>
-    <p className="text-[14px] text-white/45 mb-8 max-w-sm leading-relaxed">
+    <h1 className="text-[24px] font-black text-paper mb-3">Account Suspended</h1>
+    <p className="text-[14px] text-paper/45 mb-8 max-w-sm leading-relaxed">
       Your account has been suspended for violating our terms of service.
       If you believe this is an error, please contact our support team.
     </p>
     
     <a
-      className="bg-gold text-white px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
+      className="bg-gold text-paper px-8 py-3 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors"
     >
       Contact Support
     </a>
@@ -67,7 +67,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (loading) return (
     <div
-      className="h-screen flex items-center justify-center bg-[#0a0a0a]"
+      className="h-screen flex items-center justify-center bg-ink"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />

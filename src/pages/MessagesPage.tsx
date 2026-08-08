@@ -93,19 +93,19 @@ const chatWindowProps = {
   if (!user) {
     return (
       <div
-        className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-5 text-center"
+        className="min-h-screen bg-ink flex flex-col items-center justify-center p-5 text-center"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
         <div className="w-14 h-14 bg-ink border border-white/6 rounded-2xl flex items-center justify-center mb-5">
-          <User className="w-7 h-7 text-white/20" />
+          <User className="w-7 h-7 text-paper/20" />
         </div>
-        <h2 className="text-[20px] font-bold text-white mb-2">Sign in to view messages</h2>
-        <p className="text-[13px] text-white/40 mb-6 max-w-xs">
+        <h2 className="text-[20px] font-bold text-paper mb-2">Sign in to view messages</h2>
+        <p className="text-[13px] text-paper/40 mb-6 max-w-xs">
           You need to be logged in to access your conversations.
         </p>
         <Link
           to="/login"
-          className="bg-gold text-white px-8 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors"
+          className="bg-gold text-paper px-8 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors"
         >
           Sign In
         </Link>
@@ -115,7 +115,7 @@ const chatWindowProps = {
 
   return (
     <div
-      className="h-[calc(100vh-64px)] bg-[#0a0a0a] flex overflow-hidden"
+      className="h-[calc(100vh-64px)] bg-ink flex overflow-hidden"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {isMobile ? (
@@ -126,12 +126,12 @@ const chatWindowProps = {
               <div className="px-4 py-3 bg-ink border-b border-white/5 flex items-center gap-3 flex-shrink-0">
                 <button
                   onClick={handleBack}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/60 hover:text-paper transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-[14px] font-bold text-white truncate flex items-center gap-1">
+                  <h3 className="text-[14px] font-bold text-paper truncate flex items-center gap-1">
                     <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
                     <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                   </h3>
@@ -150,12 +150,12 @@ const chatWindowProps = {
                 )}
                 <button
                   onClick={() => setShowChatMenu(!showChatMenu)}
-                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors flex-shrink-0 relative"
+                  className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors flex-shrink-0 relative"
                 >
                   <MoreVertical className="w-4 h-4" />
                   {showChatMenu && (
                     <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-ink border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
-                      <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-white/70 hover:bg-white/5 transition-colors text-left">
+                      <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-paper/70 hover:bg-white/5 transition-colors text-left">
                         <Ban className="w-3.5 h-3.5" /> Block user
                       </button>
                       <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-red-400 hover:bg-red-500/10 transition-colors text-left">
@@ -170,8 +170,8 @@ const chatWindowProps = {
           ) : (
             <div className="flex-1 flex flex-col h-full">
               <div className="px-5 py-4 bg-ink border-b border-white/5 flex-shrink-0">
-                <h2 className="text-[18px] font-bold text-white">Messages</h2>
-                <p className="text-[12px] text-white/35 mt-0.5">
+                <h2 className="text-[18px] font-bold text-paper">Messages</h2>
+                <p className="text-[12px] text-paper/35 mt-0.5">
                   {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -185,8 +185,8 @@ const chatWindowProps = {
           {/* Left panel */}
           <div className="w-80 flex-shrink-0 flex flex-col bg-ink border border-white/6 rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-white/5 flex-shrink-0">
-              <h2 className="text-[16px] font-bold text-white">Messages</h2>
-              <p className="text-[12px] text-white/35 mt-0.5">
+              <h2 className="text-[16px] font-bold text-paper">Messages</h2>
+              <p className="text-[12px] text-paper/35 mt-0.5">
                 {loading
                   ? 'Loading...'
                   : `${conversations.length} conversation${conversations.length !== 1 ? 's' : ''}`
@@ -204,11 +204,11 @@ const chatWindowProps = {
               <>
                 {/* Desktop chat header */}
                 <div className="px-5 py-3.5 border-b border-white/5 flex items-center gap-3 flex-shrink-0">
-                  <div className="w-8 h-8 bg-gold rounded-xl flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-gold rounded-xl flex items-center justify-center text-paper text-[12px] font-bold flex-shrink-0">
                     {(selectedConversation?.participants?.[0]?.full_name || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-bold text-white truncate flex items-center gap-1">
+                    <h3 className="text-[14px] font-bold text-paper truncate flex items-center gap-1">
                       <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
                       <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
                     </h3>
@@ -227,12 +227,12 @@ const chatWindowProps = {
                   )}
                   <button
                     onClick={() => setShowChatMenu(!showChatMenu)}
-                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors flex-shrink-0 relative"
+                    className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors flex-shrink-0 relative"
                   >
                     <MoreVertical className="w-4 h-4" />
                     {showChatMenu && (
                       <div onClick={(e) => e.stopPropagation()} className="absolute top-9 right-0 w-44 bg-ink border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
-                        <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-white/70 hover:bg-white/5 transition-colors text-left">
+                        <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-paper/70 hover:bg-white/5 transition-colors text-left">
                           <Ban className="w-3.5 h-3.5" /> Block user
                         </button>
                         <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-red-400 hover:bg-red-500/10 transition-colors text-left">
@@ -247,10 +247,10 @@ const chatWindowProps = {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
                 <div className="w-14 h-14 bg-white/4 rounded-2xl flex items-center justify-center mb-4">
-                  <MessageSquare className="w-7 h-7 text-white/15" />
+                  <MessageSquare className="w-7 h-7 text-paper/15" />
                 </div>
-                <h3 className="text-[16px] font-bold text-white mb-2">Select a conversation</h3>
-                <p className="text-[13px] text-white/35 max-w-xs">
+                <h3 className="text-[16px] font-bold text-paper mb-2">Select a conversation</h3>
+                <p className="text-[13px] text-paper/35 max-w-xs">
                   Choose a conversation from the left to start messaging.
                 </p>
               </div>
@@ -265,8 +265,8 @@ const chatWindowProps = {
           <div onClick={() => setShowReportModal(false)} className="fixed inset-0 bg-black/70 z-[100]" />
           <div className="fixed inset-x-4 bottom-4 md:inset-0 m-auto w-full max-w-sm h-fit bg-ink border border-white/10 rounded-2xl z-[110] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-white">Report User</h3>
-              <button onClick={() => setShowReportModal(false)} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
+              <h3 className="text-[15px] font-bold text-paper">Report User</h3>
+              <button onClick={() => setShowReportModal(false)} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -275,12 +275,12 @@ const chatWindowProps = {
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
                 placeholder="What happened?"
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none"
+                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none"
               />
               <button
                 onClick={handleReport}
                 disabled={!reportReason.trim() || actionLoading}
-                className="w-full bg-red-500 text-white py-3 rounded-xl font-bold text-[13px] hover:bg-red-600 transition-all disabled:opacity-40"
+                className="w-full bg-red-500 text-paper py-3 rounded-xl font-bold text-[13px] hover:bg-red-600 transition-all disabled:opacity-40"
               >
                 {actionLoading ? 'Submitting...' : 'Submit Report'}
               </button>

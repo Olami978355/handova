@@ -83,7 +83,7 @@ const FeaturedCard = ({ property }: { property: Property }) => {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Home className="w-10 h-10 text-white/10" />
+            <Home className="w-10 h-10 text-paper/10" />
           </div>
         )}
         {/* Badges */}
@@ -92,14 +92,14 @@ const FeaturedCard = ({ property }: { property: Property }) => {
             {property.transaction_type === 'rent' ? 'For Rent' : 'For Sale'}
           </span>
           {property.escrow_verified && (
-            <span className="bg-gold text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+            <span className="bg-gold text-paper text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
               <Shield className="w-2.5 h-2.5" /> Verified
             </span>
           )}
         </div>
         {/* Type badge */}
         <div className="absolute top-3 right-3">
-          <span className="bg-black/50 backdrop-blur-sm text-white/70 text-[10px] font-medium px-2 py-1 rounded-lg capitalize">
+          <span className="bg-black/50 backdrop-blur-sm text-paper/70 text-[10px] font-medium px-2 py-1 rounded-lg capitalize">
             {property.listing_type}
           </span>
         </div>
@@ -108,11 +108,11 @@ const FeaturedCard = ({ property }: { property: Property }) => {
       {/* Body */}
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="text-[14px] font-semibold text-white line-clamp-1 leading-snug">
+          <h3 className="text-[14px] font-semibold text-paper line-clamp-1 leading-snug">
             {property.title}
           </h3>
         </div>
-        <div className="flex items-center gap-1 text-white/40 mb-3">
+        <div className="flex items-center gap-1 text-paper/40 mb-3">
           <MapPin className="w-3 h-3 flex-shrink-0" />
           <span className="text-[12px] truncate">{property.lga}, {property.state}</span>
         </div>
@@ -122,13 +122,13 @@ const FeaturedCard = ({ property }: { property: Property }) => {
               {formatNaira(property.price)}
             </span>
             {property.price_period && (
-              <span className="text-[11px] text-white/40 ml-1">
+              <span className="text-[11px] text-paper/40 ml-1">
                 {periodLabel[property.price_period]}
               </span>
             )}
           </div>
           {property.bedrooms && (
-            <span className="text-[11px] text-white/40">
+            <span className="text-[11px] text-paper/40">
               {property.bedrooms} bed · {property.bathrooms} bath
             </span>
           )}
@@ -146,7 +146,7 @@ const StatItem = ({
     <div className="text-[28px] lg:text-[36px] font-black text-gold leading-none mb-1">
       {value}
     </div>
-    <div className="text-[12px] text-white/50 font-medium uppercase tracking-wider">
+    <div className="text-[12px] text-paper/50 font-medium uppercase tracking-wider">
       {label}
     </div>
   </div>
@@ -171,8 +171,8 @@ const HowStep = ({
             <div className="text-[10px] font-bold text-gold/60 uppercase tracking-widest mb-1">
               Step {num}
             </div>
-            <h3 className="text-[15px] font-bold text-white mb-2">{title}</h3>
-            <p className="text-[13px] text-white/50 leading-relaxed">{desc}</p>
+            <h3 className="text-[15px] font-bold text-paper mb-2">{title}</h3>
+            <p className="text-[13px] text-paper/50 leading-relaxed">{desc}</p>
           </div>
         </div>
       </div>
@@ -191,8 +191,8 @@ const FeatureCard = ({
       <div className="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-gold/15 transition-colors">
         <Icon className="w-5 h-5 text-gold" />
       </div>
-      <h3 className="text-[14px] font-bold text-white mb-2">{title}</h3>
-      <p className="text-[13px] text-white/45 leading-relaxed">{desc}</p>
+      <h3 className="text-[14px] font-bold text-paper mb-2">{title}</h3>
+      <p className="text-[13px] text-paper/45 leading-relaxed">{desc}</p>
     </div>
   </FadeUp>
 );
@@ -240,10 +240,10 @@ const BarristerAmakaCard = () => {
           <div className="text-[9px] font-bold text-gold uppercase tracking-widest mb-1">
             Know Your Rights
           </div>
-          <div className="text-[15px] font-bold text-white leading-snug">
+          <div className="text-[15px] font-bold text-paper leading-snug">
             {tip.title}
           </div>
-          <div className="text-[11px] text-white/35 mt-0.5">{tip.law}</div>
+          <div className="text-[11px] text-paper/35 mt-0.5">{tip.law}</div>
         </div>
         {/* Barrister Amaka illustration */}
         <div className="flex-shrink-0 ml-3">
@@ -283,7 +283,7 @@ const BarristerAmakaCard = () => {
             }`}>
               {pt.type === 'right' ? '✓' : '!'}
             </div>
-            <span className="text-[12px] text-white/65 leading-relaxed">{pt.text}</span>
+            <span className="text-[12px] text-paper/65 leading-relaxed">{pt.text}</span>
           </div>
         ))}
       </div>
@@ -339,8 +339,8 @@ const WaitlistSection = () => {
           <div className="w-12 h-12 bg-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-6 h-6 text-[#4ade80]" />
           </div>
-          <h3 className="text-[18px] font-bold text-white mb-2">You're on the list!</h3>
-          <p className="text-[13px] text-white/45">
+          <h3 className="text-[18px] font-bold text-paper mb-2">You're on the list!</h3>
+          <p className="text-[13px] text-paper/45">
             We'll notify you when we launch in your area.
           </p>
         </div>
@@ -350,10 +350,10 @@ const WaitlistSection = () => {
             <div className="text-[10px] font-bold text-gold uppercase tracking-widest mb-2">
               Early Access
             </div>
-            <h3 className="text-[20px] font-bold text-white mb-2">
+            <h3 className="text-[20px] font-bold text-paper mb-2">
               Be among the first
             </h3>
-            <p className="text-[13px] text-white/45 leading-relaxed">
+            <p className="text-[13px] text-paper/45 leading-relaxed">
               Join the waitlist and get early access when we launch in your city.
               No spam — just one email when we're ready.
             </p>
@@ -367,8 +367,8 @@ const WaitlistSection = () => {
                 onClick={() => setRole(r)}
                 className={`flex-1 py-2 rounded-xl text-[12px] font-semibold capitalize transition-all ${
                   role === r
-                    ? 'bg-gold text-white'
-                    : 'bg-white/5 text-white/45 hover:bg-white/8 hover:text-white/70'
+                    ? 'bg-gold text-paper'
+                    : 'bg-white/5 text-paper/45 hover:bg-white/8 hover:text-paper/70'
                 }`}
               >
                 {r}
@@ -383,7 +383,7 @@ const WaitlistSection = () => {
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors"
             />
             <button
               type="submit"
@@ -478,7 +478,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="bg-[#0a0a0a] min-h-screen">
+    <div className="bg-ink min-h-screen">
 
       {/* ─────────────────────────────────────────────────────── */}
       {/* HERO SECTION */}
@@ -524,7 +524,7 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-[40px] lg:text-[64px] font-black text-white leading-[1.05] tracking-tight mb-6"
+              className="text-[40px] lg:text-[64px] font-black text-paper leading-[1.05] tracking-tight mb-6"
             >
               Rent or Buy<br />
               <span className="text-gold">Safely</span> in Nigeria.
@@ -535,7 +535,7 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-[16px] lg:text-[18px] text-white/55 leading-relaxed mb-10 max-w-xl"
+              className="text-[16px] lg:text-[18px] text-paper/55 leading-relaxed mb-10 max-w-xl"
             >
               Verified landlords. Escrow protection. Fair inspections.
               No more "Omonile" stress.
@@ -547,7 +547,7 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <form onSubmit={handleSearch} className="bg-[#0a0a0a]/80 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
+              <form onSubmit={handleSearch} className="bg-ink/80 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
                 <div className="flex flex-col lg:flex-row">
                   {/* State select */}
                   <div className="flex-1 flex items-center gap-3 px-5 py-4 border-b lg:border-b-0 lg:border-r border-white/8">
@@ -555,11 +555,11 @@ export default function Landing() {
                     <select
                       value={state}
                       onChange={e => setState(e.target.value)}
-                      className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/30 focus:outline-none appearance-none cursor-pointer"
+                      className="flex-1 bg-transparent text-[14px] text-paper placeholder:text-paper/30 focus:outline-none appearance-none cursor-pointer"
                     >
                       <option value="">All states</option>
                       {NIGERIAN_STATES.map(s => (
-                        <option key={s} value={s} className="bg-ink text-white">{s}</option>
+                        <option key={s} value={s} className="bg-ink text-paper">{s}</option>
                       ))}
                     </select>
                   </div>
@@ -570,7 +570,7 @@ export default function Landing() {
                     <select
                       value={propertyType}
                       onChange={e => setPropertyType(e.target.value)}
-                      className="bg-transparent text-[14px] text-white focus:outline-none appearance-none cursor-pointer"
+                      className="bg-transparent text-[14px] text-paper focus:outline-none appearance-none cursor-pointer"
                     >
                       <option value="all" className="bg-ink">All types</option>
                       <option value="house" className="bg-ink">House</option>
@@ -587,8 +587,8 @@ export default function Landing() {
                         onClick={() => setTransaction(t)}
                         className={`px-4 py-2 rounded-xl text-[13px] font-semibold capitalize transition-all ${
                           transaction === t
-                            ? 'bg-gold text-white'
-                            : 'text-white/45 hover:text-white'
+                            ? 'bg-gold text-paper'
+                            : 'text-paper/45 hover:text-paper'
                         }`}
                       >
                         {t === 'sell' ? 'Buy' : 'Rent'}
@@ -618,7 +618,7 @@ export default function Landing() {
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-2">
                     <Icon className="w-3.5 h-3.5 text-gold" />
-                    <span className="text-[12px] text-white/50 font-medium">{text}</span>
+                    <span className="text-[12px] text-paper/50 font-medium">{text}</span>
                   </div>
                 ))}
               </div>
@@ -628,7 +628,7 @@ export default function Landing() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce">
-          <ChevronDown className="w-4 h-4 text-white/20" />
+          <ChevronDown className="w-4 h-4 text-paper/20" />
         </div>
       </section>
 
@@ -662,10 +662,10 @@ export default function Landing() {
               <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                 The Process
               </div>
-              <h2 className="text-[28px] lg:text-[40px] font-black text-white tracking-tight">
+              <h2 className="text-[28px] lg:text-[40px] font-black text-paper tracking-tight">
                 Renting made safe and simple
               </h2>
-              <p className="text-[14px] text-white/45 mt-3 max-w-lg mx-auto">
+              <p className="text-[14px] text-paper/45 mt-3 max-w-lg mx-auto">
                 From search to move-in — every step is verified, protected, and transparent.
               </p>
             </div>
@@ -707,13 +707,13 @@ export default function Landing() {
                 <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">
                   Latest Listings
                 </div>
-                <h2 className="text-[24px] lg:text-[32px] font-black text-white tracking-tight">
+                <h2 className="text-[24px] lg:text-[32px] font-black text-paper tracking-tight">
                   Recently listed properties
                 </h2>
               </div>
               <Link
                 to="/listings"
-                className="hidden sm:flex items-center gap-2 text-[13px] font-semibold text-white/50 hover:text-gold transition-colors"
+                className="hidden sm:flex items-center gap-2 text-[13px] font-semibold text-paper/50 hover:text-gold transition-colors"
               >
                 View all <ArrowRight className="w-4 h-4" />
               </Link>
@@ -743,16 +743,16 @@ export default function Landing() {
             </div>
           ) : (
             <div className="bg-ink border border-white/6 rounded-2xl p-14 text-center">
-              <Home className="w-10 h-10 text-white/15 mx-auto mb-4" />
-              <p className="text-[15px] font-semibold text-white/40 mb-2">
+              <Home className="w-10 h-10 text-paper/15 mx-auto mb-4" />
+              <p className="text-[15px] font-semibold text-paper/40 mb-2">
                 Properties coming soon
               </p>
-              <p className="text-[13px] text-white/25">
+              <p className="text-[13px] text-paper/25">
                 Be the first to list your property on RentEasy.
               </p>
               <Link
                 to="/signup"
-                className="inline-flex items-center gap-2 mt-6 bg-gold text-white px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-gold-dark transition-colors"
+                className="inline-flex items-center gap-2 mt-6 bg-gold text-paper px-6 py-3 rounded-xl font-semibold text-[13px] hover:bg-gold-dark transition-colors"
               >
                 List your property <ArrowRight className="w-4 h-4" />
               </Link>
@@ -762,7 +762,7 @@ export default function Landing() {
           <div className="mt-8 text-center sm:hidden">
             <Link
               to="/listings"
-              className="inline-flex items-center gap-2 text-[13px] font-semibold text-white/50 hover:text-gold transition-colors"
+              className="inline-flex items-center gap-2 text-[13px] font-semibold text-paper/50 hover:text-gold transition-colors"
             >
               View all properties <ArrowRight className="w-4 h-4" />
             </Link>
@@ -796,10 +796,10 @@ export default function Landing() {
               <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                 Why Choose Us
               </div>
-              <h2 className="text-[28px] lg:text-[40px] font-black text-white tracking-tight">
+              <h2 className="text-[28px] lg:text-[40px] font-black text-paper tracking-tight">
                 Built for Nigerian reality
               </h2>
-              <p className="text-[14px] text-white/45 mt-3 max-w-lg mx-auto">
+              <p className="text-[14px] text-paper/45 mt-3 max-w-lg mx-auto">
                 We built every feature to solve real problems Nigerians face every day 
                 in the property market.
               </p>
@@ -851,7 +851,7 @@ export default function Landing() {
                   <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">
                     For Landlords & Agents
                   </div>
-                  <h2 className="text-[28px] lg:text-[36px] font-black text-white tracking-tight mb-5">
+                  <h2 className="text-[28px] lg:text-[36px] font-black text-paper tracking-tight mb-5">
                     List your property with confidence
                   </h2>
                   <ul className="space-y-3 mb-8">
@@ -864,7 +864,7 @@ export default function Landing() {
                     ].map(item => (
                       <li key={item} className="flex items-start gap-3">
                         <CheckCircle className="w-4 h-4 text-[#4ade80] flex-shrink-0 mt-0.5" />
-                        <span className="text-[13px] text-white/65">{item}</span>
+                        <span className="text-[13px] text-paper/65">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -877,7 +877,7 @@ export default function Landing() {
                     </Link>
                     <Link
                       to="/listings"
-                      className="bg-white/6 text-white px-8 py-3.5 rounded-xl font-semibold text-[14px] hover:bg-white/10 transition-colors border border-white/8"
+                      className="bg-white/6 text-paper px-8 py-3.5 rounded-xl font-semibold text-[14px] hover:bg-white/10 transition-colors border border-white/8"
                     >
                       Browse Properties
                     </Link>
@@ -894,8 +894,8 @@ export default function Landing() {
                   ].map(({ value, label, sub }) => (
                     <div key={label} className="bg-[#111a14] border border-white/5 rounded-2xl p-5 text-center aspect-square flex flex-col items-center justify-center">
                       <div className="text-[26px] font-black text-gold leading-none mb-1">{value}</div>
-                      <div className="text-[12px] font-semibold text-white mb-1">{label}</div>
-                      <div className="text-[10px] text-white/35">{sub}</div>
+                      <div className="text-[12px] font-semibold text-paper mb-1">{label}</div>
+                      <div className="text-[10px] text-paper/35">{sub}</div>
                     </div>
                   ))}
                 </div>
@@ -914,10 +914,10 @@ export default function Landing() {
             <div className="w-16 h-16 mx-auto mb-8 flex items-center justify-center">
               <RentEasyLogo size={64} />
             </div>
-            <h2 className="text-[28px] lg:text-[40px] font-black text-white tracking-tight mb-4">
+            <h2 className="text-[28px] lg:text-[40px] font-black text-paper tracking-tight mb-4">
               Ready to rent or list safely?
             </h2>
-            <p className="text-[15px] text-white/45 mb-10 max-w-md mx-auto">
+            <p className="text-[15px] text-paper/45 mb-10 max-w-md mx-auto">
               Join thousands of Nigerians already using RentEasy to find and list 
               properties without the stress.
             </p>
@@ -930,7 +930,7 @@ export default function Landing() {
               </Link>
               <Link
                 to="/listings"
-                className="bg-ink text-white px-10 py-4 rounded-xl font-bold text-[15px] hover:bg-[#111a14] transition-colors border border-white/8"
+                className="bg-ink text-paper px-10 py-4 rounded-xl font-bold text-[15px] hover:bg-[#111a14] transition-colors border border-white/8"
               >
                 Browse Properties
               </Link>

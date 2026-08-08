@@ -76,39 +76,39 @@ export default function Directory() {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <p className="text-[13px] font-bold text-white truncate">{p.full_name || 'RentEasy User'}</p>
+          <p className="text-[13px] font-bold text-paper truncate">{p.full_name || 'RentEasy User'}</p>
           <VerifiedBadge status={p.verification_status} size={12} />
         </div>
-        <p className="text-[11px] text-white/35 capitalize">{p.role}</p>
+        <p className="text-[11px] text-paper/35 capitalize">{p.role}</p>
         {p.lasrera_id && (
-          <p className="text-[10px] text-white/25 font-mono mt-0.5 truncate">{p.lasrera_id}</p>
+          <p className="text-[10px] text-paper/25 font-mono mt-0.5 truncate">{p.lasrera_id}</p>
         )}
         {!p.username && (
-          <p className="text-[10px] text-white/20 mt-0.5">Profile not public yet</p>
+          <p className="text-[10px] text-paper/20 mt-0.5">Profile not public yet</p>
         )}
       </div>
     </>
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pb-24" style={font}>
+    <div className="min-h-screen bg-ink pb-24" style={font}>
       <div className="max-w-5xl mx-auto px-5 py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-[22px] font-black text-white mb-1">Find an Agent or Landlord</h1>
-          <p className="text-[13px] text-white/40">Browse verified agents and landlords on RentEasy</p>
+          <h1 className="text-[22px] font-black text-paper mb-1">Find an Agent or Landlord</h1>
+          <p className="text-[13px] text-paper/40">Browse verified agents and landlords on RentEasy</p>
         </div>
 
         {/* Search + filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name or username..."
-              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
+              className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors"
             />
           </div>
           <div className="flex gap-2">
@@ -122,8 +122,8 @@ export default function Directory() {
                 onClick={() => setRoleFilter(opt.key)}
                 className={`px-4 py-3 rounded-xl text-[13px] font-bold whitespace-nowrap transition-colors ${
                   roleFilter === opt.key
-                    ? 'bg-gold text-white'
-                    : 'bg-white/5 text-white/40 hover:text-white/70'
+                    ? 'bg-gold text-paper'
+                    : 'bg-white/5 text-paper/40 hover:text-paper/70'
                 }`}
               >
                 {opt.label}
@@ -136,15 +136,15 @@ export default function Directory() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
             <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-            <p className="text-[13px] text-white/30">Loading...</p>
+            <p className="text-[13px] text-paper/30">Loading...</p>
           </div>
         ) : profiles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-16 h-16 bg-white/4 rounded-2xl flex items-center justify-center mb-4">
-              <Users className="w-7 h-7 text-white/20" />
+              <Users className="w-7 h-7 text-paper/20" />
             </div>
-            <p className="text-[15px] font-bold text-white/40 mb-1">No matches found</p>
-            <p className="text-[12px] text-white/20">Try a different search or filter.</p>
+            <p className="text-[15px] font-bold text-paper/40 mb-1">No matches found</p>
+            <p className="text-[12px] text-paper/20">Try a different search or filter.</p>
           </div>
         ) : (
           <>
@@ -174,7 +174,7 @@ export default function Directory() {
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] font-bold text-white/60 hover:text-white transition-colors disabled:opacity-40"
+                  className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] font-bold text-paper/60 hover:text-paper transition-colors disabled:opacity-40"
                 >
                   {loadingMore && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   Load More

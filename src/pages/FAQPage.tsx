@@ -116,9 +116,9 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-white/3 transition-colors"
       >
-        <span className="text-[14px] font-semibold text-white leading-snug">{q}</span>
+        <span className="text-[14px] font-semibold text-paper leading-snug">{q}</span>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />
+          <ChevronDown className="w-4 h-4 text-paper/40 flex-shrink-0" />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -130,7 +130,7 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
             transition={{ duration: 0.2 }}
           >
             <div className="px-5 pb-5 border-t border-white/5">
-              <p className="text-[13px] text-white/55 leading-relaxed pt-4">{a}</p>
+              <p className="text-[13px] text-paper/55 leading-relaxed pt-4">{a}</p>
             </div>
           </motion.div>
         )}
@@ -151,32 +151,32 @@ export default function FAQPage() {
   })).filter(cat => cat.questions.length > 0);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20" style={font}>
+    <div className="min-h-screen bg-ink pt-24 pb-20" style={font}>
       <div className="max-w-3xl mx-auto px-5">
 
         <div className="text-center mb-12">
           <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">FAQ</div>
-          <h1 className="text-[32px] font-black text-white mb-4">Frequently Asked Questions</h1>
-          <p className="text-[14px] text-white/45 max-w-lg mx-auto">
+          <h1 className="text-[32px] font-black text-paper mb-4">Frequently Asked Questions</h1>
+          <p className="text-[14px] text-paper/45 max-w-lg mx-auto">
             Everything you need to know about renting, listing, and transacting safely on RentEasy Nigeria.
           </p>
         </div>
 
         {/* Search */}
         <div className="relative mb-10">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/30 pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search questions..."
-            className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
+            className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors"
           />
         </div>
 
         {filtered.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-[14px] text-white/30">No questions found for "{search}"</p>
+            <p className="text-[14px] text-paper/30">No questions found for "{search}"</p>
             <button onClick={() => setSearch('')} className="mt-4 text-gold text-[13px] font-semibold">
               Clear search
             </button>
@@ -199,8 +199,8 @@ export default function FAQPage() {
         )}
 
         <div className="mt-16 bg-ink border border-white/6 rounded-2xl p-8 text-center">
-          <h3 className="text-[18px] font-bold text-white mb-2">Still have questions?</h3>
-          <p className="text-[13px] text-white/45 mb-6">
+          <h3 className="text-[18px] font-bold text-paper mb-2">Still have questions?</h3>
+          <p className="text-[13px] text-paper/45 mb-6">
             Our support team is available Monday to Friday, 9am to 6pm WAT.
           </p>
           

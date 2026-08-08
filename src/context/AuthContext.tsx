@@ -171,7 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (
       <div style={{
         minHeight: '100vh',
-        background: '#0a0a0a',
+        background: '#0B0D10',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -193,7 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (
       <div style={{
         minHeight: '100vh',
-        background: '#0a0a0a',
+        background: '#0B0D10',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

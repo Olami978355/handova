@@ -61,12 +61,12 @@ const RoleCard = ({
       </div>
     )}
     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-colors ${
-      active ? 'bg-gold text-black' : 'bg-white/5 text-white/40'
+      active ? 'bg-gold text-black' : 'bg-white/5 text-paper/40'
     }`}>
       {icon}
     </div>
-    <h3 className="text-[15px] font-bold text-white mb-2 leading-snug">{title}</h3>
-    <p className="text-[13px] text-white/45 leading-relaxed">{description}</p>
+    <h3 className="text-[15px] font-bold text-paper mb-2 leading-snug">{title}</h3>
+    <p className="text-[13px] text-paper/45 leading-relaxed">{description}</p>
   </button>
 );
 
@@ -76,7 +76,7 @@ const FeatureBullet = ({ text }: { text: string }) => (
     <div className="w-5 h-5 bg-gold/20 border border-gold/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
       <div className="w-1.5 h-1.5 bg-[#4ade80] rounded-full" />
     </div>
-    <span className="text-[13px] text-white/60 leading-relaxed">{text}</span>
+    <span className="text-[13px] text-paper/60 leading-relaxed">{text}</span>
   </div>
 );
 
@@ -241,7 +241,7 @@ export default function OnboardingWizard() {
   // ─────────────────────────────────────────────────────────────
   return (
     <div
-      className="min-h-screen bg-[#0a0a0a] flex flex-col"
+      className="min-h-screen bg-ink flex flex-col"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* ── Top bar ── */}
@@ -250,7 +250,7 @@ export default function OnboardingWizard() {
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             <RentEasyLogo size={30} />
-            <span className="text-[18px] font-extrabold tracking-tight text-white">
+            <span className="text-[18px] font-extrabold tracking-tight text-paper">
               Rent<span className="text-gold">Easy</span>
             </span>
           </div>
@@ -264,7 +264,7 @@ export default function OnboardingWizard() {
                     ? 'bg-[#4ade80] text-black'
                     : step === s
                     ? 'bg-gold text-black'
-                    : 'bg-white/10 text-white/30'
+                    : 'bg-white/10 text-paper/30'
                 }`}>
                   {step > s ? (
                     <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -299,10 +299,10 @@ export default function OnboardingWizard() {
                   <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                     Step 1 of 3
                   </div>
-                  <h1 className="text-[28px] lg:text-[36px] font-black text-white tracking-tight mb-3">
+                  <h1 className="text-[28px] lg:text-[36px] font-black text-paper tracking-tight mb-3">
                     How will you use RentEasy?
                   </h1>
-                  <p className="text-[14px] text-white/45 max-w-md mx-auto">
+                  <p className="text-[14px] text-paper/45 max-w-md mx-auto">
                     Choose your role to get a personalized experience. 
                     You can always change this later.
                   </p>
@@ -348,10 +348,10 @@ export default function OnboardingWizard() {
                   <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">
                     Step 2 of 3
                   </div>
-                  <h2 className="text-[26px] font-black text-white tracking-tight mb-2">
+                  <h2 className="text-[26px] font-black text-paper tracking-tight mb-2">
                     Complete your profile
                   </h2>
-                  <p className="text-[13px] text-white/45">
+                  <p className="text-[13px] text-paper/45">
                     This helps landlords and tenants know who they're dealing with.
                   </p>
                 </div>
@@ -380,11 +380,11 @@ export default function OnboardingWizard() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <User className="w-10 h-10 text-white/20" />
+                          <User className="w-10 h-10 text-paper/20" />
                         )}
                         {uploading && (
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                            <Loader2 className="w-6 h-6 text-white animate-spin" />
+                            <Loader2 className="w-6 h-6 text-paper animate-spin" />
                           </div>
                         )}
                       </div>
@@ -398,18 +398,18 @@ export default function OnboardingWizard() {
                         />
                       </label>
                     </div>
-                    <span className="text-[11px] text-white/30 font-medium">
+                    <span className="text-[11px] text-paper/30 font-medium">
                       Profile photo (optional · max 5MB)
                     </span>
                   </div>
 
                   {/* Full name */}
                   <div>
-                    <label className="block text-[12px] font-semibold text-white/50 uppercase tracking-wider mb-2">
+                    <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
                       Full Name <span className="text-red-400">*</span>
                     </label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none" />
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
                       <input
                         type="text"
                         value={formData.fullName}
@@ -418,18 +418,18 @@ export default function OnboardingWizard() {
                           if (error) setError(null);
                         }}
                         placeholder="Your full name"
-                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
                   </div>
 
                   {/* Phone */}
                   <div>
-                    <label className="block text-[12px] font-semibold text-white/50 uppercase tracking-wider mb-2">
+                    <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
                       Phone Number <span className="text-red-400">*</span>
                     </label>
                     <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none" />
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
                       <input
                         type="tel"
                         value={formData.phone}
@@ -438,25 +438,25 @@ export default function OnboardingWizard() {
                           if (error) setError(null);
                         }}
                         placeholder="+234 800 000 0000"
-                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
                   </div>
 
                   {/* State */}
                   <div>
-                    <label className="block text-[12px] font-semibold text-white/50 uppercase tracking-wider mb-2">
+                    <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
                       State of Residence <span className="text-red-400">*</span>
                     </label>
                     <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none" />
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
                       <select
                         value={formData.state}
                         onChange={e => {
                           setFormData(prev => ({ ...prev, state: e.target.value }));
                           if (error) setError(null);
                         }}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-gold transition-colors appearance-none cursor-pointer"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper focus:outline-none focus:border-gold transition-colors appearance-none cursor-pointer"
                       >
                         <option value="" className="bg-ink">Select your state</option>
                         {NIGERIAN_STATES.map(s => (
@@ -468,8 +468,8 @@ export default function OnboardingWizard() {
 
                   {/* Bio (optional) */}
                   <div>
-                    <label className="block text-[12px] font-semibold text-white/50 uppercase tracking-wider mb-2">
-                      Short Bio <span className="text-white/25 normal-case font-normal">(optional)</span>
+                    <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
+                      Short Bio <span className="text-paper/25 normal-case font-normal">(optional)</span>
                     </label>
                     <textarea
                       value={formData.bio}
@@ -483,10 +483,10 @@ export default function OnboardingWizard() {
                           : 'Tell tenants about yourself and your properties...'
                       }
                       rows={3}
-                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/25 focus:outline-none focus:border-gold transition-colors resize-none"
+                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors resize-none"
                     />
                     <div className="flex justify-end mt-1">
-                      <span className="text-[11px] text-white/25">{formData.bio.length}/200</span>
+                      <span className="text-[11px] text-paper/25">{formData.bio.length}/200</span>
                     </div>
                   </div>
 
@@ -494,7 +494,7 @@ export default function OnboardingWizard() {
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={() => setStep(1)}
-                      className="flex items-center gap-2 px-5 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[14px] font-semibold text-white/60 hover:bg-white/8 hover:text-white transition-all"
+                      className="flex items-center gap-2 px-5 py-3.5 bg-white/5 border border-white/8 rounded-xl text-[14px] font-semibold text-paper/60 hover:bg-white/8 hover:text-paper transition-all"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       Back
@@ -535,10 +535,10 @@ export default function OnboardingWizard() {
                   <div className="w-14 h-14 bg-gold/20 border border-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-7 h-7 text-[#4ade80]" />
                   </div>
-                  <h2 className="text-[26px] font-black text-white tracking-tight mb-2">
+                  <h2 className="text-[26px] font-black text-paper tracking-tight mb-2">
                     You're all set, {formData.fullName.split(' ')[0]}!
                   </h2>
-                  <p className="text-[13px] text-white/45">
+                  <p className="text-[13px] text-paper/45">
                     Your account is ready. Here's what you can do now.
                   </p>
                 </div>
@@ -578,7 +578,7 @@ export default function OnboardingWizard() {
                             <p className="text-[12px] font-semibold text-gold mb-1">
                               Get verified for instant listing approval
                             </p>
-                            <p className="text-[11px] text-white/40 leading-relaxed">
+                            <p className="text-[11px] text-paper/40 leading-relaxed">
                               Submit your NIN and ID. Verified landlords go live immediately.
                               Unverified listings wait for moderator review.
                             </p>
@@ -608,7 +608,7 @@ export default function OnboardingWizard() {
                             <p className="text-[12px] font-semibold text-gold mb-1">
                               Verification required to list properties
                             </p>
-                            <p className="text-[11px] text-white/40 leading-relaxed">
+                            <p className="text-[11px] text-paper/40 leading-relaxed">
                               Submit your NIN, Business Registration, and optional LASRERA ID.
                             </p>
                           </div>
@@ -638,7 +638,7 @@ export default function OnboardingWizard() {
                     </button>
                     <button
                       onClick={handleFinish}
-                      className="w-full bg-white/5 text-white/60 py-4 rounded-xl font-semibold text-[14px] hover:bg-white/8 hover:text-white transition-all border border-white/8"
+                      className="w-full bg-white/5 text-paper/60 py-4 rounded-xl font-semibold text-[14px] hover:bg-white/8 hover:text-paper transition-all border border-white/8"
                     >
                       Skip for now — explore the platform
                     </button>

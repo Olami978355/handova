@@ -85,9 +85,9 @@ const RightItem = ({ title, desc }: { title: string; desc: string }) => {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-white/3 transition-colors"
       >
-        <span className="text-[14px] font-semibold text-white">{title}</span>
+        <span className="text-[14px] font-semibold text-paper">{title}</span>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />
+          <ChevronDown className="w-4 h-4 text-paper/40 flex-shrink-0" />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -99,7 +99,7 @@ const RightItem = ({ title, desc }: { title: string; desc: string }) => {
             transition={{ duration: 0.2 }}
           >
             <div className="px-5 pb-5 border-t border-white/5">
-              <p className="text-[13px] text-white/55 leading-relaxed pt-4">{desc}</p>
+              <p className="text-[13px] text-paper/55 leading-relaxed pt-4">{desc}</p>
             </div>
           </motion.div>
         )}
@@ -113,7 +113,7 @@ export default function LegalGuidePage() {
   const active = rights.find(r => r.id === activeSection) || rights[0];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20" style={font}>
+    <div className="min-h-screen bg-ink pt-24 pb-20" style={font}>
       <div className="max-w-6xl mx-auto px-5">
 
         {/* Header */}
@@ -123,8 +123,8 @@ export default function LegalGuidePage() {
           </div>
           <div>
             <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">Know Your Rights</div>
-            <h1 className="text-[32px] font-black text-white mb-3">Nigerian Real Estate Legal Guide</h1>
-            <p className="text-[14px] text-white/45 max-w-2xl">
+            <h1 className="text-[32px] font-black text-paper mb-3">Nigerian Real Estate Legal Guide</h1>
+            <p className="text-[14px] text-paper/45 max-w-2xl">
               Understanding your rights as a tenant or landlord in Nigeria can protect you from exploitation, 
               illegal eviction, and financial loss. This guide is based on Nigerian property law.
             </p>
@@ -151,11 +151,11 @@ export default function LegalGuidePage() {
           </svg>
           <div>
             <div className="text-[10px] font-bold text-gold uppercase tracking-widest mb-2">A word from Barrister Amaka</div>
-            <p className="text-[14px] font-semibold text-white leading-snug mb-2">
+            <p className="text-[14px] font-semibold text-paper leading-snug mb-2">
               "Knowledge is your first line of defence. A tenant who knows their rights cannot be easily exploited. 
               A landlord who understands the law protects their investment."
             </p>
-            <p className="text-[12px] text-white/35">Property Law Specialist · Lagos Bar Association</p>
+            <p className="text-[12px] text-paper/35">Property Law Specialist · Lagos Bar Association</p>
           </div>
         </div>
 
@@ -164,7 +164,7 @@ export default function LegalGuidePage() {
           {/* Sidebar */}
           <div className="lg:w-64 flex-shrink-0">
             <div className="bg-ink border border-white/6 rounded-2xl p-4 lg:sticky lg:top-24">
-              <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3 px-2">Sections</p>
+              <p className="text-[10px] font-bold text-paper/30 uppercase tracking-widest mb-3 px-2">Sections</p>
               <div className="space-y-1">
                 {rights.map(right => {
                   const Icon = right.icon;
@@ -174,8 +174,8 @@ export default function LegalGuidePage() {
                       onClick={() => setActiveSection(right.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all text-left ${
                         activeSection === right.id
-                          ? 'bg-gold text-white'
-                          : 'text-white/50 hover:bg-white/5 hover:text-white'
+                          ? 'bg-gold text-paper'
+                          : 'text-paper/50 hover:bg-white/5 hover:text-paper'
                       }`}
                     >
                       <Icon className="w-4 h-4 flex-shrink-0" style={{
@@ -200,8 +200,8 @@ export default function LegalGuidePage() {
                   <active.icon className="w-6 h-6" style={{ color: active.color }} />
                 </div>
                 <div>
-                  <h2 className="text-[22px] font-black text-white">{active.title}</h2>
-                  <p className="text-[12px] text-white/30 mt-1">{active.law}</p>
+                  <h2 className="text-[22px] font-black text-paper">{active.title}</h2>
+                  <p className="text-[12px] text-paper/30 mt-1">{active.law}</p>
                 </div>
               </div>
 

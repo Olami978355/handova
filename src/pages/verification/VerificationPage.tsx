@@ -146,13 +146,13 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
   // ── Already verified ──
   if (profile?.verification_status === 'verified') {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-5" style={font}>
+      <div className="min-h-screen bg-ink flex items-center justify-center p-5" style={font}>
         <div className="max-w-md w-full bg-ink border border-white/8 rounded-2xl p-10 text-center">
           <div className="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Shield className="w-8 h-8 text-white" />
+            <Shield className="w-8 h-8 text-paper" />
           </div>
-          <h2 className="text-[24px] font-black text-white mb-3">You're Verified!</h2>
-          <p className="text-[13px] text-white/45 mb-8 leading-relaxed">
+          <h2 className="text-[24px] font-black text-paper mb-3">You're Verified!</h2>
+          <p className="text-[13px] text-paper/45 mb-8 leading-relaxed">
             Your account is fully verified. You can now list properties and close deals with confidence.
           </p>
           <button
@@ -169,13 +169,13 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
   // ── Submitted successfully ──
   if (success) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-5" style={font}>
+      <div className="min-h-screen bg-ink flex items-center justify-center p-5" style={font}>
         <div className="max-w-md w-full bg-ink border border-white/8 rounded-2xl p-10 text-center">
           <div className="w-16 h-16 bg-gold/10 border border-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Loader2 className="w-8 h-8 text-gold animate-spin" />
           </div>
-          <h2 className="text-[24px] font-black text-white mb-3">Under Review</h2>
-          <p className="text-[13px] text-white/45 mb-8 leading-relaxed">
+          <h2 className="text-[24px] font-black text-paper mb-3">Under Review</h2>
+          <p className="text-[13px] text-paper/45 mb-8 leading-relaxed">
             Your verification documents are being reviewed. We'll notify you within 24 hours.
           </p>
           <button
@@ -190,13 +190,13 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] py-8 px-5" style={font}>
+    <div className="min-h-screen bg-ink py-8 px-5" style={font}>
       <div className="max-w-xl mx-auto">
 
         {/* Back */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-[13px] font-semibold text-white/40 hover:text-white transition-colors mb-6"
+          className="flex items-center gap-2 text-[13px] font-semibold text-paper/40 hover:text-paper transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
@@ -207,8 +207,8 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
             <Shield className="w-6 h-6 text-gold" />
           </div>
           <div>
-            <h1 className="text-[22px] font-black text-white tracking-tight">Identity Verification</h1>
-            <p className="text-[12px] text-white/35">Complete verification to unlock all features</p>
+            <h1 className="text-[22px] font-black text-paper tracking-tight">Identity Verification</h1>
+            <p className="text-[12px] text-paper/35">Complete verification to unlock all features</p>
           </div>
         </div>
 
@@ -218,7 +218,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
             <Loader2 className="w-4 h-4 text-gold animate-spin flex-shrink-0" />
             <div>
               <p className="text-[12px] font-bold text-gold">Verification Pending</p>
-              <p className="text-[11px] text-white/35">We're reviewing your documents.</p>
+              <p className="text-[11px] text-paper/35">We're reviewing your documents.</p>
             </div>
           </div>
         )}
@@ -230,7 +230,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
               <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
               <p className="text-[12px] font-bold text-red-400">Verification Rejected</p>
             </div>
-            <p className="text-[11px] text-white/40 mb-3">
+            <p className="text-[11px] text-paper/40 mb-3">
               Reason: {(verificationRequest.rejection_reason as string) || 'Documents were unclear or invalid.'}
             </p>
             <button
@@ -261,8 +261,8 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                     step === s
                       ? 'bg-gold text-black'
                       : step > s
-                      ? 'bg-gold text-white'
-                      : 'bg-white/5 text-white/30'
+                      ? 'bg-gold text-paper'
+                      : 'bg-white/5 text-paper/30'
                   }`}>
                     {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
                   </div>
@@ -285,12 +285,12 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   className="bg-ink border border-white/6 rounded-2xl p-6 space-y-5"
                 >
                   <div>
-                    <h3 className="text-[16px] font-bold text-white mb-1">Enter your NIN</h3>
-                    <p className="text-[12px] text-white/35">Your 11-digit National Identification Number</p>
+                    <h3 className="text-[16px] font-bold text-paper mb-1">Enter your NIN</h3>
+                    <p className="text-[12px] text-paper/35">Your 11-digit National Identification Number</p>
                   </div>
 
                   <div className="relative">
-                    <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
+                    <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25" />
                     <input
                       type="text"
                       maxLength={11}
@@ -299,13 +299,13 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                         setFormData({ ...formData, nin: e.target.value.replace(/\D/g, '') })
                       }
                       placeholder="11-digit NIN"
-                      className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/60 transition-colors"
+                      className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/60 transition-colors"
                     />
                   </div>
 
                   <div className="flex items-center gap-2 p-3 bg-gold/5 border border-gold/10 rounded-xl">
                     <Shield className="w-3.5 h-3.5 text-gold flex-shrink-0" />
-                    <p className="text-[11px] text-white/40">
+                    <p className="text-[11px] text-paper/40">
                       Your NIN is encrypted and stored securely. It cannot be changed after submission.
                     </p>
                   </div>
@@ -330,8 +330,8 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   className="bg-ink border border-white/6 rounded-2xl p-6 space-y-5"
                 >
                   <div>
-                    <h3 className="text-[16px] font-bold text-white mb-1">Upload Government ID</h3>
-                    <p className="text-[12px] text-white/35">
+                    <h3 className="text-[16px] font-bold text-paper mb-1">Upload Government ID</h3>
+                    <p className="text-[12px] text-paper/35">
                       NIN slip, Voter's card, International Passport, or Driver's Licence
                     </p>
                   </div>
@@ -354,19 +354,19 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                     {uploading === 'ninDocUrl' ? (
                       <div className="flex flex-col items-center gap-2">
                         <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-                        <span className="text-[12px] text-white/40">Uploading...</span>
+                        <span className="text-[12px] text-paper/40">Uploading...</span>
                       </div>
                     ) : formData.ninDocUrl ? (
                       <div className="flex flex-col items-center gap-2">
                         <CheckCircle2 className="w-10 h-10 text-gold" />
                         <span className="text-[13px] font-bold text-gold">ID Uploaded</span>
-                        <span className="text-[11px] text-white/30">Click to replace</span>
+                        <span className="text-[11px] text-paper/30">Click to replace</span>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-2">
-                        <Upload className="w-10 h-10 text-white/15" />
-                        <span className="text-[13px] font-semibold text-white/40">Click to upload ID</span>
-                        <span className="text-[11px] text-white/20">JPG, PNG, PDF · Max 10MB</span>
+                        <Upload className="w-10 h-10 text-paper/15" />
+                        <span className="text-[13px] font-semibold text-paper/40">Click to upload ID</span>
+                        <span className="text-[11px] text-paper/20">JPG, PNG, PDF · Max 10MB</span>
                       </div>
                     )}
                   </label>
@@ -374,14 +374,14 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   <div className="flex gap-3">
                     <button
                       onClick={() => setStep(1)}
-                      className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                      className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
                     >
                       Back
                     </button>
                     <button
                       disabled={!formData.ninDocUrl}
                       onClick={() => (profile?.role === 'agent' ? setStep(3) : handleSubmit())}
-                      className="flex-[2] bg-gold text-white py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="flex-[2] bg-gold text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                       {profile?.role === 'agent' ? 'Next — Agent Credentials' : 'Submit Verification'}
@@ -400,29 +400,29 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   className="bg-ink border border-white/6 rounded-2xl p-6 space-y-5"
                 >
                   <div>
-                    <h3 className="text-[16px] font-bold text-white mb-1">Agent Credentials</h3>
-                    <p className="text-[12px] text-white/35">
+                    <h3 className="text-[16px] font-bold text-paper mb-1">Agent Credentials</h3>
+                    <p className="text-[12px] text-paper/35">
                       Business registration required. LASRERA ID optional (Lagos agents only).
                     </p>
                   </div>
 
                   {/* LASRERA ID */}
                   <div>
-                    <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
-                      LASRERA ID <span className="text-white/20 normal-case font-normal">(optional)</span>
+                    <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">
+                      LASRERA ID <span className="text-paper/20 normal-case font-normal">(optional)</span>
                     </label>
                     <input
                       type="text"
                       value={formData.lasreraId}
                       onChange={(e) => setFormData({ ...formData, lasreraId: e.target.value })}
                       placeholder="AG/2024/0001"
-                      className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/60 transition-colors"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/60 transition-colors"
                     />
                   </div>
 
                   {/* Business reg upload */}
                   <div>
-                    <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
+                    <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">
                       CAC Business Registration Certificate
                     </label>
                     <input
@@ -442,11 +442,11 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                     >
                       <div className="flex items-center gap-3">
                         <Building2
-                          className={`w-5 h-5 ${formData.businessRegUrl ? 'text-gold' : 'text-white/25'}`}
+                          className={`w-5 h-5 ${formData.businessRegUrl ? 'text-gold' : 'text-paper/25'}`}
                         />
                         <span
                           className={`text-[13px] font-semibold ${
-                            formData.businessRegUrl ? 'text-gold' : 'text-white/40'
+                            formData.businessRegUrl ? 'text-gold' : 'text-paper/40'
                           }`}
                         >
                           {formData.businessRegUrl ? 'Certificate Uploaded' : 'Upload CAC Certificate'}
@@ -455,7 +455,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                       {uploading === 'businessRegUrl' ? (
                         <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                       ) : (
-                        <Upload className="w-4 h-4 text-white/25" />
+                        <Upload className="w-4 h-4 text-paper/25" />
                       )}
                     </label>
                   </div>
@@ -463,7 +463,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
                   <div className="flex gap-3">
                     <button
                       onClick={() => setStep(2)}
-                      className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors"
+                      className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors"
                     >
                       Back
                     </button>

@@ -5,16 +5,16 @@ const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20" style={font}>
+    <div className="min-h-screen bg-ink pt-24 pb-20" style={font}>
 
       {/* Hero */}
       <div className="max-w-4xl mx-auto px-5 text-center mb-20">
         <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">About Us</div>
-        <h1 className="text-[36px] lg:text-[48px] font-black text-white leading-tight mb-6">
+        <h1 className="text-[36px] lg:text-[48px] font-black text-paper leading-tight mb-6">
           Nigeria's first escrow-protected<br />
           <span className="text-gold">real estate marketplace</span>
         </h1>
-        <p className="text-[16px] text-white/50 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-[16px] text-paper/50 leading-relaxed max-w-2xl mx-auto">
           We built RentEasy because we were tired of seeing Nigerians lose their hard-earned money to property scams, 
           ghost landlords, and Omonile stress. There had to be a better way.
         </p>
@@ -27,10 +27,10 @@ export default function AboutPage() {
             <Target className="w-6 h-6 text-gold" />
             <span className="text-[11px] font-bold text-gold uppercase tracking-widest">Our Mission</span>
           </div>
-          <h2 className="text-[28px] font-black text-white mb-4 max-w-2xl">
+          <h2 className="text-[28px] font-black text-paper mb-4 max-w-2xl">
             To make renting and letting property in Nigeria safe, transparent, and stress-free for everyone.
           </h2>
-          <p className="text-[14px] text-white/50 leading-relaxed max-w-2xl">
+          <p className="text-[14px] text-paper/50 leading-relaxed max-w-2xl">
             Whether you are a tenant looking for your first apartment in Lagos, a landlord in Abuja wanting guaranteed 
             payments, or an agent in Port Harcourt building a portfolio — RentEasy gives you the tools and protection 
             you need to transact with confidence.
@@ -41,8 +41,8 @@ export default function AboutPage() {
       {/* Problem we solve */}
       <div className="max-w-6xl mx-auto px-5 mb-20">
         <div className="text-center mb-10">
-          <h2 className="text-[28px] font-black text-white mb-3">The problem we solve</h2>
-          <p className="text-[14px] text-white/45 max-w-xl mx-auto">
+          <h2 className="text-[28px] font-black text-paper mb-3">The problem we solve</h2>
+          <p className="text-[14px] text-paper/45 max-w-xl mx-auto">
             The Nigerian rental market has long been broken. We are fixing it.
           </p>
         </div>
@@ -67,7 +67,7 @@ export default function AboutPage() {
             <div key={problem} className="bg-ink border border-white/6 rounded-2xl p-6">
               <div className="text-3xl mb-4">{emoji}</div>
               <h3 className="text-[16px] font-bold text-red-400 mb-3">{problem}</h3>
-              <p className="text-[13px] text-white/50 leading-relaxed">{solution}</p>
+              <p className="text-[13px] text-paper/50 leading-relaxed">{solution}</p>
             </div>
           ))}
         </div>
@@ -76,8 +76,8 @@ export default function AboutPage() {
       {/* How it works */}
       <div className="max-w-6xl mx-auto px-5 mb-20">
         <div className="text-center mb-10">
-          <h2 className="text-[28px] font-black text-white mb-3">How RentEasy works</h2>
-          <p className="text-[14px] text-white/45">Three simple steps to your new home</p>
+          <h2 className="text-[28px] font-black text-paper mb-3">How RentEasy works</h2>
+          <p className="text-[14px] text-paper/45">Three simple steps to your new home</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {[
@@ -104,15 +104,15 @@ export default function AboutPage() {
             },
           ].map(({ step, icon: Icon, title, desc, color }) => (
             <div key={step} className="bg-ink border border-white/6 rounded-2xl p-6 relative overflow-hidden">
-              <div className="absolute top-4 right-4 text-[40px] font-black text-white/4">{step}</div>
+              <div className="absolute top-4 right-4 text-[40px] font-black text-paper/4">{step}</div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
                 style={{ background: `${color}15`, border: `1px solid ${color}25` }}
               >
                 <Icon className="w-6 h-6" style={{ color }} />
               </div>
-              <h3 className="text-[16px] font-bold text-white mb-3">{title}</h3>
-              <p className="text-[13px] text-white/50 leading-relaxed">{desc}</p>
+              <h3 className="text-[16px] font-bold text-paper mb-3">{title}</h3>
+              <p className="text-[13px] text-paper/50 leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -121,7 +121,7 @@ export default function AboutPage() {
       {/* Values */}
       <div className="max-w-6xl mx-auto px-5 mb-20">
         <div className="text-center mb-10">
-          <h2 className="text-[28px] font-black text-white mb-3">What we stand for</h2>
+          <h2 className="text-[28px] font-black text-paper mb-3">What we stand for</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[
@@ -135,8 +135,8 @@ export default function AboutPage() {
                 <Icon className="w-5 h-5 text-gold" />
               </div>
               <div>
-                <h3 className="text-[14px] font-bold text-white mb-2">{title}</h3>
-                <p className="text-[13px] text-white/50 leading-relaxed">{desc}</p>
+                <h3 className="text-[14px] font-bold text-paper mb-2">{title}</h3>
+                <p className="text-[13px] text-paper/50 leading-relaxed">{desc}</p>
               </div>
             </div>
           ))}
@@ -146,8 +146,8 @@ export default function AboutPage() {
       {/* CTA */}
       <div className="max-w-3xl mx-auto px-5 text-center">
         <div className="bg-ink border border-gold/25 rounded-2xl p-10">
-          <h2 className="text-[24px] font-black text-white mb-4">Ready to rent safely?</h2>
-          <p className="text-[14px] text-white/45 mb-8">
+          <h2 className="text-[24px] font-black text-paper mb-4">Ready to rent safely?</h2>
+          <p className="text-[14px] text-paper/45 mb-8">
             Join thousands of Nigerians already using RentEasy to find and let properties without the stress.
           </p>
           <div className="flex gap-3 justify-center">
@@ -159,7 +159,7 @@ export default function AboutPage() {
             </a>
             <a
               href="/signup"
-              className="bg-white/5 text-white px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-white/8 transition-colors border border-white/8"
+              className="bg-white/5 text-paper px-6 py-3 rounded-xl font-bold text-[14px] hover:bg-white/8 transition-colors border border-white/8"
             >
               Create Account
             </a>

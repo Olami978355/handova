@@ -80,12 +80,12 @@ const DealOfferCard = ({
         <div className="flex items-center gap-2">
           <Tag className={`w-3.5 h-3.5 ${
             isAccepted ? 'text-gold'
-            : isDeclined || isExpired ? 'text-white/30'
+            : isDeclined || isExpired ? 'text-paper/30'
             : 'text-gold'
           }`} />
           <span className={`text-[11px] font-bold uppercase tracking-wider ${
             isAccepted ? 'text-gold'
-            : isDeclined || isExpired ? 'text-white/30'
+            : isDeclined || isExpired ? 'text-paper/30'
             : 'text-gold'
           }`}>
             {isAccepted ? 'Deal Accepted'
@@ -98,21 +98,21 @@ const DealOfferCard = ({
 
       <div className="p-4 space-y-3">
         <div>
-          <p className="text-[11px] text-white/30 mb-0.5">Agreed Price</p>
+          <p className="text-[11px] text-paper/30 mb-0.5">Agreed Price</p>
           <p className="text-[22px] font-black text-gold">
             {formatNaira(offer.agreed_price)}
           </p>
         </div>
         {offer.duration && (
           <div className="flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
-            <p className="text-[12px] text-white/60">{offer.duration}</p>
+            <Clock className="w-3.5 h-3.5 text-paper/30 flex-shrink-0" />
+            <p className="text-[12px] text-paper/60">{offer.duration}</p>
           </div>
         )}
         {offer.move_in_date && (
           <div className="flex items-center gap-2">
-            <Calendar className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
-            <p className="text-[12px] text-white/60">
+            <Calendar className="w-3.5 h-3.5 text-paper/30 flex-shrink-0" />
+            <p className="text-[12px] text-paper/60">
               Move-in: {new Date(offer.move_in_date).toLocaleDateString('en-NG', {
                 day: 'numeric', month: 'short', year: 'numeric'
               })}
@@ -120,7 +120,7 @@ const DealOfferCard = ({
           </div>
         )}
         {offer.note && (
-          <p className="text-[12px] text-white/50 italic leading-relaxed border-t border-white/5 pt-2">
+          <p className="text-[12px] text-paper/50 italic leading-relaxed border-t border-white/5 pt-2">
             "{offer.note}"
           </p>
         )}
@@ -135,14 +135,14 @@ const DealOfferCard = ({
             </button>
             <button
               onClick={onDecline}
-              className="w-10 h-10 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
+              className="w-10 h-10 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center text-paper/40 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
             >
               <XCircle className="w-4 h-4" />
             </button>
           </div>
         )}
         {isPending && isMe && (
-          <p className="text-[11px] text-white/30 text-center pt-1">
+          <p className="text-[11px] text-paper/30 text-center pt-1">
             Waiting for tenant response...
           </p>
         )}
@@ -150,7 +150,7 @@ const DealOfferCard = ({
           <button
             onClick={handleViewDeal}
             disabled={navigating}
-            className="w-full bg-gold text-white py-2.5 rounded-xl font-bold text-[12px] hover:bg-gold-dark transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full bg-gold text-paper py-2.5 rounded-xl font-bold text-[12px] hover:bg-gold-dark transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {navigating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'View Deal'}
           </button>
@@ -211,10 +211,10 @@ const CreateDealModal = ({
       >
         <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
           <div>
-            <h3 className="text-[15px] font-bold text-white">Create Custom Deal</h3>
-            <p className="text-[11px] text-white/35">Send a negotiated offer to the tenant</p>
+            <h3 className="text-[15px] font-bold text-paper">Create Custom Deal</h3>
+            <p className="text-[11px] text-paper/35">Send a negotiated offer to the tenant</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors">
+          <button onClick={onClose} className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-paper/40 hover:text-paper transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -226,22 +226,22 @@ const CreateDealModal = ({
             </div>
           )}
           <div>
-            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Agreed Price (₦) *</label>
+            <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">Agreed Price (₦) *</label>
             <input
               type="number"
               value={agreedPrice}
               onChange={e => { setAgreedPrice(e.target.value); setLocalError(null); }}
               placeholder="e.g. 900000"
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/50 transition-colors"
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/50 transition-colors"
             />
             {agreedPrice && !isNaN(parseInt(agreedPrice)) && (
               <p className="text-[11px] text-gold mt-1 ml-1">= {formatNaira(parseInt(agreedPrice))}</p>
             )}
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Duration</label>
+            <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">Duration</label>
             <select value={duration} onChange={e => setDuration(e.target.value)}
-              className="w-full px-4 py-3 bg-ink border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-gold/50 transition-colors appearance-none">
+              className="w-full px-4 py-3 bg-ink border border-white/8 rounded-xl text-[13px] text-paper outline-none focus:border-gold/50 transition-colors appearance-none">
               <option value="6 months" className="bg-ink">6 months</option>
               <option value="1 year" className="bg-ink">1 year</option>
               <option value="2 years" className="bg-ink">2 years</option>
@@ -250,22 +250,22 @@ const CreateDealModal = ({
             </select>
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Proposed Move-in Date *</label>
+            <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">Proposed Move-in Date *</label>
             <input type="date" value={moveInDate} onChange={e => setMoveInDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white outline-none focus:border-gold/50 transition-colors" />
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper outline-none focus:border-gold/50 transition-colors" />
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">
-              Note <span className="text-white/20 normal-case font-normal">(optional)</span>
+            <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">
+              Note <span className="text-paper/20 normal-case font-normal">(optional)</span>
             </label>
             <textarea value={note} onChange={e => setNote(e.target.value)}
               placeholder="Any additional terms or conditions..." rows={2}
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-white placeholder-white/25 outline-none focus:border-gold/50 transition-colors resize-none" />
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/50 transition-colors resize-none" />
           </div>
-          <p className="text-[11px] text-white/25 text-center">This offer expires in 3 days if not accepted</p>
+          <p className="text-[11px] text-paper/25 text-center">This offer expires in 3 days if not accepted</p>
           <div className="flex gap-3 pt-1">
-            <button onClick={onClose} className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-white/40 hover:bg-white/5 transition-colors">Cancel</button>
+            <button onClick={onClose} className="flex-1 py-3.5 rounded-xl font-bold text-[14px] text-paper/40 hover:bg-white/5 transition-colors">Cancel</button>
             <button onClick={handleSubmit} disabled={!agreedPrice || sending}
               className="flex-[2] bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
               {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tag className="w-4 h-4" />}
@@ -534,19 +534,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   return (
     <>
       <div className="flex-1 flex flex-col h-full overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-[#0a0a0a]">
+        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-ink">
           {loading && resolvedConversationId ? (
             <div className="flex flex-col items-center justify-center h-full gap-3">
               <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-              <p className="text-[12px] text-white/25">Loading messages...</p>
+              <p className="text-[12px] text-paper/25">Loading messages...</p>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center gap-2">
               <div className="w-14 h-14 bg-white/4 border border-white/6 rounded-2xl flex items-center justify-center mb-1">
-                <Send className="w-6 h-6 text-white/15" />
+                <Send className="w-6 h-6 text-paper/15" />
               </div>
-              <p className="text-[14px] font-bold text-white/30">No messages yet</p>
-              <p className="text-[12px] text-white/20">Say hello to {otherParticipantName || 'start the conversation'}</p>
+              <p className="text-[14px] font-bold text-paper/30">No messages yet</p>
+              <p className="text-[12px] text-paper/20">Say hello to {otherParticipantName || 'start the conversation'}</p>
             </div>
           ) : (
             <AnimatePresence initial={false}>
@@ -582,13 +582,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             value={editText}
                             onChange={e => setEditText(e.target.value)}
                             rows={2}
-                            className="w-full px-3 py-2 bg-white/5 border border-gold/40 rounded-xl text-[13px] text-white outline-none resize-none"
+                            className="w-full px-3 py-2 bg-white/5 border border-gold/40 rounded-xl text-[13px] text-paper outline-none resize-none"
                             autoFocus
                           />
                           <div className="flex gap-2 mt-1.5">
                             <button
                               onClick={() => { setEditingId(null); setEditText(''); }}
-                              className="flex-1 py-1.5 rounded-lg text-[11px] font-bold text-white/40 bg-white/5 hover:text-white transition-colors"
+                              className="flex-1 py-1.5 rounded-lg text-[11px] font-bold text-paper/40 bg-white/5 hover:text-paper transition-colors"
                             >
                               Cancel
                             </button>
@@ -610,8 +610,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                           onTouchEnd={endLongPress}
                           className={`px-4 py-2.5 text-[13px] leading-relaxed break-words cursor-pointer select-none ${
                             isMe
-                              ? 'bg-gold text-white rounded-2xl rounded-tr-sm'
-                              : 'bg-ink border border-white/8 text-white/85 rounded-2xl rounded-tl-sm'
+                              ? 'bg-gold text-paper rounded-2xl rounded-tr-sm'
+                              : 'bg-ink border border-white/8 text-paper/85 rounded-2xl rounded-tl-sm'
                           } ${isDeleted ? 'italic opacity-50' : ''}`}
                         >
                           {msg.quoted_message && !isDeleted && (
@@ -639,7 +639,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             {!isDeleted && (
                               <button
                                 onClick={() => { setQuotedMessage(msg); setMenuMessageId(null); }}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-white/70 hover:bg-white/8 rounded-lg transition-colors"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-paper/70 hover:bg-white/8 rounded-lg transition-colors"
                               >
                                 <Reply className="w-3.5 h-3.5" /> Quote
                               </button>
@@ -647,7 +647,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             {canEdit && (
                               <button
                                 onClick={() => startEdit(msg)}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-white/70 hover:bg-white/8 rounded-lg transition-colors"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-paper/70 hover:bg-white/8 rounded-lg transition-colors"
                               >
                                 <Pencil className="w-3.5 h-3.5" /> Edit
                               </button>
@@ -655,7 +655,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             {!isDeleted && (
                               <button
                                 onClick={() => handleDeleteMessage(msg, false)}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-white/70 hover:bg-white/8 rounded-lg transition-colors"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-paper/70 hover:bg-white/8 rounded-lg transition-colors"
                               >
                                 <Trash2 className="w-3.5 h-3.5" /> Delete for me
                               </button>
@@ -673,7 +673,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                       )}
 
                       <div className="flex items-center gap-1.5 mt-1 px-1">
-                        <span className="text-[10px] text-white/20">
+                        <span className="text-[10px] text-paper/20">
                           {isOptimistic ? 'Sending...' : formatRelativeTime(msg.created_at)}
                           {msg.edited_at && !isDeleted ? ' · edited' : ''}
                         </span>
@@ -711,11 +711,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 <p className="text-[10px] font-bold text-gold uppercase tracking-wider mb-0.5">
                   Replying to {quotedMessage.sender_id === user?.id ? 'yourself' : (otherParticipantName || 'them')}
                 </p>
-                <p className="text-[12px] text-white/50 truncate">{quotedMessage.content}</p>
+                <p className="text-[12px] text-paper/50 truncate">{quotedMessage.content}</p>
               </div>
               <button
                 onClick={() => setQuotedMessage(null)}
-                className="w-6 h-6 flex-shrink-0 bg-white/5 rounded-lg flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                className="w-6 h-6 flex-shrink-0 bg-white/5 rounded-lg flex items-center justify-center text-paper/40 hover:text-paper transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -750,7 +750,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingMedia}
-              className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-white/40 hover:text-white transition-colors disabled:opacity-40"
+              className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-paper/40 hover:text-paper transition-colors disabled:opacity-40"
             >
               {uploadingMedia ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
             </button>
@@ -762,19 +762,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 onKeyDown={handleKeyDown}
                 placeholder={`Message ${otherParticipantName || ''}...`}
                 rows={1}
-                className="w-full bg-transparent outline-none resize-none text-[13px] text-white placeholder-white/25 leading-relaxed"
+                className="w-full bg-transparent outline-none resize-none text-[13px] text-paper placeholder-white/25 leading-relaxed"
                 style={{ minHeight: '22px', maxHeight: '120px' }}
               />
             </div>
             <button
               onClick={() => handleSend()}
               disabled={!newMessage.trim() || isSending}
-              className="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-white hover:bg-gold-dark disabled:opacity-35 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
+              className="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-paper hover:bg-gold-dark disabled:opacity-35 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
             >
               {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-[10px] text-white/15 mt-1.5 ml-1">Enter to send · Shift+Enter for new line</p>
+          <p className="text-[10px] text-paper/15 mt-1.5 ml-1">Enter to send · Shift+Enter for new line</p>
         </div>
       </div>
 
