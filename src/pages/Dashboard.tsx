@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { supabase, requireValidSession } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { InspectionDelegateInvite } from '../components/inspection/InspectionDelegateInvite';
+import { PendingInspectionDelegateInvites } from '../components/inspection/PendingInspectionDelegateInvites';
 import { FeatureCarousel } from '../components/dashboard/FeatureCarousel';
 import { useAuth } from '../context/AuthContext';
 import { Property, Deal, InspectionBooking } from '../types';
@@ -632,6 +633,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-5 lg:px-8 py-6">
         {loading ? <DashboardSkeleton /> : (
           <div className="space-y-6">
+            <PendingInspectionDelegateInvites />
             <FeatureCarousel />
 
             {/* Verification nudge */}
