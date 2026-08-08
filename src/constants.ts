@@ -1,3 +1,6 @@
+// Digital agent ID card — built but not launched yet. Flip to true when ready.
+export const ID_CARD_FEATURE_ENABLED = false;
+
 export const NIGERIAN_STATES = [
   "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", 
   "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT - Abuja", "Gombe", 

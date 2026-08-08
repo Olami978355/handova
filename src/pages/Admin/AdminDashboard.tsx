@@ -7,6 +7,7 @@ import {
   Bell, Settings, LogOut, CreditCard
 } from 'lucide-react';
 import CardRequestQueue from './CardRequestQueue';
+import { ID_CARD_FEATURE_ENABLED } from '../../constants';
 import { useAdmin } from '../../hooks/useAdmin';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -78,7 +79,7 @@ export default function AdminDashboard() {
     { id: 'properties', label: 'Properties', icon: Building2, roles: ['admin', 'moderator'] },
     { id: 'disputes', label: 'Disputes', icon: AlertCircle, roles: ['admin', 'moderator'] },
     { id: 'fund-releases', label: 'Fund Releases', icon: DollarSign, roles: ['admin', 'moderator'] },
-    { id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] },
+    ...(ID_CARD_FEATURE_ENABLED ? [{ id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] }] : []),
     { id: 'reports', label: 'Reports', icon: AlertCircle, roles: ['admin', 'moderator'] },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp, roles: ['admin', 'moderator'] },
     { id: 'logs', label: 'Logs', icon: History, roles: ['admin'] },

@@ -56,7 +56,7 @@ export default function CardRequestQueue() {
       await supabase.from('notifications').insert({
         user_id: agentId,
         title: 'Digital ID Card Approved! 🎉',
-        body: 'Your RentEasy Verified Agent Digital ID is now ready. View it on your profile.',
+        body: 'Your Handova Verified Agent Digital ID is now ready. View it on your profile.',
         type: 'verification_approved',
         link: '/profile',
       });

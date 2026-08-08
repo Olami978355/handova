@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgentCardRequest } from '../components/profile/AgentCardRequest';
+import { ID_CARD_FEATURE_ENABLED } from '../constants';
 import { PayoutSettings } from '../components/profile/PayoutSettings';
 import { ChangePasswordSection } from '../components/profile/ChangePasswordSection';
 import { supabase } from '../lib/supabase';
@@ -300,7 +301,7 @@ export default function Profile() {
               </div>
             </div>
             {/* Agent/Landlord Digital ID Card — NEW */}
-            <AgentCardRequest />
+            {ID_CARD_FEATURE_ENABLED && <AgentCardRequest />}
 
           </div>
 

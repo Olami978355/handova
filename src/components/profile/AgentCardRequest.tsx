@@ -67,12 +67,12 @@ export const AgentCardRequest: React.FC = () => {
             <CreditCard className="w-5 h-5 text-white/30" />
           </div>
           <div>
-            <h3 className="text-[14px] font-bold text-white">RentEasy Digital ID</h3>
+            <h3 className="text-[14px] font-bold text-white">Handova Digital ID</h3>
             <p className="text-[11px] text-white/30">Verify your account to request one</p>
           </div>
         </div>
         <p className="text-[12px] text-white/40 leading-relaxed">
-          Complete NIN verification first to become eligible for a RentEasy Verified Agent Digital ID Card.
+          Complete NIN verification first to become eligible for a Handova Verified Agent Digital ID Card.
         </p>
       </div>
     );
@@ -93,7 +93,7 @@ export const AgentCardRequest: React.FC = () => {
           <CreditCard className="w-5 h-5 text-gold" />
         </div>
         <div>
-          <h3 className="text-[14px] font-bold text-white">RentEasy Digital ID</h3>
+          <h3 className="text-[14px] font-bold text-white">Handova Digital ID</h3>
           <p className="text-[11px] text-white/30">Show this to tenants in person to verify your identity</p>
         </div>
       </div>
@@ -166,7 +166,7 @@ const DigitalIDCard: React.FC<{ cardId: string }> = ({ cardId }) => {
       <div className="relative flex items-start justify-between mb-4">
         <div>
           <p className="text-[10px] font-bold text-gold uppercase tracking-widest mb-0.5">Verified Agent</p>
-          <p className="text-[16px] font-black text-white">RentEasy ID</p>
+          <p className="text-[16px] font-black text-white">Handova ID</p>
         </div>
         <Shield className="w-6 h-6 text-gold" />
       </div>
@@ -190,7 +190,7 @@ const DigitalIDCard: React.FC<{ cardId: string }> = ({ cardId }) => {
 
       <div className="relative mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
         <p className="text-[10px] text-white/30 leading-relaxed max-w-[180px]">
-          Scan to verify this agent's profile on RentEasy
+          Scan to verify this agent's profile on Handova
         </p>
         <img
           src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&bgcolor=0a1f11&color=ffffff&data=${encodeURIComponent(profileUrl)}`}
