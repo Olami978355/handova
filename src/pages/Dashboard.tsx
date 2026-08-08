@@ -9,6 +9,7 @@ import {
 import { motion } from 'framer-motion';
 import { supabase, requireValidSession } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import { InspectionDelegateInvite } from '../components/inspection/InspectionDelegateInvite';
 import { FeatureCarousel } from '../components/dashboard/FeatureCarousel';
 import { useAuth } from '../context/AuthContext';
 import { Property, Deal, InspectionBooking } from '../types';
@@ -860,6 +861,7 @@ export default function Dashboard() {
                                 {timeAgo(booking.created_at)}
                               </span>
                             </div>
+                            <InspectionDelegateInvite bookingId={booking.id} isTenant={isTenant} />
 
                             {booking.confirmed_date && (
                               <div className="flex items-center gap-2 mt-2 p-2.5 bg-gold/8 border border-gold/15 rounded-xl">
