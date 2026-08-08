@@ -9,17 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { NotificationBell } from './notifications/NotificationBell';
 import { useConversationsContext } from '../context/ConversationsContext';
+import { HandovaLogo } from './brand/HandovaMark';
 
-const HandovaLogo = ({ size = 32 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none">
-    <path d="M-50 -70 L-20 -55 L-20 55 L-50 70 Z" fill="#D4AF37" />
-    <path d="M50 -70 L20 -55 L20 55 L50 70 Z" fill="#D4AF37" />
-    <circle cx="-32" cy="0" r="17" fill="none" stroke="#D4AF37" strokeWidth="9" />
-    <rect x="-15" y="-4.5" width="35" height="9" fill="#D4AF37" />
-    <rect x="10" y="4.5" width="8" height="10" fill="#D4AF37" />
-    <rect x="22" y="4.5" width="8" height="10" fill="#D4AF37" />
-  </svg>
-);
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,7 +58,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-5 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <HandovaLogo size={34} />
+            <HandovaLogo size={34} animateKey />
             <span className="text-[20px] font-extrabold tracking-tight text-paper leading-none">
               Hand<span className="text-gold">ova</span>
             </span>
