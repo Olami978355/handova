@@ -141,8 +141,6 @@ export default function PropertyModeration() {
           <option value="pending_review" className="bg-ink">Pending Review</option>
           <option value="active" className="bg-ink">Active</option>
           <option value="inactive" className="bg-ink">Suspended</option>
-          <option value="sold" className="bg-ink">Sold</option>
-          <option value="rented" className="bg-ink">Rented</option>
         </select>
       </div>
 

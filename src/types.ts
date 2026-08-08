@@ -54,8 +54,6 @@ export type PropertyStatus =
   | 'active'
   | 'pending_review'
   | 'inactive'
-  | 'sold'
-  | 'rented'
   | 'flagged';
 
 export interface Property {

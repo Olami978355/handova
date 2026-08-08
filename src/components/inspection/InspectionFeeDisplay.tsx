@@ -54,12 +54,12 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   tenant_declined: {
     label: 'Inspection Declined',
     description: 'You declined after inspection. A 70% refund has been processed.',
-    color: 'text-white/40',
+    color: 'text-paper/40',
   },
   refunded: {
     label: 'Refunded',
     description: 'Your inspection fee has been refunded.',
-    color: 'text-white/40',
+    color: 'text-paper/40',
   },
   dispute_raised: {
     label: 'Dispute Raised',
@@ -69,7 +69,7 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   dispute_resolved: {
     label: 'Dispute Resolved',
     description: 'The dispute has been resolved. Check your dashboard for details.',
-    color: 'text-white/40',
+    color: 'text-paper/40',
   },
 };
 
@@ -124,25 +124,6 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
   // Hide for property owner
   if (profile?.id === property.owner_id) return null;
 
-  // Property no longer available
-  if (property.status === 'rented' || property.status === 'sold') {
-    return (
-      <div className="bg-ink border border-white/6 rounded-2xl p-5 text-center"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <AlertCircle className="w-8 h-8 text-white/20 mx-auto mb-2" />
-        <p className="text-[13px] font-semibold text-white/40 mb-1">
-          {property.status === 'rented' ? 'This property has been rented' : 'This property has been sold'}
-        </p>
-        <p className="text-[11px] text-white/25 mb-4">It is no longer accepting new bookings.</p>
-        <button
-          onClick={() => navigate('/listings')}
-          className="text-[12px] text-gold/60 hover:text-gold transition-colors flex items-center gap-1 mx-auto"
-        >
-          Browse similar properties <ArrowRight className="w-3 h-3" />
-        </button>
-      </div>
-    );
-  }
 
   // Active escrow deal on property
   if (property.has_active_deal) {
@@ -155,7 +136,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
         <p className="text-[12px] font-bold text-gold uppercase tracking-wider mb-1">
           Deal In Progress
         </p>
-        <p className="text-[12px] text-white/40 leading-relaxed">
+        <p className="text-[12px] text-paper/40 leading-relaxed">
           A tenant is currently in escrow for this property. New inspection bookings are paused.
         </p>
       </div>
@@ -169,9 +150,9 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div className="flex items-center gap-2 mb-3">
           <Shield className="w-4 h-4 text-gold" />
-          <p className="text-[13px] font-bold text-white">Book an Inspection</p>
+          <p className="text-[13px] font-bold text-paper">Book an Inspection</p>
         </div>
-        <p className="text-[12px] text-white/40 mb-4 leading-relaxed">
+        <p className="text-[12px] text-paper/40 mb-4 leading-relaxed">
           Sign in to book a viewing or proceed to rent this property securely via escrow.
         </p>
         <button
@@ -198,7 +179,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
     const statusInfo = STATUS_INFO[existingBooking.status] || {
       label: existingBooking.status.replace(/_/g, ' '),
       description: 'Check your dashboard for details.',
-      color: 'text-white/50',
+      color: 'text-paper/50',
     };
 
     const canGoToDeal = existingBooking.status === 'escrow_started';
@@ -208,7 +189,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
       <div className="bg-ink border border-white/6 rounded-2xl overflow-hidden"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div className="px-5 pt-5 pb-4 border-b border-white/5">
-          <h3 className="text-[14px] font-bold text-white">Your Inspection</h3>
+          <h3 className="text-[14px] font-bold text-paper">Your Inspection</h3>
         </div>
         <div className="p-5 space-y-4">
           {/* Status card */}
@@ -220,13 +201,13 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             <p className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${statusInfo.color}`}>
               {statusInfo.label}
             </p>
-            <p className="text-[12px] text-white/50 leading-relaxed">
+            <p className="text-[12px] text-paper/50 leading-relaxed">
               {statusInfo.description}
             </p>
             {existingBooking.confirmed_date && (
               <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/8">
                 <Calendar className="w-3.5 h-3.5 text-gold" />
-                <span className="text-[12px] font-semibold text-white">
+                <span className="text-[12px] font-semibold text-paper">
                   {new Date(existingBooking.confirmed_date).toLocaleDateString('en-NG', {
                     weekday: 'long', day: 'numeric', month: 'long'
                   })}
@@ -240,7 +221,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           {existingBooking.refund_amount && existingBooking.refund_amount > 0 && (
             <div className="flex items-center gap-2 p-3 bg-white/4 border border-white/6 rounded-xl">
               <CheckCircle className="w-3.5 h-3.5 text-[#4ade80] flex-shrink-0" />
-              <p className="text-[12px] text-white/50">
+              <p className="text-[12px] text-paper/50">
                 Refund of {formatNaira(existingBooking.refund_amount)} processed
                 ({existingBooking.refund_percentage}%)
               </p>
@@ -252,7 +233,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             className={`w-full py-3 rounded-xl font-bold text-[13px] transition-colors flex items-center justify-center gap-2 ${
               canGoToDeal
                 ? 'bg-gold text-black hover:bg-[#e0b030]'
-                : 'bg-white/5 border border-white/8 text-white hover:bg-white/8'
+                : 'bg-white/5 border border-white/8 text-paper hover:bg-white/8'
             }`}
           >
             {canGoToDeal ? 'Complete Your Deal' : 'Manage in Dashboard'}
@@ -268,8 +249,8 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
     <div className="bg-ink border border-white/6 rounded-2xl overflow-hidden"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="px-5 pt-5 pb-4 border-b border-white/5">
-        <h3 className="text-[15px] font-bold text-white mb-0.5">Ready to proceed?</h3>
-        <p className="text-[12px] text-white/40">
+        <h3 className="text-[15px] font-bold text-paper mb-0.5">Ready to proceed?</h3>
+        <p className="text-[12px] text-paper/40">
           How would you like to move forward with this property?
         </p>
       </div>
@@ -284,11 +265,11 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
         >
           {startingChat
             ? <Loader2 className="w-4 h-4 text-gold animate-spin flex-shrink-0" />
-            : <MessageCircle className="w-4 h-4 text-white/30 flex-shrink-0" />
+            : <MessageCircle className="w-4 h-4 text-paper/30 flex-shrink-0" />
           }
           <div>
-            <p className="text-[12px] font-semibold text-white/60">Have questions?</p>
-            <p className="text-[11px] text-white/30">Chat with the {property.profiles?.role || 'owner'} first — it's free</p>
+            <p className="text-[12px] font-semibold text-paper/60">Have questions?</p>
+            <p className="text-[11px] text-paper/30">Chat with the {property.profiles?.role || 'owner'} first — it's free</p>
           </div>
         </button>
 
@@ -299,16 +280,16 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
               <span className="text-[10px] font-bold text-gold bg-gold/10 px-2 py-0.5 rounded-full">
                 Recommended
               </span>
-              <h4 className="text-[14px] font-bold text-white mt-1.5 mb-0.5">
+              <h4 className="text-[14px] font-bold text-paper mt-1.5 mb-0.5">
                 Book an Inspection
               </h4>
-              <p className="text-[11px] text-white/40 leading-relaxed">
+              <p className="text-[11px] text-paper/40 leading-relaxed">
                 Visit the property before committing. Pay a small fee — mostly refundable.
               </p>
             </div>
             <div className="text-right flex-shrink-0">
               <div className="text-[18px] font-black text-gold">{formatFee(inspectionFee)}</div>
-              <div className="text-[10px] text-white/30">fee</div>
+              <div className="text-[10px] text-paper/30">fee</div>
             </div>
           </div>
 
@@ -320,14 +301,14 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="text-[#4ade80] text-[11px] flex-shrink-0">{item.icon}</span>
-                <span className="text-[11px] text-white/45">{item.text}</span>
+                <span className="text-[11px] text-paper/45">{item.text}</span>
               </div>
             ))}
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="w-full bg-gold text-white py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-gold text-paper py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors flex items-center justify-center gap-2"
           >
             <Calendar className="w-4 h-4" />
             Book Inspection — {formatFee(inspectionFee)}
@@ -336,16 +317,16 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-white/6" />
-          <span className="text-[11px] text-white/20 font-medium">or</span>
+          <span className="text-[11px] text-paper/20 font-medium">or</span>
           <div className="flex-1 h-px bg-white/6" />
         </div>
 
         {/* OPTION 2 — Skip inspection */}
         <div className="bg-white/3 border border-white/6 rounded-xl p-4">
-          <h4 className="text-[13px] font-bold text-white mb-1">
+          <h4 className="text-[13px] font-bold text-paper mb-1">
             Already seen this property?
           </h4>
-          <p className="text-[11px] text-white/35 mb-3 leading-relaxed">
+          <p className="text-[11px] text-paper/35 mb-3 leading-relaxed">
             Skip the inspection and pay rent directly. Your money is still held in escrow and only released after you confirm move-in.
           </p>
 
@@ -356,19 +337,19 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
               
             ].map((row, i) => (
               <div key={i} className="flex justify-between">
-                <span className="text-[11px] text-white/35">{row.label}</span>
-                <span className="text-[11px] text-white/60">{row.value}</span>
+                <span className="text-[11px] text-paper/35">{row.label}</span>
+                <span className="text-[11px] text-paper/60">{row.value}</span>
               </div>
             ))}
             <div className="flex justify-between pt-1.5 border-t border-white/5">
-              <span className="text-[12px] font-bold text-white">Total</span>
+              <span className="text-[12px] font-bold text-paper">Total</span>
               <span className="text-[13px] font-black text-gold">{formatNaira(totalTenantPays)}</span>
             </div>
           </div>
 
           <div className="flex items-start gap-2 mb-3 p-3 bg-gold/5 border border-gold/10 rounded-xl">
             <Info className="w-3.5 h-3.5 text-gold/50 flex-shrink-0 mt-0.5" />
-            <p className="text-[11px] text-white/35 mb-3 leading-relaxed">
+            <p className="text-[11px] text-paper/35 mb-3 leading-relaxed">
   Already viewed this property? Contact the owner via chat. They can send you a custom deal offer which you can accept and pay securely via escrow.
 </p>
           </div>
@@ -376,7 +357,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
        <button
   onClick={handleStartChat}
   disabled={startingChat}
-  className="w-full bg-white/5 border border-white/10 text-white/60 py-3 rounded-xl font-semibold text-[13px] hover:bg-white/8 hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+  className="w-full bg-white/5 border border-white/10 text-paper/60 py-3 rounded-xl font-semibold text-[13px] hover:bg-white/8 hover:text-paper transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
 >
   {startingChat
     ? <Loader2 className="w-4 h-4 animate-spin" />
