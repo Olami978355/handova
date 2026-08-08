@@ -23,7 +23,7 @@ export default function HowItWorks() {
           <h2 className="font-serif text-2xl text-gold mb-5">The deal flow</h2>
           <ol className="space-y-6">
             {[
-              { n: '01', t: 'Find a verified listing', d: 'Browse with filters, verified-only toggle, or a saved search that alerts you.' },
+              { n: '01', t: 'Find a verified listing', d: 'Browse with filters, a verified-only toggle, or a saved search that alerts you when a match goes live.' },
               { n: '02', t: 'Connect directly', d: 'Message the landlord or agent through the platform, no back-channel required.' },
               { n: '03', t: 'Sign the tenancy agreement', d: 'Every deal includes a binding agreement before any money moves. No exceptions.' },
               { n: '04', t: 'Pay and move in', d: 'Payment is secured through the platform and released on confirmed move-in.' },

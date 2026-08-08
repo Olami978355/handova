@@ -91,7 +91,7 @@ serve(async (req) => {
           user_ids: parties,
           title: 'New Inspection Booking',
           body: `A tenant has paid for an inspection of ${booking.properties.title}. Please confirm the date.`,
-          link: `/dashboard/bookings`,
+          link: `/dashboard`,
           type: 'inspection_requested',
         }),
       });
