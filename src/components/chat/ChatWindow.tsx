@@ -337,6 +337,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     prevMessageCountRef.current = messages.length;
   }, [messages, resolvedConversationId, user?.id]);
   const [pendingMedia, setPendingMedia] = useState<{ file: File; mediaType: 'image' | 'video'; previewUrl: string } | null>(null);
+  const [showFullMediaPreview, setShowFullMediaPreview] = useState(false);
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -747,9 +748,18 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           {pendingMedia && (
             <div className="flex items-center gap-3 mb-2 p-2.5 bg-white/5 border border-white/10 rounded-xl">
               {pendingMedia.mediaType === 'image' ? (
-                <img src={pendingMedia.previewUrl} alt="" className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+                <img
+                  src={pendingMedia.previewUrl}
+                  alt=""
+                  onClick={() => setShowFullMediaPreview(true)}
+                  className="w-14 h-14 rounded-lg object-cover flex-shrink-0 cursor-pointer"
+                />
               ) : (
-                <video src={pendingMedia.previewUrl} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+                <video
+                  src={pendingMedia.previewUrl}
+                  onClick={() => setShowFullMediaPreview(true)}
+                  className="w-14 h-14 rounded-lg object-cover flex-shrink-0 cursor-pointer"
+                />
               )}
               <span className="flex-1 text-[12px] text-paper/50">
                 {pendingMedia.mediaType === 'image' ? 'Send this photo?' : 'Send this video?'}
@@ -768,6 +778,24 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               >
                 {uploadingMedia ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               </button>
+            </div>
+          )}
+          {showFullMediaPreview && pendingMedia && (
+            <div
+              className="fixed inset-0 z-[70] bg-ink/95 backdrop-blur-sm flex items-center justify-center p-6"
+              onClick={() => setShowFullMediaPreview(false)}
+            >
+              <button
+                onClick={() => setShowFullMediaPreview(false)}
+                className="absolute top-5 right-5 w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-paper/70 hover:text-paper transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              {pendingMedia.mediaType === 'image' ? (
+                <img src={pendingMedia.previewUrl} alt="" className="max-w-full max-h-full rounded-2xl object-contain" onClick={e => e.stopPropagation()} />
+              ) : (
+                <video src={pendingMedia.previewUrl} controls autoPlay className="max-w-full max-h-full rounded-2xl object-contain" onClick={e => e.stopPropagation()} />
+              )}
             </div>
           )}
           {quotedMessage && (
