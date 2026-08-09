@@ -23,21 +23,12 @@ import EscrowQueue from './EscrowQueue';
 import AdminLogs from './AdminLogs';
 import PropertyReports from './PropertyReports';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import { HandovaLogo } from '../../components/brand/HandovaMark';
 
 type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports' | 'analytics';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
-const HandovaLogo = ({ size = 28 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none">
-    <path d="M-50 -70 L-20 -55 L-20 55 L-50 70 Z" fill="#D4AF37" />
-    <path d="M50 -70 L20 -55 L20 55 L50 70 Z" fill="#D4AF37" />
-    <circle cx="-32" cy="0" r="17" fill="none" stroke="#D4AF37" strokeWidth="9" />
-    <rect x="-15" y="-4.5" width="35" height="9" fill="#D4AF37" />
-    <rect x="10" y="4.5" width="8" height="10" fill="#D4AF37" />
-    <rect x="22" y="4.5" width="8" height="10" fill="#D4AF37" />
-  </svg>
-);
 
 export default function AdminDashboard() {
   const { profile, signOut } = useAuth();

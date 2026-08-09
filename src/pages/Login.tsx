@@ -4,17 +4,8 @@ import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Eye, EyeOff, Shield, Badg
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { HandovaLogo } from '../components/brand/HandovaMark';
 
-const HandovaLogo = ({ size = 32 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none">
-    <path d="M-50 -70 L-20 -55 L-20 55 L-50 70 Z" fill="#D4AF37" />
-    <path d="M50 -70 L20 -55 L20 55 L50 70 Z" fill="#D4AF37" />
-    <circle cx="-32" cy="0" r="17" fill="none" stroke="#D4AF37" strokeWidth="9" />
-    <rect x="-15" y="-4.5" width="35" height="9" fill="#D4AF37" />
-    <rect x="10" y="4.5" width="8" height="10" fill="#D4AF37" />
-    <rect x="22" y="4.5" width="8" height="10" fill="#D4AF37" />
-  </svg>
-);
 
 const WatermarkLogo = () => (
   <svg
