@@ -48,7 +48,7 @@ interface HandovaLogoProps {
  * per app load, since Navbar stays mounted across route changes.
  */
 export const HandovaLogo: React.FC<HandovaLogoProps> = ({ size = 32, className = 'text-gold', animateKey = false }) => (
-  <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none" className={className}>
+  <svg width={size} height={size} viewBox="-60 -85 120 170" fill="none" className={className} style={{ overflow: animateKey ? "visible" : undefined }}>
     <path d="M-50 -70 L-20 -55 L-20 55 L-50 70 Z" fill="currentColor" />
     <path d="M50 -70 L20 -55 L20 55 L50 70 Z" fill="currentColor" />
     {animateKey ? (
