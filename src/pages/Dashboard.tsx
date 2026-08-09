@@ -11,6 +11,7 @@ import { supabase, requireValidSession } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { InspectionDelegateInvite } from '../components/inspection/InspectionDelegateInvite';
 import { PendingInspectionDelegateInvites } from '../components/inspection/PendingInspectionDelegateInvites';
+import { DelegateFeatureCard } from '../components/DelegateFeatureCard';
 import { FeatureCarousel } from '../components/dashboard/FeatureCarousel';
 import { useAuth } from '../context/AuthContext';
 import { Property, Deal, InspectionBooking } from '../types';
@@ -1218,6 +1219,8 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
+
+                <DelegateFeatureCard />
 
                 {(profile?.agent_id || profile?.landlord_id) && (
                   <div className="bg-slate/20 border border-gold/15 rounded-2xl p-5">

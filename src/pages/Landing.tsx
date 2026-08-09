@@ -748,7 +748,7 @@ export default function Landing() {
                 Properties coming soon
               </p>
               <p className="text-[13px] text-paper/25">
-                Be the first to list your property on RentEasy.
+                Be the first to list your property on Handova.
               </p>
               <Link
                 to="/signup"
