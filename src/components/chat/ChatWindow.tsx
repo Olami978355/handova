@@ -309,7 +309,35 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [newMessage, setNewMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
+  const prevConversationIdRef = useRef<string | undefined>(undefined);
+  const prevMessageCountRef = useRef(0);
+
+  const handleMessagesScroll = () => {
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    isNearBottomRef.current = distanceFromBottom < 150;
+  };
+
+  useEffect(() => {
+    const conversationChanged = prevConversationIdRef.current !== resolvedConversationId;
+    const isNewMessage = messages.length > prevMessageCountRef.current;
+    const lastMessage = messages[messages.length - 1];
+    const isOwnMessage = lastMessage?.sender_id === user?.id;
+
+    if (conversationChanged && messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    } else if (isNewMessage && (isNearBottomRef.current || isOwnMessage)) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    prevConversationIdRef.current = resolvedConversationId;
+    prevMessageCountRef.current = messages.length;
+  }, [messages, resolvedConversationId, user?.id]);
+  const [pendingMedia, setPendingMedia] = useState<{ file: File; mediaType: 'image' | 'video'; previewUrl: string } | null>(null);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = '';
@@ -318,9 +346,20 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       return;
     }
     const mediaType: 'image' | 'video' = file.type.startsWith('video') ? 'video' : 'image';
+    setPendingMedia({ file, mediaType, previewUrl: URL.createObjectURL(file) });
+  };
+  const cancelPendingMedia = () => {
+    if (pendingMedia) URL.revokeObjectURL(pendingMedia.previewUrl);
+    setPendingMedia(null);
+  };
+  const confirmSendMedia = async () => {
+    if (!pendingMedia) return;
+    const { file, mediaType, previewUrl } = pendingMedia;
     setUploadingMedia(true);
     try {
       await sendMediaMessage(file, mediaType);
+      URL.revokeObjectURL(previewUrl);
+      setPendingMedia(null);
     } catch (err) {
       setLocalError(err instanceof Error ? err.message : 'Failed to send media');
     } finally {
@@ -534,7 +573,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   return (
     <>
       <div className="flex-1 flex flex-col h-full overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-ink">
+        <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-ink">
           {loading && resolvedConversationId ? (
             <div className="flex flex-col items-center justify-center h-full gap-3">
               <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
@@ -705,6 +744,32 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </AnimatePresence>
 
         <div className="flex-shrink-0 px-4 py-3 bg-ink border-t border-white/5">
+          {pendingMedia && (
+            <div className="flex items-center gap-3 mb-2 p-2.5 bg-white/5 border border-white/10 rounded-xl">
+              {pendingMedia.mediaType === 'image' ? (
+                <img src={pendingMedia.previewUrl} alt="" className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+              ) : (
+                <video src={pendingMedia.previewUrl} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+              )}
+              <span className="flex-1 text-[12px] text-paper/50">
+                {pendingMedia.mediaType === 'image' ? 'Send this photo?' : 'Send this video?'}
+              </span>
+              <button
+                onClick={cancelPendingMedia}
+                disabled={uploadingMedia}
+                className="w-8 h-8 flex-shrink-0 bg-white/5 rounded-lg flex items-center justify-center text-paper/40 hover:text-paper transition-colors disabled:opacity-40"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <button
+                onClick={confirmSendMedia}
+                disabled={uploadingMedia}
+                className="w-8 h-8 flex-shrink-0 bg-gold rounded-lg flex items-center justify-center text-ink hover:bg-gold-dark transition-colors disabled:opacity-40"
+              >
+                {uploadingMedia ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+              </button>
+            </div>
+          )}
           {quotedMessage && (
             <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 bg-white/5 border-l-2 border-gold rounded-lg">
               <div className="min-w-0">

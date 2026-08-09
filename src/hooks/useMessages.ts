@@ -24,7 +24,7 @@ export const useMessages = (conversationId?: string) => {
     try {
       const { data: rawMessages, error } = await supabase
         .from('messages')
-        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at, edited_at, deleted_for_everyone, deleted_for, quoted_message_id')
+        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at, edited_at, deleted_for_everyone, deleted_for, quoted_message_id, media_url, media_type')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
@@ -179,7 +179,7 @@ export const useMessages = (conversationId?: string) => {
           message_type: 'text',
           quoted_message_id: quotedMessageId || null,
         })
-        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at, edited_at, deleted_for_everyone, deleted_for, quoted_message_id')
+        .select('id, conversation_id, sender_id, content, message_type, custom_deal_offer_id, read, created_at, edited_at, deleted_for_everyone, deleted_for, quoted_message_id, media_url, media_type')
         .single();
       if (insertError) throw new Error(insertError.message);
       const { data: senderProfile } = await supabase
