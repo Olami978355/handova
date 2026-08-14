@@ -4,7 +4,7 @@ import {
   Users, ShieldCheck, Building2, History,
   LayoutDashboard, AlertCircle, ChevronRight,
   DollarSign, Shield, User, Home, Eye, TrendingUp,
-  Bell, Settings, LogOut, CreditCard
+  Bell, Settings, LogOut, CreditCard, Scale
 } from 'lucide-react';
 import CardRequestQueue from './CardRequestQueue';
 import { ID_CARD_FEATURE_ENABLED } from '../../constants';
@@ -17,6 +17,7 @@ import { VerifiedBadge } from '../../components/VerifiedBadge';
 import { formatNaira } from '../../utils/format';
 import UserManagement from './UserManagement';
 import VerificationReview from './VerificationReview';
+import LawyerVerificationReview from './LawyerVerificationReview';
 import PropertyModeration from './PropertyModeration';
 import DisputeQueue from './DisputeQueue';
 import EscrowQueue from './EscrowQueue';
@@ -25,7 +26,7 @@ import PropertyReports from './PropertyReports';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import { HandovaLogo } from '../../components/brand/HandovaMark';
 
-type AdminTab = 'overview' | 'users' | 'verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports' | 'analytics';
+type AdminTab = 'overview' | 'users' | 'verifications' | 'lawyer-verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports' | 'analytics';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
     { id: 'overview', label: 'Overview', icon: LayoutDashboard, roles: ['admin', 'moderator'] },
     { id: 'users', label: 'Users', icon: Users, roles: ['admin'] },
     { id: 'verifications', label: 'Verifications', icon: ShieldCheck, roles: ['admin', 'moderator'] },
+    { id: 'lawyer-verifications', label: 'Lawyers', icon: Scale, roles: ['admin', 'moderator'] },
     { id: 'properties', label: 'Properties', icon: Building2, roles: ['admin', 'moderator'] },
     { id: 'disputes', label: 'Disputes', icon: AlertCircle, roles: ['admin', 'moderator'] },
     { id: 'fund-releases', label: 'Fund Releases', icon: DollarSign, roles: ['admin', 'moderator'] },
@@ -184,6 +186,7 @@ export default function AdminDashboard() {
               {activeTab === 'overview' && <OverviewStats setActiveTab={setActiveTab} />}
               {activeTab === 'users' && <UserManagement />}
               {activeTab === 'verifications' && <VerificationReview />}
+              {activeTab === 'lawyer-verifications' && <LawyerVerificationReview />}
               {activeTab === 'properties' && <PropertyModeration />}
               {activeTab === 'disputes' && <DisputeQueue />}
               {activeTab === 'fund-releases' && <EscrowQueue />}

@@ -24,6 +24,7 @@ export interface Profile {
   bank_code?: string;
   username?: string;
   is_system_account?: boolean;
+  is_lawyer?: boolean;
   created_at: string;
   updated_at: string;
 }

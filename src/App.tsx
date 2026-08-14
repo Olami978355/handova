@@ -13,6 +13,7 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import OnboardingWizard from './pages/onboarding/OnboardingWizard';
 import VerificationPage from './pages/verification/VerificationPage';
+import LawyerVerificationPage from './pages/lawyer/LawyerVerificationPage';
 import Listings from './pages/Listings';
 import PropertyDetail from './pages/PropertyDetail';
 import HowItWorks from './pages/HowItWorks';
@@ -130,6 +131,7 @@ function AppInner() {
             {/* Protected Routes */}
             <Route path="onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
             <Route path="verification" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
+            <Route path="lawyer/verification" element={<ProtectedRoute><LawyerVerificationPage /></ProtectedRoute>} />
             <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="landlord/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="agent/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
