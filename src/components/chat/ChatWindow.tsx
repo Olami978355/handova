@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Loader2, AlertCircle, RefreshCw,
@@ -307,6 +307,29 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   } = useMessages(resolvedConversationId);
 
   const [newMessage, setNewMessage] = useState('');
+  const offPlatformWarning = useMemo(() => {
+    const text = newMessage.toLowerCase();
+    if (!text.trim()) return null;
+
+    const bankKeywords = /\b(account number|acct no|acct number|gtbank|gt bank|first bank|zenith|access bank|uba|opay|palmpay|kuda|moniepoint|fidelity bank|union bank|sterling bank|polaris bank|wema bank|stanbic|fcmb|providus)\b/;
+    const tenDigitSequence = /\b\d{10}\b/;
+    const offPlatformPhrase = /\b(pay me directly|pay directly|send to my account|outside the app|off[\s-]?platform|pay in cash|send cash|pay cash|bank transfer)\b/;
+    const messagingApp = /\b(whatsapp|telegram)\b/;
+    const phoneNumberPattern = /\b0\d{10}\b|\b\d{10,11}\b/;
+    const moveConversationPhrase = /\b(message me on|contact me on|reach me on|text me on|let'?s continue on|move this to|chat with me on)\b/;
+
+    if (tenDigitSequence.test(text) && bankKeywords.test(text)) {
+      return "Sharing bank account details outside Handova isn't covered by escrow protection.";
+    }
+    if (offPlatformPhrase.test(text)) {
+      return "Arranging payment outside Handova isn't covered by escrow protection.";
+    }
+    if (messagingApp.test(text) && (phoneNumberPattern.test(text) || moveConversationPhrase.test(text))) {
+      return "Keeping the conversation on Handova protects both of you if something goes wrong.";
+    }
+    return null;
+  }, [newMessage]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -473,12 +496,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               .single();
             if (createError) throw createError;
             conversationId = created.id;
-            await supabase.from('messages').insert({
-              conversation_id: conversationId,
-              sender_id: user.id,
-              content: "⚠️ Stay safe: RentEasy holds all payments in escrow until you're satisfied — never pay a landlord or agent directly, and never send money before an inspection. If anyone pressures you to pay off-platform, report them immediately.",
-              message_type: 'system',
-            });
           }
 
           setResolvedConversationId(conversationId);
@@ -830,6 +847,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 Create Custom Deal Offer
               </button>
             </div>
+          )}
+          {offPlatformWarning && (
+            <p className="text-[11px] text-paper/45 mb-2 px-1">{offPlatformWarning}</p>
           )}
           <div className="flex items-end gap-2">
             <input
