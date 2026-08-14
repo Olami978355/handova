@@ -859,7 +859,7 @@ export default function PropertyDetail() {
               </div>
 
               {user && !isOwner && (
-                <button className="w-full text-[12px] text-paper/25 hover:text-paper/50 transition-colors py-2 text-center">
+                <button onClick={() => setShowReportModal(true)} className="w-full text-[12px] text-paper/25 hover:text-paper/50 transition-colors py-2 text-center">
                   🚩 Report this listing
                 </button>
               )}

@@ -114,6 +114,7 @@ const chatWindowProps = {
   }
 
   return (
+    <>
     <div
       className="h-[calc(100vh-64px)] bg-ink flex overflow-hidden"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
@@ -259,7 +260,6 @@ const chatWindowProps = {
         </div>
       )}
     </div>
-  );
       {showReportModal && (
         <>
           <div onClick={() => setShowReportModal(false)} className="fixed inset-0 bg-black/70 z-[100]" />
@@ -288,4 +288,6 @@ const chatWindowProps = {
           </div>
         </>
       )}
+    </>
+  );
 }
