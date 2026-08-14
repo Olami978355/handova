@@ -34,6 +34,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LegalGuidePage from './pages/LegalGuidePage';
 import AgentDirectory from './pages/AgentDirectory';
+import LawyerDirectory from './pages/LawyerDirectory';
 import SavedProperties from './pages/SavedProperties';
 import MyDelegates from './pages/MyDelegates';
 
@@ -121,6 +122,7 @@ function AppInner() {
             <Route path="property/:id" element={<PropertyDetail />} />
             <Route path="u/:username" element={<PublicProfile />} />
             <Route path="directory" element={<AgentDirectory />} />
+            <Route path="lawyers" element={<LawyerDirectory />} />
             <Route path="saved" element={<ProtectedRoute><SavedProperties /></ProtectedRoute>} />
             <Route path="legal" element={<LegalPage />} />
             <Route path="faq" element={<FAQPage />} />

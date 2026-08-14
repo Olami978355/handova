@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu, X, LogOut, LayoutDashboard,
   MessageSquare, Shield, Plus, ChevronRight,
-  FileText, HelpCircle, Home, MapPin, Users, ChevronDown
+  FileText, HelpCircle, Home, MapPin, Users, ChevronDown, Scale
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -46,6 +46,7 @@ export default function Navbar() {
     { name: 'Properties', path: '/listings', icon: Home },
     { name: 'Map View', path: '/map', icon: MapPin },
     { name: 'Find an Agent', path: '/directory', icon: Users },
+    { name: 'Find a Lawyer', path: '/lawyers', icon: Scale },
     { name: 'How it Works', path: '/how-it-works', icon: FileText },
   ];
 
