@@ -33,7 +33,7 @@ import FAQPage from './pages/FAQPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LegalGuidePage from './pages/LegalGuidePage';
-import Directory from './pages/Directory';
+import AgentDirectory from './pages/AgentDirectory';
 import SavedProperties from './pages/SavedProperties';
 import MyDelegates from './pages/MyDelegates';
 
@@ -120,7 +120,7 @@ function AppInner() {
             <Route path="map" element={<MapSearch />} />
             <Route path="property/:id" element={<PropertyDetail />} />
             <Route path="u/:username" element={<PublicProfile />} />
-            <Route path="directory" element={<Directory />} />
+            <Route path="directory" element={<AgentDirectory />} />
             <Route path="saved" element={<ProtectedRoute><SavedProperties /></ProtectedRoute>} />
             <Route path="legal" element={<LegalPage />} />
             <Route path="faq" element={<FAQPage />} />
