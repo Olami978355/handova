@@ -11,6 +11,7 @@ interface EscrowDeal {
   platform_fee: number;
   agent_commission_rate: number;
   status: string;
+  transfer_status?: string;
   created_at: string;
   updated_at: string;
   properties: { title: string; address?: string };
@@ -57,12 +58,12 @@ export default function EscrowQueue() {
     }
   };
 
-  const handleRelease = async (dealId: string) => {
+  const handleRelease = async (dealId: string, confirmFirstPayout: boolean = false) => {
     setReleasing(dealId);
     try {
       if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('release-funds', {
-        body: { dealId },
+        body: { dealId, confirmFirstPayout },
       });
       if (error) throw new Error(error.message);
       setReleased(prev => [...prev, dealId]);
@@ -121,6 +122,11 @@ export default function EscrowQueue() {
                   <span className="text-[11px] font-bold text-gold bg-gold/10 px-2 py-0.5 rounded-lg">
                     MOVE-IN CONFIRMED
                   </span>
+                  {deal.transfer_status === 'first_payout_review' && (
+                    <span className="text-[11px] font-bold text-paper/50 bg-white/6 px-2 py-0.5 rounded-lg">
+                      FIRST PAYOUT · HELD FOR REVIEW
+                    </span>
+                  )}
                 </div>
                 <h4 className="text-[14px] font-bold text-paper truncate">{deal.properties?.title}</h4>
                 <p className="text-[12px] text-paper/40 mt-0.5">
@@ -175,6 +181,8 @@ export default function EscrowQueue() {
                   <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Releasing...</>
                 ) : released.includes(deal.id) ? (
                   <><CheckCircle className="w-3.5 h-3.5" /> Released</>
+                ) : deal.transfer_status === 'first_payout_review' ? (
+                  <><DollarSign className="w-3.5 h-3.5" /> Approve First Payout <ArrowRight className="w-3.5 h-3.5" /></>
                 ) : (
                   <><DollarSign className="w-3.5 h-3.5" /> Release Funds <ArrowRight className="w-3.5 h-3.5" /></>
                 )}
@@ -190,8 +198,14 @@ export default function EscrowQueue() {
             <div className="w-12 h-12 bg-gold/15 rounded-xl flex items-center justify-center mb-4">
               <DollarSign className="w-6 h-6 text-gold" />
             </div>
-            <h3 className="text-[16px] font-black text-paper mb-2">Release Funds?</h3>
-            <p className="text-[13px] text-paper/50 mb-1">You are about to release funds for:</p>
+            <h3 className="text-[16px] font-black text-paper mb-2">
+              {selectedDeal.transfer_status === 'first_payout_review' ? 'Approve First Payout?' : 'Release Funds?'}
+            </h3>
+            <p className="text-[13px] text-paper/50 mb-1">
+              {selectedDeal.transfer_status === 'first_payout_review'
+                ? "This is the recipient's first payout on Handova. It was automatically held for review. Approving sends the transfer now."
+                : 'You are about to release funds for:'}
+            </p>
             <p className="text-[14px] font-bold text-paper mb-1">{selectedDeal.properties?.title}</p>
             <p className="text-[13px] text-paper/40 mb-4">Tenant: {selectedDeal.tenant?.full_name}</p>
             <div className="p-3 bg-white/3 rounded-xl mb-5 space-y-1">
@@ -211,11 +225,11 @@ export default function EscrowQueue() {
                 Cancel
               </button>
               <button
-                onClick={() => handleRelease(selectedDeal.id)}
+                onClick={() => handleRelease(selectedDeal.id, selectedDeal.transfer_status === 'first_payout_review')}
                 disabled={!!releasing}
                 className="flex-1 py-2.5 bg-gold rounded-xl text-[13px] font-bold text-paper hover:bg-gold-dark transition-all disabled:opacity-40"
               >
-                {releasing ? 'Releasing...' : 'Confirm Release'}
+                {releasing ? 'Releasing...' : selectedDeal.transfer_status === 'first_payout_review' ? 'Approve First Payout' : 'Confirm Release'}
               </button>
             </div>
           </div>
