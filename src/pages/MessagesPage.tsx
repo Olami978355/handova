@@ -19,6 +19,7 @@ export default function MessagesPage() {
   const [showChatMenu, setShowChatMenu] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [reportDetails, setReportDetails] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   const otherId = selectedConversation?.participants?.[0]?.id;
@@ -39,15 +40,21 @@ export default function MessagesPage() {
   };
 
   const handleReport = async () => {
-    if (!otherId || !user || !reportReason.trim()) return;
+    if (!otherId || !user || !reportReason) return;
     setActionLoading(true);
     try {
-      const { error } = await supabase.rpc('report_user', { p_reported_id: otherId, p_reason: reportReason });
+      const { error } = await supabase.rpc('report_user', {
+        p_reported_id: otherId,
+        p_reason: reportReason,
+        p_details: reportDetails.trim() || null,
+        p_conversation_id: conversationId || null,
+      });
       if (error) throw new Error(error.message);
       alert('Report submitted. Our team will review it.');
       setShowReportModal(false);
       setShowChatMenu(false);
       setReportReason('');
+      setReportDetails('');
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Failed to submit report');
     } finally {
@@ -271,15 +278,36 @@ const chatWindowProps = {
               </button>
             </div>
             <div className="p-5 space-y-4">
+              <div className="space-y-2">
+                {[
+                  { value: 'requested_off_platform_payment', label: 'Asked for payment outside Handova' },
+                  { value: 'harassment', label: 'Harassment' },
+                  { value: 'scam_or_fraud', label: 'Scam or fraud' },
+                  { value: 'other', label: 'Something else' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setReportReason(opt.value)}
+                    className={`w-full text-left px-4 py-2.5 rounded-xl text-[13px] font-semibold border transition-colors ${
+                      reportReason === opt.value
+                        ? 'bg-red-500/15 border-red-500/40 text-paper'
+                        : 'bg-white/5 border-white/8 text-paper/60 hover:text-paper'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
               <textarea
-                value={reportReason}
-                onChange={(e) => setReportReason(e.target.value)}
-                placeholder="What happened?"
-                className="w-full h-28 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none"
+                value={reportDetails}
+                onChange={(e) => setReportDetails(e.target.value)}
+                placeholder="Add any details (optional)"
+                className="w-full h-20 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none"
               />
               <button
                 onClick={handleReport}
-                disabled={!reportReason.trim() || actionLoading}
+                disabled={!reportReason || actionLoading}
                 className="w-full bg-red-500 text-paper py-3 rounded-xl font-bold text-[13px] hover:bg-red-600 transition-all disabled:opacity-40"
               >
                 {actionLoading ? 'Submitting...' : 'Submit Report'}
