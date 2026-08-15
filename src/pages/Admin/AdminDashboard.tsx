@@ -4,7 +4,7 @@ import {
   Users, ShieldCheck, Building2, History,
   LayoutDashboard, AlertCircle, ChevronRight,
   DollarSign, Shield, User, Home, Eye, TrendingUp,
-  Bell, Settings, LogOut, CreditCard, Scale
+  Bell, Settings, LogOut, CreditCard, Scale, Flag
 } from 'lucide-react';
 import CardRequestQueue from './CardRequestQueue';
 import { ID_CARD_FEATURE_ENABLED } from '../../constants';
@@ -23,10 +23,11 @@ import DisputeQueue from './DisputeQueue';
 import EscrowQueue from './EscrowQueue';
 import AdminLogs from './AdminLogs';
 import PropertyReports from './PropertyReports';
+import UserReports from './UserReports';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import { HandovaLogo } from '../../components/brand/HandovaMark';
 
-type AdminTab = 'overview' | 'users' | 'verifications' | 'lawyer-verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports' | 'analytics';
+type AdminTab = 'overview' | 'users' | 'verifications' | 'lawyer-verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports' | 'user-reports' | 'analytics';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -74,6 +75,7 @@ export default function AdminDashboard() {
     { id: 'fund-releases', label: 'Fund Releases', icon: DollarSign, roles: ['admin', 'moderator'] },
     ...(ID_CARD_FEATURE_ENABLED ? [{ id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] }] : []),
     { id: 'reports', label: 'Reports', icon: AlertCircle, roles: ['admin', 'moderator'] },
+    { id: 'user-reports', label: 'User Reports', icon: Flag, roles: ['admin', 'moderator'] },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp, roles: ['admin', 'moderator'] },
     { id: 'logs', label: 'Logs', icon: History, roles: ['admin'] },
   ].filter(item => item.roles.includes(profile?.role || ''));
@@ -193,6 +195,7 @@ export default function AdminDashboard() {
               {activeTab === 'logs' && <AdminLogs />}
               {activeTab === 'card-requests' && <CardRequestQueue />}
               {activeTab === 'reports' && <PropertyReports />}
+              {activeTab === 'user-reports' && <UserReports />}
               {activeTab === 'analytics' && <AnalyticsDashboard />}
             </motion.div>
           </AnimatePresence>
