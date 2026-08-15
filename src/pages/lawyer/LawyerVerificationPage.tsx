@@ -17,6 +17,10 @@ export default function LawyerVerificationPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [existingRequest, setExistingRequest] = useState<Record<string, unknown> | null>(null);
+  const [defaultFee, setDefaultFee] = useState<number | null>(null);
+  const [feeInput, setFeeInput] = useState('');
+  const [savingFee, setSavingFee] = useState(false);
+  const [feeSaved, setFeeSaved] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
 
   const [nbaNumber, setNbaNumber] = useState('');
@@ -25,7 +29,7 @@ export default function LawyerVerificationPage() {
   const [certUrl, setCertUrl] = useState('');
 
   useEffect(() => {
-    if (user) fetchStatus();
+    if (user) { fetchStatus(); fetchFee(); }
   }, [user]);
 
   const fetchStatus = async () => {
@@ -44,6 +48,46 @@ export default function LawyerVerificationPage() {
       console.error('Error fetching lawyer verification status:', err);
     } finally {
       setCheckingStatus(false);
+    }
+  };
+
+  const fetchFee = async () => {
+    try {
+      const { data } = await supabase
+        .from('lawyer_verifications')
+        .select('default_fee')
+        .eq('user_id', user?.id)
+        .eq('status', 'approved')
+        .maybeSingle();
+      if (data) {
+        setDefaultFee(data.default_fee);
+        setFeeInput(String(data.default_fee));
+      }
+    } catch (err) {
+      console.error('Error fetching lawyer fee:', err);
+    }
+  };
+
+  const saveFee = async () => {
+    const parsed = Number(feeInput);
+    if (!parsed || parsed < 1000) {
+      setError('Fee must be at least ₦1,000');
+      return;
+    }
+    setSavingFee(true);
+    setError(null);
+    setFeeSaved(false);
+    try {
+      const { error: rpcError } = await supabase.rpc('update_own_lawyer_fee', { p_fee: parsed });
+      if (rpcError) throw new Error(rpcError.message);
+      setDefaultFee(parsed);
+      setFeeSaved(true);
+      setTimeout(() => setFeeSaved(false), 2500);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update fee';
+      setError(msg);
+    } finally {
+      setSavingFee(false);
     }
   };
 
@@ -145,6 +189,32 @@ export default function LawyerVerificationPage() {
           <p className="text-[13px] text-paper/45 mb-8 leading-relaxed">
             Your profile is listed in the lawyer directory and can be booked for reviews.
           </p>
+
+          <div className="bg-white/5 border border-white/8 rounded-xl p-4 mb-6 text-left">
+            <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">
+              Your Review Fee
+            </label>
+            <p className="text-[11px] text-paper/35 mb-3">
+              What you charge per agreement review, on top of Handova's ₦500 platform fee. Minimum ₦1,000.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min={1000}
+                value={feeInput}
+                onChange={(e) => setFeeInput(e.target.value)}
+                className="flex-1 px-3 py-2.5 bg-white/5 border border-white/8 rounded-lg text-[13px] text-paper outline-none focus:border-gold/60 transition-colors"
+              />
+              <button
+                onClick={saveFee}
+                disabled={savingFee || Number(feeInput) === defaultFee}
+                className="px-4 py-2.5 bg-gold text-black rounded-lg font-bold text-[12px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center gap-1.5"
+              >
+                {savingFee ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : feeSaved ? <CheckCircle2 className="w-3.5 h-3.5" /> : null}
+                {feeSaved ? 'Saved' : 'Save'}
+              </button>
+            </div>
+          </div>
           <button
             onClick={() => navigate('/dashboard')}
             className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
