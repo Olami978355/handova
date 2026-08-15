@@ -18,6 +18,7 @@ export default function UserManagement() {
   const [suspendReason, setSuspendReason] = useState('');
   const [userToSuspend, setUserToSuspend] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [pendingRoleChange, setPendingRoleChange] = useState<{ userId: string; role: UserRole } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -183,6 +184,8 @@ export default function UserManagement() {
                     </button>
                     <AnimatePresence>
                       {selectedUser === u.id && (
+                        <>
+                        <div className="fixed inset-0 z-10" onClick={() => setSelectedUser(null)} />
                         <motion.div
                           initial={{ opacity: 0, scale: 0.95, y: 6 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -191,7 +194,7 @@ export default function UserManagement() {
                         >
                           <p className="px-3 py-2 text-[10px] font-bold text-paper/25 uppercase tracking-wider">Change Role</p>
                           {(['tenant', 'landlord', 'agent', 'moderator', 'admin'] as UserRole[]).map((role) => (
-                            <button key={role} disabled={!isAdmin} onClick={() => handleRoleChange(u.id, role)}
+                            <button key={role} disabled={!isAdmin} onClick={() => { setPendingRoleChange({ userId: u.id, role }); setSelectedUser(null); }}
                               className={`w-full flex items-center gap-2 px-3 py-2.5 text-[12px] font-bold rounded-lg transition-colors ${
                                 u.role === role ? 'bg-gold/15 text-gold' : 'text-paper/50 hover:bg-white/5 hover:text-paper'
                               } ${!isAdmin ? 'opacity-40 cursor-not-allowed' : ''}`}
@@ -208,6 +211,7 @@ export default function UserManagement() {
                             <ShieldOff className="w-3.5 h-3.5" /> Suspend Account
                           </button>
                         </motion.div>
+                        </>
                       )}
                     </AnimatePresence>
                   </td>
@@ -259,6 +263,39 @@ export default function UserManagement() {
                 <button onClick={handleSuspend} disabled={!suspendReason || actionLoading}
                   className="flex-1 bg-danger text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-danger-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
                   {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Suspension'}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+      {/* Role change confirmation */}
+      <AnimatePresence>
+        {pendingRoleChange && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setPendingRoleChange(null)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100]" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 m-auto w-full max-w-sm h-fit bg-slate/20 border border-white/8 rounded-2xl z-[110] p-6 shadow-2xl" style={font}
+            >
+              <h3 className="text-[15px] font-bold text-paper mb-2">Change Role?</h3>
+              <p className="text-[12px] text-paper/45 mb-5 leading-relaxed">
+                This will change the user's role to <span className="text-gold font-bold capitalize">{pendingRoleChange.role}</span>. This takes effect immediately.
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setPendingRoleChange(null)}
+                  className="flex-1 py-3 rounded-xl font-bold text-[13px] text-paper/40 hover:bg-white/5 transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!pendingRoleChange) return;
+                    await handleRoleChange(pendingRoleChange.userId, pendingRoleChange.role);
+                    setPendingRoleChange(null);
+                  }}
+                  className="flex-1 bg-gold text-paper py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors">
+                  Confirm
                 </button>
               </div>
             </motion.div>

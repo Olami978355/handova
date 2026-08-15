@@ -22,7 +22,7 @@ serve(async (req) => {
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile || (profile.role !== 'admin' && profile.role !== 'staff')) {
+    if (profileError || !profile || (profile.role !== 'admin' && profile.role !== 'moderator')) {
       throw new Error('You are not authorized to resolve disputes.');
     }
 
