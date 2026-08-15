@@ -13,15 +13,15 @@ const sections = [
     content: [
       {
         heading: '1. Acceptance of Terms',
-        body: `By accessing or using RentEasy Nigeria ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services. These terms apply to all users including tenants, landlords, agents, and visitors.`
+        body: `By accessing or using Handova ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services. These terms apply to all users including tenants, landlords, agents, and visitors.`
       },
       {
         heading: '2. Description of Service',
-        body: `RentEasy Nigeria is an online real estate marketplace that connects tenants with landlords and agents. We provide an escrow-based payment system to protect both parties during property transactions. We are not a real estate agency and do not own any of the listed properties.`
+        body: `Handova is an online real estate marketplace that connects tenants with landlords and agents. We provide an escrow-based payment system to protect both parties during property transactions. We are not a real estate agency and do not own any of the listed properties.`
       },
       {
         heading: '3. User Accounts',
-        body: `You must provide accurate and complete information when creating an account. You are responsible for maintaining the confidentiality of your account credentials. You must be at least 18 years old to use this platform. RentEasy reserves the right to suspend or terminate accounts that violate these terms.`
+        body: `You must provide accurate and complete information when creating an account. You are responsible for maintaining the confidentiality of your account credentials. You must be at least 18 years old to use this platform. Handova reserves the right to suspend or terminate accounts that violate these terms.`
       },
       {
         heading: '4. Landlord and Agent Obligations',
@@ -33,23 +33,27 @@ const sections = [
       },
       {
         heading: '6. Platform Fees',
-        body: `RentEasy charges a 2% platform fee on all escrow transactions. This fee is deducted from the total amount before funds are disbursed. Agent commission (typically 10%) is agreed upon between the agent and property owner and is separate from the platform fee. Inspection fees are non-refundable except as outlined in our Refund Policy.`
+        body: `Handova charges a 2% platform fee on all escrow transactions. This fee is deducted from the total amount before funds are disbursed. Agent commission (typically 10%) is agreed upon between the agent and property owner and is separate from the platform fee. Inspection fees are non-refundable except as outlined in our Refund Policy.`
       },
       {
         heading: '7. Prohibited Activities',
         body: `Users must not: post false or misleading property listings, engage in fraudulent transactions, harass or threaten other users, attempt to hack or disrupt the platform, use the platform for money laundering or any illegal activity, or create multiple accounts to circumvent suspensions.`
       },
       {
-        heading: '8. Limitation of Liability',
-        body: `RentEasy Nigeria is a marketplace platform and is not liable for disputes between landlords and tenants beyond what is covered by our escrow policy. We are not responsible for the physical condition of properties. Our liability in any dispute is limited to the amount held in escrow.`
+        heading: '8. Off-Platform Transactions',
+        body: `All payments and payment-related arrangements between tenants, landlords, and agents must go through Handova's escrow system. Arranging or accepting payment outside Handova — including cash, direct bank transfer, or third-party payment apps — is against these Terms and is not covered by our escrow protection or dispute resolution process. Handova cannot verify, protect, or refund any transaction that happens outside the platform. If someone asks you to pay outside the platform, use the Report option in your conversation to flag it to our team. A first instance may result in a warning; confirmed or repeated attempts to arrange payment off-platform will result in account suspension.`
       },
       {
-        heading: '9. Governing Law',
+        heading: '9. Limitation of Liability',
+        body: `Handova is a marketplace platform and is not liable for disputes between landlords and tenants beyond what is covered by our escrow policy. We are not responsible for the physical condition of properties. Our liability in any dispute is limited to the amount held in escrow.`
+      },
+      {
+        heading: '10. Governing Law',
         body: `These terms are governed by the laws of the Federal Republic of Nigeria. Any disputes shall be resolved in the courts of Lagos State, Nigeria. By using this platform you consent to the jurisdiction of Nigerian courts.`
       },
       {
-        heading: '10. Changes to Terms',
-        body: `RentEasy reserves the right to modify these terms at any time. Users will be notified of significant changes via email. Continued use of the platform after changes constitutes acceptance of the new terms.`
+        heading: '11. Changes to Terms',
+        body: `Handova reserves the right to modify these terms at any time. Users will be notified of significant changes via email. Continued use of the platform after changes constitutes acceptance of the new terms.`
       },
     ]
   },
@@ -121,7 +125,7 @@ const sections = [
       },
       {
         heading: '3. Refund Processing Time',
-        body: `Approved refunds are processed within 5-7 business days to your original payment method. Paystack processing times may add an additional 1-3 business days. RentEasy is not liable for delays caused by your bank or payment provider.`
+        body: `Approved refunds are processed within 5-7 business days to your original payment method. Paystack processing times may add an additional 1-3 business days. Handova is not liable for delays caused by your bank or payment provider.`
       },
       {
         heading: '4. How to Request a Refund',
@@ -141,39 +145,39 @@ const sections = [
     content: [
       {
         heading: '1. What is Escrow?',
-        body: `Escrow is a financial arrangement where a neutral third party (RentEasy Nigeria) holds funds on behalf of two parties in a transaction until specific conditions are met. This protects both the tenant and the landlord/agent during property rental transactions.`
+        body: `Escrow is a financial arrangement where a neutral third party (Handova) holds funds on behalf of two parties in a transaction until specific conditions are met. This protects both the tenant and the landlord/agent during property rental transactions.`
       },
       {
-        heading: '2. How RentEasy Escrow Works',
-        body: `When a tenant accepts a deal offer: the tenant pays the agreed rent amount plus 2% platform fee into escrow via Paystack, funds are held securely by RentEasy, the landlord or agent uploads the tenancy agreement, both parties sign the agreement, the tenant moves in and confirms move-in on the platform, RentEasy releases the funds to the landlord or agent within 24 hours of move-in confirmation.`
+        heading: '2. How Handova Escrow Works',
+        body: `When a tenant accepts a deal offer: the tenant pays the agreed rent amount plus 2% platform fee into escrow via Paystack, funds are held securely by Handova, the landlord or agent uploads the tenancy agreement, both parties sign the agreement, the tenant moves in and confirms move-in on the platform, Handova releases the funds to the landlord or agent within 24 hours of move-in confirmation.`
       },
       {
         heading: '3. Parties to the Escrow',
-        body: `Depositor (Tenant): The party who deposits funds into escrow. Beneficiary (Landlord/Agent): The party who receives funds after conditions are met. Escrow Agent (RentEasy Nigeria): The neutral party that holds and disburses funds according to this agreement.`
+        body: `Depositor (Tenant): The party who deposits funds into escrow. Beneficiary (Landlord/Agent): The party who receives funds after conditions are met. Escrow Agent (Handova): The neutral party that holds and disburses funds according to this agreement.`
       },
       {
         heading: '4. Conditions for Fund Release',
-        body: `Funds are released to the beneficiary when: the tenant confirms they have successfully moved into the property, the move-in confirmation is not disputed within 24 hours, or the RentEasy moderation team approves release after dispute resolution.`
+        body: `Funds are released to the beneficiary when: the tenant confirms they have successfully moved into the property, the move-in confirmation is not disputed within 24 hours, or the Handova moderation team approves release after dispute resolution.`
       },
       {
         heading: '5. Dispute Resolution',
-        body: `If a dispute is raised: both parties submit their evidence through the platform, the RentEasy moderation team reviews all evidence within 3-5 business days, a decision is made and funds are either released to the beneficiary or refunded to the tenant, decisions by the moderation team are final and binding.`
+        body: `If a dispute is raised: both parties submit their evidence through the platform, the Handova moderation team reviews all evidence within 3-5 business days, a decision is made and funds are either released to the beneficiary or refunded to the tenant, decisions by the moderation team are final and binding.`
       },
       {
         heading: '6. Escrow Fees',
-        body: `RentEasy charges 2% of the total transaction amount as an escrow fee. This is paid by the tenant and deducted before disbursement to the beneficiary. There are no hidden charges beyond the agreed amount and platform fee.`
+        body: `Handova charges 2% of the total transaction amount as an escrow fee. This is paid by the tenant and deducted before disbursement to the beneficiary. There are no hidden charges beyond the agreed amount and platform fee.`
       },
       {
         heading: '7. Prohibited Escrow Transactions',
-        body: `The escrow service cannot be used for: outright property purchases above ₦50,000,000 without prior approval, transactions involving parties outside Nigeria, properties that are subject to legal disputes or court orders, or any transaction that violates Nigerian law.`
+        body: `The escrow service cannot be used for: outright property purchases above ₦50,000,000 without prior approval, transactions involving parties outside Nigeria, properties that are subject to legal disputes or court orders, or any transaction that violates Nigerian law. Arranging payment outside escrow is also a violation of Handova's Terms of Service and may lead to account suspension — see the Terms of Service for details.`
       },
       {
         heading: '8. Liability',
-        body: `RentEasy's liability as escrow agent is limited to the amount held in escrow. We are not liable for: loss of rental income, property damage, personal injury, or any consequential damages arising from the transaction. We act solely as a neutral holder of funds.`
+        body: `Handova's liability as escrow agent is limited to the amount held in escrow. We are not liable for: loss of rental income, property damage, personal injury, or any consequential damages arising from the transaction. We act solely as a neutral holder of funds.`
       },
       {
         heading: '9. Regulatory Compliance',
-        body: `RentEasy Nigeria operates in compliance with the Central Bank of Nigeria (CBN) guidelines on electronic payments, the Federal Competition and Consumer Protection Act (FCCPA), and the Nigeria Data Protection Act (NDPA) 2023. Our payment processing is handled by Paystack, a CBN-licensed payment company.`
+        body: `Handova operates in compliance with the Central Bank of Nigeria (CBN) guidelines on electronic payments, the Federal Competition and Consumer Protection Act (FCCPA), and the Nigeria Data Protection Act (NDPA) 2023. Our payment processing is handled by Paystack, a CBN-licensed payment company.`
       },
     ]
   },
@@ -204,7 +208,7 @@ export default function LegalPage() {
           <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">Legal</div>
           <h1 className="text-[32px] font-black text-paper mb-3">Legal Documents</h1>
           <p className="text-[14px] text-paper/45 max-w-xl">
-            Please read these documents carefully. By using RentEasy Nigeria you agree to all terms outlined below.
+            Please read these documents carefully. By using Handova you agree to all terms outlined below.
           </p>
         </div>
 

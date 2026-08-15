@@ -9,20 +9,20 @@ const faqs = [
     category: 'Getting Started',
     questions: [
       {
-        q: 'What is RentEasy Nigeria?',
-        a: 'RentEasy Nigeria is an escrow-protected real estate marketplace that connects tenants with verified landlords and agents. We hold your rent payment securely until you confirm you have successfully moved in — protecting you from scams and property fraud.'
+        q: 'What is Handova?',
+        a: 'Handova is an escrow-protected real estate marketplace that connects tenants with verified landlords and agents. We hold your rent payment securely until you confirm you have successfully moved in — protecting you from scams and property fraud.'
       },
       {
-        q: 'How is RentEasy different from other property sites?',
-        a: 'Unlike other listing sites that simply show properties, RentEasy provides end-to-end transaction protection. Every payment goes through our escrow system, every landlord and agent must verify their NIN, and every inspection is paid for upfront to ensure both parties are serious.'
+        q: 'How is Handova different from other property sites?',
+        a: 'Unlike other listing sites that simply show properties, Handova provides end-to-end transaction protection. Every payment goes through our escrow system, every landlord and agent must verify their NIN, and every inspection is paid for upfront to ensure both parties are serious.'
       },
       {
-        q: 'Is RentEasy available across all Nigerian states?',
-        a: 'Yes. RentEasy covers all 36 states and the FCT. However, we currently have the highest concentration of listings in Lagos, Abuja, Port Harcourt, Ibadan, and Enugu. We are actively expanding to more cities.'
+        q: 'Is Handova available across all Nigerian states?',
+        a: 'Yes. Handova covers all 36 states and the FCT. However, we currently have the highest concentration of listings in Lagos, Abuja, Port Harcourt, Ibadan, and Enugu. We are actively expanding to more cities.'
       },
       {
         q: 'Is it free to sign up?',
-        a: 'Yes, creating an account on RentEasy is completely free for tenants, landlords, and agents. We only charge fees when a transaction takes place — a 2% platform fee on escrow payments.'
+        a: 'Yes, creating an account on Handova is completely free for tenants, landlords, and agents. We only charge fees when a transaction takes place — a 2% platform fee on escrow payments.'
       },
     ]
   },
@@ -72,7 +72,7 @@ const faqs = [
     category: 'Landlords & Agents',
     questions: [
       {
-        q: 'How do I list my property on RentEasy?',
+        q: 'How do I list my property on Handova?',
         a: 'Create an account, complete NIN verification, then click "List Property" on your dashboard. You will be asked to provide property details, upload photos and videos, set your price, and add house rules. Your listing will be reviewed and approved within 24 hours if you are verified.'
       },
       {
@@ -80,8 +80,8 @@ const faqs = [
         a: 'NIN (National Identification Number) verification confirms your identity as a Nigerian citizen or resident. It is required for all landlords and agents before their listings can go live. This protects tenants from anonymous scammers and builds trust on the platform.'
       },
       {
-        q: 'How does agent commission work on RentEasy?',
-        a: 'When an agent closes a deal through RentEasy, their commission (typically 10%) is automatically calculated and deducted from the total amount. The commission is paid to the agent directly from the escrow disbursement — no need to chase the landlord for payment.'
+        q: 'How does agent commission work on Handova?',
+        a: 'When an agent closes a deal through Handova, their commission (typically 10%) is automatically calculated and deducted from the total amount. The commission is paid to the agent directly from the escrow disbursement — no need to chase the landlord for payment.'
       },
       {
         q: 'Can a landlord list without using an agent?',
@@ -93,7 +93,7 @@ const faqs = [
     category: 'Security & Trust',
     questions: [
       {
-        q: 'Is my money safe with RentEasy?',
+        q: 'Is my money safe with Handova?',
         a: 'Yes. All payments are processed by Paystack, a CBN-licensed payment company. Funds are held in a secure escrow account and are never accessible to the landlord until you confirm your move-in. We use bank-grade encryption and security practices.'
       },
       {
@@ -103,6 +103,10 @@ const faqs = [
       {
         q: 'How do I raise a dispute?',
         a: 'Go to your deal page and click "Flag Transaction" in the danger zone section (admin only for now) or contact our support team at joinrenteasy@gmail.com with your deal reference number and a description of the issue. Our team responds within 48 hours.'
+      },
+      {
+        q: 'What if someone asks me to pay outside Handova?',
+        a: "Don't do it — payments made outside the platform aren't covered by escrow protection, and we can't help if something goes wrong. Use the Report option in your conversation to flag it to our team."
       },
     ]
   },
@@ -158,7 +162,7 @@ export default function FAQPage() {
           <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-3">FAQ</div>
           <h1 className="text-[32px] font-black text-paper mb-4">Frequently Asked Questions</h1>
           <p className="text-[14px] text-paper/45 max-w-lg mx-auto">
-            Everything you need to know about renting, listing, and transacting safely on RentEasy Nigeria.
+            Everything you need to know about renting, listing, and transacting safely on Handova.
           </p>
         </div>
 
