@@ -319,16 +319,34 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     const moveConversationPhrase = /\b(message me on|contact me on|reach me on|text me on|let'?s continue on|move this to|chat with me on)\b/;
 
     if (tenDigitSequence.test(text) && bankKeywords.test(text)) {
-      return "Sharing bank account details outside Handova isn't covered by escrow protection.";
+      return { message: "Sharing bank account details outside Handova isn't covered by escrow protection.", type: 'bank_details' as const };
     }
     if (offPlatformPhrase.test(text)) {
-      return "Arranging payment outside Handova isn't covered by escrow protection.";
+      return { message: "Arranging payment outside Handova isn't covered by escrow protection.", type: 'off_platform_phrase' as const };
     }
     if (messagingApp.test(text) && (phoneNumberPattern.test(text) || moveConversationPhrase.test(text))) {
-      return "Keeping the conversation on Handova protects both of you if something goes wrong.";
+      return { message: "Keeping the conversation on Handova protects both of you if something goes wrong.", type: 'messaging_app' as const };
     }
     return null;
   }, [newMessage]);
+
+  // Silent server-side log of when the warning banner fires, once per
+  // transition from hidden to showing per conversation. Never blocks
+  // typing or sending, no UI change.
+  const loggedWarningRef = useRef<{ conversationId?: string; warningType: string | null }>({ conversationId: undefined, warningType: null });
+  useEffect(() => {
+    if (!offPlatformWarning || !user || !resolvedConversationId) return;
+    const last = loggedWarningRef.current;
+    if (last.conversationId === resolvedConversationId && last.warningType === offPlatformWarning.type) return;
+    loggedWarningRef.current = { conversationId: resolvedConversationId, warningType: offPlatformWarning.type };
+    supabase.from('offplatform_warning_triggers').insert({
+      user_id: user.id,
+      conversation_id: resolvedConversationId,
+      warning_type: offPlatformWarning.type,
+    }).then(({ error }) => {
+      if (error) console.error('Failed to log off-platform warning trigger (non-fatal):', error);
+    });
+  }, [offPlatformWarning, user, resolvedConversationId]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
@@ -849,7 +867,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             </div>
           )}
           {offPlatformWarning && (
-            <p className="text-[11px] text-paper/45 mb-2 px-1">{offPlatformWarning}</p>
+            <p className="text-[11px] text-paper/45 mb-2 px-1">{offPlatformWarning.message}</p>
           )}
           <div className="flex items-end gap-2">
             <input
