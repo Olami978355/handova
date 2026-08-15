@@ -19,6 +19,8 @@ export default function DisputeQueue() {
   const [resolving, setResolving] = useState<string | null>(null);
   const [selectedDispute, setSelectedDispute] = useState<InspectionBooking | null>(null);
   const [resolutionText, setResolutionText] = useState('');
+  const [refundTenant, setRefundTenant] = useState(true);
+  const [atFaultPartyId, setAtFaultPartyId] = useState<'landlord' | 'agent' | null>('landlord');
   const [resolvingDealId, setResolvingDealId] = useState<string | null>(null);
   const [dealResolutionNote, setDealResolutionNote] = useState('');
   const [dealResolving, setDealResolving] = useState<{ id: string; outcome: 'release' | 'refund' } | null>(null);
@@ -49,17 +51,19 @@ export default function DisputeQueue() {
     }
   };
 
-  const handleResolve = async (landlordAtFault: boolean) => {
+  const handleResolve = async () => {
     if (!selectedDispute || !resolutionText) return;
     setResolving(selectedDispute.id);
     try {
       if (!(await requireValidSession())) return;
       const { error } = await supabase.functions.invoke('resolve-inspection-dispute', {
-        body: { bookingId: selectedDispute.id, resolution: resolutionText, landlordAtFault },
+        body: { bookingId: selectedDispute.id, resolution: resolutionText, refundTenant, atFaultPartyId },
       });
       if (error) throw error;
       setSelectedDispute(null);
       setResolutionText('');
+      setRefundTenant(true);
+      setAtFaultPartyId('landlord');
       await fetchDisputes();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to resolve dispute';
@@ -310,22 +314,69 @@ export default function DisputeQueue() {
               </div>
 
               <div className="space-y-2.5">
-                <button
-                  onClick={() => handleResolve(true)}
-                  disabled={!!resolving || !resolutionText}
-                  className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
-                >
-                  {resolving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  <span className="text-center">Landlord at Fault, Refund Tenant</span>
-                </button>
-                <button
-                  onClick={() => handleResolve(false)}
-                  disabled={!!resolving || !resolutionText}
-                  className="w-full bg-danger/15 text-danger border border-danger/20 py-3.5 rounded-xl font-bold text-[13px] hover:bg-danger/25 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
-                >
-                  {resolving ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
-                  <span className="text-center">Tenant at Fault, Reject Dispute</span>
-                </button>
+              <div className="space-y-2">
+                <p className="text-[10px] text-paper/30 uppercase tracking-wider">Refund Tenant?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setRefundTenant(true)}
+                    className={`flex-1 py-2.5 rounded-xl font-bold text-[12px] border transition-colors ${
+                      refundTenant ? 'bg-gold/15 border-gold/30 text-gold' : 'bg-white/5 border-white/8 text-paper/50 hover:text-paper'
+                    }`}
+                  >
+                    Yes, refund 100%
+                  </button>
+                  <button
+                    onClick={() => setRefundTenant(false)}
+                    className={`flex-1 py-2.5 rounded-xl font-bold text-[12px] border transition-colors ${
+                      !refundTenant ? 'bg-danger/15 border-danger/30 text-danger' : 'bg-white/5 border-white/8 text-paper/50 hover:text-paper'
+                    }`}
+                  >
+                    No refund
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[10px] text-paper/30 uppercase tracking-wider">Who is at fault?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setAtFaultPartyId('landlord')}
+                    className={`flex-1 py-2.5 rounded-xl font-bold text-[12px] border transition-colors ${
+                      atFaultPartyId === 'landlord' ? 'bg-danger/15 border-danger/30 text-danger' : 'bg-white/5 border-white/8 text-paper/50 hover:text-paper'
+                    }`}
+                  >
+                    Landlord
+                  </button>
+                  {selectedDispute.agent_id && (
+                    <button
+                      onClick={() => setAtFaultPartyId('agent')}
+                      className={`flex-1 py-2.5 rounded-xl font-bold text-[12px] border transition-colors ${
+                        atFaultPartyId === 'agent' ? 'bg-danger/15 border-danger/30 text-danger' : 'bg-white/5 border-white/8 text-paper/50 hover:text-paper'
+                      }`}
+                    >
+                      Agent
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setAtFaultPartyId(null)}
+                    className={`flex-1 py-2.5 rounded-xl font-bold text-[12px] border transition-colors ${
+                      atFaultPartyId === null ? 'bg-white/10 border-white/20 text-paper' : 'bg-white/5 border-white/8 text-paper/50 hover:text-paper'
+                    }`}
+                  >
+                    No fault
+                  </button>
+                </div>
+                {atFaultPartyId && (
+                  <p className="text-[11px] text-paper/30">A strike will be issued to the {atFaultPartyId}.</p>
+                )}
+              </div>
+              <button
+                onClick={handleResolve}
+                disabled={!!resolving || !resolutionText}
+                className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+              >
+                {resolving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                Confirm Resolution
+              </button>
               </div>
             </div>
           ) : (

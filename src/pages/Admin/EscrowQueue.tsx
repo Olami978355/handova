@@ -16,8 +16,8 @@ interface EscrowDeal {
   updated_at: string;
   properties: { title: string; address?: string };
   tenant?: { full_name: string; email: string };
-  landlord?: { full_name: string };
-  agent?: { full_name: string };
+  landlord?: { full_name: string; account_status?: string };
+  agent?: { full_name: string; account_status?: string };
 }
 
 const computeEscrowBreakdown = (deal: EscrowDeal) => {
@@ -44,8 +44,8 @@ export default function EscrowQueue() {
           *,
           properties(*),
           tenant:profiles!tenant_id(full_name, email),
-          landlord:profiles!landlord_id(full_name),
-          agent:profiles!agent_id(full_name)
+          landlord:profiles!landlord_id(full_name, account_status),
+          agent:profiles!agent_id(full_name, account_status)
         `)
         .eq('status', 'move_in_confirmed')
         .order('updated_at', { ascending: true });
@@ -125,6 +125,11 @@ export default function EscrowQueue() {
                   {deal.transfer_status === 'first_payout_review' && (
                     <span className="text-[11px] font-bold text-paper/50 bg-white/6 px-2 py-0.5 rounded-lg">
                       FIRST PAYOUT · HELD FOR REVIEW
+                    </span>
+                  )}
+                  {(deal.landlord?.account_status === 'suspended' || deal.agent?.account_status === 'suspended') && (
+                    <span className="text-[11px] font-bold text-danger bg-danger/10 px-2 py-0.5 rounded-lg">
+                      COUNTERPARTY SUSPENDED
                     </span>
                   )}
                 </div>
