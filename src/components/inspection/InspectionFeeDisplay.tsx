@@ -13,6 +13,7 @@ import { useConversationsContext } from '../../context/ConversationsContext';
 
 interface InspectionFeeDisplayProps {
   property: Property;
+  ownerLikelySuspended?: boolean;
 }
 
 const formatNaira = (amount: number) =>
@@ -73,7 +74,7 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   },
 };
 
-export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ property }) => {
+export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ property, ownerLikelySuspended }) => {
   const { user, profile } = useAuth();
   const { checkExistingBooking } = useInspectionBooking();
   const { findOrCreateConversation, conversations } = useConversationsContext();
@@ -82,6 +83,8 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
   const [existingBooking, setExistingBooking] = useState<InspectionBooking | null>(null);
   const [loading, setLoading] = useState(true);
   const [startingChat, setStartingChat] = useState(false);
+
+  const isSuspendedOwner = !!ownerLikelySuspended;
 
   const inspectionFee = calculateInspectionFee(
     property.price,
@@ -307,11 +310,11 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           </div>
 
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="w-full bg-gold text-paper py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors flex items-center justify-center gap-2"
+            onClick={() => !isSuspendedOwner && setIsModalOpen(true)}
+            className={`w-full py-3 rounded-xl font-bold text-[13px] transition-colors flex items-center justify-center gap-2 ${isSuspendedOwner ? 'bg-white/5 text-paper/30 cursor-not-allowed' : 'bg-gold text-paper hover:bg-gold-dark'}`}
           >
             <Calendar className="w-4 h-4" />
-            Book Inspection — {formatFee(inspectionFee)}
+            {isSuspendedOwner ? 'Temporarily unavailable' : `Book Inspection — ${formatFee(inspectionFee)}`}
           </button>
         </div>
 
@@ -355,8 +358,8 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           </div>
 
        <button
-  onClick={handleStartChat}
-  disabled={startingChat}
+  onClick={() => !isSuspendedOwner && handleStartChat()}
+  disabled={startingChat || isSuspendedOwner}
   className="w-full bg-white/5 border border-white/10 text-paper/60 py-3 rounded-xl font-semibold text-[13px] hover:bg-white/8 hover:text-paper transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
 >
   {startingChat

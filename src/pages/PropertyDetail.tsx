@@ -304,6 +304,7 @@ export default function PropertyDetail() {
 
   const [property, setProperty] = useState<Property | null>(null);
   const [owner, setOwner] = useState<Profile | null>(null);
+  const [ownerLikelySuspended, setOwnerLikelySuspended] = useState(false);
   const [priceHistory, setPriceHistory] = useState<{ old_price: number; new_price: number; changed_at: string }[]>([]);
   const [showPriceHistory, setShowPriceHistory] = useState(false);
 
@@ -356,6 +357,7 @@ export default function PropertyDetail() {
           .eq('id', data.owner_id)
           .single();
         setOwner(ownerData as Profile);
+        if (!ownerData) setOwnerLikelySuspended(true);
       }
 
       // Increment view count — debounced via localStorage
@@ -837,7 +839,7 @@ export default function PropertyDetail() {
               </div>
 
               {/* Inspection fee */}
-              {property.status === 'active' && !isOwner && <InspectionFeeDisplay property={property} />}
+              {property.status === 'active' && !isOwner && <InspectionFeeDisplay property={property} ownerLikelySuspended={ownerLikelySuspended} />}
 
               {/* Escrow info */}
               <div className="bg-ink border border-gold/25 rounded-2xl p-5">
