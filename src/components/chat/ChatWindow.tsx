@@ -109,6 +109,12 @@ const DealOfferCard = ({
             <p className="text-[12px] text-paper/60">{offer.duration}</p>
           </div>
         )}
+        {(offer as any).caution_fee && (
+          <div className="flex items-center justify-between pt-1 border-t border-white/5">
+            <p className="text-[11px] text-paper/40">Caution / Security Deposit</p>
+            <p className="text-[12px] font-semibold text-paper/70">{formatNaira((offer as any).caution_fee)}</p>
+          </div>
+        )}
         {offer.move_in_date && (
           <div className="flex items-center gap-2">
             <Calendar className="w-3.5 h-3.5 text-paper/30 flex-shrink-0" />
@@ -171,6 +177,7 @@ const CreateDealModal = ({
     duration: string;
     moveInDate: string;
     note: string;
+    cautionFee?: number;
   }) => void;
   sending: boolean;
 }) => {
@@ -178,6 +185,7 @@ const CreateDealModal = ({
   const [duration, setDuration] = useState('1 year');
   const [moveInDate, setMoveInDate] = useState('');
   const [note, setNote] = useState('');
+  const [cautionFee, setCautionFee] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
 
   const handleSubmit = () => {
@@ -191,7 +199,7 @@ const CreateDealModal = ({
       return;
     }
     setLocalError(null);
-    onSend({ agreedPrice: price, duration, moveInDate, note });
+    onSend({ agreedPrice: price, duration, moveInDate, note, cautionFee: cautionFee ? parseInt(cautionFee) : undefined });
   };
 
   return (
@@ -237,6 +245,16 @@ const CreateDealModal = ({
             {agreedPrice && !isNaN(parseInt(agreedPrice)) && (
               <p className="text-[11px] text-gold mt-1 ml-1">= {formatNaira(parseInt(agreedPrice))}</p>
             )}
+          </div>
+          <div>
+            <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">Caution / Security Deposit (₦) <span className="normal-case text-paper/25">(optional)</span></label>
+            <input
+              type="number"
+              value={cautionFee}
+              onChange={e => setCautionFee(e.target.value)}
+              placeholder="e.g. 200000"
+              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/50 transition-colors"
+            />
           </div>
           <div>
             <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">Duration</label>
@@ -560,6 +578,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     duration: string;
     moveInDate: string;
     note: string;
+    cautionFee?: number;
   }) => {
     if (!propertyId || !recipientId) {
       setLocalError('Cannot send deal offer — property or recipient information is missing.');
@@ -579,6 +598,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         duration: data.duration,
         moveInDate: data.moveInDate,
         note: data.note,
+        cautionFee: data.cautionFee,
       });
       setShowDealModal(false);
     } catch (err: unknown) {
@@ -867,7 +887,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             </div>
           )}
           {offPlatformWarning && (
-            <p className="text-[11px] text-paper/45 mb-2 px-1">{offPlatformWarning.message}</p>
+            <div className="flex items-start gap-2 mb-2 px-3 py-2 bg-gold/8 border border-gold/20 rounded-xl">
+              <AlertCircle className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
+              <p className="text-[12px] text-paper/80 leading-snug">{offPlatformWarning.message}</p>
+            </div>
           )}
           <div className="flex items-end gap-2">
             <input

@@ -250,7 +250,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
               <p className="text-[12px] text-white/45 text-center mb-6 leading-relaxed">
                 {showConfirm.type === 'interested'
                   ? "The landlord will be notified. You have 72 hours to start escrow before your priority expires."
-                  : "You will receive a 70% refund of your inspection fee. This cannot be undone."
+                  : "The agent/landlord keeps the inspection fee, same as any completed visit. This cannot be undone."
                 }
               </p>
               <div className="flex gap-3">

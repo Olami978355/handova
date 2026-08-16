@@ -108,16 +108,16 @@ const sections = [
         body: `Inspection fees are partially refundable based on the outcome of your inspection visit. The following refund schedule applies:`
       },
       {
-        heading: '100% Refund Cases',
-        body: `You receive a full refund of your inspection fee if: the property is significantly different from what was advertised, the landlord or agent cancels or fails to show up for the inspection, another tenant completes an escrow deal for the property before your inspection, or the property is found to be uninhabitable.`
+        heading: 'Cancel Before the Inspection Date',
+        body: `You can cancel your booking and receive a full refund of your inspection fee any time before the scheduled inspection date.`
       },
       {
-        heading: '70% Refund Cases',
-        body: `You receive 70% of your inspection fee if: you inspect the property and decide not to proceed for any personal reason, the property matches the listing but does not meet your expectations, or you choose a different property on the platform.`
+        heading: 'Automatic Release on the Inspection Date',
+        body: `Once the scheduled inspection date arrives, the fee is automatically released to the agent or landlord. This cannot be reversed through a refund request.`
       },
       {
-        heading: '0% Refund Cases',
-        body: `No refund is issued if: you book an inspection but fail to show up without cancelling at least 24 hours in advance, you have already entered into an escrow deal for the property, or your account is suspended for violating our terms of service.`
+        heading: 'Disputes After the Inspection Date',
+        body: `If the inspection did not happen as agreed, or the property was significantly misrepresented, you may raise a dispute for a moderator to review. A refund is only issued if the dispute is resolved in your favour.`
       },
       {
         heading: '2. Escrow Payment Refunds',

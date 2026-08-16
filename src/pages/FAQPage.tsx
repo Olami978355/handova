@@ -39,7 +39,7 @@ const faqs = [
       },
       {
         q: 'Can I get my inspection fee back?',
-        a: 'Yes, in most cases. You get 100% back if the property is misrepresented, the landlord cancels, or the property is taken by another tenant before your visit. You get 70% back if you inspect and decide not to proceed for personal reasons. You get 0% back only if you book and fail to show up without cancelling.'
+        a: "You can cancel and get a full refund any time before the scheduled inspection date. Once that date arrives, the fee is automatically released to the agent or landlord and can't be reversed through a refund request. If the inspection didn't happen as agreed or the property was significantly misrepresented, you can raise a dispute for a moderator to review — a refund is only issued if the dispute is upheld."
       },
       {
         q: 'What if the property looks nothing like the photos?',

@@ -296,9 +296,9 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   <div className="pt-1 space-y-1.5">
                     {[
                       'Your slot is guaranteed once paid',
-                      '70% back if you decide not to proceed',
-                      '100% back if the property is misrepresented',
-                      '100% back if another tenant takes it first',
+                      'Full refund if you cancel before the inspection date',
+                      'Fee auto-releases on the inspection date, non-refundable after',
+                      'Disputes reviewed by a moderator if something goes wrong',
                     ].map((t, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <CheckCircle className="w-3 h-3 text-[#4ade80] flex-shrink-0" />
@@ -488,7 +488,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   <Shield className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
                   <p className="text-[11px] text-white/40 leading-relaxed">
                     <span className="text-white/60 font-semibold">Your money is protected. </span>
-                    70% refund if you decline. 100% refund if the property is taken.
+                    Full refund if you cancel before the inspection date. Once that date passes, the fee auto-releases and can only be refunded via a dispute review.
                   </p>
                 </div>
 

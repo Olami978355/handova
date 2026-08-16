@@ -680,7 +680,7 @@ export default function Landing() {
             <HowStep
               num="02" icon={CheckCircle} delay={0.1}
               title="Book Inspection"
-              desc="Pay a small inspection fee to secure your viewing slot. Get 70-100% refund if anything goes wrong."
+              desc="Pay a small inspection fee to secure your viewing slot. Cancel anytime before the visit for a full refund."
             />
             <HowStep
               num="03" icon={FileText} delay={0.2}

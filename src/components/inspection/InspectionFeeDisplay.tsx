@@ -54,7 +54,7 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   },
   tenant_declined: {
     label: 'Inspection Declined',
-    description: 'You declined after inspection. A 70% refund has been processed.',
+    description: 'You declined after your visit. The agent/landlord keeps the fee, same as any completed inspection.',
     color: 'text-paper/40',
   },
   refunded: {
@@ -298,9 +298,9 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
 
           <div className="grid grid-cols-1 gap-1.5 mb-4">
             {[
-              { text: '70% refund if you decline after visiting', icon: '↩' },
-              { text: '100% refund if taken by another tenant', icon: '✓' },
-              { text: '100% refund if property is misrepresented', icon: '✓' },
+              { text: 'Full refund if you cancel before the inspection date', icon: '↩' },
+              { text: 'Fee auto-releases to the agent/landlord on the inspection date', icon: 'ℹ' },
+              { text: 'Refund only via dispute review after that', icon: '⚠' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="text-[#4ade80] text-[11px] flex-shrink-0">{item.icon}</span>

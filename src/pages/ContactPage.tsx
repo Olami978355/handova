@@ -70,7 +70,7 @@ export default function ContactPage() {
             <div className="bg-ink border border-white/6 rounded-2xl p-5">
               <h3 className="text-[14px] font-bold text-paper mb-3">Common Topics</h3>
               <div className="space-y-2">
-                {['Refund requests', 'Listing disputes', 'Account verification', 'Partnership inquiries', 'Bug reports'].map(t => (
+                {['Account verification', 'Partnership inquiries', 'Bug reports', 'General questions'].map(t => (
                   <div key={t} className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-gold rounded-full" />
                     <span className="text-[13px] text-paper/45">{t}</span>
