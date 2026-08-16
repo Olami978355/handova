@@ -79,6 +79,24 @@ export const LandlordBookingsList: React.FC = () => {
     }
   };
 
+  const handleMarkDone = async (bookingId: string) => {
+    setConfirming(bookingId);
+    setActionError(null);
+    try {
+      if (!(await requireValidSession())) return;
+      const { error } = await supabase.functions.invoke(
+        'mark-inspection-done',
+        { body: { bookingId } }
+      );
+      if (error) throw error;
+      await fetchData();
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : 'Failed to mark inspection complete');
+    } finally {
+      setConfirming(null);
+    }
+  };
+
   const handleStartEscrow = async (bookingId: string) => {
     setStartingEscrow(bookingId);
     setActionError(null);
@@ -291,6 +309,19 @@ export const LandlordBookingsList: React.FC = () => {
                                 : <CheckCircle className="w-3.5 h-3.5" />
                               }
                               Confirm Date
+                            </button>
+                          )}
+                          {booking.status === 'inspection_scheduled' && (
+                            <button
+                              onClick={() => handleMarkDone(booking.id)}
+                              disabled={confirming === booking.id}
+                              className="flex-1 bg-gold text-white py-2.5 rounded-xl text-[12px] font-bold hover:bg-gold-dark transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                            >
+                              {confirming === booking.id
+                                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                : <CheckCircle className="w-3.5 h-3.5" />
+                              }
+                              Mark Inspection Complete
                             </button>
                           )}
 
