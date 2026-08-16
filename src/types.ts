@@ -220,6 +220,7 @@ export interface Deal {
   landlord_id: string;
   agent_id?: string;
   amount: number;
+  caution_fee?: number;
   listed_amount: number;
   inspection_fee_credit?: number;
   platform_fee: number;

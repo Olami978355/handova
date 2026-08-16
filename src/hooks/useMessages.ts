@@ -308,6 +308,7 @@ export const useMessages = (conversationId?: string) => {
     duration?: string;
     moveInDate?: string;
     note?: string;
+    cautionFee?: number;
   }): Promise<void> => {
     if (!conversationId || !user || sending) return;
     setSending(true);
@@ -326,6 +327,7 @@ export const useMessages = (conversationId?: string) => {
           duration: offer.duration || null,
           move_in_date: offer.moveInDate || null,
           note: offer.note || null,
+          caution_fee: offer.cautionFee || null,
           status: 'pending',
           expires_at: expiresAt.toISOString(),
         })

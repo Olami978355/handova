@@ -1032,6 +1032,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
               <div className="space-y-2.5">
                 {[
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
+                  ...(deal.caution_fee ? [{ label: 'Caution / Security Deposit', value: formatNaira(deal.caution_fee) }] : []),
                   { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}` },
                   ...(deal.agent_id && deal.agent_fee && deal.agent_fee > 0
                     ? [

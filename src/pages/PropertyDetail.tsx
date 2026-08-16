@@ -647,6 +647,11 @@ export default function PropertyDetail() {
                     {property.price_period && (
                       <div className="text-[12px] text-paper/35 mt-1">{periodLabel[property.price_period]}</div>
                     )}
+                    {(property as any).caution_fee && (
+                      <div className="text-[12px] text-paper/40 mt-1">
+                        + {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format((property as any).caution_fee)} caution/security deposit
+                      </div>
+                    )}
                     {priceHistory.length > 0 && (
                       <button
                         onClick={() => setShowPriceHistory(!showPriceHistory)}
