@@ -85,41 +85,18 @@ serve(async (req) => {
         );
       }
     } else {
-      // Declined: trigger 70% Paystack refund
-      const refundPercentage = 70;
-      const refundAmount = booking.inspection_fee * (refundPercentage / 100);
-      const refundAmountKobo = toKobo(refundAmount);
-
-      // Call Paystack refund API
-      const refundResponse = await fetch('https://api.paystack.co/refund', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${paystackSecret}`,
-        },
-        body: JSON.stringify({
-          transaction: booking.paystack_reference,
-          amount: refundAmountKobo,
-        }),
-      });
-
-      const refundData = await refundResponse.json();
-      if (!refundResponse.ok) {
-        throw new Error(`Paystack refund failed: ${refundData.message}`);
-      }
-
-      // Update booking status
+      // Declined: the visit already happened (this function only runs
+      // after inspection_done), so the agent/landlord did their job and
+      // keeps the fee — same as any completed visit. No refund. The fee
+      // still releases automatically via release-inspection-fees on the
+      // agreed release_at date, same as if the tenant had said yes.
       const { error: updateError } = await supabase
         .from('inspection_bookings')
-        .update({ 
+        .update({
           status: 'tenant_declined',
-          refund_percentage: refundPercentage,
-          refund_amount: refundAmount,
-          paystack_refund_reference: refundData.data.reference,
-          updated_at: new Date().toISOString() 
+          updated_at: new Date().toISOString()
         })
         .eq('id', bookingId);
-
       if (updateError) throw updateError;
 
       // Notify landlord/agent
@@ -135,26 +112,12 @@ serve(async (req) => {
         body: JSON.stringify({
           user_ids: parties,
           title: 'Tenant Declined',
-          body: `The tenant who inspected ${booking.properties.title} has declined. They have been issued a 70% refund.`,
+          body: `The tenant who inspected ${booking.properties.title} has declined to proceed.`,
           link: `/dashboard/bookings`,
           type: 'info',
         }),
       });
 
-      // Send Refund Email to Tenant
-      if (booking.tenant?.email) {
-        await sendEmail(
-          booking.tenant.email,
-          'Refund Processed - Rent Easy',
-          'refund',
-          {
-            name: booking.tenant.full_name,
-            propertyTitle: booking.properties.title,
-            amount: refundAmount,
-            link: `https://handova.ng/dashboard`
-          }
-        );
-      }
     }
 
     return new Response(JSON.stringify({ success: true }), {

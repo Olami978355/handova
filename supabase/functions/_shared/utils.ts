@@ -349,20 +349,25 @@ export const executeInspectionFeeTransfer = async (
   booking: any,
   actorId: string
 ) => {
-  if (!booking.agent_id) {
-    // No agent on this booking — nothing to transfer, nothing to log as a failure.
-    return { transferInitiated: false, reason: 'no_agent' };
+  // 85/15 split: whoever did the work (agent, or landlord if no agent) gets
+  // 85%, Handova keeps 15% as its cut for holding and mediating the fee.
+  const payoutRecipientId = booking.agent_id || booking.landlord_id;
+  if (!payoutRecipientId) {
+    return { transferInitiated: false, reason: 'no_recipient' };
   }
 
-  const transferAmountNaira = Number(booking.inspection_fee);
-  if (!transferAmountNaira || transferAmountNaira <= 0) {
+  const totalFee = Number(booking.inspection_fee);
+  if (!totalFee || totalFee <= 0) {
     return { transferInitiated: false, reason: 'zero_fee' };
   }
+
+  const PLATFORM_CUT_RATE = 0.15;
+  const transferAmountNaira = Math.round(totalFee * (1 - PLATFORM_CUT_RATE) * 100) / 100;
 
   const { data: payoutProfile, error: payoutProfileError } = await adminSupabase
     .from('profiles')
     .select('paystack_recipient_code, full_name')
-    .eq('id', booking.agent_id)
+    .eq('id', payoutRecipientId)
     .single();
 
   if (payoutProfileError || !payoutProfile?.paystack_recipient_code) {
@@ -371,10 +376,10 @@ export const executeInspectionFeeTransfer = async (
       .update({ transfer_status: 'failed' })
       .eq('id', booking.id);
     await logAdminAction(adminSupabase, actorId, 'inspection_fee_transfer_failed', booking.id, 'inspection_booking', {
-      reason: 'Agent has no bank details on file',
-      agent_id: booking.agent_id,
+      reason: 'Recipient has no bank details on file',
+      payout_recipient_id: payoutRecipientId,
     });
-    return { transferInitiated: false, warning: 'Inspection fee received, but the agent has no bank details on file. Transfer was NOT sent.' };
+    return { transferInitiated: false, warning: 'Inspection fee release date reached, but the recipient has no bank details on file. Transfer was NOT sent.' };
   }
 
   const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
@@ -404,7 +409,7 @@ export const executeInspectionFeeTransfer = async (
     await logAdminAction(adminSupabase, actorId, 'inspection_fee_transfer_failed', booking.id, 'inspection_booking', {
       reason: transferData.message || 'Unknown Paystack transfer error',
     });
-    return { transferInitiated: false, warning: `Inspection fee received, but the Paystack transfer failed: ${transferData.message}` };
+    return { transferInitiated: false, warning: `Inspection fee release failed: ${transferData.message}` };
   }
 
   await adminSupabase
@@ -418,7 +423,8 @@ export const executeInspectionFeeTransfer = async (
 
   await logAdminAction(adminSupabase, actorId, 'inspection_fee_transfer_initiated', booking.id, 'inspection_booking', {
     amount: transferAmountNaira,
-    agent_id: booking.agent_id,
+    platform_cut: Math.round(totalFee * PLATFORM_CUT_RATE * 100) / 100,
+    payout_recipient_id: payoutRecipientId,
   });
 
   return { transferInitiated: true };

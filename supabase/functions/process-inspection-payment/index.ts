@@ -71,11 +71,17 @@ serve(async (req) => {
         .from('inspection_bookings')
         .update({ 
           status: 'payment_confirmed', 
+          transfer_status: 'awaiting_release',
           updated_at: new Date().toISOString() 
         })
         .eq('id', booking.id);
 
       if (updateError) throw updateError;
+
+      // Fee is held by Handova, not paid out yet. It releases automatically
+      // once the agreed inspection date passes (see release-inspection-fees),
+      // giving cancellations/disputes raised before that date a clean path
+      // with no clawback ever needed.
 
       // Notify landlord/agent
       const parties = [booking.landlord_id];
