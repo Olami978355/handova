@@ -60,16 +60,16 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
   };
 
   const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
-    pending_payment:      { label: 'Pending Payment',      color: '#D4AF37', bg: 'rgba(240,192,64,0.1)' },
-    payment_confirmed:    { label: 'Payment Confirmed',    color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    inspection_scheduled: { label: 'Inspection Scheduled', color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
-    inspection_done:      { label: 'Inspection Done',      color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
-    tenant_interested:    { label: 'Interested',           color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    tenant_declined:      { label: 'Declined',             color: '#f87171', bg: 'rgba(248,113,113,0.1)' },
-    escrow_started:       { label: 'Escrow Started',       color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    pending_payment:      { label: 'Pending Payment',      color: '#D4AF37', bg: 'rgba(212,175,55,0.1)' },
+    payment_confirmed:    { label: 'Payment Confirmed',    color: '#D4AF37', bg: 'rgba(212,175,55,0.1)' },
+    inspection_scheduled: { label: 'Inspection Scheduled', color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
+    inspection_done:      { label: 'Inspection Done',      color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
+    tenant_interested:    { label: 'Interested',           color: '#D4AF37', bg: 'rgba(212,175,55,0.1)' },
+    tenant_declined:      { label: 'Declined',             color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
+    escrow_started:       { label: 'Escrow Started',       color: '#D4AF37', bg: 'rgba(212,175,55,0.1)' },
     refunded:             { label: 'Refunded',             color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
-    dispute_raised:       { label: 'Dispute Raised',       color: '#fb923c', bg: 'rgba(251,146,60,0.1)' },
-    dispute_resolved:     { label: 'Dispute Resolved',     color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+    dispute_raised:       { label: 'Dispute Raised',       color: '#E5484D', bg: 'rgba(229,72,77,0.1)' },
+    dispute_resolved:     { label: 'Dispute Resolved',     color: '#D4AF37', bg: 'rgba(212,175,55,0.1)' },
   };
 
   const status = statusConfig[booking.status] || {
@@ -171,7 +171,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
               </button>
               <button
                 onClick={() => setShowConfirm({ type: 'declined', show: true })}
-                className="py-2.5 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-[12px] font-bold hover:bg-red-500/15 transition-colors flex items-center justify-center gap-1.5"
+                className="py-2.5 bg-white/5 border border-white/10 text-paper/60 rounded-xl text-[12px] font-bold hover:bg-white/8 transition-colors flex items-center justify-center gap-1.5"
               >
                 <XCircle className="w-3.5 h-3.5" />
                 Not Interested
@@ -184,10 +184,10 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
         {booking.status === 'refunded' && (
           <div className="flex items-center justify-between p-3 bg-white/4 border border-white/6 rounded-xl mb-4">
             <div className="flex items-center gap-2 text-white/40">
-              <CheckCircle className="w-4 h-4 text-[#4ade80]" />
+              <CheckCircle className="w-4 h-4 text-gold" />
               <span className="text-[12px] font-semibold">Refund processed</span>
             </div>
-            <span className="text-[13px] font-black text-[#4ade80]">
+            <span className="text-[13px] font-black text-gold">
               {formatFee(booking.refund_amount || 0)}
             </span>
           </div>
@@ -196,8 +196,8 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
         {/* Escrow started */}
         {booking.status === 'escrow_started' && (
           <div className="flex items-center gap-2 p-3 bg-gold/15 border border-gold/25 rounded-xl mb-4">
-            <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0" />
-            <p className="text-[12px] text-[#4ade80] font-semibold">
+            <Shield className="w-4 h-4 text-gold flex-shrink-0" />
+            <p className="text-[12px] text-gold font-semibold">
               Escrow deal is active for this property
             </p>
           </div>
@@ -234,11 +234,11 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
                 showConfirm.type === 'interested'
                   ? 'bg-gold/20'
-                  : 'bg-red-500/15'
+                  : 'bg-white/10'
               }`}>
                 {showConfirm.type === 'interested'
-                  ? <CheckCircle className="w-7 h-7 text-[#4ade80]" />
-                  : <XCircle className="w-7 h-7 text-red-400" />
+                  ? <CheckCircle className="w-7 h-7 text-gold" />
+                  : <XCircle className="w-7 h-7 text-paper/60" />
                 }
               </div>
               <h3 className="text-[17px] font-black text-white text-center mb-2">
@@ -266,7 +266,7 @@ export const InspectionBookingCard: React.FC<InspectionBookingCardProps> = ({
                   className={`flex-1 py-3 rounded-xl font-bold text-[13px] text-white transition-colors flex items-center justify-center gap-2 ${
                     showConfirm.type === 'interested'
                       ? 'bg-gold hover:bg-gold-dark'
-                      : 'bg-red-500 hover:bg-red-600'
+                      : 'bg-white/10 hover:bg-white/15'
                   }`}
                 >
                   {loading
