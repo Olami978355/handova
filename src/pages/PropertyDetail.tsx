@@ -136,7 +136,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
-  const propertyUrl = `https://renteasyapp.com/property/${property.id}`;
+  const propertyUrl = `${window.location.origin}/property/${property.id}`;
   const priceStr = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(property.price);
   const periodStr = property.price_period && property.price_period !== 'outright' ? `/${property.price_period}` : '';
   const whatsappText = encodeURIComponent(`🏠 *${property.title}*\n📍 ${property.lga}, ${property.state}\n💰 ${priceStr}${periodStr}\n✓ Escrow Protected · ✓ Verified\n\nBook inspection:\n${propertyUrl}\n\n_Listed on RentEasy — Nigeria's trusted real estate platform_`);
@@ -425,7 +425,7 @@ export default function PropertyDetail() {
 
   const periodLabel: Record<string, string> = { yearly: '/ year', monthly: '/ month', nightly: '/ night', outright: '' };
 
-  const propertyUrl = `https://renteasyapp.com/property/${id}`;
+  const propertyUrl = `${window.location.origin}/property/${id}`;
   const ogDescription = property
     ? `${formatNaira(property.price)} · ${property.lga}, ${property.state} · Escrow Protected · Book Inspection on RentEasy`
     : 'Find verified properties in Nigeria with escrow protection.';
