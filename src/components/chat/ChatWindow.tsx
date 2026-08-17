@@ -649,6 +649,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 const isMe = msg.sender_id === user?.id;
                 const isOptimistic = msg.id.startsWith('temp-');
                 const isCustomDeal = msg.message_type === 'custom_deal_offer';
+                const isMedia = !!msg.media_url && (msg.media_type === 'image' || msg.media_type === 'video');
                 const isDeleted = !!msg.deleted_for_everyone;
                 const isEditing = editingId === msg.id;
                 const canEdit = isMe && !isCustomDeal && !isDeleted && !isOptimistic &&
@@ -703,10 +704,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                           onMouseLeave={endLongPress}
                           onTouchStart={() => !isDeleted && startLongPress(msg)}
                           onTouchEnd={endLongPress}
-                          className={`px-4 py-2.5 text-[13px] leading-relaxed break-words cursor-pointer select-none ${
+                          className={`text-[13px] leading-relaxed break-words cursor-pointer select-none ${isMedia ? '' : 'px-4 py-2.5'} ${
                             isMe
-                              ? 'bg-gold text-paper rounded-2xl rounded-tr-sm'
-                              : 'bg-ink border border-white/8 text-paper/85 rounded-2xl rounded-tl-sm'
+                              ? `${isMedia ? '' : 'bg-gold'} text-paper rounded-2xl rounded-tr-sm overflow-hidden`
+                              : `${isMedia ? '' : 'bg-ink border border-white/8'} text-paper/85 rounded-2xl rounded-tl-sm overflow-hidden`
                           } ${isDeleted ? 'italic opacity-50' : ''}`}
                         >
                           {msg.quoted_message && !isDeleted && (
