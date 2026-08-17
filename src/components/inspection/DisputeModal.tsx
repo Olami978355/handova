@@ -98,13 +98,13 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                   className="p-5 space-y-4 max-h-[70vh] overflow-y-auto"
                 >
                   {/* Warning */}
-                  <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-3 p-4 bg-danger/10 border border-danger/20 rounded-xl">
+                    <AlertCircle className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-[12px] font-bold text-red-400 mb-1">
+                      <p className="text-[12px] font-bold text-danger mb-1">
                         Important
                       </p>
-                      <p className="text-[11px] text-red-400/70 leading-relaxed">
+                      <p className="text-[11px] text-danger/70 leading-relaxed">
                         Raising a dispute freezes the inspection fee. A moderator will review your evidence within 24-48 hours. False disputes may lead to account suspension.
                       </p>
                     </div>
@@ -113,12 +113,12 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                   {/* Reason */}
                   <div>
                     <label className="block text-[12px] font-semibold text-white/40 uppercase tracking-wider mb-2">
-                      Reason <span className="text-red-400">*</span>
+                      Reason <span className="text-gold">*</span>
                     </label>
                     <select
                       value={reason}
                       onChange={e => { setReason(e.target.value); setError(null); }}
-                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-red-500/50 transition-colors appearance-none cursor-pointer"
+                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white focus:outline-none focus:border-gold/50 transition-colors appearance-none cursor-pointer"
                     >
                       <option value="" className="bg-ink">Select a reason</option>
                       {disputeReasons.map(r => (
@@ -131,10 +131,10 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-[12px] font-semibold text-white/40 uppercase tracking-wider">
-                        Description <span className="text-red-400">*</span>
+                        Description <span className="text-gold">*</span>
                       </label>
                       <span className={`text-[11px] font-medium ${
-                        description.length >= 50 ? 'text-[#4ade80]' : 'text-white/25'
+                        description.length >= 50 ? 'text-gold' : 'text-white/25'
                       }`}>
                         {description.length}/50 min
                       </span>
@@ -144,7 +144,7 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                       onChange={e => { setDescription(e.target.value); setError(null); }}
                       rows={4}
                       placeholder="Describe in detail what happened and how the property differed from the listing..."
-                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/50 transition-colors resize-none"
+                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-white/20 focus:outline-none focus:border-gold/50 transition-colors resize-none"
                     />
                   </div>
 
@@ -166,7 +166,7 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                           <button
                             type="button"
                             onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))}
-                            className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
+                            className="absolute top-1 right-1 w-5 h-5 bg-danger text-white rounded-full flex items-center justify-center"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -187,9 +187,9 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                   </div>
 
                   {error && (
-                    <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                      <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-                      <p className="text-[12px] text-red-400">{error}</p>
+                    <div className="flex items-center gap-2 p-3 bg-danger/10 border border-danger/20 rounded-xl">
+                      <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
+                      <p className="text-[12px] text-danger">{error}</p>
                     </div>
                   )}
 
@@ -204,7 +204,7 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex-1 py-3.5 rounded-xl font-bold text-[13px] text-white bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                      className="flex-1 py-3.5 rounded-xl font-bold text-[13px] text-black bg-gold hover:bg-gold-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                       {loading
                         ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -220,8 +220,8 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   className="p-8 text-center"
                 >
-                  <div className="w-16 h-16 bg-red-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Shield className="w-8 h-8 text-red-400" />
+                  <div className="w-16 h-16 bg-gold/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Shield className="w-8 h-8 text-gold" />
                   </div>
                   <h3 className="text-[18px] font-black text-white mb-2">
                     Dispute Raised
