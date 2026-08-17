@@ -301,7 +301,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                       'Disputes reviewed by a moderator if something goes wrong',
                     ].map((t, i) => (
                       <div key={i} className="flex items-center gap-2">
-                        <CheckCircle className="w-3 h-3 text-[#4ade80] flex-shrink-0" />
+                        <CheckCircle className="w-3 h-3 text-gold flex-shrink-0" />
                         <span className="text-[11px] text-white/45">{t}</span>
                       </div>
                     ))}
@@ -493,9 +493,9 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                 </div>
 
                 {error && (
-                  <div className="flex items-start gap-2 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl">
-                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-[12px] text-red-400 leading-relaxed">{error}</p>
+                  <div className="flex items-start gap-2 p-3.5 bg-danger/10 border border-danger/20 rounded-xl">
+                    <AlertCircle className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
+                    <p className="text-[12px] text-danger leading-relaxed">{error}</p>
                   </div>
                 )}
 
