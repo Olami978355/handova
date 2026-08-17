@@ -4,7 +4,7 @@ import {
   Shield, CheckCircle2, Clock, FileText, CreditCard,
   Home, AlertTriangle, Loader2, ArrowLeft, Download,
   Key, History, User, ExternalLink, X, Upload,
-  Eye, ThumbsUp, ThumbsDown, MessageSquare
+  Eye, ThumbsUp, ThumbsDown, MessageSquare, Scale
 } from 'lucide-react';
 import { useDeal } from '../hooks/useDeal';
 import { ReceiptPanel } from '../components/receipt/ReceiptCards';
@@ -14,6 +14,7 @@ import { DealDelegatePreview } from '../components/deal/DealDelegatePreview';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
+import { LawyerReviewModal } from '../components/deal/LawyerReviewModal';
 import { supabase, requireValidSession } from '../lib/supabase';
 import { parseFunctionError } from '../lib/parseFunctionError';
 import { VerifiedBadge } from '../components/VerifiedBadge';
@@ -175,6 +176,8 @@ export default function DealDetail() {
   const [canSignAsDelegate, setCanSignAsDelegate] = useState(false);
   const [canConfirmMoveInAsDelegate, setCanConfirmMoveInAsDelegate] = useState(false);
   const [delegateRepresentsTenant, setDelegateRepresentsTenant] = useState(false);
+  const [showLawyerReviewModal, setShowLawyerReviewModal] = useState(false);
+  const [lawyerBooking, setLawyerBooking] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     if (!deal || !user || isTenant) return;
@@ -194,6 +197,17 @@ export default function DealDetail() {
         setDelegateRepresentsTenant(representsTenant);
       });
   }, [deal?.id, user?.id, isTenant]);
+  useEffect(() => {
+    if (!deal) return;
+    supabase
+      .from('lawyer_review_bookings')
+      .select('*')
+      .eq('deal_id', deal.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => setLawyerBooking(data));
+  }, [deal?.id]);
   const [showChangeModal, setShowChangeModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -569,6 +583,37 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   </div>
                   <p className="text-[11px] text-paper/30 text-center mt-2.5">
                     You'll be taken to payment next.
+                  </p>
+                </div>
+              )}
+
+              {/* Lawyer review trigger / status, tenant only for now */}
+              {deal.status === 'agreement_draft' && deal.agreement_url && isTenant && !lawyerBooking && (
+                <button
+                  onClick={() => setShowLawyerReviewModal(true)}
+                  className="w-full mt-3 flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-[12px] font-bold text-paper/60 hover:text-paper hover:bg-white/8 transition-colors"
+                >
+                  <Scale className="w-3.5 h-3.5" />
+                  Get this reviewed by a lawyer first
+                </button>
+              )}
+
+              {deal.status === 'agreement_draft' && isTenant && lawyerBooking && (lawyerBooking.status === 'paid' || lawyerBooking.status === 'verdict_submitted') && (
+                <div className="mt-3 p-3 bg-gold/6 border border-gold/15 rounded-xl flex items-center gap-2.5">
+                  <Scale className="w-4 h-4 text-gold flex-shrink-0" />
+                  <p className="text-[11px] text-paper/60">
+                    {lawyerBooking.status === 'paid'
+                      ? "Lawyer review requested. You'll be notified once they respond."
+                      : 'Lawyer review submitted. Check your notifications for the verdict.'}
+                  </p>
+                </div>
+              )}
+
+              {deal.status === 'agreement_draft' && isTenant && lawyerBooking && lawyerBooking.status === 'expired' && (
+                <div className="mt-3 p-3 bg-white/4 border border-white/8 rounded-xl flex items-center gap-2.5">
+                  <Scale className="w-4 h-4 text-paper/30 flex-shrink-0" />
+                  <p className="text-[11px] text-paper/40">
+                    The lawyer didn't respond in time. Your review fee was refunded.
                   </p>
                 </div>
               )}
@@ -1207,6 +1252,14 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
         </div>
       </div>
 
+
+      {showLawyerReviewModal && (
+        <LawyerReviewModal
+          dealId={deal.id}
+          onClose={() => setShowLawyerReviewModal(false)}
+          onBooked={() => refresh()}
+        />
+      )}
 
       <ConfirmModal
         open={showChangeModal}

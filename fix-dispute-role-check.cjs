@@ -1,0 +1,10 @@
+const fs = require('fs');
+const path = 'supabase/functions/resolve-inspection-dispute/index.ts';
+const raw = fs.readFileSync(path, 'utf8');
+const eol = raw.includes('\r\n') ? '\r\n' : '\n';
+const lines = raw.split(/\r\n|\n/);
+const idx = lines.findIndex(l => l.includes("profile.role !== 'admin' && profile.role !== 'staff'"));
+if (idx === -1) throw new Error('Anchor not found.');
+lines[idx] = lines[idx].replace("profile.role !== 'staff'", "profile.role !== 'moderator'");
+fs.writeFileSync(path, lines.join(eol), 'utf8');
+console.log('resolve-inspection-dispute: staff -> moderator fixed.');
