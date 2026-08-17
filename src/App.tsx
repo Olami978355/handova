@@ -14,6 +14,7 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import OnboardingWizard from './pages/onboarding/OnboardingWizard';
 import VerificationPage from './pages/verification/VerificationPage';
 import LawyerVerificationPage from './pages/lawyer/LawyerVerificationPage';
+import LawyerBookingsPage from './pages/lawyer/LawyerBookingsPage';
 import Listings from './pages/Listings';
 import PropertyDetail from './pages/PropertyDetail';
 import HowItWorks from './pages/HowItWorks';
@@ -134,6 +135,7 @@ function AppInner() {
             <Route path="onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
             <Route path="verification" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
             <Route path="lawyer/verification" element={<ProtectedRoute><LawyerVerificationPage /></ProtectedRoute>} />
+            <Route path="lawyer/bookings" element={<ProtectedRoute><LawyerBookingsPage /></ProtectedRoute>} />
             <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="landlord/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="agent/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
