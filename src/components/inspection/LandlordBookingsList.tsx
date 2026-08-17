@@ -144,13 +144,13 @@ export const LandlordBookingsList: React.FC = () => {
 
   const bookingStatusColor: Record<string, string> = {
     payment_confirmed: '#D4AF37',
-    inspection_scheduled: '#60a5fa',
-    inspection_done: '#a78bfa',
-    tenant_interested: '#4ade80',
-    tenant_declined: '#f87171',
-    escrow_started: '#4ade80',
+    inspection_scheduled: '#9ca3af',
+    inspection_done: '#9ca3af',
+    tenant_interested: '#D4AF37',
+    tenant_declined: '#9ca3af',
+    escrow_started: '#D4AF37',
     refunded: '#9ca3af',
-    dispute_raised: '#fb923c',
+    dispute_raised: '#E5484D',
   };
 
   return (
@@ -159,9 +159,9 @@ export const LandlordBookingsList: React.FC = () => {
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {actionError && (
-        <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-[13px] text-red-400">{actionError}</p>
+        <div className="flex items-start gap-3 p-4 bg-danger/10 border border-danger/20 rounded-xl">
+          <AlertCircle className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
+          <p className="text-[13px] text-danger">{actionError}</p>
         </div>
       )}
 
@@ -210,7 +210,7 @@ export const LandlordBookingsList: React.FC = () => {
                       </span>
                     )}
                     {property.has_active_deal && (
-                      <span className="text-[10px] font-bold text-[#4ade80] bg-gold/20 px-2 py-0.5 rounded-full border border-gold/30">
+                      <span className="text-[10px] font-bold text-gold bg-gold/20 px-2 py-0.5 rounded-full border border-gold/30">
                         Deal active
                       </span>
                     )}
@@ -350,8 +350,8 @@ export const LandlordBookingsList: React.FC = () => {
 
                         {booking.status === 'escrow_started' && (
                           <div className="flex items-center gap-2 mt-3 p-3 bg-gold/10 border border-gold/20 rounded-xl">
-                            <Shield className="w-4 h-4 text-[#4ade80] flex-shrink-0" />
-                            <p className="text-[11px] text-[#4ade80] font-semibold">
+                            <Shield className="w-4 h-4 text-gold flex-shrink-0" />
+                            <p className="text-[11px] text-gold font-semibold">
                               Escrow deal is active with this tenant
                             </p>
                           </div>
