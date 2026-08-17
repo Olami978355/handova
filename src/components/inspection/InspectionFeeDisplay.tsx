@@ -30,12 +30,12 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   payment_confirmed: {
     label: 'Payment Confirmed',
     description: 'Your inspection fee has been received. The landlord will confirm your inspection date shortly.',
-    color: 'text-[#4ade80]',
+    color: 'text-gold',
   },
   inspection_scheduled: {
     label: 'Inspection Scheduled',
     description: 'Your inspection has been confirmed. Check your dashboard for the date and time.',
-    color: 'text-[#4ade80]',
+    color: 'text-gold',
   },
   inspection_done: {
     label: 'Inspection Completed',
@@ -50,7 +50,7 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   escrow_started: {
     label: 'Escrow Started',
     description: 'The deal is in progress. Go to your dashboard to complete the payment.',
-    color: 'text-[#4ade80]',
+    color: 'text-gold',
   },
   tenant_declined: {
     label: 'Inspection Declined',
@@ -65,7 +65,7 @@ const STATUS_INFO: Record<string, { label: string; description: string; color: s
   dispute_raised: {
     label: 'Dispute Raised',
     description: 'A dispute is under review by our moderation team.',
-    color: 'text-red-400',
+    color: 'text-danger',
   },
   dispute_resolved: {
     label: 'Dispute Resolved',
@@ -223,7 +223,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           {/* Refund info if applicable */}
           {existingBooking.refund_amount && existingBooking.refund_amount > 0 && (
             <div className="flex items-center gap-2 p-3 bg-white/4 border border-white/6 rounded-xl">
-              <CheckCircle className="w-3.5 h-3.5 text-[#4ade80] flex-shrink-0" />
+              <CheckCircle className="w-3.5 h-3.5 text-[#D4AF37] flex-shrink-0" />
               <p className="text-[12px] text-paper/50">
                 Refund of {formatNaira(existingBooking.refund_amount)} processed
                 ({existingBooking.refund_percentage}%)
@@ -303,7 +303,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
               { text: 'Refund only via dispute review after that', icon: '⚠' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-2">
-                <span className="text-[#4ade80] text-[11px] flex-shrink-0">{item.icon}</span>
+                <span className="text-[#D4AF37] text-[11px] flex-shrink-0">{item.icon}</span>
                 <span className="text-[11px] text-paper/45">{item.text}</span>
               </div>
             ))}
