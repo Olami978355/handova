@@ -4,7 +4,7 @@ import {
   Shield, CheckCircle2, Clock, FileText, CreditCard,
   Home, AlertTriangle, Loader2, ArrowLeft, Download,
   Key, History, User, ExternalLink, X, Upload,
-  Eye, ThumbsUp, ThumbsDown, MessageSquare, Scale
+  Eye, ThumbsUp, ThumbsDown, MessageSquare, Scale, Star
 } from 'lucide-react';
 import { useDeal } from '../hooks/useDeal';
 import { ReceiptPanel } from '../components/receipt/ReceiptCards';
@@ -178,6 +178,7 @@ export default function DealDetail() {
   const [delegateRepresentsTenant, setDelegateRepresentsTenant] = useState(false);
   const [showLawyerReviewModal, setShowLawyerReviewModal] = useState(false);
   const [lawyerBooking, setLawyerBooking] = useState<Record<string, unknown> | null>(null);
+  const [submittingRating, setSubmittingRating] = useState(false);
 
   useEffect(() => {
     if (!deal || !user || isTenant) return;
@@ -208,6 +209,23 @@ export default function DealDetail() {
       .maybeSingle()
       .then(({ data }) => setLawyerBooking(data));
   }, [deal?.id]);
+  const submitLawyerRating = async (rating: number) => {
+    if (!lawyerBooking || !user) return;
+    setSubmittingRating(true);
+    try {
+      const { error } = await supabase
+        .from('lawyer_review_bookings')
+        .update({ requester_rating: rating })
+        .eq('id', lawyerBooking.id as string)
+        .eq('requested_by', user.id);
+      if (error) throw error;
+      setLawyerBooking({ ...lawyerBooking, requester_rating: rating });
+    } catch (err) {
+      console.error('Failed to submit lawyer rating:', err);
+    } finally {
+      setSubmittingRating(false);
+    }
+  };
   const [showChangeModal, setShowChangeModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -598,14 +616,43 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                 </button>
               )}
 
-              {deal.status === 'agreement_draft' && isTenant && lawyerBooking && (lawyerBooking.status === 'paid' || lawyerBooking.status === 'verdict_submitted') && (
+              {deal.status === 'agreement_draft' && isTenant && lawyerBooking && lawyerBooking.status === 'paid' && (
                 <div className="mt-3 p-3 bg-gold/6 border border-gold/15 rounded-xl flex items-center gap-2.5">
                   <Scale className="w-4 h-4 text-gold flex-shrink-0" />
                   <p className="text-[11px] text-paper/60">
-                    {lawyerBooking.status === 'paid'
-                      ? "Lawyer review requested. You'll be notified once they respond."
-                      : 'Lawyer review submitted. Check your notifications for the verdict.'}
+                    Lawyer review requested. You'll be notified once they respond.
                   </p>
+                </div>
+              )}
+
+              {deal.status === 'agreement_draft' && isTenant && lawyerBooking && lawyerBooking.status === 'verdict_submitted' && (
+                <div className="mt-3 p-4 bg-gold/6 border border-gold/15 rounded-xl space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <Scale className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[12px] font-bold text-paper mb-1">
+                        {lawyerBooking.verdict === 'fine' ? 'Lawyer verdict: Looks fine' : 'Lawyer verdict: Has concerns'}
+                      </p>
+                      <p className="text-[11px] text-paper/50 leading-relaxed">{lawyerBooking.verdict_notes as string}</p>
+                    </div>
+                  </div>
+                  {lawyerBooking.requester_rating ? (
+                    <p className="text-[11px] text-paper/35">You rated this review {lawyerBooking.requester_rating as number}/5</p>
+                  ) : (
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <span className="text-[11px] text-paper/40 mr-1">Rate this review:</span>
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => submitLawyerRating(n)}
+                          disabled={submittingRating}
+                          className="text-gold hover:scale-110 transition-transform disabled:opacity-40"
+                        >
+                          <Star className="w-4 h-4 fill-current" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
