@@ -59,7 +59,7 @@ export default function ConfirmEmail() {
         {status === 'success' && (
           <>
             <div className="w-16 h-16 bg-gold/20 border border-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-8 h-8 text-[#4ade80]" />
+              <CheckCircle className="w-8 h-8 text-gold" />
             </div>
             <h2 className="text-[28px] font-black text-paper mb-3">Email confirmed!</h2>
             <p className="text-[14px] text-paper/50 leading-relaxed mb-8">
@@ -76,8 +76,8 @@ export default function ConfirmEmail() {
 
         {status === 'error' && (
           <>
-            <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <AlertCircle className="w-8 h-8 text-red-400" />
+            <div className="w-16 h-16 bg-danger/10 border border-danger/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-8 h-8 text-danger" />
             </div>
             <h2 className="text-[28px] font-black text-paper mb-3">Verification failed</h2>
             <p className="text-[14px] text-paper/50 leading-relaxed mb-8">{error}</p>

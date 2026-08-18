@@ -76,10 +76,10 @@ export default function ResetPasswordPage() {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+            className="mb-6 flex items-start gap-3 p-4 bg-danger/10 border border-danger/20 rounded-xl"
           >
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-[13px] text-red-400">{error}</p>
+            <AlertCircle className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
+            <p className="text-[13px] text-danger">{error}</p>
           </motion.div>
         )}
 

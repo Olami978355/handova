@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
         {sent ? (
           <div className="text-center">
             <div className="w-12 h-12 bg-gold/15 border border-gold/25 rounded-full flex items-center justify-center mx-auto mb-5">
-              <CheckCircle2 className="w-6 h-6 text-[#4ade80]" />
+              <CheckCircle2 className="w-6 h-6 text-gold" />
             </div>
             <h1 className="text-[20px] font-black text-paper mb-2">Check your email</h1>
             <p className="text-[13px] text-paper/45 leading-relaxed mb-6">
@@ -79,10 +79,10 @@ export default function ForgotPasswordPage() {
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-6 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                className="mb-6 flex items-start gap-3 p-4 bg-danger/10 border border-danger/20 rounded-xl"
               >
-                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                <p className="text-[13px] text-red-400">{error}</p>
+                <AlertCircle className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
+                <p className="text-[13px] text-danger">{error}</p>
               </motion.div>
             )}
 
