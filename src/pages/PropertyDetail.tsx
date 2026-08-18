@@ -444,7 +444,7 @@ export default function PropertyDetail() {
   if (error || !property) {
     return (
       <div className="min-h-screen bg-ink flex flex-col items-center justify-center p-5 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+        <AlertCircle className="w-12 h-12 text-danger mb-4" />
         <h1 className="text-[20px] font-bold text-paper mb-2">Property not found</h1>
         <p className="text-[13px] text-paper/40 mb-6 max-w-xs">{error || "This property doesn't exist or has been removed."}</p>
         <button onClick={() => navigate('/listings')} className="bg-gold text-paper px-6 py-3 rounded-xl font-semibold text-[14px] hover:bg-gold-dark transition-colors">
@@ -858,7 +858,7 @@ export default function PropertyDetail() {
                 <div className="space-y-2">
                   {['Payment held until move-in confirmed', 'Full refund if property is misrepresented', 'Permanent transaction audit trail'].map((item, i) => (
                     <div key={i} className="flex items-start gap-2">
-                      <CheckCircle className="w-3.5 h-3.5 text-[#4ade80] flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
                       <span className="text-[12px] text-paper/50">{item}</span>
                     </div>
                   ))}
@@ -924,7 +924,7 @@ export default function PropertyDetail() {
                 {reportSubmitted ? (
                   <div className="text-center py-4">
                     <div className="w-12 h-12 bg-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle className="w-6 h-6 text-[#4ade80]" />
+                      <CheckCircle className="w-6 h-6 text-gold" />
                     </div>
                     <h3 className="text-[16px] font-bold text-paper mb-2">Report submitted</h3>
                     <p className="text-[13px] text-paper/40 mb-6">Thanks for flagging this. Our team will review it shortly.</p>
@@ -994,7 +994,7 @@ export default function PropertyDetail() {
                         }
                       }}
                       disabled={!reportReason || submittingReport}
-                      className="w-full bg-red-500/90 text-paper py-3.5 rounded-xl font-bold text-[14px] hover:bg-red-500 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                      className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                     >
                       {submittingReport ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Report'}
                     </button>

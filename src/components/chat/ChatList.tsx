@@ -224,8 +224,8 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           <div className="bg-ink border border-white/10 rounded-2xl p-6 max-w-xs w-full">
-            <div className="w-11 h-11 bg-red-500/10 rounded-xl flex items-center justify-center mb-4">
-              <Trash2 className="w-5 h-5 text-red-400" />
+            <div className="w-11 h-11 bg-danger/10 rounded-xl flex items-center justify-center mb-4">
+              <Trash2 className="w-5 h-5 text-danger" />
             </div>
             <h3 className="text-[15px] font-black text-white mb-1">Delete Conversation?</h3>
             <p className="text-[12px] text-white/60 mb-1">
@@ -243,7 +243,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="flex-1 py-2.5 bg-red-500/80 rounded-xl text-[13px] font-bold text-white hover:bg-red-500 transition-all disabled:opacity-40"
+                className="flex-1 py-2.5 bg-danger/80 rounded-xl text-[13px] font-bold text-white hover:bg-danger transition-all disabled:opacity-40"
               >
                 {deleting ? 'Deleting...' : 'Delete'}
               </button>
