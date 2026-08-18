@@ -134,7 +134,7 @@ export default function SignupPage() {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
         options: {
-         emailRedirectTo: `https://rent-easy-ruby.vercel.app/auth/confirm`,
+         emailRedirectTo: `${window.location.origin}/auth/confirm`,
         },
       });
 
@@ -210,7 +210,7 @@ export default function SignupPage() {
               await supabase.auth.resend({
                 type: 'signup',
                 email: formData.email,
-                options: { emailRedirectTo: 'https://rent-easy-ruby.vercel.app/auth/confirm' }
+                options: { emailRedirectTo: `${window.location.origin}/auth/confirm` }
               });
               alert('Confirmation email resent! Check your inbox.');
             }}

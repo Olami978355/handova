@@ -118,7 +118,7 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
                 Rent<span style={{ color: '#D4AF37' }}>Easy</span>
               </p>
               <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-                renteasyapp.com/property/{property.id.slice(0, 8)}
+                {window.location.host}/property/{property.id.slice(0, 8)}
               </p>
             </div>
           </div>
@@ -473,13 +473,13 @@ export default function PropertyDetail() {
         <title>{property.title} — RentEasy</title>
         <meta property="og:title" content={property.title} />
         <meta property="og:description" content={ogDescription} />
-        <meta property="og:image" content={property.images?.[0] || 'https://renteasyapp.com/og-image.png'} />
+        <meta property="og:image" content={property.images?.[0] || `${window.location.origin}/og-image.png`} />
         <meta property="og:url" content={propertyUrl} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={property.title} />
         <meta name="twitter:description" content={ogDescription} />
-        <meta name="twitter:image" content={property.images?.[0] || 'https://renteasyapp.com/og-image.png'} />
+        <meta name="twitter:image" content={property.images?.[0] || `${window.location.origin}/og-image.png`} />
       </Helmet>
 
       <div className="min-h-screen bg-ink page-with-tabs" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

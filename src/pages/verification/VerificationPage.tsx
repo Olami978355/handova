@@ -124,7 +124,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
             data: {
               name: profile?.full_name || 'User',
               status: 'Pending Review',
-              link: 'https://renteasyapp.com/verification',
+              link: `${window.location.origin}/verification`,
             },
           },
         });

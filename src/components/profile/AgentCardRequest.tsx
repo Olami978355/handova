@@ -149,7 +149,7 @@ export const AgentCardRequest: React.FC = () => {
 
 const DigitalIDCard: React.FC<{ cardId: string }> = ({ cardId }) => {
   const { profile } = useAuth();
-  const profileUrl = `https://rent-easy-ruby.vercel.app/agent/${profile?.id}`;
+  const profileUrl = `${window.location.origin}/agent/${profile?.id}`;
 
   return (
     <motion.div
