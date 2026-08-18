@@ -139,8 +139,8 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
   const propertyUrl = `${window.location.origin}/property/${property.id}`;
   const priceStr = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(property.price);
   const periodStr = property.price_period && property.price_period !== 'outright' ? `/${property.price_period}` : '';
-  const whatsappText = encodeURIComponent(`🏠 *${property.title}*\n📍 ${property.lga}, ${property.state}\n💰 ${priceStr}${periodStr}\n✓ Escrow Protected · ✓ Verified\n\nBook inspection:\n${propertyUrl}\n\n_Listed on RentEasy — Nigeria's trusted real estate platform_`);
-  const twitterText = encodeURIComponent(`${property.title} in ${property.lga}, ${property.state}\n${priceStr}${periodStr} · Escrow Protected\nBook inspection 👇\n${propertyUrl}\n#LagosRealEstate #RentEasy`);
+  const whatsappText = encodeURIComponent(`🏠 *${property.title}*\n📍 ${property.lga}, ${property.state}\n💰 ${priceStr}${periodStr}\n✓ Escrow Protected · ✓ Verified\n\nBook inspection:\n${propertyUrl}\n\n_Listed on Handova — Nigeria's trusted real estate platform_`);
+  const twitterText = encodeURIComponent(`${property.title} in ${property.lga}, ${property.state}\n${priceStr}${periodStr} · Escrow Protected\nBook inspection 👇\n${propertyUrl}\n#LagosRealEstate #Handova`);
 
   const trackShare = async (platform: string) => {
     try {
@@ -427,7 +427,7 @@ export default function PropertyDetail() {
 
   const propertyUrl = `${window.location.origin}/property/${id}`;
   const ogDescription = property
-    ? `${formatNaira(property.price)} · ${property.lga}, ${property.state} · Escrow Protected · Book Inspection on RentEasy`
+    ? `${formatNaira(property.price)} · ${property.lga}, ${property.state} · Escrow Protected · Book Inspection on Handova`
     : 'Find verified properties in Nigeria with escrow protection.';
 
   if (loading) {
@@ -470,7 +470,7 @@ export default function PropertyDetail() {
   return (
     <>
       <Helmet>
-        <title>{property.title} — RentEasy</title>
+        <title>{property.title} — Handova</title>
         <meta property="og:title" content={property.title} />
         <meta property="og:description" content={ogDescription} />
         <meta property="og:image" content={property.images?.[0] || `${window.location.origin}/og-image.png`} />
@@ -599,7 +599,7 @@ export default function PropertyDetail() {
                   <MessageCircle className="w-3.5 h-3.5" />
                 </a>
                 <a
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${property.title} · ${formatNaira(property.price)} · ${propertyUrl} #RentEasy`)}`}
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${property.title} · ${formatNaira(property.price)} · ${propertyUrl} #Handova`)}`}
                   target="_blank" rel="noopener noreferrer"
                   className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-paper/40 hover:text-paper hover:bg-white/8 transition-colors"
                 >
@@ -853,7 +853,7 @@ export default function PropertyDetail() {
                   <h3 className="text-[14px] font-bold text-paper">Escrow Protected</h3>
                 </div>
                 <p className="text-[12px] text-paper/45 leading-relaxed mb-4">
-                  Your payment is held securely by RentEasy and only released to the {owner?.role} after you've confirmed everything is right.
+                  Your payment is held securely by Handova and only released to the {owner?.role} after you've confirmed everything is right.
                 </p>
                 <div className="space-y-2">
                   {['Payment held until move-in confirmed', 'Full refund if property is misrepresented', 'Permanent transaction audit trail'].map((item, i) => (

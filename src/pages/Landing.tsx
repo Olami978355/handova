@@ -901,7 +901,7 @@ export default function Landing() {
               Ready to rent or list safely?
             </h2>
             <p className="text-[15px] text-paper/45 mb-10 max-w-md mx-auto">
-              Join thousands of Nigerians already using RentEasy to find and list 
+              Join thousands of Nigerians already using Handova to find and list 
               properties without the stress.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">

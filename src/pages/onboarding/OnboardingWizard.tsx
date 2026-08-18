@@ -10,6 +10,14 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
 import { HandovaLogo } from '../../components/brand/HandovaMark';
+
+const NIGERIAN_STATES = [
+  'Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno',
+  'Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT','Gombe',
+  'Imo','Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi','Kwara',
+  'Lagos','Nasarawa','Niger','Ogun','Ondo','Osun','Oyo','Plateau',
+  'Rivers','Sokoto','Taraba','Yobe','Zamfara'
+];
 // ─── Role Card ────────────────────────────────────────────────────
 const RoleCard = ({
   icon, title, description, onClick, active
@@ -191,7 +199,7 @@ export default function OnboardingWizard() {
       supabase.functions.invoke('send-email', {
         body: {
           to: user.email,
-          subject: 'Welcome to RentEasy Nigeria!',
+          subject: 'Welcome to Handova Nigeria!',
           template: 'welcome',
           data: { name: formData.fullName },
         },
@@ -275,7 +283,7 @@ export default function OnboardingWizard() {
                     Step 1 of 3
                   </div>
                   <h1 className="text-[28px] lg:text-[36px] font-black text-paper tracking-tight mb-3">
-                    How will you use RentEasy?
+                    How will you use Handova?
                   </h1>
                   <p className="text-[14px] text-paper/45 max-w-md mx-auto">
                     Choose your role to get a personalized experience. 

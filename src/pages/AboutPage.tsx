@@ -15,7 +15,7 @@ export default function AboutPage() {
           <span className="text-gold">real estate marketplace</span>
         </h1>
         <p className="text-[16px] text-paper/50 leading-relaxed max-w-2xl mx-auto">
-          We built RentEasy because we were tired of seeing Nigerians lose their hard-earned money to property scams, 
+          We built Handova because we were tired of seeing Nigerians lose their hard-earned money to property scams, 
           ghost landlords, and Omonile stress. There had to be a better way.
         </p>
       </div>
@@ -32,7 +32,7 @@ export default function AboutPage() {
           </h2>
           <p className="text-[14px] text-paper/50 leading-relaxed max-w-2xl">
             Whether you are a tenant looking for your first apartment in Lagos, a landlord in Abuja wanting guaranteed 
-            payments, or an agent in Port Harcourt building a portfolio — RentEasy gives you the tools and protection 
+            payments, or an agent in Port Harcourt building a portfolio — Handova gives you the tools and protection 
             you need to transact with confidence.
           </p>
         </div>
@@ -76,7 +76,7 @@ export default function AboutPage() {
       {/* How it works */}
       <div className="max-w-6xl mx-auto px-5 mb-20">
         <div className="text-center mb-10">
-          <h2 className="text-[28px] font-black text-paper mb-3">How RentEasy works</h2>
+          <h2 className="text-[28px] font-black text-paper mb-3">How Handova works</h2>
           <p className="text-[14px] text-paper/45">Three simple steps to your new home</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -125,10 +125,10 @@ export default function AboutPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[
-            { icon: Shield, title: 'Security First', desc: 'Every transaction on RentEasy is protected by our escrow system. Your money never touches the landlord\'s hands until you are satisfied.' },
+            { icon: Shield, title: 'Security First', desc: 'Every transaction on Handova is protected by our escrow system. Your money never touches the landlord\'s hands until you are satisfied.' },
             { icon: CheckCircle, title: 'Verified Only', desc: 'We verify every landlord and agent with their NIN before they can list. No anonymous listings, no ghost landlords.' },
             { icon: Users, title: 'Community Trust', desc: 'We build trust between strangers. A tenant from Imo state can safely rent from a landlord in Lagos without ever worrying about being scammed.' },
-            { icon: Heart, title: 'Built for Nigerians', desc: 'We understand the Nigerian market — from agency fees to inspection wahala. We built RentEasy to solve real Nigerian problems with real solutions.' },
+            { icon: Heart, title: 'Built for Nigerians', desc: 'We understand the Nigerian market — from agency fees to inspection wahala. We built Handova to solve real Nigerian problems with real solutions.' },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="bg-ink border border-white/6 rounded-2xl p-6 flex gap-4">
               <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -148,7 +148,7 @@ export default function AboutPage() {
         <div className="bg-ink border border-gold/25 rounded-2xl p-10">
           <h2 className="text-[24px] font-black text-paper mb-4">Ready to rent safely?</h2>
           <p className="text-[14px] text-paper/45 mb-8">
-            Join thousands of Nigerians already using RentEasy to find and let properties without the stress.
+            Join thousands of Nigerians already using Handova to find and let properties without the stress.
           </p>
           <div className="flex gap-3 justify-center">
             <a

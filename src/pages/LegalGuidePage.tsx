@@ -41,11 +41,11 @@ const rights = [
     color: '#ef4444',
     law: 'Know your rights, protect your money',
     items: [
-      { title: 'Ghost Landlord Scam', desc: 'Someone claims to be the owner of a property they do not own, collects rent from multiple people, and disappears. ALWAYS verify ownership documents. On RentEasy, every landlord is NIN-verified.' },
+      { title: 'Ghost Landlord Scam', desc: 'Someone claims to be the owner of a property they do not own, collects rent from multiple people, and disappears. ALWAYS verify ownership documents. On Handova, every landlord is NIN-verified.' },
       { title: 'Fake "Caution Fee" Scam', desc: 'Fraudsters request large "caution fees" or "agency fees" upfront before you ever see the property. Legitimate caution fees are paid AFTER you have inspected the property and signed an agreement.' },
       { title: 'Omonile/Land Grabber Fraud', desc: 'Multiple individuals claim ownership of the same land or property and collect money from different buyers. Always conduct due diligence with a lawyer before purchasing land.' },
       { title: 'Online Rental Scam', desc: 'Property photos copied from legitimate listings are posted at suspiciously low prices. The "landlord" is always unavailable to show the property in person and asks for upfront payment before viewing. Never pay before you physically see a property.' },
-      { title: 'Fake Agent Scam', desc: 'Someone poses as a professional agent, collects agency fees, and provides fake keys or access. Always verify an agent\'s credentials and use platforms like RentEasy where agents are verified.' },
+      { title: 'Fake Agent Scam', desc: 'Someone poses as a professional agent, collects agency fees, and provides fake keys or access. Always verify an agent\'s credentials and use platforms like Handova where agents are verified.' },
     ]
   },
   {

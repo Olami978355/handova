@@ -166,7 +166,7 @@ export default function PublicProfile() {
                         (r.reviewer?.full_name || 'U').charAt(0).toUpperCase()
                       )}
                     </div>
-                    <p className="text-[12px] font-semibold text-white">{r.reviewer?.full_name || 'RentEasy User'}</p>
+                    <p className="text-[12px] font-semibold text-white">{r.reviewer?.full_name || 'Handova User'}</p>
                   </div>
                   <div className="flex gap-0.5">
                     {[1, 2, 3, 4, 5].map(n => (

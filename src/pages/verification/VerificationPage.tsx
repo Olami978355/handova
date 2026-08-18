@@ -119,7 +119,7 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
         await supabase.functions.invoke('send-email', {
           body: {
             to: user.email,
-            subject: 'Verification Request Received — RentEasy',
+            subject: 'Verification Request Received — Handova',
             template: 'verification_status',
             data: {
               name: profile?.full_name || 'User',

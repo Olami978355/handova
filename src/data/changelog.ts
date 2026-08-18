@@ -12,7 +12,7 @@ export const changelog: ChangelogEntry[] = [
   {
     version: '2026-07-27',
     date: 'July 2026',
-    title: "What's New on RentEasy",
+    title: "What's New on Handova",
     items: [
       'Find an Agent or Landlord — browse and search verified agents/landlords directly',
       'Leave a review after a deal completes, and see ratings on public profiles',
