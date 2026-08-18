@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Scale, Loader2, CheckCircle2, MapPin } from 'lucide-react';
+import { Search, Scale, Loader2, CheckCircle2, MapPin, Star } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 
@@ -17,6 +17,8 @@ interface LawyerListing {
   username: string | null;
   avatar_url: string | null;
   verification_status: string | null;
+  avgRating?: number | null;
+  reviewCount?: number;
 }
 
 type SpecialtyFilter = 'all' | 'tenancy' | 'property_title' | 'both';
@@ -67,6 +69,27 @@ export default function LawyerDirectory() {
         avatar_url: profileMap[v.user_id].avatar_url,
         verification_status: profileMap[v.user_id].verification_status,
       }));
+
+    const { data: ratingRows } = await supabase
+      .from('lawyer_review_bookings')
+      .select('lawyer_id, requester_rating')
+      .in('lawyer_id', userIds)
+      .not('requester_rating', 'is', null);
+
+    const ratingMap: Record<string, number[]> = {};
+    (ratingRows || []).forEach(r => {
+      if (!ratingMap[r.lawyer_id]) ratingMap[r.lawyer_id] = [];
+      ratingMap[r.lawyer_id].push(r.requester_rating as number);
+    });
+
+    combined = combined.map(l => {
+      const ratings = ratingMap[l.user_id] || [];
+      return {
+        ...l,
+        avgRating: ratings.length > 0 ? Math.round((ratings.reduce((s, r) => s + r, 0) / ratings.length) * 10) / 10 : null,
+        reviewCount: ratings.length,
+      };
+    });
 
     if (searchTerm.trim()) {
       const term = searchTerm.trim().toLowerCase();
@@ -199,6 +222,12 @@ export default function LawyerDirectory() {
                     <div className="flex items-center gap-1 mt-0.5">
                       <CheckCircle2 className="w-3 h-3 text-gold flex-shrink-0" />
                       <span className="text-[11px] font-semibold text-gold">NBA Verified</span>
+                      {l.avgRating && (
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-gold ml-2">
+                          <Star className="w-3 h-3 fill-gold" /> {l.avgRating.toFixed(1)}
+                          <span className="text-paper/30 font-normal">({l.reviewCount})</span>
+                        </span>
+                      )}
                     </div>
                     <p className="text-[11px] text-paper/40 mt-0.5">{specialtyLabel(l.specialty)}</p>
                     {l.states_covered.length > 0 && (
