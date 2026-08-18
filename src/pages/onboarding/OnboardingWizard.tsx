@@ -57,7 +57,7 @@ const RoleCard = ({
 const FeatureBullet = ({ text }: { text: string }) => (
   <div className="flex items-start gap-3">
     <div className="w-5 h-5 bg-gold/20 border border-gold/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-      <div className="w-1.5 h-1.5 bg-[#4ade80] rounded-full" />
+      <div className="w-1.5 h-1.5 bg-gold rounded-full" />
     </div>
     <span className="text-[13px] text-paper/60 leading-relaxed">{text}</span>
   </div>
@@ -234,7 +234,7 @@ export default function OnboardingWizard() {
           <div className="flex items-center gap-2.5">
             <HandovaLogo size={30} />
             <span className="text-[18px] font-extrabold tracking-tight text-paper">
-              Rent<span className="text-gold">Easy</span>
+              Hand<span className="text-gold">ova</span>
             </span>
           </div>
 
@@ -244,7 +244,7 @@ export default function OnboardingWizard() {
               <div key={s} className="flex items-center gap-2">
                 <div className={`flex items-center justify-center w-7 h-7 rounded-full text-[11px] font-bold transition-all ${
                   step > s
-                    ? 'bg-[#4ade80] text-black'
+                    ? 'bg-gold text-black'
                     : step === s
                     ? 'bg-gold text-black'
                     : 'bg-white/10 text-paper/30'
@@ -256,7 +256,7 @@ export default function OnboardingWizard() {
                   ) : s}
                 </div>
                 {s < 3 && (
-                  <div className={`w-8 h-px transition-all ${step > s ? 'bg-[#4ade80]' : 'bg-white/10'}`} />
+                  <div className={`w-8 h-px transition-all ${step > s ? 'bg-gold' : 'bg-white/10'}`} />
                 )}
               </div>
             ))}
@@ -344,10 +344,10 @@ export default function OnboardingWizard() {
                   <motion.div
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-5 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                    className="mb-5 flex items-start gap-3 p-4 bg-danger/10 border border-danger/20 rounded-xl"
                   >
-                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-[13px] text-red-400">{error}</p>
+                    <AlertCircle className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
+                    <p className="text-[13px] text-danger">{error}</p>
                   </motion.div>
                 )}
 
@@ -389,7 +389,7 @@ export default function OnboardingWizard() {
                   {/* Full name */}
                   <div>
                     <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
-                      Full Name <span className="text-red-400">*</span>
+                      Full Name <span className="text-gold">*</span>
                     </label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
@@ -409,7 +409,7 @@ export default function OnboardingWizard() {
                   {/* Phone */}
                   <div>
                     <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
-                      Phone Number <span className="text-red-400">*</span>
+                      Phone Number <span className="text-gold">*</span>
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
@@ -429,7 +429,7 @@ export default function OnboardingWizard() {
                   {/* State */}
                   <div>
                     <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
-                      State of Residence <span className="text-red-400">*</span>
+                      State of Residence <span className="text-gold">*</span>
                     </label>
                     <div className="relative">
                       <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
@@ -516,7 +516,7 @@ export default function OnboardingWizard() {
                     Step 3 of 3
                   </div>
                   <div className="w-14 h-14 bg-gold/20 border border-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="w-7 h-7 text-[#4ade80]" />
+                    <CheckCircle className="w-7 h-7 text-gold" />
                   </div>
                   <h2 className="text-[26px] font-black text-paper tracking-tight mb-2">
                     You're all set, {formData.fullName.split(' ')[0]}!
