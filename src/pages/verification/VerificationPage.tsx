@@ -225,17 +225,17 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
 
         {/* Rejected banner */}
         {verificationRequest?.status === 'rejected' && (
-          <div className="mb-5 p-4 bg-red-500/8 border border-red-500/20 rounded-xl">
+          <div className="mb-5 p-4 bg-danger/8 border border-danger/20 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-              <p className="text-[12px] font-bold text-red-400">Verification Rejected</p>
+              <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
+              <p className="text-[12px] font-bold text-danger">Verification Rejected</p>
             </div>
             <p className="text-[11px] text-paper/40 mb-3">
               Reason: {(verificationRequest.rejection_reason as string) || 'Documents were unclear or invalid.'}
             </p>
             <button
               onClick={() => setVerificationRequest(null)}
-              className="text-[11px] font-bold text-red-400 hover:text-red-300 transition-colors"
+              className="text-[11px] font-bold text-gold hover:text-gold-dark transition-colors"
             >
               Resubmit Documents →
             </button>
@@ -244,9 +244,9 @@ setFormData((prev) => ({ ...prev, [field]: signedData.signedUrl }));
 
         {/* Error */}
         {error && (
-          <div className="mb-5 flex items-center gap-2 p-4 bg-red-500/8 border border-red-500/20 rounded-xl">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <p className="text-[12px] text-red-400">{error}</p>
+          <div className="mb-5 flex items-center gap-2 p-4 bg-danger/8 border border-danger/20 rounded-xl">
+            <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
+            <p className="text-[12px] text-danger">{error}</p>
           </div>
         )}
 
