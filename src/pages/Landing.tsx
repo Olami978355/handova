@@ -10,24 +10,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { Property } from '../types';
 import { useAuth } from '../context/AuthContext';
-
-// ─── Logo SVG ────────────────────────────────────────────────────
-const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#D4AF37" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#D4AF37" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
-    <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
-    <path d="M32 54 L32 50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M36 54 L36 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
-    <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
+import { HandovaLogo } from '../components/brand/HandovaMark';
 // ─── Nigerian States ──────────────────────────────────────────────
 const NIGERIAN_STATES = [
   'Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa',
@@ -912,7 +895,7 @@ export default function Landing() {
         <div className="max-w-3xl mx-auto px-5 lg:px-8 text-center">
           <FadeUp>
             <div className="w-16 h-16 mx-auto mb-8 flex items-center justify-center">
-              <RentEasyLogo size={64} />
+              <HandovaLogo size={64} />
             </div>
             <h2 className="text-[28px] lg:text-[40px] font-black text-paper tracking-tight mb-4">
               Ready to rent or list safely?

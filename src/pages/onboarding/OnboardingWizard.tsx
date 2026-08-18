@@ -9,32 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
-
-const NIGERIAN_STATES = [
-  'Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno',
-  'Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT','Gombe',
-  'Imo','Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi','Kwara',
-  'Lagos','Nasarawa','Niger','Ogun','Ondo','Osun','Oyo','Plateau',
-  'Rivers','Sokoto','Taraba','Yobe','Zamfara'
-];
-
-// ─── Logo ─────────────────────────────────────────────────────────
-const RentEasyLogo = ({ size = 32 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <rect width="80" height="80" rx="18" fill="#D4AF37" />
-    <path d="M16 54 L16 32 L40 14 L64 32 L64 54" stroke="#D4AF37" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M16 54 L28 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
-    <path d="M54 54 L64 54" stroke="#D4AF37" strokeWidth="4" strokeLinecap="round" />
-    <path d="M28 54 L28 44" stroke="white" strokeWidth="3" strokeLinecap="round" />
-    <circle cx="28" cy="38" r="6" fill="none" stroke="white" strokeWidth="3" />
-    <path d="M32 54 L32 50" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M36 54 L36 51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-    <rect x="43" y="42" width="16" height="13" rx="3" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="2" />
-    <path d="M46 42 L46 38 Q46 35 51 35 Q56 35 56 38 L56 42" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path d="M47.5 48.5 L50 51 L54.5 46" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
+import { HandovaLogo } from '../../components/brand/HandovaMark';
 // ─── Role Card ────────────────────────────────────────────────────
 const RoleCard = ({
   icon, title, description, onClick, active
@@ -249,7 +224,7 @@ export default function OnboardingWizard() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
-            <RentEasyLogo size={30} />
+            <HandovaLogo size={30} />
             <span className="text-[18px] font-extrabold tracking-tight text-paper">
               Rent<span className="text-gold">Easy</span>
             </span>
