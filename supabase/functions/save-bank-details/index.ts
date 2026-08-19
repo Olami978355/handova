@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
+import { createSupabaseClient, createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
 import { corsHeaders } from '../_shared/utils.ts';
 
 serve(async (req) => {
@@ -60,6 +60,29 @@ serve(async (req) => {
       .eq('id', user.id);
 
     if (updateError) throw updateError;
+
+      // 4. Security alert: notify the account owner immediately whenever
+      // payout bank details change, so an unauthorized change is noticed
+      // right away, not discovered later at payout time.
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      const serviceRoleKey = getServiceRoleKey();
+      if (supabaseUrl && serviceRoleKey) {
+        try {
+          await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
+            body: JSON.stringify({
+              user_id: user.id,
+              title: 'Payout Bank Details Changed',
+              body: `Your payout account was updated to ${accountName}, account ending ${accountNumber.slice(-4)}. If this wasn't you, contact support immediately.`,
+              link: '/profile',
+              type: 'security_alert',
+            }),
+          });
+        } catch (notifyErr) {
+          console.error('Failed to send bank-details-changed notification:', notifyErr);
+        }
+      }
 
     return new Response(JSON.stringify({
       success: true,
