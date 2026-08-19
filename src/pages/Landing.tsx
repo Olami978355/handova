@@ -261,7 +261,7 @@ const BarristerAmakaCard = () => {
           <div key={i} className="flex items-start gap-2.5">
             <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-[8px] font-black ${
               pt.type === 'right'
-                ? 'bg-gold/25 text-[#4ade80]'
+                ? 'bg-gold/25 text-gold'
                 : 'bg-gold/15 text-gold'
             }`}>
               {pt.type === 'right' ? '✓' : '!'}
@@ -320,7 +320,7 @@ const WaitlistSection = () => {
       {joined ? (
         <div className="text-center py-4">
           <div className="w-12 h-12 bg-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-6 h-6 text-[#4ade80]" />
+            <CheckCircle className="w-6 h-6 text-gold" />
           </div>
           <h3 className="text-[18px] font-bold text-paper mb-2">You're on the list!</h3>
           <p className="text-[13px] text-paper/45">
@@ -846,7 +846,7 @@ export default function Landing() {
                       'Manage all your listings in one dashboard',
                     ].map(item => (
                       <li key={item} className="flex items-start gap-3">
-                        <CheckCircle className="w-4 h-4 text-[#4ade80] flex-shrink-0 mt-0.5" />
+                        <CheckCircle className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
                         <span className="text-[13px] text-paper/65">{item}</span>
                       </li>
                     ))}
