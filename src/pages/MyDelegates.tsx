@@ -30,9 +30,9 @@ const permissionLabels = (d: DelegateRelation) => {
 
 const statusBadge = (status: DelegateRelation['status']) => {
   const styles: Record<string, string> = {
-    accepted: 'bg-[#4ade80]/10 text-[#4ade80]',
-    pending: 'bg-gold/10 text-gold',
-    declined: 'bg-red-500/10 text-red-400',
+    accepted: 'bg-gold/10 text-gold',
+    pending: 'bg-white/8 text-paper/50',
+    declined: 'bg-danger/10 text-danger',
     revoked: 'bg-white/8 text-paper/35',
   };
   return (
