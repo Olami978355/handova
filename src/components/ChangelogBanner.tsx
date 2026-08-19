@@ -46,14 +46,14 @@ export const ChangelogBanner: React.FC = () => {
       >
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 bg-gold/20 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-4 h-4 text-[#4ade80]" />
+            <Sparkles className="w-4 h-4 text-gold" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-bold text-white mb-2">{latest.title}</p>
             <ul className="space-y-1.5 mb-3">
               {latest.items.map((item, i) => (
                 <li key={i} className="text-[12px] text-white/50 leading-relaxed flex gap-2">
-                  <span className="text-[#4ade80] flex-shrink-0">•</span>
+                  <span className="text-gold flex-shrink-0">•</span>
                   <span>{item}</span>
                 </li>
               ))}

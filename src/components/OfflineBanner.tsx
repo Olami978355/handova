@@ -25,7 +25,7 @@ export const OfflineBanner: React.FC = () => {
           exit={{ y: -40, opacity: 0 }}
           role="status"
           aria-live="polite"
-          className="fixed top-0 inset-x-0 z-[70] bg-red-500/95 text-white text-[12px] font-semibold py-2 flex items-center justify-center gap-2"
+          className="fixed top-0 inset-x-0 z-[70] bg-danger/95 text-white text-[12px] font-semibold py-2 flex items-center justify-center gap-2"
         >
           <WifiOff className="w-3.5 h-3.5" />
           You're offline — some features may not work until you reconnect.
