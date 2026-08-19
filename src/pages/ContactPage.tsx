@@ -86,7 +86,7 @@ export default function ContactPage() {
               {success ? (
                 <div className="text-center py-10">
                   <div className="w-16 h-16 bg-gold/20 border border-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="w-8 h-8 text-[#4ade80]" />
+                    <CheckCircle className="w-8 h-8 text-gold" />
                   </div>
                   <h3 className="text-[22px] font-black text-paper mb-3">Message sent!</h3>
                   <p className="text-[14px] text-paper/45 mb-8">
@@ -103,9 +103,9 @@ export default function ContactPage() {
                 <>
                   <h2 className="text-[18px] font-bold text-paper mb-6">Send us a message</h2>
                   {error && (
-                    <div className="flex items-center gap-2 p-4 bg-red-500/10 border border-red-500/20 rounded-xl mb-6">
-                      <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-                      <p className="text-[13px] text-red-400">{error}</p>
+                    <div className="flex items-center gap-2 p-4 bg-danger/10 border border-danger/20 rounded-xl mb-6">
+                      <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
+                      <p className="text-[13px] text-danger">{error}</p>
                     </div>
                   )}
                   <form onSubmit={handleSubmit} className="space-y-4">
