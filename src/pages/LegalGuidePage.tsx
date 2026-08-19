@@ -38,7 +38,7 @@ const rights = [
     id: 'scams',
     icon: AlertTriangle,
     title: "Common Scams to Avoid",
-    color: '#ef4444',
+    color: '#D4AF37',
     law: 'Know your rights, protect your money',
     items: [
       { title: 'Ghost Landlord Scam', desc: 'Someone claims to be the owner of a property they do not own, collects rent from multiple people, and disappears. ALWAYS verify ownership documents. On Handova, every landlord is NIN-verified.' },
@@ -52,7 +52,7 @@ const rights = [
     id: 'agreement',
     icon: FileText,
     title: "Tenancy Agreement Guide",
-    color: '#60a5fa',
+    color: '#D4AF37',
     law: 'What to look for before you sign',
     items: [
       { title: 'What Must Be in Every Agreement', desc: 'A valid tenancy agreement must include: full names and addresses of both landlord and tenant, detailed description of the property, amount of rent and payment schedule, duration of tenancy, caution fee amount and conditions for return, notice period for either party to terminate.' },
