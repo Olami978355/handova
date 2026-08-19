@@ -876,7 +876,7 @@ export default function Dashboard() {
                         <h2 className="text-[15px] font-bold text-paper">Saved Properties</h2>
                         <p className="text-[11px] text-paper/35 mt-0.5">Properties you hearted</p>
                       </div>
-                      <Heart className="w-4 h-4 text-danger" />
+                      <Heart className="w-4 h-4 text-gold" />
                     </div>
                     {savedProperties.length === 0 ? (
                       <EmptyState
