@@ -44,8 +44,8 @@ const SuspendedScreen = () => (
     className="min-h-screen bg-ink flex flex-col items-center justify-center p-5 text-center"
     style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
   >
-    <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mb-6">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+    <div className="w-16 h-16 bg-danger/10 border border-danger/20 rounded-2xl flex items-center justify-center mb-6">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E5484D" strokeWidth="2">
         <circle cx="12" cy="12" r="10" />
         <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
       </svg>
