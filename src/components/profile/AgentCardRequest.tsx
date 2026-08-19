@@ -121,10 +121,10 @@ export const AgentCardRequest: React.FC = () => {
 
       {request?.status === 'rejected' && (
         <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3.5 bg-red-500/8 border border-red-500/15 rounded-xl">
-            <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-3.5 bg-danger/8 border border-danger/15 rounded-xl">
+            <XCircle className="w-4 h-4 text-danger flex-shrink-0" />
             <div>
-              <p className="text-[12px] font-bold text-red-400">Request not approved</p>
+              <p className="text-[12px] font-bold text-danger">Request not approved</p>
               {request.rejection_reason && (
                 <p className="text-[11px] text-white/35">{request.rejection_reason}</p>
               )}
@@ -182,7 +182,7 @@ const DigitalIDCard: React.FC<{ cardId: string }> = ({ cardId }) => {
         <div className="min-w-0">
           <p className="text-[15px] font-bold text-white truncate">{profile?.full_name}</p>
           <p className="text-[11px] text-white/50 font-mono">{cardId || profile?.agent_id}</p>
-          <p className="text-[10px] text-[#4ade80] font-semibold mt-1 flex items-center gap-1">
+          <p className="text-[10px] text-gold font-semibold mt-1 flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> NIN Verified
           </p>
         </div>
