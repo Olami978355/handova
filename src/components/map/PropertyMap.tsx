@@ -41,25 +41,25 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-zinc-50 flex flex-col items-center justify-center rounded-[40px] border border-zinc-100">
+      <div className="w-full h-full bg-ink flex flex-col items-center justify-center rounded-[40px] border border-white/10">
         <Loader2 className="w-10 h-10 text-gold animate-spin mb-4" />
-        <p className="text-zinc-500 font-bold">Loading property map...</p>
+        <p className="text-paper/50 font-bold">Loading property map...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full h-full bg-red-50 flex flex-col items-center justify-center p-8 text-center rounded-[40px] border border-red-100">
-        <p className="text-red-500 font-bold mb-2">Error loading properties</p>
-        <p className="text-red-400 text-sm">{error}</p>
+      <div className="w-full h-full bg-ink flex flex-col items-center justify-center p-8 text-center rounded-[40px] border border-danger/20">
+        <p className="text-danger font-bold mb-2">Error loading properties</p>
+        <p className="text-paper/50 text-sm">{error}</p>
       </div>
     );
   }
 
   return (
     <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-      <div className="w-full h-full relative rounded-[40px] overflow-hidden border border-zinc-100 shadow-xl">
+      <div className="w-full h-full relative rounded-[40px] overflow-hidden border border-white/10 shadow-xl">
         <Map
           defaultCenter={{ lat: 9.082, lng: 8.6753 }} // Center of Nigeria
           defaultZoom={6}
