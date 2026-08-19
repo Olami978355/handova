@@ -66,7 +66,7 @@ export default function AboutPage() {
           ].map(({ emoji, problem, solution }) => (
             <div key={problem} className="bg-ink border border-white/6 rounded-2xl p-6">
               <div className="text-3xl mb-4">{emoji}</div>
-              <h3 className="text-[16px] font-bold text-red-400 mb-3">{problem}</h3>
+              <h3 className="text-[16px] font-bold text-gold mb-3">{problem}</h3>
               <p className="text-[13px] text-paper/50 leading-relaxed">{solution}</p>
             </div>
           ))}
@@ -100,7 +100,7 @@ export default function AboutPage() {
               icon: Key,
               title: 'Move In Safely',
               desc: 'Move in, confirm on the app, and funds are released to your landlord. Simple, safe, and stress-free.',
-              color: '#4ade80',
+              color: '#D4AF37',
             },
           ].map(({ step, icon: Icon, title, desc, color }) => (
             <div key={step} className="bg-ink border border-white/6 rounded-2xl p-6 relative overflow-hidden">
