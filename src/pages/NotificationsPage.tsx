@@ -13,13 +13,13 @@ const getIcon = (type: Notification['type']) => {
     case 'inspection_booked': return <Calendar className="text-gold" size={16} />;
     case 'inspection_confirmed': return <CheckCircle className="text-gold" size={16} />;
     case 'verification_approved': return <ShieldCheck className="text-gold" size={16} />;
-    case 'verification_rejected': return <ShieldX className="text-red-400" size={16} />;
+    case 'verification_rejected': return <ShieldX className="text-danger" size={16} />;
     case 'listing_approved': return <Home className="text-gold" size={16} />;
-    case 'listing_rejected': return <XCircle className="text-red-400" size={16} />;
+    case 'listing_rejected': return <XCircle className="text-danger" size={16} />;
     case 'deal_state_change':
     case 'custom_deal_offer': return <DollarSign className="text-gold" size={16} />;
     case 'new_message': return <MessageCircle className="text-gold" size={16} />;
-    case 'refund_processed': return <CheckCircle className="text-[#4ade80]" size={16} />;
+    case 'refund_processed': return <CheckCircle className="text-gold" size={16} />;
     default: return <Info className="text-paper/30" size={16} />;
   }
 };
