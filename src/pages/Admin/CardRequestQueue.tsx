@@ -142,7 +142,7 @@ export default function CardRequestQueue() {
             <button
               onClick={() => handleReject(req.id, req.agent_id)}
               disabled={actionLoading === req.id}
-              className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl font-bold text-[12px] hover:bg-red-500/20 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-danger/10 text-danger border border-danger/20 rounded-xl font-bold text-[12px] hover:bg-danger/20 transition-colors disabled:opacity-50"
             >
               Reject
             </button>
