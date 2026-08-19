@@ -35,22 +35,22 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <div className="min-h-[400px] flex flex-col items-center justify-center p-8 text-center bg-zinc-50 rounded-3xl border-2 border-dashed border-zinc-200">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
-            <AlertTriangle className="text-red-600 w-8 h-8" />
+        <div className="min-h-[400px] flex flex-col items-center justify-center p-8 text-center bg-ink rounded-3xl border-2 border-dashed border-white/10">
+          <div className="w-16 h-16 bg-danger/10 border border-danger/20 rounded-full flex items-center justify-center mb-6">
+            <AlertTriangle className="text-danger w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-zinc-900 mb-2 tracking-tight">Something went wrong</h2>
-          <p className="text-zinc-500 mb-8 max-w-md mx-auto">
+          <h2 className="text-2xl font-bold text-paper mb-2 tracking-tight">Something went wrong</h2>
+          <p className="text-paper/45 mb-8 max-w-md mx-auto">
             We encountered an unexpected error. Try reloading, or head back to the homepage.
             {this.state.error && (
-              <span className="block mt-2 text-xs font-mono bg-zinc-100 p-2 rounded border border-zinc-200 overflow-auto max-h-24">
+              <span className="block mt-2 text-xs font-mono bg-white/5 text-paper/60 p-2 rounded border border-white/10 overflow-auto max-h-24">
                 {this.state.error.message}
               </span>
             )}
           </p>
           <button
             onClick={this.handleReset}
-            className="flex items-center gap-2 px-6 py-3 bg-gold text-white rounded-xl font-bold hover:bg-gold/90 transition-all shadow-lg shadow-gold/20"
+            className="flex items-center gap-2 px-6 py-3 bg-gold text-black rounded-xl font-bold hover:bg-gold-dark transition-all shadow-lg shadow-gold/20"
           >
             <RefreshCcw className="w-4 h-4" />
             Reload Page
