@@ -121,7 +121,7 @@ export default function PublicProfile() {
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-[22px] font-black text-white">{profile.full_name || 'Unnamed User'}</h1>
               {isVerified && (
-                <span className="flex items-center gap-1 text-[11px] font-bold text-[#4ade80] bg-[#4ade80]/10 px-2 py-1 rounded-lg">
+                <span className="flex items-center gap-1 text-[11px] font-bold text-gold bg-gold/10 px-2 py-1 rounded-lg">
                   <ShieldCheck className="w-3 h-3" /> Verified
                 </span>
               )}
