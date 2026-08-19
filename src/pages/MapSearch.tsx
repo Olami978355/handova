@@ -239,7 +239,7 @@ export default function MapSearch() {
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-                <p className="text-[13px] text-red-400 mb-2">Failed to load properties</p>
+                <p className="text-[13px] text-danger mb-2">Failed to load properties</p>
                 <p className="text-[11px] text-paper/30">{error}</p>
               </div>
             ) : properties.length === 0 ? (
