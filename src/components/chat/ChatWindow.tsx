@@ -141,7 +141,7 @@ const DealOfferCard = ({
             </button>
             <button
               onClick={onDecline}
-              className="w-10 h-10 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center text-paper/40 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
+              className="w-10 h-10 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center text-paper/40 hover:text-danger hover:bg-danger/10 transition-colors flex-shrink-0"
             >
               <XCircle className="w-4 h-4" />
             </button>
@@ -228,9 +228,9 @@ const CreateDealModal = ({
         </div>
         <div className="p-5 space-y-4">
           {localError && (
-            <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-              <p className="text-[12px] text-red-400">{localError}</p>
+            <div className="flex items-center gap-2 p-3 bg-danger/10 border border-danger/20 rounded-xl">
+              <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
+              <p className="text-[12px] text-danger">{localError}</p>
             </div>
           )}
           <div>
@@ -759,7 +759,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                             {canDeleteForEveryone && (
                               <button
                                 onClick={() => handleDeleteMessage(msg, true)}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-danger hover:bg-danger/10 rounded-lg transition-colors"
                               >
                                 <Trash2 className="w-3.5 h-3.5" /> Delete for everyone
                               </button>
@@ -787,13 +787,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           {(localError || sendError) && (
             <motion.div
               initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="mx-4 mb-2 flex items-center justify-between gap-2 px-3.5 py-2.5 bg-red-500/10 border border-red-500/20 rounded-xl"
+              className="mx-4 mb-2 flex items-center justify-between gap-2 px-3.5 py-2.5 bg-danger/10 border border-danger/20 rounded-xl"
             >
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-                <p className="text-[12px] text-red-400">{localError || sendError}</p>
+                <AlertCircle className="w-3.5 h-3.5 text-danger flex-shrink-0" />
+                <p className="text-[12px] text-danger">{localError || sendError}</p>
               </div>
-              <button onClick={() => { setLocalError(null); refresh(); }} className="text-red-400/60 hover:text-red-400 transition-colors flex-shrink-0">
+              <button onClick={() => { setLocalError(null); refresh(); }} className="text-gold/60 hover:text-gold transition-colors flex-shrink-0">
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
             </motion.div>
