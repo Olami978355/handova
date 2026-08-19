@@ -166,7 +166,7 @@ const chatWindowProps = {
                       <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-paper/70 hover:bg-white/5 transition-colors text-left">
                         <Ban className="w-3.5 h-3.5" /> Block user
                       </button>
-                      <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-red-400 hover:bg-red-500/10 transition-colors text-left">
+                      <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-paper/70 hover:bg-white/5 transition-colors text-left">
                         <Flag className="w-3.5 h-3.5" /> Report user
                       </button>
                     </div>
@@ -243,7 +243,7 @@ const chatWindowProps = {
                         <button onClick={handleBlock} disabled={actionLoading} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-paper/70 hover:bg-white/5 transition-colors text-left">
                           <Ban className="w-3.5 h-3.5" /> Block user
                         </button>
-                        <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-red-400 hover:bg-red-500/10 transition-colors text-left">
+                        <button onClick={() => { setShowReportModal(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-[12px] text-paper/70 hover:bg-white/5 transition-colors text-left">
                           <Flag className="w-3.5 h-3.5" /> Report user
                         </button>
                       </div>
@@ -291,7 +291,7 @@ const chatWindowProps = {
                     onClick={() => setReportReason(opt.value)}
                     className={`w-full text-left px-4 py-2.5 rounded-xl text-[13px] font-semibold border transition-colors ${
                       reportReason === opt.value
-                        ? 'bg-red-500/15 border-red-500/40 text-paper'
+                        ? 'bg-gold/15 border-gold/40 text-paper'
                         : 'bg-white/5 border-white/8 text-paper/60 hover:text-paper'
                     }`}
                   >
@@ -303,12 +303,12 @@ const chatWindowProps = {
                 value={reportDetails}
                 onChange={(e) => setReportDetails(e.target.value)}
                 placeholder="Add any details (optional)"
-                className="w-full h-20 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-red-500/40 transition-colors resize-none"
+                className="w-full h-20 p-4 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/40 transition-colors resize-none"
               />
               <button
                 onClick={handleReport}
                 disabled={!reportReason || actionLoading}
-                className="w-full bg-red-500 text-paper py-3 rounded-xl font-bold text-[13px] hover:bg-red-600 transition-all disabled:opacity-40"
+                className="w-full bg-gold text-black py-3 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-all disabled:opacity-40"
               >
                 {actionLoading ? 'Submitting...' : 'Submit Report'}
               </button>
