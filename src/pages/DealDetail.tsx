@@ -791,11 +791,20 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                             }
                           }
                           if (!confirmed) {
-                            alert(
-                              'Your payment was received by Paystack (ref: ' + reference + '). ' +
-                              'Our system is confirming it — please refresh in a moment. ' +
-                              'Contact support if this persists after 5 minutes.'
-                            );
+                            try {
+                              const { data: fnData, error: fnError } = await supabase.functions.invoke('confirm-escrow-payment', {
+                                body: { dealId: deal.id, reference },
+                              });
+                              if (fnError) throw new Error(fnError.message);
+                              if (fnData?.error) throw new Error(fnData.error);
+                              await refresh();
+                            } catch (fallbackErr) {
+                              alert(
+                                'Your payment was received by Paystack (ref: ' + reference + '). ' +
+                                'We could not confirm it automatically: ' + (fallbackErr instanceof Error ? fallbackErr.message : 'Unknown error') + ' ' +
+                                'Please contact support with this reference.'
+                              );
+                            }
                           }
                         } finally {
                           setProcessing(false);

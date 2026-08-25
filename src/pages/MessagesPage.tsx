@@ -21,6 +21,7 @@ export default function MessagesPage() {
   const [reportReason, setReportReason] = useState('');
   const [reportDetails, setReportDetails] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; isError: boolean } | null>(null);
 
   const otherId = selectedConversation?.participants?.[0]?.id;
 
@@ -30,10 +31,12 @@ export default function MessagesPage() {
     try {
       const { error } = await supabase.rpc('block_user', { p_blocked_id: otherId });
       if (error) throw error;
-      alert('User blocked.');
+      setToast({ message: 'User blocked.', isError: false });
+      setTimeout(() => setToast(null), 3000);
       setShowChatMenu(false);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to block user');
+      setToast({ message: err instanceof Error ? err.message : 'Failed to block user', isError: true });
+      setTimeout(() => setToast(null), 4000);
     } finally {
       setActionLoading(false);
     }
@@ -50,13 +53,15 @@ export default function MessagesPage() {
         p_conversation_id: conversationId || null,
       });
       if (error) throw new Error(error.message);
-      alert('Report submitted. Our team will review it.');
+      setToast({ message: 'Report submitted. Our team will review it.', isError: false });
+      setTimeout(() => setToast(null), 3000);
       setShowReportModal(false);
       setShowChatMenu(false);
       setReportReason('');
       setReportDetails('');
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to submit report');
+      setToast({ message: err instanceof Error ? err.message : 'Failed to submit report', isError: true });
+      setTimeout(() => setToast(null), 4000);
     } finally {
       setActionLoading(false);
     }
@@ -315,6 +320,17 @@ const chatWindowProps = {
             </div>
           </div>
         </>
+      )}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-xl border shadow-lg" style={{
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          backgroundColor: toast.isError ? 'rgba(229,72,77,0.12)' : 'rgba(212,175,55,0.12)',
+          borderColor: toast.isError ? 'rgba(229,72,77,0.3)' : 'rgba(212,175,55,0.3)',
+        }}>
+          <p className={`text-[13px] font-semibold ${toast.isError ? "text-danger" : "text-gold"}`}>
+            {toast.message}
+          </p>
+        </div>
       )}
     </>
   );
