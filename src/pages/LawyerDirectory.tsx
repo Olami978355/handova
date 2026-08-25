@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Scale, Loader2, CheckCircle2, MapPin, Star } from 'lucide-react';
+import { Search, Scale, Loader2, CheckCircle2, MapPin, Star, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 
@@ -19,6 +19,7 @@ interface LawyerListing {
   verification_status: string | null;
   avgRating?: number | null;
   reviewCount?: number;
+  avgResponseHours?: number | null;
 }
 
 type SpecialtyFilter = 'all' | 'tenancy' | 'property_title' | 'both';
@@ -88,6 +89,27 @@ export default function LawyerDirectory() {
         ...l,
         avgRating: ratings.length > 0 ? Math.round((ratings.reduce((s, r) => s + r, 0) / ratings.length) * 10) / 10 : null,
         reviewCount: ratings.length,
+      };
+    });
+
+    const { data: responseRows } = await supabase
+      .from('lawyer_review_bookings')
+      .select('lawyer_id, created_at, verdict_submitted_at')
+      .in('lawyer_id', userIds)
+      .not('verdict_submitted_at', 'is', null);
+
+    const responseMap: Record<string, number[]> = {};
+    (responseRows || []).forEach(r => {
+      const hours = (new Date(r.verdict_submitted_at as string).getTime() - new Date(r.created_at).getTime()) / (1000 * 60 * 60);
+      if (!responseMap[r.lawyer_id]) responseMap[r.lawyer_id] = [];
+      responseMap[r.lawyer_id].push(hours);
+    });
+
+    combined = combined.map(l => {
+      const times = responseMap[l.user_id] || [];
+      return {
+        ...l,
+        avgResponseHours: times.length > 0 ? Math.round(times.reduce((s, h) => s + h, 0) / times.length) : null,
       };
     });
 
@@ -232,6 +254,11 @@ export default function LawyerDirectory() {
                     <p className="text-[11px] text-paper/40 mt-0.5">{specialtyLabel(l.specialty)}</p>
                     {l.states_covered.length > 0 && (
                       <p className="text-[10px] text-paper/25 mt-0.5 truncate">{l.states_covered.join(', ')}</p>
+                    )}
+                    {l.avgResponseHours !== null && l.avgResponseHours !== undefined && (
+                      <p className="flex items-center gap-1 text-[10px] text-paper/30 mt-0.5">
+                        <Clock className="w-2.5 h-2.5" /> Usually responds within {l.avgResponseHours < 24 ? l.avgResponseHours + "h" : Math.round(l.avgResponseHours / 24) + "d"}
+                      </p>
                     )}
                   </div>
                 </Link>
