@@ -36,7 +36,15 @@ serve(async (req) => {
       throw new Error(`Cannot cancel a deal in ${deal.status} status.`);
     }
 
-    const isPrePayment = deal.status === 'agreement_draft' || deal.status === 'pending_payment';
+    // Structural check instead of an allowlist of status strings: payment
+    // either happened (paystack_reference is set, alongside status flipping to
+    // payment_received in both the webhook and the confirm-escrow-payment
+    // fallback) or it didn't. An allowlist here previously missed
+    // 'agreement_sent', causing tenants in that state to see incorrect
+    // cancellation-fee messaging and, if they tried to actually cancel, an
+    // outright failure ("No payment reference found") instead of a free
+    // cancellation.
+    const isPrePayment = !deal.paystack_reference;
 
     let feeAmount = 0;
     let refundAmount = 0;

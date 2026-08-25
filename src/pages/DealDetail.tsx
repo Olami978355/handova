@@ -18,6 +18,8 @@ import { LawyerReviewModal } from '../components/deal/LawyerReviewModal';
 import { supabase, requireValidSession } from '../lib/supabase';
 import { parseFunctionError } from '../lib/parseFunctionError';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import { useToast } from '../hooks/useToast';
+import { Toast } from '../components/Toast';
 import { useAuth } from '../context/AuthContext';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
@@ -179,6 +181,7 @@ export default function DealDetail() {
   const [showLawyerReviewModal, setShowLawyerReviewModal] = useState(false);
   const [lawyerBooking, setLawyerBooking] = useState<Record<string, unknown> | null>(null);
   const [submittingRating, setSubmittingRating] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
     if (!deal || !user || isTenant) return;
@@ -237,7 +240,7 @@ export default function DealDetail() {
     const result = await action();
     setProcessing(false);
     if (!result.success) {
-      alert(result.error || 'Action failed');
+      showToast(result.error || 'Action failed', true);
     }
   };
 
@@ -340,7 +343,7 @@ export default function DealDetail() {
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
           <span className={`text-[11px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider ${statusColor}`}>
-            {deal.status.replace(/_/g, ' ')}
+            {statusSteps.find((s) => s.id === deal.status)?.label || deal.status.replace(/_/g, ' ')}
           </span>
         </div>
       </div>
@@ -489,14 +492,14 @@ export default function DealDetail() {
                       const file = e.target.files?.[0];
                       if (!file) return;
                       const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image file (JPG, PNG, WebP)'); return; }
-                      if (file.size > 20 * 1024 * 1024) { alert('File exceeds 20MB limit'); return; }
+if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image file (JPG, PNG, WebP)', true); return; }
+                      if (file.size > 20 * 1024 * 1024) { showToast('File exceeds 20MB limit', true); return; }
                       setProcessing(true);
                       setUploadProgress(30);
                       const result = await uploadAgreement(file);
                       setUploadProgress(100);
                       setProcessing(false);
-                      if (!result.success) { alert(result.error || 'Upload failed'); setUploadProgress(0); }
+                      if (!result.success) { showToast(result.error || 'Upload failed', true); setUploadProgress(0); }
                     }}
                   />
                   {processing && uploadProgress > 0 && (
@@ -521,7 +524,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                       setProcessing(true);
                       const result = await generateAgreement();
                       setProcessing(false);
-                      if (!result.success) alert(result.error || 'Failed to generate agreement');
+                      if (!result.success) showToast(result.error || 'Failed to generate agreement', true);
                     }}
                     disabled={processing}
                     className="w-full mt-3 bg-white/5 text-paper/70 border border-white/10 py-3 rounded-xl font-bold text-[13px] hover:bg-white/8 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
@@ -710,7 +713,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                             setProcessing(true);
                             const result = await uploadAgreement(file);
                             setProcessing(false);
-                            if (!result.success) alert(result.error || 'Upload failed');
+                            if (!result.success) showToast(result.error || 'Upload failed', true);
                           }}
                         />
                       </div>
@@ -799,10 +802,10 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                               if (fnData?.error) throw new Error(fnData.error);
                               await refresh();
                             } catch (fallbackErr) {
-                              alert(
-                                'Your payment was received by Paystack (ref: ' + reference + '). ' +
-                                'We could not confirm it automatically: ' + (fallbackErr instanceof Error ? fallbackErr.message : 'Unknown error') + ' ' +
-                                'Please contact support with this reference.'
+                              showToast(
+                                'Payment received by Paystack (ref: ' + reference + '). Could not confirm automatically: ' + (fallbackErr instanceof Error ? fallbackErr.message : 'Unknown error') + ' Please contact support with this reference.',
+                                true,
+                                true
                               );
                             }
                           }
@@ -1232,7 +1235,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
                   <AlertTriangle className="w-4 h-4" /> Cancel This Deal
                 </h3>
                 <p className="text-[12px] text-paper/40 mb-3">
-                  {deal.status === 'agreement_draft' || deal.status === 'pending_payment'
+                  {!deal.paystack_reference
                     ? 'No payment has been made yet — this deal can be cancelled free of charge.'
                     : 'A 5% cancellation fee applies. The rest of your payment will be refunded.'}
                 </p>
@@ -1370,7 +1373,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
         onClose={() => setShowTenantCancelModal(false)}
         title="Cancel deal"
         description={
-          deal.status === 'agreement_draft' || deal.status === 'pending_payment'
+          !deal.paystack_reference
             ? 'No payment has been made on this deal, so this cancellation is free. This cannot be undone.'
             : 'A 5% cancellation fee will be deducted from your refund. This cannot be undone.'
         }
@@ -1407,6 +1410,7 @@ if (!allowedTypes.includes(file.type)) { alert('Please upload a PDF or image fil
           setShowDisputeModal(false);
         }}
       />
+      <Toast toast={toast} onDismiss={hideToast} />
     </div>
   );
 }

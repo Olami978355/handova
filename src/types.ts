@@ -227,6 +227,7 @@ export interface Deal {
   agent_fee: number;
   agent_commission_rate: number;
   transfer_status?: 'pending' | 'success' | 'failed' | null;
+  paystack_reference?: string;
   paystack_transfer_reference?: string;
   paystack_transfer_code?: string;
   landlord_payout: number;
