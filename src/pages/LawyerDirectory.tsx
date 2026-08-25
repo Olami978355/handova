@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Scale, Loader2, CheckCircle2, MapPin, Star, Clock } from 'lucide-react';
+import { LawyerConsultationModal } from '../components/deal/LawyerConsultationModal';
 import { supabase } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 
@@ -20,6 +21,7 @@ interface LawyerListing {
   avgRating?: number | null;
   reviewCount?: number;
   avgResponseHours?: number | null;
+  default_fee: number;
 }
 
 type SpecialtyFilter = 'all' | 'tenancy' | 'property_title' | 'both';
@@ -32,12 +34,13 @@ export default function LawyerDirectory() {
   const [search, setSearch] = useState('');
   const [specialty, setSpecialty] = useState<SpecialtyFilter>('all');
   const [stateFilter, setStateFilter] = useState<string | null>(null);
+  const [consultLawyer, setConsultLawyer] = useState<LawyerListing | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchLawyers = useCallback(async (searchTerm: string, spec: SpecialtyFilter, state: string | null, offset: number) => {
     let query = supabase
       .from('lawyer_verifications')
-      .select('id, user_id, specialty, states_covered')
+      .select('id, user_id, specialty, states_covered, default_fee')
       .eq('status', 'approved')
       .order('reviewed_at', { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
@@ -224,8 +227,8 @@ export default function LawyerDirectory() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {lawyers.map(l => (
-                <Link
-                  key={l.id}
+                <div key={l.id}>
+                  <Link
                   to={`/u/${l.username}`}
                   className="bg-ink border border-white/6 rounded-2xl p-4 flex items-center gap-3 hover:border-white/12 transition-all"
                 >
@@ -262,6 +265,13 @@ export default function LawyerDirectory() {
                     )}
                   </div>
                 </Link>
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConsultLawyer(l); }}
+                  className="w-full mt-2 py-2 bg-gold/10 border border-gold/20 rounded-lg text-[11px] font-bold text-gold hover:bg-gold/15 transition-colors"
+                >
+                  Book a Consultation
+                </button>
+                </div>
               ))}
             </div>
 
@@ -280,6 +290,14 @@ export default function LawyerDirectory() {
           </>
         )}
       </div>
+      {consultLawyer && (
+        <LawyerConsultationModal
+          lawyerId={consultLawyer.user_id}
+          lawyerName={consultLawyer.full_name || 'this lawyer'}
+          lawyerFee={consultLawyer.default_fee}
+          onClose={() => setConsultLawyer(null)}
+        />
+      )}
     </div>
   );
 }
