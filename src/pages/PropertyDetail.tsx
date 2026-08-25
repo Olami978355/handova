@@ -329,6 +329,7 @@ export default function PropertyDetail() {
   const [reportDetails, setReportDetails] = useState('');
   const [submittingReport, setSubmittingReport] = useState(false);
   const [reportSubmitted, setReportSubmitted] = useState(false);
+  const [reportError, setReportErrorMsg] = useState<string | null>(null);
 
   useEffect(() => { if (id) fetchProperty(); }, [id]);
 
@@ -968,6 +969,9 @@ export default function PropertyDetail() {
                         </button>
                       ))}
                     </div>
+                    {reportError && (
+                      <p className="text-[12px] text-danger mb-3">{reportError}</p>
+                    )}
                     <textarea
                       value={reportDetails}
                       onChange={(e) => setReportDetails(e.target.value)}
@@ -980,15 +984,17 @@ export default function PropertyDetail() {
                         if (!reportReason || !user) return;
                         setSubmittingReport(true);
                         try {
-                          await supabase.from('property_reports').insert({
+                          const { error: insertError } = await supabase.from('property_reports').insert({
                             property_id: property.id,
                             reporter_id: user.id,
                             reason: reportReason,
                             details: reportDetails.trim() || null,
                           });
+                          if (insertError) throw new Error(insertError.message);
                           setReportSubmitted(true);
                         } catch (err) {
                           console.error('Failed to submit report:', err);
+                          setReportErrorMsg(err instanceof Error ? err.message : 'Failed to submit report. Please try again.');
                         } finally {
                           setSubmittingReport(false);
                         }
