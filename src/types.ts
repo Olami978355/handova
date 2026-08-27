@@ -17,6 +17,7 @@ export interface Profile {
   agent_id?: string;      // RE-AGT-2026-XXXXX
   landlord_id?: string;   // RE-LLD-2026-XXXXX
   lasrera_id?: string;
+  bio?: string;
   agent_bio?: string;
   agent_specialty?: string;
   bank_account_name?: string;

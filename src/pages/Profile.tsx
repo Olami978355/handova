@@ -38,13 +38,15 @@ export default function Profile() {
     phonePublic: profile?.phone_public || false,
     avatarUrl: profile?.avatar_url || '',
     username: profile?.username || '',
+    bio: profile?.bio || '',
   });
 
   const isDirty =
     formData.fullName !== (profile?.full_name || '') ||
     formData.phone !== (profile?.phone || '') ||
     formData.phonePublic !== (profile?.phone_public || false) ||
-    (formData.username || '') !== (profile?.username || '');
+    (formData.username || '') !== (profile?.username || '') ||
+    (formData.bio || '') !== (profile?.bio || '');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,6 +88,7 @@ export default function Profile() {
         avatar_url: formData.avatarUrl || profile?.avatar_url || null,
         username: formData.username || null,
         phone_public: formData.phonePublic,
+        bio: formData.bio || null,
         email: user.email || '',
       });
       if (!result.success) throw new Error(result.error?.message || 'Failed to update');
@@ -416,6 +419,22 @@ export default function Profile() {
                         {usernameStatus === 'invalid' && (
                           <p className="text-[11px] text-danger mt-1.5">3-20 characters, lowercase letters, numbers, underscore only</p>
                         )}
+                      </div>
+                      {/* Bio */}
+                      <div>
+                        <label className="block text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-2">
+                          Bio <span className="text-paper/25 normal-case font-normal">(optional)</span>
+                        </label>
+                        <textarea
+                          value={formData.bio}
+                          onChange={e => setFormData(prev => ({ ...prev, bio: e.target.value.slice(0, 200) }))}
+                          placeholder="Tell people a bit about yourself..."
+                          rows={3}
+                          className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors resize-none"
+                        />
+                        <div className="flex justify-end mt-1">
+                          <span className="text-[11px] text-paper/25">{formData.bio.length}/200</span>
+                        </div>
                       </div>
                       {/* Email — read only */}
                       <div>
