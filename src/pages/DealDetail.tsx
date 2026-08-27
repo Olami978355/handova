@@ -1137,15 +1137,15 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                 {[
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
                   ...(deal.caution_fee ? [{ label: 'Caution / Security Deposit', value: formatNaira(deal.caution_fee) }] : []),
-                  { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}` },
+                  { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}`, deduction: true },
                   ...(deal.agent_id && deal.agent_fee && deal.agent_fee > 0
                     ? [
-                        { label: 'Your Commission (10%)', value: formatNaira(deal.agent_fee) },
+                        { label: 'Your Commission (10%)', value: formatNaira(deal.agent_fee), earned: true },
                         { label: "Landlord's Share (forward to them yourself)", value: formatNaira(deal.landlord_payout) },
                       ]
                     : []),
                   ...(deal.agreement_fee && deal.agreement_fee > 0
-                    ? [{ label: 'Agreement Generation Fee', value: `-${formatNaira(deal.agreement_fee)}` }]
+                    ? [{ label: 'Agreement Generation Fee', value: `-${formatNaira(deal.agreement_fee)}`, deduction: true }]
                     : []),
                   {
                     label: deal.agent_id ? 'Your Total Payout' : 'Landlord Payout',
@@ -1161,10 +1161,10 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                   },
                 ].map((row) => (
                   <div key={row.label} className="flex items-center justify-between">
-                    <span className={`text-[12px] ${row.highlight ? 'font-bold text-paper' : 'text-paper/40'}`}>
-                      {row.label}
+                    <span className={`text-[12px] ${row.highlight ? 'font-bold text-paper' : row.earned ? 'text-gold/70' : 'text-paper/40'}`}>
+                      {row.label}{row.earned ? ' (yours)' : ''}
                     </span>
-                    <span className={`text-[12px] font-bold ${row.highlight ? 'text-gold' : 'text-paper/60'}`}>
+                    <span className={`text-[12px] font-bold ${row.highlight ? 'text-gold' : row.earned ? 'text-gold' : row.deduction ? 'text-paper/60' : 'text-paper/60'}`}>
                       {row.value}
                     </span>
                   </div>

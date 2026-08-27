@@ -185,7 +185,6 @@ const CreateDealModal = ({
   const [duration, setDuration] = useState('1 year');
   const [moveInDate, setMoveInDate] = useState('');
   const [note, setNote] = useState('');
-  const [cautionFee, setCautionFee] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
 
   const handleSubmit = () => {
@@ -199,7 +198,7 @@ const CreateDealModal = ({
       return;
     }
     setLocalError(null);
-    onSend({ agreedPrice: price, duration, moveInDate, note, cautionFee: cautionFee ? parseInt(cautionFee) : undefined });
+    onSend({ agreedPrice: price, duration, moveInDate, note });
   };
 
   return (
@@ -245,16 +244,6 @@ const CreateDealModal = ({
             {agreedPrice && !isNaN(parseInt(agreedPrice)) && (
               <p className="text-[11px] text-gold mt-1 ml-1">= {formatNaira(parseInt(agreedPrice))}</p>
             )}
-          </div>
-          <div>
-            <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">Caution / Security Deposit (₦) <span className="normal-case text-paper/25">(optional)</span></label>
-            <input
-              type="number"
-              value={cautionFee}
-              onChange={e => setCautionFee(e.target.value)}
-              placeholder="e.g. 200000"
-              className="w-full px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper placeholder-white/25 outline-none focus:border-gold/50 transition-colors"
-            />
           </div>
           <div>
             <label className="block text-[11px] font-bold text-paper/40 uppercase tracking-wider mb-2">Duration</label>

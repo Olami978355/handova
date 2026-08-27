@@ -79,7 +79,6 @@ export default function OnboardingWizard() {
     fullName: '',
     phone: '',
     state: '',
-    bio: '',
     avatarUrl: '',
   });
 
@@ -449,29 +448,6 @@ export default function OnboardingWizard() {
                     </div>
                   </div>
 
-                  {/* Bio (optional) */}
-                  <div>
-                    <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
-                      Short Bio <span className="text-paper/25 normal-case font-normal">(optional)</span>
-                    </label>
-                    <textarea
-                      value={formData.bio}
-                      onChange={e => setFormData(prev => ({
-                        ...prev,
-                        bio: e.target.value.slice(0, 200)
-                      }))}
-                      placeholder={
-                        formData.role === 'tenant'
-                          ? 'Tell landlords a bit about yourself...'
-                          : 'Tell tenants about yourself and your properties...'
-                      }
-                      rows={3}
-                      className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors resize-none"
-                    />
-                    <div className="flex justify-end mt-1">
-                      <span className="text-[11px] text-paper/25">{formData.bio.length}/200</span>
-                    </div>
-                  </div>
 
                   {/* Buttons */}
                   <div className="flex gap-3 pt-2">
