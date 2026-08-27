@@ -27,6 +27,8 @@ export default function Profile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
+  const [pendingAvatarPreview, setPendingAvatarPreview] = useState<string | null>(null);
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -100,25 +102,38 @@ export default function Profile() {
     }
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file || !user) return;
     if (file.size > 5 * 1024 * 1024) {
       setError('Photo must be less than 5MB');
       return;
     }
+    setError(null);
+    setPendingAvatarFile(file);
+    setPendingAvatarPreview(URL.createObjectURL(file));
+  };
 
+  const cancelAvatarSelect = () => {
+    if (pendingAvatarPreview) URL.revokeObjectURL(pendingAvatarPreview);
+    setPendingAvatarFile(null);
+    setPendingAvatarPreview(null);
+  };
+
+  const confirmAvatarUpload = async () => {
+    if (!pendingAvatarFile || !user) return;
     setUploadLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = pendingAvatarFile.name.split('.').pop();
       const filePath = `${user.id}/avatar.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, { upsert: true });
+        .upload(filePath, pendingAvatarFile, { upsert: true });
 
       if (uploadError) throw uploadError;
 
@@ -138,6 +153,9 @@ export default function Profile() {
 
       if (!result.success) throw new Error(result.error?.message || 'Failed to save');
       setSuccess('Photo updated successfully');
+      if (pendingAvatarPreview) URL.revokeObjectURL(pendingAvatarPreview);
+      setPendingAvatarFile(null);
+      setPendingAvatarPreview(null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to upload photo');
     } finally {
@@ -210,10 +228,40 @@ export default function Profile() {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={handleAvatarUpload}
+                      onChange={handleAvatarSelect}
                     />
                   </label>
                 </div>
+
+                {pendingAvatarPreview && (
+                  <div className="w-full mb-4 p-3 bg-white/4 border border-white/8 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-white/10">
+                        <img src={pendingAvatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-[11px] text-paper/50 flex-1 text-left">New photo selected</p>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        type="button"
+                        onClick={cancelAvatarSelect}
+                        disabled={uploadLoading}
+                        className="flex-1 py-2 rounded-lg text-[12px] font-semibold text-paper/50 hover:bg-white/5 transition-colors disabled:opacity-40"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={confirmAvatarUpload}
+                        disabled={uploadLoading}
+                        className="flex-1 py-2 rounded-lg text-[12px] font-bold bg-gold text-black hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
+                      >
+                        {uploadLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <h3 className="text-[15px] font-bold text-paper">{profile?.full_name}</h3>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-[11px] text-paper/35 capitalize">{profile?.role}</span>
