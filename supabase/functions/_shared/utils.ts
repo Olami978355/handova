@@ -175,11 +175,17 @@ export const executeDealPayout = async (
   extraLogDetails: Record<string, any> = {}
 ) => {
   const payoutRecipientId = deal.agent_id || deal.landlord_id;
+  // Fee model v2: tenant pays Handova's 2% and the agreement fee on top, so nothing is
+  // deducted from the recipient (payout_amount is computed by the database).
+  // Fee model v1 (existing deals): rent minus fees, as before.
+  const isFeeModelV2 = Number(deal.fee_model_version) === 2;
   const grossPayout = deal.agent_id
     ? Number(deal.agent_fee) + Number(deal.landlord_payout)
     : Number(deal.landlord_payout);
   const agreementFee = Number(deal.agreement_fee) || 0;
-  const transferAmountNaira = Math.max(0, grossPayout - agreementFee);
+  const transferAmountNaira = isFeeModelV2
+    ? Math.max(0, Number(deal.payout_amount))
+    : Math.max(0, grossPayout - agreementFee);
 
   const { data: payoutProfile, error: payoutProfileError } = await adminSupabase
     .from('profiles')
@@ -194,13 +200,16 @@ export const executeDealPayout = async (
       payout_recipient_id: payoutRecipientId,
       ...extraLogDetails,
     });
-    return { transferInitiated: false, warning: 'Deal marked as funds released, but the payout recipient has no bank details on file. Transfer was NOT sent.' };
+    return { transferInitiated: false, warning: 'The payout recipient has no bank details on file. No transfer was sent.' };
   }
 
   const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
   if (!paystackSecret) throw new Error('PAYSTACK_SECRET_KEY not set');
 
-  const transferReference = `RELEASE_${deal.id}_${Date.now()}`;
+  // One deterministic reference per release attempt: Paystack rejects duplicates.
+  const transferReference = extraLogDetails.attempt
+    ? `RELEASE_${deal.id}_${extraLogDetails.attempt}`
+    : `RELEASE_${deal.id}_${Date.now()}`;
 
   const transferRes = await fetch('https://api.paystack.co/transfer', {
     method: 'POST',
@@ -221,7 +230,7 @@ export const executeDealPayout = async (
       reason: transferData.message || 'Unknown Paystack transfer error',
       ...extraLogDetails,
     });
-    return { transferInitiated: false, warning: `Deal marked as funds released, but the Paystack transfer failed: ${transferData.message}` };
+    return { transferInitiated: false, warning: `The Paystack transfer could not be started: ${transferData.message}` };
   }
 
   await adminSupabase
@@ -233,7 +242,7 @@ export const executeDealPayout = async (
     })
     .eq('id', deal.id);
 
-  await logDealAction(adminSupabase, deal.id, 'funds_released', actorId, {
+  await logDealAction(adminSupabase, deal.id, 'release_submitted', actorId, {
     released_by_role: actorRole,
     transfer_reference: transferReference,
     transfer_amount: transferAmountNaira,
