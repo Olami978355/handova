@@ -286,6 +286,7 @@ serve(async (req) => {
       .update({
         status: 'agreement_draft',
         agreement_url: publicUrl,
+        agreement_path: filePath,
         agreement_source: 'generated',
         agreement_fee: AGREEMENT_FEE,
         updated_at: new Date().toISOString(),
