@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createAdminClient } from '../_shared/supabase.ts';
 import { logDealAction, notifyDealParties, sendEmail, corsHeaders } from '../_shared/utils.ts';
+import { completeDealRelease, failDealRelease } from '../_shared/release.ts';
 
 async function verifySignature(rawBody: string, signature: string | null, secret: string): Promise<boolean> {
   if (!signature) return false;
@@ -21,6 +22,14 @@ async function verifySignature(rawBody: string, signature: string | null, secret
   return computedHex === signature;
 }
 
+const jsonResponse = (payload: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(payload), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status,
+  });
+
+// Payout (transfer) confirmations. Only a provider-confirmed success marks the deal
+// funds_released; a failed or reversed transfer is recorded as a failed release.
 async function handleTransferEvent(body: any, supabase: ReturnType<typeof createAdminClient>) {
   const transferCode = body.data?.transfer_code;
   const reference = body.data?.reference;
@@ -39,41 +48,30 @@ async function handleTransferEvent(body: any, supabase: ReturnType<typeof create
     throw new Error(`No deal found for transfer_code: ${transferCode}`);
   }
 
-  const newTransferStatus = body.event === 'transfer.success' ? 'success' : 'failed';
+  const isSuccess = body.event === 'transfer.success';
+  const newTransferStatus = isSuccess ? 'success' : 'failed';
 
-  if (deal.transfer_status === newTransferStatus) {
-    return new Response(JSON.stringify({ message: 'Already processed' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
+  // Idempotency: a repeated webhook for an outcome we already recorded does nothing.
+  const alreadyProcessed = isSuccess
+    ? deal.release_status === 'completed'
+    : deal.transfer_status === 'failed' && deal.release_status === 'failed';
+  if (alreadyProcessed) {
+    return jsonResponse({ message: 'Already processed' });
   }
 
-  const { error: updateError } = await supabase
-    .from('deals')
-    .update({
-      transfer_status: newTransferStatus,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', deal.id);
+  if (isSuccess) {
+    await completeDealRelease(supabase, deal);
+  } else {
+    await failDealRelease(supabase, deal, body.data?.reason || `Payout provider reported ${body.event}`);
+  }
 
-  if (updateError) throw updateError;
-
-  await logDealAction(supabase, deal.id, `transfer_${newTransferStatus}`, null, {
+  await logDealAction(supabase, deal.id, `transfer_${newTransferStatus}`, null as any, {
     transfer_code: transferCode,
     reference,
     paystack_event: body.event,
   });
 
-  if (newTransferStatus === 'success') {
-    await notifyDealParties(
-      supabase,
-      deal,
-      'Payout Sent',
-      `Your payout for ${deal.properties.title} has been sent to your bank account.`,
-      `/deals/${deal.id}`,
-      'deal_state_change'
-    );
-  } else {
+  if (!isSuccess) {
     await notifyDealParties(
       supabase,
       deal,
@@ -84,10 +82,90 @@ async function handleTransferEvent(body: any, supabase: ReturnType<typeof create
     );
   }
 
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  });
+  return jsonResponse({ success: true });
+}
+
+// Refund confirmations. A refund is only treated as complete when Paystack says so.
+async function handleRefundEvent(body: any, supabase: ReturnType<typeof createAdminClient>) {
+  const reference = body.data?.transaction_reference ?? body.data?.transaction?.reference;
+  if (!reference) {
+    return jsonResponse({ message: 'Refund event without a transaction reference ignored' });
+  }
+
+  const { data: deal } = await supabase
+    .from('deals')
+    .select('*, properties(*)')
+    .eq('paystack_reference', reference)
+    .maybeSingle();
+
+  if (!deal) {
+    // Not a deal payment (for example an inspection or lawyer-booking refund).
+    return jsonResponse({ message: 'No deal for this refund reference' });
+  }
+
+  const now = new Date().toISOString();
+
+  if (body.event === 'refund.processed') {
+    if (deal.refund_status === 'completed') return jsonResponse({ message: 'Already processed' });
+
+    await supabase
+      .from('deals')
+      .update({
+        refund_status: 'completed',
+        refund_failure_reason: null,
+        status: deal.status === 'cancelled' ? 'refunded' : deal.status,
+        updated_at: now,
+      })
+      .eq('id', deal.id)
+      .neq('refund_status', 'completed');
+
+    await logDealAction(supabase, deal.id, 'refund_completed', null as any, {
+      paystack_event: body.event,
+      transaction_reference: reference,
+    });
+    await notifyDealParties(
+      supabase,
+      deal,
+      'Refund Processed',
+      `The refund for ${deal.properties?.title ?? 'your deal'} has been processed. It can take up to 10 business days to reach the bank account.`,
+      `/deals/${deal.id}`,
+      'deal_state_change'
+    );
+    return jsonResponse({ success: true });
+  }
+
+  if (body.event === 'refund.failed' || body.event === 'refund.needs-attention') {
+    if (deal.refund_status === 'failed') return jsonResponse({ message: 'Already processed' });
+
+    const reason =
+      body.event === 'refund.needs-attention'
+        ? 'Paystack needs the customer bank account details to complete this refund'
+        : body.data?.reason || 'Paystack could not process the refund';
+
+    await supabase
+      .from('deals')
+      .update({ refund_status: 'failed', refund_failure_reason: reason, updated_at: now })
+      .eq('id', deal.id)
+      .neq('refund_status', 'completed');
+
+    await logDealAction(supabase, deal.id, 'refund_failed', null as any, {
+      paystack_event: body.event,
+      transaction_reference: reference,
+      reason,
+    });
+    await notifyDealParties(
+      supabase,
+      deal,
+      'Refund Needs Attention',
+      `The refund for ${deal.properties?.title ?? 'your deal'} could not be completed yet. Our team is looking into it.`,
+      `/deals/${deal.id}`,
+      'deal_state_change'
+    );
+    return jsonResponse({ success: true });
+  }
+
+  // refund.pending / refund.processing: nothing to change, the request is already recorded.
+  return jsonResponse({ message: 'Refund event noted' });
 }
 
 serve(async (req) => {
@@ -104,7 +182,7 @@ serve(async (req) => {
 
     const validSignature = await verifySignature(rawBody, signature, paystackSecret);
     if (!validSignature) {
-      console.error('Invalid Paystack webhook signature — rejecting request');
+      console.error('Invalid Paystack webhook signature - rejecting request');
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401,
@@ -116,6 +194,10 @@ serve(async (req) => {
 
     if (['transfer.success', 'transfer.failed', 'transfer.reversed'].includes(body.event)) {
       return await handleTransferEvent(body, supabase);
+    }
+
+    if (typeof body.event === 'string' && body.event.startsWith('refund.')) {
+      return await handleRefundEvent(body, supabase);
     }
 
     if (body.event !== 'charge.success') {
@@ -191,7 +273,12 @@ serve(async (req) => {
     }
 
     const verifiedAmountKobo = verifyData.data.amount;
-    const expectedAmountKobo = Math.round((deal.amount - (deal.inspection_fee_credit || 0)) * 100);
+    // Fee model v2 deals are charged the full total (rent + Handova 2% + agreement fee + agency fee);
+    // existing deals keep the original rent-only amount.
+    const expectedAmountKobo =
+      Number(deal.fee_model_version) === 2
+        ? Math.round(Number(deal.total_payable) * 100)
+        : Math.round((deal.amount - (deal.inspection_fee_credit || 0)) * 100);
 
     if (verifiedAmountKobo !== expectedAmountKobo) {
       throw new Error(
@@ -217,7 +304,7 @@ serve(async (req) => {
       });
     }
 
-    await logDealAction(supabase, dealId, 'payment_received', null, {
+    await logDealAction(supabase, dealId, 'payment_received', null as any, {
       paystack_reference: reference,
       paystack_transaction_id: verifyData.data.id,
       amount_received: amountNaira,
@@ -238,7 +325,7 @@ serve(async (req) => {
         propertyTitle: deal.properties.title,
         status: 'Payment Received',
         message: `Your payment of ₦${amountNaira.toLocaleString()} has been confirmed. The funds are now held in escrow.`,
-        link: `https://handova.ng/deals/${dealId}`,
+        link: `https://renteasy.ng/deals/${dealId}`,
       });
     }
 
