@@ -8,3 +8,9 @@ project_id = "huvczugwcphcptblwbym"
 # a 401 before our function code ever runs.
 [functions.process-payment-webhook]
 verify_jwt = false
+
+# paystack-transfer-webhook is also called by Paystack (payout events) and
+# verifies the x-paystack-signature header itself, so the platform JWT check
+# must be off here as well.
+[functions.paystack-transfer-webhook]
+verify_jwt = false
