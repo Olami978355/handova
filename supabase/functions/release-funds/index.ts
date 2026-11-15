@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
-import { logDealAction, notifyDealParties, corsHeaders, executeDealPayout, logAdminAction, sendDealStatusEmails, isRecipientFirstPayout, finalizeDealFundsRelease } from '../_shared/utils.ts';
+import { corsHeaders, logAdminAction } from '../_shared/utils.ts';
+import { startDealRelease } from '../_shared/release.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -11,11 +12,9 @@ serve(async (req) => {
     const adminSupabase = createAdminClient();
     const { dealId, confirmFirstPayout } = await req.json();
 
-    // 1. Verify caller authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) throw new Error('Unauthorized');
 
-    // 2. Fetch deal details
     const { data: deal, error: dealError } = await adminSupabase
       .from('deals')
       .select('*, properties(*)')
@@ -23,12 +22,10 @@ serve(async (req) => {
       .single();
     if (dealError || !deal) throw new Error('Deal not found');
 
-    // 2.1 Verify deal status
     if (deal.status !== 'move_in_confirmed') {
       throw new Error(`Cannot release funds in ${deal.status} status. Move-in must be confirmed first.`);
     }
 
-    // 3. Validate caller has permission (admin or moderator)
     const { data: profile, error: profileError } = await adminSupabase
       .from('profiles')
       .select('role')
@@ -38,44 +35,32 @@ serve(async (req) => {
       throw new Error('Permission denied. Only admins or moderators can release funds.');
     }
 
-    // 3.1 First-payout safety check. A recipient's first-ever released
-    // payout is held for explicit admin confirmation instead of being
-    // paid out automatically. Does not touch deal.status or is_rented —
-    // nothing user-facing changes until an admin confirms.
-    const payoutRecipientId = deal.agent_id || deal.landlord_id;
-    if (!confirmFirstPayout) {
-      const isFirstPayout = await isRecipientFirstPayout(adminSupabase, payoutRecipientId);
-      if (isFirstPayout) {
-        await adminSupabase
-          .from('deals')
-          .update({ transfer_status: 'first_payout_review' })
-          .eq('id', dealId);
-        await logAdminAction(adminSupabase, user.id, 'first_payout_held_for_review', dealId, 'deal', {
-          payout_recipient_id: payoutRecipientId,
-        });
-        return new Response(JSON.stringify({ success: true, heldForReview: true }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        });
-      }
-    }
+    // Release normally starts automatically when the tenant confirms move-in. This path lets
+    // admins confirm a held first payout or start one that did not start. A release already
+    // in progress or completed is never started twice.
+    const result = await startDealRelease(
+      adminSupabase,
+      dealId,
+      { id: user.id, role: profile.role },
+      { confirmFirstPayout: !!confirmFirstPayout }
+    );
 
-    // 4. Finalize the release: deal + property status, real Paystack
-    // payout, first-payout milestone, and notifications. Shared with the
-    // admin first-payout confirmation path above.
-    const payoutResult = await finalizeDealFundsRelease(adminSupabase, deal, user.id, profile.role);
+    await logAdminAction(adminSupabase, user.id, 'release_funds_requested', dealId, 'deal', {
+      role: profile.role,
+      confirm_first_payout: !!confirmFirstPayout,
+      resulting_state: result.state,
+    });
 
-    if (!payoutResult.transferInitiated) {
-      return new Response(JSON.stringify({ success: true, transferInitiated: false, warning: payoutResult.warning }), {
+    const json = (payload: Record<string, unknown>) =>
+      new Response(JSON.stringify(payload), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       });
-    }
 
-    return new Response(JSON.stringify({ success: true, transferInitiated: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
+    if (!result.started) return json({ success: true, alreadyInProgress: true, releaseState: result.state });
+    if (result.state === 'held_for_review') return json({ success: true, heldForReview: true });
+    if (result.state === 'failed') return json({ success: true, transferInitiated: false, warning: result.warning });
+    return json({ success: true, transferInitiated: true, releaseState: result.state });
   } catch (error) {
     console.error('Release funds error:', error);
     return new Response(JSON.stringify({ error: error.message }), {

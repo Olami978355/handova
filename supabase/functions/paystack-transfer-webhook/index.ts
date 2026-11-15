@@ -1,27 +1,20 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createAdminClient } from '../_shared/supabase.ts';
 import { logDealAction, notifyDealParties, corsHeaders } from '../_shared/utils.ts';
+import { completeDealRelease, failDealRelease } from '../_shared/release.ts';
 
 async function verifySignature(rawBody: string, signature: string | null, secret: string): Promise<boolean> {
   if (!signature) return false;
   const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-512' },
-    false,
-    ['sign']
+    'raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']
   );
   const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(rawBody));
-  const computedHex = Array.from(new Uint8Array(mac))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+  const computedHex = Array.from(new Uint8Array(mac)).map((b) => b.toString(16).padStart(2, '0')).join('');
   return computedHex === signature;
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
     const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
@@ -29,10 +22,8 @@ serve(async (req) => {
 
     const rawBody = await req.text();
     const signature = req.headers.get('x-paystack-signature');
-
-    const validSignature = await verifySignature(rawBody, signature, paystackSecret);
-    if (!validSignature) {
-      console.error('Invalid Paystack transfer webhook signature — rejecting request');
+    if (!(await verifySignature(rawBody, signature, paystackSecret))) {
+      console.error('Invalid Paystack transfer webhook signature, rejecting request');
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401,
@@ -42,7 +33,6 @@ serve(async (req) => {
     const body = JSON.parse(rawBody);
     const supabase = createAdminClient();
 
-    // Only care about transfer lifecycle events
     if (!['transfer.success', 'transfer.failed', 'transfer.reversed'].includes(body.event)) {
       return new Response(JSON.stringify({ message: 'Event ignored' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -52,66 +42,45 @@ serve(async (req) => {
 
     const transferCode = body.data?.transfer_code;
     const reference = body.data?.reference;
-
-    if (!transferCode) {
-      throw new Error('Missing transfer_code in webhook payload');
-    }
+    if (!transferCode) throw new Error('Missing transfer_code in webhook payload');
 
     const { data: deal, error: dealError } = await supabase
       .from('deals')
       .select('*, properties(*)')
       .eq('paystack_transfer_code', transferCode)
       .single();
+    if (dealError || !deal) throw new Error(`No deal found for transfer_code: ${transferCode}`);
 
-    if (dealError || !deal) {
-      throw new Error(`No deal found for transfer_code: ${transferCode}`);
-    }
+    const isSuccess = body.event === 'transfer.success';
+    const newTransferStatus = isSuccess ? 'success' : 'failed';
 
-    const newTransferStatus =
-      body.event === 'transfer.success' ? 'success' : 'failed';
-
-    // Idempotency: if we've already recorded this exact outcome, skip re-processing
-    if (deal.transfer_status === newTransferStatus) {
+    const alreadyProcessed = isSuccess
+      ? deal.release_status === 'completed'
+      : deal.transfer_status === 'failed' && deal.release_status === 'failed';
+    if (alreadyProcessed) {
       return new Response(JSON.stringify({ message: 'Already processed' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       });
     }
 
-    const { error: updateError } = await supabase
-      .from('deals')
-      .update({
-        transfer_status: newTransferStatus,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', deal.id);
+    if (isSuccess) {
+      await completeDealRelease(supabase, deal);
+    } else {
+      await failDealRelease(supabase, deal, body.data?.reason || `Payout provider reported ${body.event}`);
+    }
 
-    if (updateError) throw updateError;
-
-    await logDealAction(supabase, deal.id, `transfer_${newTransferStatus}`, null, {
+    await logDealAction(supabase, deal.id, `transfer_${newTransferStatus}`, null as any, {
       transfer_code: transferCode,
       reference,
       paystack_event: body.event,
     });
 
-    if (newTransferStatus === 'success') {
+    if (!isSuccess) {
       await notifyDealParties(
-        supabase,
-        deal,
-        'Payout Sent',
-        `Your payout for ${deal.properties.title} has been sent to your bank account.`,
-        `/deals/${deal.id}`,
-        'deal_state_change'
-      );
-    } else {
-      // Failed/reversed transfer — surface this clearly, money did not move
-      await notifyDealParties(
-        supabase,
-        deal,
-        'Payout Failed',
+        supabase, deal, 'Payout Failed',
         `The payout for ${deal.properties.title} could not be completed. Our team has been notified.`,
-        `/deals/${deal.id}`,
-        'deal_state_change'
+        `/deals/${deal.id}`, 'deal_state_change'
       );
     }
 
