@@ -67,7 +67,12 @@ serve(async (req) => {
     }
 
     const verifiedAmountKobo = verifyData.data.amount;
-    const expectedAmountKobo = Math.round((deal.amount - (deal.inspection_fee_credit || 0)) * 100);
+    // Fee model v2 deals are charged the full total (rent + Handova 2% + agreement fee + agency fee);
+    // existing deals keep the original rent-only amount.
+    const expectedAmountKobo =
+      Number(deal.fee_model_version) === 2
+        ? Math.round(Number(deal.total_payable) * 100)
+        : Math.round((deal.amount - (deal.inspection_fee_credit || 0)) * 100);
 
     if (verifiedAmountKobo !== expectedAmountKobo) {
       throw new Error(`Amount mismatch: expected ${expectedAmountKobo} kobo, Paystack confirms ${verifiedAmountKobo} kobo`);
