@@ -1,9 +1,17 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, createAdminClient } from '../_shared/supabase.ts';
 import { logDealAction, notifyDealParties, corsHeaders, sendDealStatusEmails } from '../_shared/utils.ts';
+import {
+  CANCELLATION_FEE_RATE,
+  computeCancellationAmounts,
+  getPaidAmountNaira,
+  requestPaystackRefund,
+} from '../_shared/refund.ts';
 
-const CANCELLATION_FEE_RATE = 0.05; // 5% — flat rate, adjust here if it changes
-
+// A tenant cancelling on their own is a voluntary cancellation: the 5% fee applies once
+// payment has been made. Cancellations caused by Handova, the landlord, the agent, an
+// invalid listing or a failed handover are handled by an admin with the matching cause
+// (see cancel-deal) and carry no fee.
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -32,67 +40,46 @@ serve(async (req) => {
       throw new Error('Only the tenant on this deal can cancel it.');
     }
 
-    if (deal.status === 'move_in_confirmed' || deal.status === 'funds_released' || deal.status === 'disputed') {
+    if (['move_in_confirmed', 'funds_released', 'disputed', 'cancelled', 'refunded'].includes(deal.status)) {
       throw new Error(`Cannot cancel a deal in ${deal.status} status.`);
     }
 
-    // Structural check instead of an allowlist of status strings: payment
-    // either happened (paystack_reference is set, alongside status flipping to
-    // payment_received in both the webhook and the confirm-escrow-payment
-    // fallback) or it didn't. An allowlist here previously missed
-    // 'agreement_sent', causing tenants in that state to see incorrect
-    // cancellation-fee messaging and, if they tried to actually cancel, an
-    // outright failure ("No payment reference found") instead of a free
-    // cancellation.
+    // Payment either happened (paystack_reference is set) or it didn't.
     const isPrePayment = !deal.paystack_reference;
 
     let feeAmount = 0;
     let refundAmount = 0;
-
-    if (isPrePayment) {
-      // No payment has been made yet — free cancellation, nothing to refund via Paystack.
-      feeAmount = 0;
-      refundAmount = 0;
-    } else {
-      if (!deal.paystack_reference) {
-        throw new Error('No payment reference found on this deal — nothing to refund.');
-      }
-
-      feeAmount = Math.round(deal.amount * CANCELLATION_FEE_RATE * 100) / 100;
-      refundAmount = deal.amount - feeAmount;
-      const toKobo = (naira: number) => Math.round(naira * 100);
-      const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
-
-      const refundResponse = await fetch('https://api.paystack.co/refund', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${paystackSecret}`,
-        },
-        body: JSON.stringify({
-          transaction: deal.paystack_reference,
-          amount: toKobo(refundAmount),
-        }),
-      });
-      const refundData = await refundResponse.json();
-      if (!refundResponse.ok) {
-        throw new Error(`Paystack refund failed: ${refundData.message}`);
-      }
+    if (!isPrePayment) {
+      // Use what Paystack actually collected so a refund can never exceed the payment.
+      const paid = await getPaidAmountNaira(deal.paystack_reference);
+      ({ fee: feeAmount, refund: refundAmount } = computeCancellationAmounts(
+        'tenant_voluntary',
+        Number(deal.amount),
+        paid
+      ));
     }
 
-    const { error: updateError } = await adminSupabase
-      .from('deals')
-      .update({
-        status: 'cancelled',
-        cancelled_at: new Date().toISOString(),
-        cancelled_by: user.id,
-        cancellation_reason: reason,
-        cancellation_fee: feeAmount,
-        refund_amount: refundAmount,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', dealId);
-    if (updateError) throw updateError;
+    // Cancel atomically first, so a double tap can never request two refunds.
+    const { data: began, error: beginError } = await adminSupabase.rpc('begin_deal_cancellation', {
+      p_deal_id: dealId,
+      p_actor: user.id,
+      p_cause: 'tenant_voluntary',
+      p_reason: reason,
+      p_fee: feeAmount,
+      p_refund: refundAmount,
+    });
+    if (beginError) throw beginError;
+    if (!began?.cancelled) throw new Error('This deal can no longer be cancelled.');
+
+    let refundStatus: 'none' | 'pending' | 'failed' = refundAmount > 0 ? 'pending' : 'none';
+    let refundWarning: string | undefined;
+    if (refundAmount > 0) {
+      const refundResult = await requestPaystackRefund(adminSupabase, deal, refundAmount, user.id);
+      if (!refundResult.ok) {
+        refundStatus = 'failed';
+        refundWarning = refundResult.reason;
+      }
+    }
 
     await adminSupabase
       .from('properties')
@@ -100,33 +87,22 @@ serve(async (req) => {
       .eq('id', deal.property_id);
 
     await logDealAction(adminSupabase, dealId, 'deal_cancelled_by_tenant', user.id, {
-      reason, feeAmount, refundAmount,
+      reason, feeAmount, refundAmount, cause: 'tenant_voluntary', refund_status: refundStatus,
     });
 
-    await notifyDealParties(
-      adminSupabase,
-      deal,
-      'Deal Cancelled by Tenant',
-      isPrePayment
-        ? `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. No payment had been made, so no fee applies.`
-        : `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. A 5% cancellation fee (₦${feeAmount.toLocaleString()}) was applied; ₦${refundAmount.toLocaleString()} was refunded.`,
-      `/deals/${dealId}`,
-      'deal_state_change'
-    );
-
-    const emailMessage = isPrePayment
+    const feePct = Math.round(CANCELLATION_FEE_RATE * 100);
+    const refundText =
+      refundStatus === 'failed'
+        ? `The refund of ₦${refundAmount.toLocaleString()} could not be started automatically. Our team will process it.`
+        : `₦${refundAmount.toLocaleString()} is being refunded. Bank timing varies.`;
+    const message = isPrePayment
       ? `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. No payment had been made, so no fee applies.`
-      : `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. A 5% cancellation fee (₦${feeAmount.toLocaleString()}) was applied; ₦${refundAmount.toLocaleString()} was refunded.`;
+      : `The deal for ${deal.properties.title} was cancelled by the tenant. Reason: ${reason}. A ${feePct}% cancellation fee (₦${feeAmount.toLocaleString()}) was applied. ${refundText}`;
 
-    await sendDealStatusEmails(
-      adminSupabase,
-      deal,
-      'Cancelled by Tenant',
-      emailMessage,
-      `/deals/${dealId}`
-    );
+    await notifyDealParties(adminSupabase, deal, 'Deal Cancelled by Tenant', message, `/deals/${dealId}`, 'deal_state_change');
+    await sendDealStatusEmails(adminSupabase, deal, 'Cancelled by Tenant', message, `/deals/${dealId}`);
 
-    return new Response(JSON.stringify({ success: true, feeAmount, refundAmount }), {
+    return new Response(JSON.stringify({ success: true, feeAmount, refundAmount, refundStatus, refundWarning }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
