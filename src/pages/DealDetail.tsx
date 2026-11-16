@@ -14,6 +14,7 @@ import { DealDelegatePreview } from '../components/deal/DealDelegatePreview';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
+import { AgencyFeeCard } from '../components/deal/AgencyFeeCard';
 import { LawyerReviewModal } from '../components/deal/LawyerReviewModal';
 import { supabase, requireValidSession } from '../lib/supabase';
 import { parseFunctionError } from '../lib/parseFunctionError';
@@ -468,6 +469,15 @@ export default function DealDetail() {
             {/* Actions */}
             <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
               <h3 className="text-[14px] font-bold text-paper mb-5">Required Actions</h3>
+
+              {deal.fee_model_version === 2 && deal.status === 'agreement_draft' && isAgent && (
+                <AgencyFeeCard
+                  dealId={deal.id}
+                  amount={deal.amount}
+                  current={Number(deal.agency_fee || 0)}
+                  onSaved={refresh}
+                />
+              )}
 
               {/* STEP 1: Agent/Landlord uploads agreement draft */}
               {deal.status === 'agreement_draft' && !deal.agreement_url && (isLandlord || isAgent) && (
