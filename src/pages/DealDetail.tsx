@@ -760,7 +760,32 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     </a>
                   )}
 
-                  {deal.inspection_fee_credit != null && deal.inspection_fee_credit > 0 && (
+                  {deal.fee_model_version === 2 && (
+                    <div className="mb-4 rounded-xl border border-white/8 bg-white/4 divide-y divide-white/5">
+                      {[
+                        { label: isSaleDeal ? 'Price' : 'Rent', value: Number(deal.amount) },
+                        { label: 'Handova fee (2%)', value: Number(deal.platform_fee) },
+                        ...(Number(deal.agency_fee) > 0 ? [{ label: 'Agency fee', value: Number(deal.agency_fee) }] : []),
+                        ...(Number(deal.agreement_fee) > 0 ? [{ label: 'Agreement fee', value: Number(deal.agreement_fee) }] : []),
+                        ...(Number(deal.inspection_fee_credit) > 0
+                          ? [{ label: 'Inspection fee credit', value: -Number(deal.inspection_fee_credit) }]
+                          : []),
+                      ].map((row) => (
+                        <div key={row.label} className="flex items-center justify-between px-4 py-2.5">
+                          <span className="text-[12px] text-paper/50">{row.label}</span>
+                          <span className="text-[12px] font-semibold text-paper/80 tabular-nums">
+                            {row.value < 0 ? `-${formatNaira(Math.abs(row.value))}` : formatNaira(row.value)}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between px-4 py-3">
+                        <span className="text-[13px] font-bold text-paper">Total to pay</span>
+                        <span className="text-[14px] font-black text-gold tabular-nums">{formatNaira(Number(deal.total_payable))}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {deal.fee_model_version !== 2 && deal.inspection_fee_credit != null && deal.inspection_fee_credit > 0 && (
                     <div className="flex items-center justify-between p-3 bg-gold/10 border border-gold/20 rounded-xl mb-4">
                       <div className="flex items-center gap-2 text-[12px] font-semibold text-gold">
                         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -779,10 +804,10 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     </div>
                   ) : (
                     <PaystackButton
-                      amount={deal.amount - (deal.inspection_fee_credit || 0)}
+                      amount={deal.fee_model_version === 2 ? Number(deal.total_payable) : deal.amount - (deal.inspection_fee_credit || 0)}
                       email={user?.email || ''}
                       reference={`ESCROW_${deal.id}_${Date.now()}`}
-                      label="Pay into Escrow"
+                      label={deal.fee_model_version === 2 ? `Pay ${formatNaira(Number(deal.total_payable))}` : 'Pay now'}
                       className="w-full"
                       disabled={!deal.agreement_url && !deal.agreement_skipped}
                       metadata={{ deal_id: deal.id, type: 'escrow_payment' }}
