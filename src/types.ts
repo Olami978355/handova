@@ -228,6 +228,15 @@ export interface Deal {
   agent_fee: number;
   agent_commission_rate: number;
   transfer_status?: 'pending' | 'success' | 'failed' | null;
+  fee_model_version?: 1 | 2;
+  agency_fee?: number;
+  total_payable?: number;
+  payout_amount?: number;
+  release_status?: 'not_started' | 'held_for_review' | 'submitted' | 'processing' | 'completed' | 'failed';
+  release_failure_reason?: string | null;
+  refund_status?: 'none' | 'pending' | 'completed' | 'failed';
+  refund_amount?: number;
+  cancellation_fee?: number;
   paystack_reference?: string;
   paystack_transfer_reference?: string;
   paystack_transfer_code?: string;
