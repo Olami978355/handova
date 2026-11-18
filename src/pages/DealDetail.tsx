@@ -1169,7 +1169,14 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
             <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
               <h3 className="text-[13px] font-bold text-paper mb-4">Payout Breakdown</h3>
               <div className="space-y-2.5">
-                {[
+                {(deal.fee_model_version === 2 ? [
+                  { label: isSaleDeal ? 'Price' : 'Rent', value: formatNaira(deal.amount), highlight: false },
+                  ...(Number(deal.agency_fee) > 0 ? [{ label: 'Agency fee (paid by tenant)', value: formatNaira(deal.agency_fee), earned: true }] : []),
+                  ...(Number(deal.inspection_fee_credit) > 0
+                    ? [{ label: 'Inspection fee already received', value: `-${formatNaira(deal.inspection_fee_credit)}`, deduction: true }]
+                    : []),
+                  { label: 'You receive', value: formatNaira(Number(deal.payout_amount)), highlight: true },
+                ] : [
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
                   ...(deal.caution_fee ? [{ label: 'Caution / Security Deposit', value: formatNaira(deal.caution_fee) }] : []),
                   { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}`, deduction: true },
@@ -1194,7 +1201,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     ),
                     highlight: true,
                   },
-                ].map((row) => (
+                ]).map((row: any) => (
                   <div key={row.label} className="flex items-center justify-between">
                     <span className={`text-[12px] ${row.highlight ? 'font-bold text-paper' : row.earned ? 'text-gold/70' : 'text-paper/40'}`}>
                       {row.label}{row.earned ? ' (yours)' : ''}
