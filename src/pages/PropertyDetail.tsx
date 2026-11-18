@@ -880,7 +880,7 @@ export default function PropertyDetail() {
                     </p>
                   </div>
                 )}
-                {!isOwner && (
+                {!isOwnerOrAgent && (
                   <ChatButton
                     property={property}
                     buttonLabel={owner?.role === 'agent' ? 'Message Agent' : owner?.role === 'company' ? 'Message Company' : 'Message Landlord'}
@@ -892,7 +892,7 @@ export default function PropertyDetail() {
               </div>
 
               {/* Inspection fee */}
-              {property.status === 'active' && !isOwner && <InspectionFeeDisplay property={property} ownerLikelySuspended={ownerLikelySuspended} />}
+              {property.status === 'active' && !isOwnerOrAgent && <InspectionFeeDisplay property={property} ownerLikelySuspended={ownerLikelySuspended} />}
 
               {/* Escrow info */}
               <div className="bg-ink border border-gold/25 rounded-2xl p-5">
@@ -913,7 +913,7 @@ export default function PropertyDetail() {
                 </div>
               </div>
 
-              {user && !isOwner && (
+              {user && !isOwnerOrAgent && (
                 <button onClick={() => setShowReportModal(true)} className="w-full text-[12px] text-paper/25 hover:text-paper/50 transition-colors py-2 text-center">
                   🚩 Report this listing
                 </button>
