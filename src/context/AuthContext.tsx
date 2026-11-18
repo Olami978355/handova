@@ -43,12 +43,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await fetchProfile(userId, true);
           return;
         }
-        setProfile(null);
+        // keep any existing profile; a failed fetch (offline) must not wipe it
       } else {
         setProfile(data);
       }
     } catch {
-      setProfile(null);
+      // keep any existing profile on network failure
     } finally {
       setLoading(false);
       fetchingProfile.current = false;

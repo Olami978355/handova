@@ -527,8 +527,8 @@ export default function Dashboard() {
   useEffect(() => {
     if (!authLoading) {
       if (!user) { navigate('/login'); return; }
-      if (!profile?.role) { navigate('/onboarding'); return; }
-      fetchData();
+      if (profile === null) return; // profile not loaded yet (e.g. offline): never treat as no role
+      if (profile.role) { fetchData(); } else { navigate('/onboarding'); }
     }
   }, [authLoading, user?.id, profile?.role]);
 
