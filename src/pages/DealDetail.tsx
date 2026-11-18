@@ -879,7 +879,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                       <p className="text-[12px] text-paper/45 leading-relaxed">
                         {isSaleDeal
                           ? 'No written contract was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the property and all relevant documents. This will release funds to the seller.'
-                          : 'No written tenancy agreement was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the keys and access to the property. This will release funds to the owner.'}
+                          : 'No written tenancy agreement was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Confirming move-in marks this rental as completed and authorises Handova to release the agreed payment. Only confirm once you have inspected and accepted the property and received the keys and access. This records completion and does not affect your legal rights under your tenancy agreement or the law.'}
                       </p>
                     </div>
                   </div>
@@ -888,7 +888,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     disabled={processing}
                     className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in and Release Payment')}
                   </button>
                   <p className="text-[11px] text-paper/25 text-center mt-3">
                     <AlertTriangle className="w-3 h-3 flex-shrink-0 inline mr-1.5 -mt-0.5" />
@@ -973,7 +973,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                       <p className="text-[12px] text-paper/45 leading-relaxed">
                         {isSaleDeal
                           ? 'Has the property been handed over successfully? Only confirm after you have physically received the property and all relevant documents. This will release funds to the seller.'
-                          : 'Have you moved in successfully? Only confirm after you have physically received the keys and access to the property. This will release funds to the owner.'}
+                          : 'Have you moved in successfully? Confirming move-in marks this rental as completed and authorises Handova to release the agreed payment. Only confirm once you have inspected and accepted the property and received the keys and access. This records completion and does not affect your legal rights under your tenancy agreement or the law.'}
                       </p>
                     </div>
                   </div>
@@ -982,7 +982,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     disabled={processing}
                     className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in and Release Payment')}
                   </button>
                   <p className="text-[11px] text-paper/25 text-center mt-3">
                     <AlertTriangle className="w-3 h-3 flex-shrink-0 inline mr-1.5 -mt-0.5" />
@@ -1032,7 +1032,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                   <CheckCircle2 className="w-8 h-8 text-gold mx-auto mb-3" />
                   <h4 className="text-[14px] font-bold text-paper mb-2">Move-in Confirmed!</h4>
                   <p className="text-[13px] text-paper/40">
-                    Funds are being reviewed for release by our team. This usually takes less than 24 hours.
+                    {deal.release_status === 'held_for_review' ? 'The payout is going through a standard first-payout security check before it is released.' : deal.release_status === 'failed' ? 'There was a problem starting the payout. Our team has been notified and is resolving it.' : 'The payment release has started. Bank settlement time depends on the receiving bank.'}
                   </p>
                 </div>
               )}
