@@ -19,6 +19,8 @@ import Listings from './pages/Listings';
 import PropertyDetail from './pages/PropertyDetail';
 import HowItWorks from './pages/HowItWorks';
 import Dashboard from './pages/Dashboard';
+import CompanyDashboard from './pages/CompanyDashboard';
+import CompanyVerification from './pages/CompanyVerification';
 import Profile from './pages/Profile';
 import MessagesPage from './pages/MessagesPage';
 import { ListingPage } from './pages/ListingPage';
@@ -139,6 +141,8 @@ function AppInner() {
             <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="landlord/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="agent/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="company/dashboard" element={<ProtectedRoute><CompanyDashboard /></ProtectedRoute>} />
+            <Route path="company/verification" element={<ProtectedRoute><CompanyVerification /></ProtectedRoute>} />
             <Route path="messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
             <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="add-property" element={<ProtectedRoute><ListingPage /></ProtectedRoute>} />

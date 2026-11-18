@@ -39,6 +39,7 @@ export default function Navbar() {
     if (profile.role === 'admin' || profile.role === 'moderator') return '/admin';
     if (profile.role === 'landlord') return '/landlord/dashboard';
     if (profile.role === 'agent') return '/agent/dashboard';
+    if (profile.role === 'company') return '/company/dashboard';
     return '/dashboard';
   };
 
@@ -229,7 +230,7 @@ export default function Navbar() {
                         </span>
                       )}
                     </Link>
-                    {(profile.role === 'landlord' || profile.role === 'agent') && (
+                    {(profile.role === 'landlord' || profile.role === 'agent' || profile.role === 'company') && (
                       <Link
                         to="/add-property"
                         onClick={() => setIsOpen(false)}

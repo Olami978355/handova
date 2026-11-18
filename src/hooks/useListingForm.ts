@@ -44,6 +44,9 @@ export const listingSchema = z.object({
   price: z.number().min(1000, 'Price must be at least ₦1,000'),
   caution_fee: z.number().min(0).optional(),
   price_period: z.enum(['yearly', 'monthly', 'nightly', 'outright']).optional(),
+
+  // Set when an agent lists under a company they belong to
+  company_id: z.string().optional(),
 });
 
 export type ListingFormData = z.infer<typeof listingSchema>;
@@ -165,6 +168,24 @@ export const useListingForm = (propertyId?: string) => {
         return;
       }
 
+      if (data.company_id) {
+        const { error: fnError } = await supabase.functions.invoke(
+          'create-company-listing',
+          { body: { companyId: data.company_id, data } }
+        );
+        if (fnError) {
+          let msg = 'Could not publish under the company.';
+          try {
+            const body = await (fnError as any).context.json();
+            if (body?.error) msg = body.error;
+          } catch { /* keep default message */ }
+          throw new Error(msg);
+        }
+        clearDraft();
+        navigate('/listing-success');
+        return;
+      }
+
       const status = profile?.verification_status === 'verified' ? 'active' : 'pending_review';
 
       const { error } = await supabase.from('properties').insert({
@@ -212,7 +233,9 @@ export const useListingForm = (propertyId?: string) => {
       navigate('/listing-success');
     } catch (error) {
       console.error('Error submitting listing:', error);
-      alert('Failed to submit listing. Please try again.');
+      alert(error instanceof Error && error.message
+        ? error.message
+        : 'Failed to submit listing. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

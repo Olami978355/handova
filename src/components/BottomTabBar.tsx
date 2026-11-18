@@ -10,12 +10,14 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ role }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isLister = role === 'landlord' || role === 'agent';
+  const isLister = role === 'landlord' || role === 'agent' || role === 'company';
 
   const dashboardPath = role === 'landlord'
     ? '/landlord/dashboard'
     : role === 'agent'
     ? '/agent/dashboard'
+    : role === 'company'
+    ? '/company/dashboard'
     : '/dashboard';
 
   const tenantTabs = [

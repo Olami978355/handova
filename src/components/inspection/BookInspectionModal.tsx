@@ -183,7 +183,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
       // Navigate to messages with property context
       // Conversation created on first message send
       onClose();
-      navigate(`/messages?property=${property.id}&recipient=${property.owner_id}`);
+      navigate(`/messages?property=${property.id}&recipient=${property.agent_id || property.owner_id}`);
     } catch {
       setError('Could not open chat. Please try again.');
     } finally {

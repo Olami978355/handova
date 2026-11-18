@@ -406,6 +406,7 @@ export default function Landing() {
         profile.role === 'admin' || profile.role === 'moderator' ? '/admin' :
         profile.role === 'landlord' ? '/landlord/dashboard' :
         profile.role === 'agent' ? '/agent/dashboard' :
+        profile.role === 'company' ? '/company/dashboard' :
         '/listings';
       navigate(dashboardPath, { replace: true });
     }

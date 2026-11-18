@@ -4,6 +4,7 @@ import { ShieldCheck, MapPin, Phone, Home, Calendar, Star } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Property } from '../types';
 import PropertyCard from '../components/PropertyCard';
+import CompanyPublicPage from '../components/company/CompanyPublicPage';
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 interface PublicProfileData {
   id: string;
@@ -104,6 +105,10 @@ export default function PublicProfile() {
       </div>
     );
   }
+  if (profile.role === 'company') {
+    return <CompanyPublicPage profile={profile} />;
+  }
+
   const isVerified = profile.verification_status === 'verified';
   const joinedDate = new Date(profile.created_at).toLocaleDateString('en-NG', { month: 'long', year: 'numeric' });
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : null;

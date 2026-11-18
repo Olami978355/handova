@@ -457,7 +457,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [creatingConversation, setCreatingConversation] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const isLandlordOrAgent = profile?.role === 'landlord' || profile?.role === 'agent';
+  const isLandlordOrAgent = profile?.role === 'landlord' || profile?.role === 'agent' || profile?.role === 'company';
 
   useEffect(() => {
     const ta = textareaRef.current;

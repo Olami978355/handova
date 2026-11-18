@@ -305,6 +305,11 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState<Property | null>(null);
   const [owner, setOwner] = useState<Profile | null>(null);
   const [ownerLikelySuspended, setOwnerLikelySuspended] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState<{
+    name: string;
+    status: string;
+    username: string | null;
+  } | null>(null);
   const [priceHistory, setPriceHistory] = useState<{ old_price: number; new_price: number; changed_at: string }[]>([]);
   const [showPriceHistory, setShowPriceHistory] = useState(false);
 
@@ -355,10 +360,30 @@ export default function PropertyDetail() {
         const { data: ownerData } = await supabase
           .from('public_profiles')
           .select('id, full_name, avatar_url, role, verification_status, lasrera_id')
-          .eq('id', data.owner_id)
+          .eq('id', data.company_id && data.agent_id ? data.agent_id : data.owner_id)
           .single();
         setOwner(ownerData as Profile);
         if (!ownerData) setOwnerLikelySuspended(true);
+      }
+
+      if (data.company_id) {
+        const { data: co } = await supabase
+          .from('companies')
+          .select('name, verification_status')
+          .eq('id', data.company_id)
+          .maybeSingle();
+        const { data: cp } = await supabase
+          .from('public_profiles')
+          .select('username')
+          .eq('id', data.company_id)
+          .maybeSingle();
+        if (co) {
+          setCompanyInfo({
+            name: co.name,
+            status: co.verification_status,
+            username: cp?.username ?? null,
+          });
+        }
       }
 
       // Increment view count — debounced via localStorage
@@ -822,7 +847,7 @@ export default function PropertyDetail() {
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[11px] text-paper/35 capitalize font-medium">
-                        {owner?.role === 'agent' ? 'Agent' : owner?.role === 'landlord' ? 'Landlord' : owner?.role}
+                        {owner?.role === 'agent' ? 'Agent' : owner?.role === 'landlord' ? 'Landlord' : owner?.role === 'company' ? 'Company' : owner?.role}
                         {owner?.verification_status === 'verified' && <span className="text-paper/25"> · Verified</span>}
                       </span>
                       {owner?.lasrera_id && (
@@ -833,10 +858,32 @@ export default function PropertyDetail() {
                     </div>
                   </div>
                 </div>
+                {companyInfo && (
+                  <div className="-mt-2 mb-4 p-3 bg-white/4 rounded-xl">
+                    <p className="text-[10px] text-paper/35 uppercase tracking-wider">Listed under</p>
+                    {companyInfo.username ? (
+                      <Link
+                        to={'/u/' + companyInfo.username}
+                        className="text-[13px] font-bold text-paper hover:text-gold"
+                      >
+                        {companyInfo.name}
+                      </Link>
+                    ) : (
+                      <p className="text-[13px] font-bold text-paper">{companyInfo.name}</p>
+                    )}
+                    <p className={'text-[11px] mt-0.5 ' + (companyInfo.status === 'verified' ? 'text-gold' : 'text-paper/40')}>
+                      {companyInfo.status === 'verified'
+                        ? 'Verified business'
+                        : companyInfo.status === 'pending_verification'
+                        ? 'Verification pending'
+                        : 'Unverified business'}
+                    </p>
+                  </div>
+                )}
                 {!isOwner && (
                   <ChatButton
                     property={property}
-                    buttonLabel={owner?.role === 'agent' ? 'Message Agent' : 'Message Landlord'}
+                    buttonLabel={owner?.role === 'agent' ? 'Message Agent' : owner?.role === 'company' ? 'Message Company' : 'Message Landlord'}
                   />
                 )}
                 {isOwner && (

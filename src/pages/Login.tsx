@@ -43,6 +43,7 @@ export default function Login() {
     if (role === 'admin' || role === 'moderator') return '/admin';
     if (role === 'landlord') return '/landlord/dashboard';
     if (role === 'agent') return '/agent/dashboard';
+    if (role === 'company') return '/company/dashboard';
     return '/listings';
   };
 

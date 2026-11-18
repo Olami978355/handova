@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
   Home, Shield, MessageSquare, Plus, Loader2,
   AlertCircle, CheckCircle, Clock, ArrowRight,
@@ -11,6 +11,8 @@ import { supabase, requireValidSession } from '../lib/supabase';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { InspectionDelegateInvite } from '../components/inspection/InspectionDelegateInvite';
 import { PendingInspectionDelegateInvites } from '../components/inspection/PendingInspectionDelegateInvites';
+import { CompanyInvites } from '../components/CompanyInvites';
+import { MyCompanies } from '../components/MyCompanies';
 import { DelegateFeatureCard } from '../components/DelegateFeatureCard';
 import { LawyerFeatureCard } from '../components/LawyerFeatureCard';
 import { FeatureCarousel } from '../components/dashboard/FeatureCarousel';
@@ -559,6 +561,10 @@ export default function Dashboard() {
     );
   }
 
+  if (profile?.role === 'company') {
+    return <Navigate to="/company/dashboard" replace />;
+  }
+
   const isTenant = profile?.role === 'tenant';
   const isLandlordOrAgent =
     profile?.role === 'landlord' || profile?.role === 'agent';
@@ -636,6 +642,8 @@ export default function Dashboard() {
         {loading ? <DashboardSkeleton /> : (
           <div className="space-y-6">
             <PendingInspectionDelegateInvites />
+            <CompanyInvites />
+            <MyCompanies />
             <FeatureCarousel />
 
             {/* Verification nudge */}

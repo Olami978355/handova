@@ -1,5 +1,5 @@
 // ─── User & Auth ────────────────────────────────────────────────
-export type UserRole = 'tenant' | 'landlord' | 'agent' | 'moderator' | 'admin' | 'banned';
+export type UserRole = 'tenant' | 'landlord' | 'agent' | 'company' | 'moderator' | 'admin' | 'banned';
 export type VerificationStatus = 'unverified' | 'pending_verification' | 'verified' | 'rejected';
 export type RequestStatus = 'pending' | 'approved' | 'rejected';
 

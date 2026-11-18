@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, Home, Briefcase, User, Phone,
+  Search, Home, Briefcase, Building2, User, Phone,
   MapPin, Camera, Loader2, ArrowRight,
   ArrowLeft, CheckCircle, Shield, AlertCircle
 } from 'lucide-react';
@@ -111,6 +111,7 @@ export default function OnboardingWizard() {
     if (role === 'admin' || role === 'moderator') navigate('/admin', { replace: true });
     else if (role === 'landlord') navigate('/landlord/dashboard', { replace: true });
     else if (role === 'agent') navigate('/agent/dashboard', { replace: true });
+    else if (role === 'company') navigate('/company/dashboard', { replace: true });
     else navigate('/listings', { replace: true });
   };
 
@@ -170,7 +171,10 @@ export default function OnboardingWizard() {
   // ── Step 2: Complete profile ──
   const handleCompleteProfile = async () => {
     if (!user || !formData.role) return;
-    if (!formData.fullName.trim()) { setError('Please enter your full name.'); return; }
+    if (!formData.fullName.trim()) {
+      setError(formData.role === 'company' ? 'Please enter your company name.' : 'Please enter your full name.');
+      return;
+    }
     if (!formData.phone.trim()) { setError('Please enter your phone number.'); return; }
     if (!formData.state) { setError('Please select your state of residence.'); return; }
 
@@ -190,6 +194,16 @@ export default function OnboardingWizard() {
         throw new Error(
           result.error?.message || result.error || 'Failed to save profile'
         );
+      }
+
+      if (formData.role === 'company') {
+        const { error: companyError } = await supabase
+          .from('companies')
+          .upsert(
+            { id: user.id, name: formData.fullName.trim() },
+            { onConflict: 'id', ignoreDuplicates: true }
+          );
+        if (companyError) throw new Error(companyError.message);
       }
 
       await refreshProfile();
@@ -290,7 +304,7 @@ export default function OnboardingWizard() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <RoleCard
                     icon={<Search className="w-6 h-6" />}
                     title="I'm looking to rent or buy"
@@ -311,6 +325,13 @@ export default function OnboardingWizard() {
                     description="List properties for owners and earn your 10% commission automatically"
                     onClick={() => handleRoleSelect('agent')}
                     active={formData.role === 'agent'}
+                  />
+                  <RoleCard
+                    icon={<Building2 className="w-6 h-6" />}
+                    title="I'm a Real Estate Company"
+                    description="Run a company account, add your agents, and publish listings under your brand"
+                    onClick={() => handleRoleSelect('company')}
+                    active={formData.role === 'company'}
                   />
                 </div>
               </motion.div>
@@ -388,7 +409,7 @@ export default function OnboardingWizard() {
                   {/* Full name */}
                   <div>
                     <label className="block text-[12px] font-semibold text-paper/50 uppercase tracking-wider mb-2">
-                      Full Name <span className="text-gold">*</span>
+                      {formData.role === 'company' ? 'Company Name' : 'Full Name'} <span className="text-gold">*</span>
                     </label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/25 pointer-events-none" />
@@ -399,7 +420,7 @@ export default function OnboardingWizard() {
                           setFormData(prev => ({ ...prev, fullName: e.target.value }));
                           if (error) setError(null);
                         }}
-                        placeholder="Your full name"
+                        placeholder={formData.role === 'company' ? 'Your company name' : 'Your full name'}
                         className="w-full pl-11 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-[14px] text-paper placeholder:text-paper/25 focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
@@ -543,6 +564,20 @@ export default function OnboardingWizard() {
                             </p>
                           </div>
                         </div>
+                      </div>
+                    </>
+                  )}
+
+                  {formData.role === 'company' && (
+                    <>
+                      <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-4">
+                        As a Company
+                      </div>
+                      <div className="space-y-3 mb-5">
+                        <FeatureBullet text="One company account for your whole team" />
+                        <FeatureBullet text="Invite your agents to join" />
+                        <FeatureBullet text="Publish listings under your company name" />
+                        <FeatureBullet text="Payments for company deals go to the company" />
                       </div>
                     </>
                   )}

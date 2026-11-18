@@ -52,7 +52,7 @@ export const ChatButton: React.FC<ChatButtonProps> = ({
         // No conversation yet — go to messages with property info
         // ChatWindow will create conversation on first message send
         navigate(
-          `/messages?property=${property.id}&recipient=${property.owner_id}`
+          `/messages?property=${property.id}&recipient=${property.agent_id || property.owner_id}`
         );
       }
     } catch (err) {

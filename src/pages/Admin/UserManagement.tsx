@@ -117,7 +117,7 @@ export default function UserManagement() {
         <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as UserRole | 'all')}
           className="px-4 py-3 bg-white/5 border border-white/8 rounded-xl text-[13px] text-paper outline-none focus:border-gold/50 transition-colors">
           <option value="all" className="bg-slate/20">All Roles</option>
-          {(['tenant', 'landlord', 'agent', 'moderator', 'admin'] as UserRole[]).map(r => (
+          {(['tenant', 'landlord', 'agent', 'company', 'moderator', 'admin'] as UserRole[]).map(r => (
             <option key={r} value={r} className="bg-slate/20 capitalize">{r.charAt(0).toUpperCase() + r.slice(1)}s</option>
           ))}
         </select>
@@ -193,7 +193,7 @@ export default function UserManagement() {
                           className="absolute right-5 top-14 w-48 bg-ink border border-white/10 rounded-xl shadow-2xl z-20 p-1.5"
                         >
                           <p className="px-3 py-2 text-[10px] font-bold text-paper/25 uppercase tracking-wider">Change Role</p>
-                          {(['tenant', 'landlord', 'agent', 'moderator', 'admin'] as UserRole[]).map((role) => (
+                          {(['tenant', 'landlord', 'agent', 'company', 'moderator', 'admin'] as UserRole[]).map((role) => (
                             <button key={role} disabled={!isAdmin} onClick={() => { setPendingRoleChange({ userId: u.id, role }); setSelectedUser(null); }}
                               className={`w-full flex items-center gap-2 px-3 py-2.5 text-[12px] font-bold rounded-lg transition-colors ${
                                 u.role === role ? 'bg-gold/15 text-gold' : 'text-paper/50 hover:bg-white/5 hover:text-paper'

@@ -15,6 +15,7 @@ interface VerificationRequestRow {
   submitted_at: string;
   profiles?: { full_name: string; email: string; role: string; avatar_url?: string };
   profiles_private?: { nin: string | null };
+  company?: { name: string; cac_number: string | null };
 }
 
 export default function VerificationReview() {
@@ -54,6 +55,12 @@ export default function VerificationReview() {
         .select('id, nin')
         .in('id', userIds);
 
+      const { data: companyData } = await supabase
+        .from('companies')
+        .select('id, name, cac_number')
+        .in('id', userIds);
+      const companyMap = Object.fromEntries((companyData || []).map(c => [c.id, c]));
+
       const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
       const privateMap = Object.fromEntries((privateData || []).map(p => [p.id, p]));
 
@@ -61,6 +68,7 @@ export default function VerificationReview() {
         ...r,
         profiles: profileMap[r.user_id],
         profiles_private: privateMap[r.user_id],
+        company: companyMap[r.user_id],
       })));
     } else {
       setRequests([]);
@@ -193,8 +201,14 @@ export default function VerificationReview() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div className="p-3 bg-white/3 rounded-xl">
-              <p className="text-[10px] font-bold text-paper/30 uppercase tracking-wider mb-1">NIN</p>
-              <p className="text-[13px] font-mono text-paper">{req.profiles_private?.nin || 'Not provided'}</p>
+              <p className="text-[10px] font-bold text-paper/30 uppercase tracking-wider mb-1">{req.profiles?.role === 'company' ? 'CAC / RC number' : 'NIN'}</p>
+              <p className="text-[13px] font-mono text-paper">{req.profiles?.role === 'company' ? (req.company?.cac_number || 'Not provided') : (req.profiles_private?.nin || 'Not provided')}</p>
+              {req.profiles?.role === 'company' && (
+                <p className="text-[11px] text-paper/40 mt-2 leading-relaxed">
+                  Company name: {req.company?.name}. Check that it matches the certificate,
+                  and confirm the number on the CAC public register before approving.
+                </p>
+              )}
             </div>
 
             <button

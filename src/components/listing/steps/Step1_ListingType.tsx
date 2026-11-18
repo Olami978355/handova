@@ -2,6 +2,7 @@ import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ListingFormData } from '../../../hooks/useListingForm';
 import { Home, Map as LandIcon, Tag, Calendar } from 'lucide-react';
+import { ListUnderSelector } from '../ListUnderSelector';
 
 interface StepProps {
   form: UseFormReturn<ListingFormData>;
@@ -47,6 +48,8 @@ export const Step1_ListingType: React.FC<StepProps> = ({ form }) => {
       className="space-y-8"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
+      <ListUnderSelector form={form} />
+
       {/* Header */}
       <div className="text-center">
         <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">

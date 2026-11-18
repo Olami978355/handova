@@ -64,6 +64,12 @@ serve(async (req) => {
       .eq('id', verificationRequest.user_id);
     if (updateProfileError) throw updateProfileError;
 
+    // Keep the company record in step (no-op for non-company accounts)
+    await adminSupabase
+      .from('companies')
+      .update({ verification_status: newProfileStatus })
+      .eq('id', verificationRequest.user_id);
+
     await adminSupabase.from('admin_audit_logs').insert({
       action: `verification_${newRequestStatus}`,
       performed_by: user.id,
