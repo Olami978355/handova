@@ -173,38 +173,29 @@ const LandlordBookingCard = ({
   const [confirmedTime, setConfirmedTime] = useState('');
   const [confirming, setConfirming] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
 
   const handleConfirm = async () => {
     if (!confirmedDate || !confirmedTime) return;
+    setConfirmError('');
     setConfirming(true);
     try {
-      const { error } = await supabase
-        .from('inspection_bookings')
-        .update({
-          status: 'inspection_scheduled',
-          confirmed_date: confirmedDate,
-          confirmed_time: confirmedTime,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', booking.id);
-
-      if (error) throw error;
-
-      await supabase.from('notifications').insert({
-        user_id: booking.tenant_id,
-        title: 'Inspection Date Confirmed!',
-        body: `Your inspection for ${booking.properties?.title} has been confirmed for ${
-          new Date(confirmedDate).toLocaleDateString('en-NG', {
-            weekday: 'long', day: 'numeric', month: 'long',
-          })
-        } ${confirmedTime}.`,
-        type: 'inspection_confirmed',
-        link: '/dashboard',
+      const { error } = await supabase.functions.invoke('confirm-inspection-date', {
+        body: { bookingId: booking.id, confirmedDate, confirmedTime },
       });
+      if (error) {
+        let msg = error.message;
+        try {
+          const j = await (error as any).context?.json?.();
+          if (j?.error) msg = j.error;
+        } catch (_e) { /* keep generic message */ }
+        throw new Error(msg);
+      }
 
-      onConfirm(booking.id);
+            onConfirm(booking.id);
     } catch (err) {
       console.error('Failed to confirm inspection:', err);
+      setConfirmError(err instanceof Error ? err.message : 'Could not confirm the date. Please try again.');
     } finally {
       setConfirming(false);
     }
@@ -280,6 +271,9 @@ const LandlordBookingCard = ({
                 <option value="Afternoon (12PM - 3PM)" className="bg-ink">Afternoon (12PM to 3PM)</option>
                 <option value="Late Afternoon (3PM - 6PM)" className="bg-ink">Late afternoon (3PM to 6PM)</option>
               </select>
+              {confirmError && (
+                <p className="text-[11px] text-danger">{confirmError}</p>
+              )}
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowForm(false)}

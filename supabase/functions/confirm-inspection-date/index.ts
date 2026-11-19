@@ -19,7 +19,16 @@ serve(async (req) => {
 
       // The release date comes from this date, so it must be in the future. Otherwise a
       // dishonest agent could confirm a past date and be paid before the tenant can react.
-      const scheduledFor = new Date(confirmedDate + 'T' + (confirmedTime || '23:59') + ':00');
+      const slotEndTime = (t?: string): string => {
+      if (!t) return '23:59';
+      if (/^\d{2}:\d{2}$/.test(t)) return t;
+      if (t.startsWith('Morning')) return '12:00';
+      if (t.startsWith('Late Afternoon')) return '18:00';
+      if (t.startsWith('Afternoon')) return '15:00';
+      return '23:59';
+    };
+    // Times are Nigerian time (WAT, UTC+1); the slot's end is when the visit is considered over.
+    const scheduledFor = new Date(confirmedDate + 'T' + slotEndTime(confirmedTime) + ':00+01:00');
       if (Number.isNaN(scheduledFor.getTime()) || scheduledFor.getTime() <= Date.now()) {
         throw new Error('The inspection date must be in the future.');
       }
@@ -43,7 +52,7 @@ serve(async (req) => {
       .from('inspection_bookings')
       .update({ 
         status: 'inspection_scheduled',
-        release_at: new Date(new Date(`${confirmedDate}T${confirmedTime || '23:59'}:00`).getTime() + 24 * 60 * 60 * 1000).toISOString(),
+        release_at: new Date(scheduledFor.getTime() + 24 * 60 * 60 * 1000).toISOString(),
         confirmed_date: confirmedDate,
         confirmed_time: confirmedTime,
         updated_at: new Date().toISOString() 
