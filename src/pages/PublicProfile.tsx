@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ShieldCheck, MapPin, Phone, Home, Calendar, Star } from 'lucide-react';
+import { ShieldCheck, MapPin, Phone, Home, Calendar, Star, Building2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Property } from '../types';
 import PropertyCard from '../components/PropertyCard';
@@ -39,6 +39,7 @@ export default function PublicProfile() {
   const [reviews, setReviews] = useState<DealReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [worksWith, setWorksWith] = useState<{ name: string; logo: string | null; username: string } | null>(null);
   useEffect(() => {
     if (!username) return;
     (async () => {
@@ -81,6 +82,31 @@ export default function PublicProfile() {
         })));
       } else {
         setReviews([]);
+      }
+
+      setWorksWith(null);
+      if (profileData.role !== 'company') {
+        const { data: m } = await supabase
+          .from('company_members')
+          .select('company_id')
+          .eq('member_id', profileData.id)
+          .eq('status', 'active')
+          .maybeSingle();
+        if (m) {
+          const { data: co } = await supabase
+            .from('companies')
+            .select('name, logo_url, verification_status')
+            .eq('id', m.company_id)
+            .maybeSingle();
+          const { data: cp } = await supabase
+            .from('public_profiles')
+            .select('username')
+            .eq('id', m.company_id)
+            .maybeSingle();
+          if (co && co.verification_status === 'verified' && cp?.username) {
+            setWorksWith({ name: co.name, logo: co.logo_url, username: cp.username });
+          }
+        }
       }
 
       setLoading(false);
@@ -126,8 +152,8 @@ export default function PublicProfile() {
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-[22px] font-black text-white">{profile.full_name || 'Unnamed User'}</h1>
               {isVerified && (
-                <span className="flex items-center gap-1 text-[11px] font-bold text-gold bg-gold/10 px-2 py-1 rounded-lg">
-                  <ShieldCheck className="w-3 h-3" /> Verified
+                <span className="flex items-center gap-1 text-[11px] font-semibold text-white/50 bg-white/5 px-2 py-1 rounded-lg">
+                  <ShieldCheck className="w-3 h-3" /> Identity verified
                 </span>
               )}
               {avgRating !== null && (
@@ -150,6 +176,17 @@ export default function PublicProfile() {
                 <Calendar className="w-3.5 h-3.5" /> Joined {joinedDate}
               </span>
             </div>
+            {worksWith && (
+              <Link to={'/u/' + worksWith.username} className="inline-flex items-center gap-2 mt-3 px-2.5 py-1.5 bg-white/4 border border-white/8 rounded-lg hover:border-white/20 transition-colors">
+                <span className="w-5 h-5 rounded-md overflow-hidden bg-white/5 flex items-center justify-center flex-shrink-0">
+                  {worksWith.logo
+                    ? <img src={worksWith.logo} alt="" className="w-full h-full object-cover" />
+                    : <Building2 className="w-3 h-3 text-gold" />}
+                </span>
+                <span className="text-[11px] text-white/45">Works with</span>
+                <span className="text-[12px] font-semibold text-white">{worksWith.name}</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>

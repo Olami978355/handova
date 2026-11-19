@@ -94,7 +94,7 @@ export default function CompanyPublicPage({ profile }: Props) {
             <div className="mt-2">
               {verified ? (
                 <span className="inline-flex items-center gap-1.5 text-[12px] font-bold text-gold bg-gold/10 px-3 py-1.5 rounded-lg">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Verified business
+                  <ShieldCheck className="w-3.5 h-3.5" /> Business verified
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-white/50 bg-white/5 px-3 py-1.5 rounded-lg">
