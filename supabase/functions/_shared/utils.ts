@@ -347,6 +347,33 @@ export const executeInspectionFeeTransfer = async (
     return { transferInitiated: false, reason: 'zero_fee' };
   }
 
+  // Never send money that was not verified as received. The booking row is written by the
+  // browser, so its fee is only a claim; Paystack's record of the charge is the proof.
+  const blockRelease = async (reason: string) => {
+    await adminSupabase
+      .from('inspection_bookings')
+      .update({ transfer_status: 'failed' })
+      .eq('id', booking.id);
+    await logAdminAction(adminSupabase, actorId, 'inspection_fee_transfer_blocked', booking.id, 'inspection_booking', { reason });
+    return { transferInitiated: false, warning: 'Inspection fee not released: ' + reason };
+  };
+  const verifyKey = Deno.env.get('PAYSTACK_SECRET_KEY');
+  if (!verifyKey) throw new Error('PAYSTACK_SECRET_KEY not set');
+  if (!booking.paystack_reference) return await blockRelease('no payment reference on this booking');
+  let charge: any = null;
+  try {
+    const verifyRes = await fetch(
+      'https://api.paystack.co/transaction/verify/' + encodeURIComponent(booking.paystack_reference),
+      { headers: { Authorization: 'Bearer ' + verifyKey } }
+    );
+    const verifyBody = await verifyRes.json();
+    charge = verifyBody?.status ? verifyBody.data : null;
+  } catch (_e) {
+    throw new Error('Could not verify the inspection payment with Paystack. Try again shortly.');
+  }
+  if (!charge || charge.status !== 'success') return await blockRelease('payment is not confirmed by Paystack');
+  if (Number(charge.amount) < Math.round(totalFee * 100)) return await blockRelease('amount paid is less than the booking fee');
+
   const PLATFORM_CUT_RATE = 0.15;
   const transferAmountNaira = Math.round(totalFee * (1 - PLATFORM_CUT_RATE) * 100) / 100;
 

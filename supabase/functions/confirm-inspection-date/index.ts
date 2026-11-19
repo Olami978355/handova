@@ -17,6 +17,13 @@ serve(async (req) => {
 
     const { bookingId, confirmedDate, confirmedTime } = await req.json();
 
+      // The release date comes from this date, so it must be in the future. Otherwise a
+      // dishonest agent could confirm a past date and be paid before the tenant can react.
+      const scheduledFor = new Date(confirmedDate + 'T' + (confirmedTime || '23:59') + ':00');
+      if (Number.isNaN(scheduledFor.getTime()) || scheduledFor.getTime() <= Date.now()) {
+        throw new Error('The inspection date must be in the future.');
+      }
+
     // Fetch booking
     const { data: booking, error: bookingError } = await supabase
       .from('inspection_bookings')
