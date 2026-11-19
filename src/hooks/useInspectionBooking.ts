@@ -334,10 +334,71 @@ export function useInspectionBooking() {
     }
   };
 
+  /**
+   * Free inspection (company listings with a zero fee). No payment, so no reference.
+   * The database sets the real fee and refuses this for any listing that must be paid.
+   */
+  const createFreeBooking = async (
+    property: Property,
+    preferredDate: string,
+    preferredTime: string
+  ) => {
+    if (!user) throw new Error('You must be logged in to book an inspection.');
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('inspection_bookings')
+        .insert({
+          property_id: property.id,
+          tenant_id: user.id,
+          landlord_id: property.owner_id,
+          agent_id: property.agent_id || null,
+          inspection_fee: 0,
+          preferred_date: preferredDate,
+          preferred_time: preferredTime,
+          status: 'payment_confirmed',
+        })
+        .select('*, properties(id, title, owner_id)')
+        .single();
+
+      if (error) {
+        if (error.code === '23505') throw new Error('You have already booked an inspection for this property.');
+        throw error;
+      }
+
+      if (data?.properties?.owner_id) {
+        await supabase.from('notifications').insert({
+          user_id: data.properties.owner_id,
+          title: 'New Inspection Booking!',
+          body: 'A tenant booked a free inspection for ' + data.properties.title + ' and wants to schedule a visit.',
+          type: 'inspection_booked',
+          link: '/dashboard',
+        });
+      }
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: 'Inspection Booked Successfully!',
+        body: 'Your inspection booking for ' + data?.properties?.title + ' is confirmed. The date will be confirmed shortly.',
+        type: 'inspection_confirmed',
+        link: '/dashboard',
+      });
+
+      return data as InspectionBooking;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to create booking';
+      setError(msg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     error,
     fetchBookingsForProperty,
+    createFreeBooking,
     fetchMyBookings,
     checkExistingBooking,
     createBooking,

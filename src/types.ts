@@ -91,6 +91,7 @@ export interface Property {
   images: string[];
   videos?: string[];
   inspection_fee?: number;
+  company_id?: string | null;
   has_active_deal: boolean;
   escrow_verified: boolean;
   status: PropertyStatus;

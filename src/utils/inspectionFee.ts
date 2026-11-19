@@ -49,3 +49,24 @@ export const formatFee = (amount: number): string => {
     maximumFractionDigits: 0,
   }).format(amount);
 };
+
+/**
+ * Company listings charge the company's own fee (0 = free inspection).
+ * Everyone else keeps the standard formula.
+ */
+export const getInspectionFee = (property: {
+  price: number;
+  price_period?: string | null;
+  listing_type: string;
+  transaction_type: string;
+  company_id?: string | null;
+  inspection_fee?: number | null;
+}): number => {
+  if (property.company_id) return Math.max(0, Number(property.inspection_fee) || 0);
+  return calculateInspectionFee(
+    property.price,
+    property.price_period || null,
+    property.listing_type,
+    property.transaction_type
+  );
+};

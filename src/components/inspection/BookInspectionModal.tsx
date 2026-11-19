@@ -8,7 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useInspectionBooking } from '../../hooks/useInspectionBooking';
 import { Property, InspectionBooking } from '../../types';
-import { calculateInspectionFee, formatFee } from '../../utils/inspectionFee';
+import { getInspectionFee, formatFee } from '../../utils/inspectionFee';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { PaystackButton } from '../payment/PaystackButton';
@@ -48,7 +48,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
   const navigate = useNavigate();
 
   // ✅ Use createAndConfirmBooking instead of createBooking
-  const { checkExistingBooking, createAndConfirmBooking } = useInspectionBooking();
+  const { checkExistingBooking, createAndConfirmBooking, createFreeBooking } = useInspectionBooking();
 
   const [step, setStep] = useState(1);
   const [preferredDate, setPreferredDate] = useState('');
@@ -61,12 +61,8 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
 
   const paymentProcessedRef = useRef(false);
 
-  const inspectionFee = calculateInspectionFee(
-    property.price,
-    property.price_period || null,
-    property.listing_type,
-    property.transaction_type
-  );
+  const inspectionFee = getInspectionFee(property);
+  const feeLabel = inspectionFee > 0 ? formatFee(inspectionFee) : 'Free';
 
   useEffect(() => {
     if (isOpen && user) {
@@ -191,6 +187,22 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
     }
   };
 
+  const handleFreeBooking = async () => {
+    if (paymentProcessedRef.current) return;
+    paymentProcessedRef.current = true;
+    setProcessingPayment(true);
+    setError(null);
+    try {
+      await createFreeBooking(property, preferredDate, preferredTime);
+      setStep(4);
+    } catch (err: unknown) {
+      paymentProcessedRef.current = false;
+      setError(err instanceof Error ? err.message : 'Booking failed. Please try again.');
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+
   const handlePaymentSuccess = async (reference: string) => {
     if (paymentProcessedRef.current) return;
     paymentProcessedRef.current = true;
@@ -311,7 +323,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                 <div className="flex items-center justify-between px-4 py-3 bg-gold/10 border border-gold/20 rounded-xl">
                   <span className="text-[13px] text-white/60">Inspection fee</span>
                   <span className="text-[18px] font-black text-gold">
-                    {formatFee(inspectionFee)}
+                    {feeLabel}
                   </span>
                 </div>
 
@@ -331,7 +343,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                     onClick={() => setStep(2)}
                     className="w-full bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
                   >
-                    Book Inspection — {formatFee(inspectionFee)}
+                    Book Inspection — {feeLabel}
                   </button>
                 </div>
               </motion.div>
@@ -479,7 +491,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                       <CreditCard className="w-3.5 h-3.5 text-gold" /> You pay
                     </span>
                     <span className="text-[18px] font-black text-gold">
-                      {formatFee(inspectionFee)}
+                      {feeLabel}
                     </span>
                   </div>
                 </div>
@@ -512,11 +524,12 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                     >
                       Back
                     </button>
-                    <PaystackButton
+                    {inspectionFee > 0 ? (
+                      <PaystackButton
                       amount={inspectionFee}
                       email={user?.email || ''}
                       reference={`INSP_${property.id.slice(0, 8)}_${Date.now()}`}
-                      label={`Pay ${formatFee(inspectionFee)}`}
+                      label={`Pay ${feeLabel}`}
                       className="flex-[2]"
                       onSuccess={reference => handlePaymentSuccess(reference)}
                       onClose={() =>
@@ -525,6 +538,14 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                         )
                       }
                     />
+                    ) : (
+                      <button
+                        onClick={handleFreeBooking}
+                        className="flex-[2] bg-gold text-black py-3.5 rounded-xl font-bold text-[14px] hover:bg-[#e0b030] transition-colors"
+                      >
+                        Confirm free booking
+                      </button>
+                    )}
                   </div>
                 )}
               </motion.div>

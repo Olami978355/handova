@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AgentCardRequest } from '../components/profile/AgentCardRequest';
 import { ID_CARD_FEATURE_ENABLED } from '../constants';
 import { PayoutSettings } from '../components/profile/PayoutSettings';
+import { CompanyInspectionFee } from '../components/profile/CompanyInspectionFee';
 import { ChangePasswordSection } from '../components/profile/ChangePasswordSection';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -548,7 +549,7 @@ export default function Profile() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <PayoutSettings />
+                    <><PayoutSettings /><CompanyInspectionFee /></>
                   </motion.div>
                 )}
 

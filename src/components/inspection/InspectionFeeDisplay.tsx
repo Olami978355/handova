@@ -4,7 +4,7 @@ import {
   AlertCircle, ArrowRight, Info, Clock, MessageCircle
 } from 'lucide-react';
 import { Property, InspectionBooking } from '../../types';
-import { calculateInspectionFee, formatFee } from '../../utils/inspectionFee';
+import { getInspectionFee, formatFee } from '../../utils/inspectionFee';
 import { useAuth } from '../../context/AuthContext';
 import { useInspectionBooking } from '../../hooks/useInspectionBooking';
 import { BookInspectionModal } from './BookInspectionModal';
@@ -86,12 +86,8 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
 
   const isSuspendedOwner = !!ownerLikelySuspended;
 
-  const inspectionFee = calculateInspectionFee(
-    property.price,
-    property.price_period || null,
-    property.listing_type,
-    property.transaction_type
-  );
+  const inspectionFee = getInspectionFee(property);
+  const feeLabel = inspectionFee > 0 ? formatFee(inspectionFee) : 'Free';
 
   // Platform fee (2%) and processing
   const platformFee = Math.round(property.price * 0.02);
@@ -291,7 +287,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
               </p>
             </div>
             <div className="text-right flex-shrink-0">
-              <div className="text-[18px] font-black text-gold">{formatFee(inspectionFee)}</div>
+              <div className="text-[18px] font-black text-gold">{feeLabel}</div>
               <div className="text-[10px] text-paper/30">fee</div>
             </div>
           </div>
@@ -314,7 +310,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             className={`w-full py-3 rounded-xl font-bold text-[13px] transition-colors flex items-center justify-center gap-2 ${isSuspendedOwner ? 'bg-white/5 text-paper/30 cursor-not-allowed' : 'bg-gold text-paper hover:bg-gold-dark'}`}
           >
             <Calendar className="w-4 h-4" />
-            {isSuspendedOwner ? 'Temporarily unavailable' : `Book Inspection — ${formatFee(inspectionFee)}`}
+            {isSuspendedOwner ? 'Temporarily unavailable' : `Book Inspection — ${feeLabel}`}
           </button>
         </div>
 

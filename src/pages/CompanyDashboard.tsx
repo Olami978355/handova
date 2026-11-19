@@ -44,6 +44,7 @@ export default function CompanyDashboard() {
   const [company, setCompany] = useState<CompanyRow | null>(null);
   const [members, setMembers] = useState<MemberRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [listings, setListings] = useState<ListingRow[]>([]);
   const [username, setUsername] = useState('');
@@ -51,11 +52,13 @@ export default function CompanyDashboard() {
 
   const load = useCallback(async () => {
     if (!user) return;
-    const { data: c } = await supabase
+    const { data: c, error: cErr } = await supabase
       .from('companies')
       .select('id, name, verification_status')
       .eq('id', user.id)
       .maybeSingle();
+    if (cErr) { setLoadError(true); setLoading(false); return; }
+    setLoadError(false);
     setCompany(c);
 
     const { data: props } = await supabase
@@ -199,6 +202,23 @@ export default function CompanyDashboard() {
     return (
       <div className="flex justify-center py-24">
         <Loader2 className="w-6 h-6 text-gold animate-spin" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-xl mx-auto px-5 py-16 text-center" style={font}>
+        <p className="text-[15px] font-bold text-white mb-2">Could not load your company</p>
+        <p className="text-[13px] text-white/40 mb-4">
+          Check your connection and try again.
+        </p>
+        <button
+          onClick={() => { setLoading(true); load(); }}
+          className="px-4 py-2 bg-gold text-ink text-[12px] font-bold rounded-xl"
+        >
+          Retry
+        </button>
       </div>
     );
   }
