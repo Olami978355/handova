@@ -155,7 +155,7 @@ export default function AgentDirectory() {
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <p className="text-[13px] font-bold text-paper truncate">{a.full_name || 'Handova Agent'}</p>
-          <VerifiedBadge status={a.verification_status} size={12} />
+          <VerifiedBadge status={a.verification_status} size={12} variant="identity" />
         </div>
         <div className="flex items-center gap-2.5 mt-0.5">
           {a.avgRating !== null ? (

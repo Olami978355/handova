@@ -149,10 +149,23 @@ export default function Listings() {
           ownerMap = Object.fromEntries(owners.map(o => [o.id, { role: o.role, verification_status: o.verification_status }]));
         }
       }
-      const enriched = rows.map(p => ({
+      const companyIds = [...new Set(rows.map((p: any) => p.company_id).filter(Boolean))];
+      let companyMap: Record<string, { name: string; verified: boolean }> = {};
+      if (companyIds.length > 0) {
+        const { data: cos } = await supabase
+          .from('companies')
+          .select('id, name, verification_status')
+          .in('id', companyIds);
+        if (cos) {
+          companyMap = Object.fromEntries(cos.map(c => [c.id, { name: c.name, verified: c.verification_status === 'verified' }]));
+        }
+      }
+      const enriched = rows.map((p: any) => ({
         ...p,
         owner_role: ownerMap[p.owner_id]?.role,
         owner_verification_status: ownerMap[p.owner_id]?.verification_status,
+        company_name: companyMap[p.company_id]?.name,
+        company_verified: companyMap[p.company_id]?.verified,
       }));
       setProperties(enriched);
       setTotalCount(count || 0);

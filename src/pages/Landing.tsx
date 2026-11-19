@@ -76,7 +76,7 @@ const FeaturedCard = ({ property }: { property: Property }) => {
           </span>
           {property.escrow_verified && (
             <span className="bg-gold text-paper text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
-              <Shield className="w-2.5 h-2.5" /> Verified
+              <Shield className="w-2.5 h-2.5" /> Verified lister
             </span>
           )}
         </div>

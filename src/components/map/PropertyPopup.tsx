@@ -29,7 +29,7 @@ export const PropertyPopup: React.FC<PropertyPopupProps> = ({ property }) => {
           </div>
           {property.escrow_verified && (
             <div className="bg-gold text-white px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center">
-              <Shield className="w-3 h-3 mr-1" fill="currentColor" /> Verified
+              <Shield className="w-3 h-3 mr-1" fill="currentColor" /> Verified lister
             </div>
           )}
         </div>

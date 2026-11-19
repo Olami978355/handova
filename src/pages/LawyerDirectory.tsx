@@ -242,7 +242,7 @@ export default function LawyerDirectory() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <p className="text-[13px] font-bold text-paper truncate">{l.full_name || 'Handova Lawyer'}</p>
-                      <VerifiedBadge status={l.verification_status} size={12} />
+                      <VerifiedBadge status={l.verification_status} size={12} variant="identity" />
                     </div>
                     <div className="flex items-center gap-1 mt-0.5">
                       <CheckCircle2 className="w-3 h-3 text-gold flex-shrink-0" />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, MapPin, Bed, Bath, Shield, Layers, Video, Heart, Loader2, Check } from 'lucide-react';
+import { Home, MapPin, Bed, Bath, Shield, Layers, Video, Heart, Loader2, Check, BadgeCheck } from 'lucide-react';
 import { Property } from '../types';
 import { formatNaira } from '../utils/format';
 import { supabase } from '../lib/supabase';
@@ -106,13 +106,13 @@ export default function PropertyCard({ property, showOwnerBadge = true, onSaveCh
           </span>
           {property.escrow_verified && (
             <span className="bg-gold/20 border border-gold/30 text-gold text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
-              <Shield className="w-2.5 h-2.5" /> Verified
+              <Shield className="w-2.5 h-2.5" /> Verified lister
             </span>
           )}
           {showOwnerBadge && (property as any).owner_role && (
             <span className="bg-ink/70 backdrop-blur-sm text-paper/80 text-[10px] font-bold px-2.5 py-1 rounded-lg capitalize flex items-center gap-1">
               {(property as any).owner_role}
-              <VerifiedBadge status={(property as any).owner_verification_status} size={11} />
+              <VerifiedBadge status={(property as any).owner_verification_status} size={11} variant={(property as any).owner_role === 'company' ? 'business' : 'identity'} />
             </span>
           )}
         </div>
@@ -151,6 +151,16 @@ export default function PropertyCard({ property, showOwnerBadge = true, onSaveCh
       </div>
 
       <div className="p-4">
+        {(property as any).company_name && (
+          <p className="flex items-center gap-1.5 text-[11px] text-paper/45 mb-1 truncate">
+            Listed by <span className="font-semibold text-paper/70 truncate">{(property as any).company_name}</span>
+            {(property as any).company_verified && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-gold flex-shrink-0">
+                <BadgeCheck className="w-3 h-3" /> Business verified
+              </span>
+            )}
+          </p>
+        )}
         <h3 className="text-[14px] font-semibold text-paper line-clamp-1 leading-snug mb-1">
           {property.title}
         </h3>

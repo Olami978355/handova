@@ -572,7 +572,7 @@ export default function PropertyDetail() {
                 </span>
                 {property.escrow_verified && (
                   <span className="bg-gold text-paper text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
-                    <Shield className="w-3 h-3" /> Escrow Verified
+                    <Shield className="w-3 h-3" /> Verified lister
                   </span>
                 )}
               </div>
