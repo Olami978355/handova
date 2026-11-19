@@ -1,6 +1,7 @@
 import {
   executeDealPayout,
   isRecipientFirstPayout,
+  payoutRecipientIdFor,
   logDealAction,
   notifyDealParties,
   sendDealStatusEmails,
@@ -71,7 +72,7 @@ export const startDealRelease = async (
       return await fail('No verified payment is recorded for this deal');
     }
 
-    const recipientId = deal.agent_id || deal.landlord_id;
+    const recipientId = payoutRecipientIdFor(deal);
     if (!opts.confirmFirstPayout && (await isRecipientFirstPayout(adminSupabase, recipientId))) {
       await adminSupabase
         .from('deals')
@@ -145,7 +146,7 @@ export const completeDealRelease = async (adminSupabase: any, deal: any) => {
     .update({ is_rented: true, updated_at: nowIso() })
     .eq('id', deal.property_id);
 
-  const recipientId = deal.agent_id || deal.landlord_id;
+  const recipientId = payoutRecipientIdFor(deal);
   await adminSupabase
     .from('profiles')
     .update({ first_payout_released_at: nowIso() })

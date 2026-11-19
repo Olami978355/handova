@@ -167,6 +167,11 @@ export const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Who receives a deal's payout. Company-listing deals pay the company account
+// (snapshotted on the deal at creation), never the staff agent who listed it.
+export const payoutRecipientIdFor = (deal: any): string =>
+  deal.payout_company_id || deal.agent_id || deal.landlord_id;
+
 export const executeDealPayout = async (
   adminSupabase: any,
   deal: any,
@@ -174,7 +179,13 @@ export const executeDealPayout = async (
   actorRole: string,
   extraLogDetails: Record<string, any> = {}
 ) => {
-  const payoutRecipientId = deal.agent_id || deal.landlord_id;
+  // Never trust a caller's partial deal row when deciding who gets the money.
+  if (deal.payout_company_id === undefined) {
+    const { data: routing } = await adminSupabase
+      .from('deals').select('payout_company_id').eq('id', deal.id).single();
+    deal = { ...deal, payout_company_id: routing?.payout_company_id ?? null };
+  }
+  const payoutRecipientId = payoutRecipientIdFor(deal);
   // Fee model v2: tenant pays Handova's 2% and the agreement fee on top, so nothing is
   // deducted from the recipient (payout_amount is computed by the database).
   // Fee model v1 (existing deals): rent minus fees, as before.
@@ -201,6 +212,32 @@ export const executeDealPayout = async (
       ...extraLogDetails,
     });
     return { transferInitiated: false, warning: 'The payout recipient has no bank details on file. No transfer was sent.' };
+  }
+
+  // Company deals: pay only a company account that passed the name check, and only the
+  // exact recipient that was checked. Unchecked or changed accounts fail closed.
+  if (deal.payout_company_id) {
+    const { data: company } = await adminSupabase
+      .from('companies').select('verification_status').eq('id', deal.payout_company_id).maybeSingle();
+    const { data: check } = await adminSupabase
+      .from('company_payout_accounts')
+      .select('paystack_recipient_code, verification_status')
+      .eq('company_id', deal.payout_company_id)
+      .maybeSingle();
+    if (
+      !check ||
+      company?.verification_status !== 'verified' ||
+      check.verification_status !== 'verified' ||
+      check.paystack_recipient_code !== payoutProfile.paystack_recipient_code
+    ) {
+      await adminSupabase.from('deals').update({ transfer_status: 'failed' }).eq('id', deal.id);
+      await logDealAction(adminSupabase, deal.id, 'transfer_failed', actorId, {
+        reason: 'Company payout account is not verified',
+        payout_recipient_id: payoutRecipientId,
+        ...extraLogDetails,
+      });
+      return { transferInitiated: false, warning: 'The company payout account is not verified. No transfer was sent.' };
+    }
   }
 
   const paystackSecret = Deno.env.get('PAYSTACK_SECRET_KEY');
@@ -265,66 +302,6 @@ export const isRecipientFirstPayout = async (
   return !data?.first_payout_released_at;
 };
 
-/**
- * Finalizes a deal's fund release: marks the deal and property settled,
- * runs the Paystack payout, marks the recipient's first-payout milestone,
- * and notifies parties. Shared by the normal release-funds path and the
- * admin first-payout confirmation path so both behave identically.
- */
-export const finalizeDealFundsRelease = async (
-  adminSupabase: any,
-  deal: any,
-  actorId: string,
-  actorRole: string
-) => {
-  const { error: updateError } = await adminSupabase
-    .from('deals')
-    .update({
-      status: 'funds_released',
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', deal.id);
-  if (updateError) throw updateError;
-
-  const { error: propUpdateError } = await adminSupabase
-    .from('properties')
-    .update({
-      is_rented: true,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', deal.property_id);
-  if (propUpdateError) throw propUpdateError;
-
-  const payoutResult = await executeDealPayout(adminSupabase, deal, actorId, actorRole);
-  await logAdminAction(adminSupabase, actorId, 'funds_released', deal.id, 'deal', { role: actorRole });
-
-  const payoutRecipientId = deal.agent_id || deal.landlord_id;
-  await adminSupabase
-    .from('profiles')
-    .update({ first_payout_released_at: new Date().toISOString() })
-    .eq('id', payoutRecipientId)
-    .is('first_payout_released_at', null);
-
-  if (payoutResult.transferInitiated) {
-    await notifyDealParties(
-      adminSupabase,
-      deal,
-      'Funds Released',
-      `Funds for ${deal.properties.title} have been released to the landlord and agent.`,
-      `/deals/${deal.id}`,
-      'deal_state_change'
-    );
-    await sendDealStatusEmails(
-      adminSupabase,
-      deal,
-      'Funds Released',
-      `Funds for ${deal.properties.title} have been released to the landlord and agent.`,
-      `/deals/${deal.id}`
-    );
-  }
-
-  return payoutResult;
-};
 
 export const logAdminAction = async (
   supabase: any,
