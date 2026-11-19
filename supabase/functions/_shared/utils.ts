@@ -337,7 +337,7 @@ export const executeInspectionFeeTransfer = async (
 ) => {
   // 85/15 split: whoever did the work (agent, or landlord if no agent) gets
   // 85%, Handova keeps 15% as its cut for holding and mediating the fee.
-  const payoutRecipientId = booking.agent_id || booking.landlord_id;
+  let payoutRecipientId = booking.agent_id || booking.landlord_id;
   if (!payoutRecipientId) {
     return { transferInitiated: false, reason: 'no_recipient' };
   }
@@ -373,6 +373,28 @@ export const executeInspectionFeeTransfer = async (
   }
   if (!charge || charge.status !== 'success') return await blockRelease('payment is not confirmed by Paystack');
   if (Number(charge.amount) < Math.round(totalFee * 100)) return await blockRelease('amount paid is less than the booking fee');
+
+  // Company listings: the fee belongs to the company account, never the staff agent.
+  const { data: listing } = await adminSupabase
+    .from('properties').select('company_id').eq('id', booking.property_id).maybeSingle();
+  if (listing?.company_id) {
+    const { data: acct } = await adminSupabase
+      .from('company_payout_accounts').select('verification_status, paystack_recipient_code')
+      .eq('company_id', listing.company_id).maybeSingle();
+    const { data: co } = await adminSupabase
+      .from('companies').select('verification_status').eq('id', listing.company_id).maybeSingle();
+    const { data: cp } = await adminSupabase
+      .from('profiles').select('paystack_recipient_code').eq('id', listing.company_id).maybeSingle();
+    if (
+      !acct || acct.verification_status !== 'verified' ||
+      co?.verification_status !== 'verified' ||
+      !cp?.paystack_recipient_code || cp.paystack_recipient_code !== acct.paystack_recipient_code
+    ) {
+      // Leave the booking awaiting_release so the cron retries once the company is verified.
+      return { transferInitiated: false, warning: 'Inspection fee held: company payout account is not verified yet' };
+    }
+    payoutRecipientId = listing.company_id;
+  }
 
   const PLATFORM_CUT_RATE = 0.15;
   const transferAmountNaira = Math.round(totalFee * (1 - PLATFORM_CUT_RATE) * 100) / 100;
