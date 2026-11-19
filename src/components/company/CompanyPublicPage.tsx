@@ -74,6 +74,7 @@ export default function CompanyPublicPage({ profile }: Props) {
   const name = company?.name || profile.full_name || 'Company';
   const verified = company?.verification_status === 'verified';
   const pending = company?.verification_status === 'pending_verification';
+  const rejected = company?.verification_status === 'rejected';
   const logo = company?.logo_url || profile.avatar_url;
   const since = new Date(profile.created_at).toLocaleDateString('en-NG', {
     month: 'long',
@@ -99,7 +100,7 @@ export default function CompanyPublicPage({ profile }: Props) {
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-white/50 bg-white/5 px-3 py-1.5 rounded-lg">
                   <ShieldAlert className="w-3.5 h-3.5" />{' '}
-                  {pending ? 'Verification pending' : 'Unverified business'}
+                  {pending ? 'Verification pending' : rejected ? 'Verification rejected' : 'Unverified business'}
                 </span>
               )}
             </div>
