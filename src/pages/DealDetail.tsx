@@ -14,6 +14,7 @@ import { DealDelegatePreview } from '../components/deal/DealDelegatePreview';
 import { formatNaira } from '../utils/format';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaystackButton } from '../components/payment/PaystackButton';
+import { AgencyFeeCard } from '../components/deal/AgencyFeeCard';
 import { LawyerReviewModal } from '../components/deal/LawyerReviewModal';
 import { supabase, requireValidSession } from '../lib/supabase';
 import { parseFunctionError } from '../lib/parseFunctionError';
@@ -469,6 +470,15 @@ export default function DealDetail() {
             <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
               <h3 className="text-[14px] font-bold text-paper mb-5">Required Actions</h3>
 
+              {deal.fee_model_version === 2 && deal.status === 'agreement_draft' && isAgent && (
+                <AgencyFeeCard
+                  dealId={deal.id}
+                  amount={deal.amount}
+                  current={Number(deal.agency_fee || 0)}
+                  onSaved={refresh}
+                />
+              )}
+
               {/* STEP 1: Agent/Landlord uploads agreement draft */}
               {deal.status === 'agreement_draft' && !deal.agreement_url && (isLandlord || isAgent) && (
                 <div className="p-5 bg-gold/8 border border-gold/20 rounded-xl">
@@ -750,7 +760,32 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     </a>
                   )}
 
-                  {deal.inspection_fee_credit != null && deal.inspection_fee_credit > 0 && (
+                  {deal.fee_model_version === 2 && (
+                    <div className="mb-4 rounded-xl border border-white/8 bg-white/4 divide-y divide-white/5">
+                      {[
+                        { label: isSaleDeal ? 'Price' : 'Rent', value: Number(deal.amount) },
+                        { label: 'Handova fee (2%)', value: Number(deal.platform_fee) },
+                        ...(Number(deal.agency_fee) > 0 ? [{ label: 'Agency fee', value: Number(deal.agency_fee) }] : []),
+                        ...(Number(deal.agreement_fee) > 0 ? [{ label: 'Agreement fee', value: Number(deal.agreement_fee) }] : []),
+                        ...(Number(deal.inspection_fee_credit) > 0
+                          ? [{ label: 'Inspection fee credit', value: -Number(deal.inspection_fee_credit) }]
+                          : []),
+                      ].map((row) => (
+                        <div key={row.label} className="flex items-center justify-between px-4 py-2.5">
+                          <span className="text-[12px] text-paper/50">{row.label}</span>
+                          <span className="text-[12px] font-semibold text-paper/80 tabular-nums">
+                            {row.value < 0 ? `-${formatNaira(Math.abs(row.value))}` : formatNaira(row.value)}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between px-4 py-3">
+                        <span className="text-[13px] font-bold text-paper">Total to pay</span>
+                        <span className="text-[14px] font-black text-gold tabular-nums">{formatNaira(Number(deal.total_payable))}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {deal.fee_model_version !== 2 && deal.inspection_fee_credit != null && deal.inspection_fee_credit > 0 && (
                     <div className="flex items-center justify-between p-3 bg-gold/10 border border-gold/20 rounded-xl mb-4">
                       <div className="flex items-center gap-2 text-[12px] font-semibold text-gold">
                         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -769,10 +804,10 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     </div>
                   ) : (
                     <PaystackButton
-                      amount={deal.amount - (deal.inspection_fee_credit || 0)}
+                      amount={deal.fee_model_version === 2 ? Number(deal.total_payable) : deal.amount - (deal.inspection_fee_credit || 0)}
                       email={user?.email || ''}
                       reference={`ESCROW_${deal.id}_${Date.now()}`}
-                      label="Pay into Escrow"
+                      label={deal.fee_model_version === 2 ? `Pay ${formatNaira(Number(deal.total_payable))}` : 'Pay now'}
                       className="w-full"
                       disabled={!deal.agreement_url && !deal.agreement_skipped}
                       metadata={{ deal_id: deal.id, type: 'escrow_payment' }}
@@ -844,7 +879,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                       <p className="text-[12px] text-paper/45 leading-relaxed">
                         {isSaleDeal
                           ? 'No written contract was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the property and all relevant documents. This will release funds to the seller.'
-                          : 'No written tenancy agreement was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Only confirm below after you have physically received the keys and access to the property. This will release funds to the owner.'}
+                          : 'No written tenancy agreement was uploaded for this deal — you confirmed terms directly with the landlord/agent when you paid. Confirming move-in marks this rental as completed and authorises Handova to release the agreed payment. Only confirm once you have inspected and accepted the property and received the keys and access. This records completion and does not affect your legal rights under your tenancy agreement or the law.'}
                       </p>
                     </div>
                   </div>
@@ -853,7 +888,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     disabled={processing}
                     className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in and Release Payment')}
                   </button>
                   <p className="text-[11px] text-paper/25 text-center mt-3">
                     <AlertTriangle className="w-3 h-3 flex-shrink-0 inline mr-1.5 -mt-0.5" />
@@ -938,7 +973,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                       <p className="text-[12px] text-paper/45 leading-relaxed">
                         {isSaleDeal
                           ? 'Has the property been handed over successfully? Only confirm after you have physically received the property and all relevant documents. This will release funds to the seller.'
-                          : 'Have you moved in successfully? Only confirm after you have physically received the keys and access to the property. This will release funds to the owner.'}
+                          : 'Have you moved in successfully? Confirming move-in marks this rental as completed and authorises Handova to release the agreed payment. Only confirm once you have inspected and accepted the property and received the keys and access. This records completion and does not affect your legal rights under your tenancy agreement or the law.'}
                       </p>
                     </div>
                   </div>
@@ -947,7 +982,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     disabled={processing}
                     className="w-full bg-gold text-ink py-3.5 rounded-xl font-bold text-[14px] hover:bg-gold-dark transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                   >
-                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in & Release Funds')}
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : (isSaleDeal ? 'Confirm Handover & Release Funds' : 'Confirm Move-in and Release Payment')}
                   </button>
                   <p className="text-[11px] text-paper/25 text-center mt-3">
                     <AlertTriangle className="w-3 h-3 flex-shrink-0 inline mr-1.5 -mt-0.5" />
@@ -997,7 +1032,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                   <CheckCircle2 className="w-8 h-8 text-gold mx-auto mb-3" />
                   <h4 className="text-[14px] font-bold text-paper mb-2">Move-in Confirmed!</h4>
                   <p className="text-[13px] text-paper/40">
-                    Funds are being reviewed for release by our team. This usually takes less than 24 hours.
+                    {deal.release_status === 'held_for_review' ? 'The payout is going through a standard first-payout security check before it is released.' : deal.release_status === 'failed' ? 'There was a problem starting the payout. Our team has been notified and is resolving it.' : 'The payment release has started. Bank settlement time depends on the receiving bank.'}
                   </p>
                 </div>
               )}
@@ -1134,7 +1169,14 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
             <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
               <h3 className="text-[13px] font-bold text-paper mb-4">Payout Breakdown</h3>
               <div className="space-y-2.5">
-                {[
+                {(deal.fee_model_version === 2 ? [
+                  { label: isSaleDeal ? 'Price' : 'Rent', value: formatNaira(deal.amount), highlight: false },
+                  ...(Number(deal.agency_fee) > 0 ? [{ label: 'Agency fee (paid by tenant)', value: formatNaira(deal.agency_fee), earned: true }] : []),
+                  ...(Number(deal.inspection_fee_credit) > 0
+                    ? [{ label: 'Inspection fee already received', value: `-${formatNaira(deal.inspection_fee_credit)}`, deduction: true }]
+                    : []),
+                  { label: 'You receive', value: formatNaira(Number(deal.payout_amount)), highlight: true },
+                ] : [
                   { label: 'Total Amount', value: formatNaira(deal.amount), highlight: true },
                   ...(deal.caution_fee ? [{ label: 'Caution / Security Deposit', value: formatNaira(deal.caution_fee) }] : []),
                   { label: 'Platform Fee (2%)', value: `-${formatNaira(deal.platform_fee)}`, deduction: true },
@@ -1159,7 +1201,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
                     ),
                     highlight: true,
                   },
-                ].map((row) => (
+                ]).map((row: any) => (
                   <div key={row.label} className="flex items-center justify-between">
                     <span className={`text-[12px] ${row.highlight ? 'font-bold text-paper' : row.earned ? 'text-gold/70' : 'text-paper/40'}`}>
                       {row.label}{row.earned ? ' (yours)' : ''}
