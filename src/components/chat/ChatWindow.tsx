@@ -424,7 +424,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const ONE_HOUR = 60 * 60 * 1000;
-  const FIFTEEN_MIN = 15 * 60 * 1000;
+  const flagsOffPlatformPayment = (content: string | null | undefined): boolean => {
+  const text = (content || '').toLowerCase();
+  if (!text.trim()) return false;
+  const bankKeywords = /\b(account number|acct no|acct number|gtbank|gt bank|first bank|zenith|access bank|uba|opay|palmpay|kuda|moniepoint|fidelity bank|union bank|sterling bank|polaris bank|wema bank|stanbic|fcmb|providus)\b/;
+  const offPlatformPhrase = /\b(pay me directly|pay directly|send to my account|outside the app|off[\s-]?platform|pay in cash|send cash|pay cash|bank transfer)\b/;
+  return (/\b\d{10}\b/.test(text) && bankKeywords.test(text)) || offPlatformPhrase.test(text);
+};
+
+const FIFTEEN_MIN = 15 * 60 * 1000;
 
   const startLongPress = (msg: typeof messages[0]) => {
     longPressTimer.current = setTimeout(() => setMenuMessageId(msg.id), 500);
@@ -712,6 +720,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                           )}
                           {!msg.media_url && msg.content}
                         </div>
+                      )}
+
+                      {!isMe && !isDeleted && !msg.media_url && flagsOffPlatformPayment(msg.content) && (
+                        <p className="mt-1 max-w-[260px] text-[11px] leading-snug text-paper/50">
+                          This message asks to move payment outside Handova. Payments made outside Handova aren't covered by Handova's payment records. If this doesn't feel right, you can report the conversation.
+                        </p>
                       )}
 
                       {menuMessageId === msg.id && !isEditing && (

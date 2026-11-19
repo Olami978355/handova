@@ -1,0 +1,10 @@
+-- Applied to production: keep previous message versions as dispute evidence,
+-- and stop non-senders changing sender-owned fields.
+-- (message_revisions table + log_message_revision trigger, then the guard
+-- trigger and changed_by column from the same session.)
+-- Rollback:
+--   drop trigger if exists trg_guard_message_sender_fields on public.messages;
+--   drop function if exists public.guard_message_sender_fields();
+--   drop trigger if exists trg_log_message_revision on public.messages;
+--   drop function if exists public.log_message_revision();
+--   drop table if exists public.message_revisions;
