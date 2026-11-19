@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CreditCard, Loader2, AlertCircle, CheckCircle2, ChevronDown } from 'lucide-react';
 import { supabase, requireValidSession } from '../../lib/supabase';
 import { parseFunctionError } from '../../lib/parseFunctionError';
 import { NIGERIAN_BANKS } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 
+type PayoutStatus = 'verified' | 'pending_review' | 'rejected' | null;
+
 export const PayoutSettings: React.FC = () => {
   const { profile, refreshProfile } = useAuth();
   const hasExisting = !!(profile?.bank_account_number && profile?.bank_code);
+  const isCompany = (profile?.role as string | undefined) === 'company';
 
   const [editing, setEditing] = useState(!hasExisting);
   const [bankCode, setBankCode] = useState('');
@@ -17,8 +20,20 @@ export const PayoutSettings: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [payoutStatus, setPayoutStatus] = useState<PayoutStatus>(null);
 
   const selectedBankName = NIGERIAN_BANKS.find(b => b.code === bankCode)?.name;
+
+  // Company accounts: load the verification status (only the caller's own row is readable).
+  useEffect(() => {
+    if (!isCompany || !hasExisting) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.rpc('get_my_company_payout_status');
+      if (!cancelled) setPayoutStatus((data as PayoutStatus) ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [isCompany, hasExisting, profile?.bank_account_number]);
 
   const handleVerify = async () => {
     setError(null);
@@ -52,10 +67,11 @@ export const PayoutSettings: React.FC = () => {
     setError(null);
     try {
       if (!(await requireValidSession())) return;
-      const { error: fnError } = await supabase.functions.invoke('save-bank-details', {
+      const { data, error: fnError } = await supabase.functions.invoke('save-bank-details', {
         body: { accountNumber, bankCode, accountName: resolvedName },
       });
       if (fnError) throw fnError;
+      if (isCompany) setPayoutStatus((data?.verification as PayoutStatus) ?? null);
       await refreshProfile();
       setSuccess(true);
       setEditing(false);
@@ -69,10 +85,54 @@ export const PayoutSettings: React.FC = () => {
     }
   };
 
+  const successMessage = !isCompany
+    ? 'Payout account saved.'
+    : payoutStatus === 'verified'
+      ? 'Payout account saved and verified.'
+      : 'Payout account saved. It is pending review before payouts are enabled.';
+
+  const successBanner = success && (
+    <div className="flex items-center gap-2 mb-4 p-3 bg-gold/8 border border-gold/20 rounded-xl">
+      <CheckCircle2 className="w-4 h-4 text-gold flex-shrink-0" />
+      <p className="text-[12px] text-gold">{successMessage}</p>
+    </div>
+  );
+
+  const companyStatusNote = () => {
+    if (!isCompany) return null;
+    if (payoutStatus === 'verified') {
+      return (
+        <div className="flex items-start gap-2 mb-4 p-3 bg-gold/8 border border-gold/20 rounded-xl">
+          <CheckCircle2 className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
+          <p className="text-[12px] text-gold">Verified. Payouts for your company's listings are sent to this account.</p>
+        </div>
+      );
+    }
+    if (payoutStatus === 'rejected') {
+      return (
+        <div className="flex items-start gap-2 mb-4 p-3 bg-danger/8 border border-danger/20 rounded-xl">
+          <AlertCircle className="w-3.5 h-3.5 text-danger flex-shrink-0 mt-0.5" />
+          <p className="text-[12px] text-danger">This account was not approved. Update your payout account to try again.</p>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-start gap-2 mb-4 p-3 bg-white/5 border border-white/10 rounded-xl">
+        <AlertCircle className="w-3.5 h-3.5 text-paper/50 flex-shrink-0 mt-0.5" />
+        <p className="text-[12px] text-paper/60 leading-relaxed">
+          {payoutStatus === 'pending_review'
+            ? 'Pending review. Payouts to this account are on hold until Handova confirms the account name matches your CAC registration.'
+            : 'Not verified yet. Save your payout account again to start verification. Payouts are on hold until it is verified.'}
+        </p>
+      </div>
+    );
+  };
+
   if (!editing && hasExisting) {
     return (
       <div>
         <h2 className="text-[16px] font-bold text-paper mb-5">Payments & Payouts</h2>
+        {successBanner}
         <div className="p-4 bg-gold/6 border border-gold/20 rounded-xl mb-4">
           <div className="flex items-center gap-2 mb-3">
             <CheckCircle2 className="w-4 h-4 text-gold" />
@@ -85,11 +145,14 @@ export const PayoutSettings: React.FC = () => {
             </p>
           </div>
         </div>
+        {companyStatusNote()}
         <p className="text-[11px] text-paper/35 leading-relaxed mb-4">
-          Funds released to you from escrow are sent to this account. Update it if your bank details change.
+          {isCompany
+            ? "Funds released for your company's listings are sent to this account. The account name must match your CAC registration. Updating it puts it back into review."
+            : 'Funds released to you from escrow are sent to this account. Update it if your bank details change.'}
         </p>
         <button
-          onClick={() => setEditing(true)}
+          onClick={() => { setEditing(true); setSuccess(false); }}
           className="text-[13px] font-bold text-gold hover:text-gold-dark transition-colors"
         >
           Update payout account
@@ -103,14 +166,10 @@ export const PayoutSettings: React.FC = () => {
       <h2 className="text-[16px] font-bold text-paper mb-2">Payments & Payouts</h2>
       <p className="text-[12px] text-paper/40 mb-5 leading-relaxed">
         Add the bank account funds should be released to when a deal completes. We verify the account holder's name with your bank before saving.
+        {isCompany && " For companies, the account name must match your CAC-registered company name."}
       </p>
 
-      {success && (
-        <div className="flex items-center gap-2 mb-4 p-3 bg-gold/8 border border-gold/20 rounded-xl">
-          <CheckCircle2 className="w-4 h-4 text-gold flex-shrink-0" />
-          <p className="text-[12px] text-gold">Payout account saved.</p>
-        </div>
-      )}
+      {successBanner}
 
       {error && (
         <div className="flex items-start gap-2 mb-4 p-3 bg-danger/8 border border-danger/20 rounded-xl">
@@ -171,7 +230,9 @@ export const PayoutSettings: React.FC = () => {
               <p className="text-[12px] text-paper/40 mt-0.5">{selectedBankName}</p>
             </div>
             <p className="text-[11px] text-paper/35 leading-relaxed">
-              Is this you? Funds will be sent to this exact name and account.
+              {isCompany
+                ? "Is this your company's account? Payouts will be sent to this exact name and account, and it must match your CAC registration."
+                : 'Is this you? Funds will be sent to this exact name and account.'}
             </p>
             <div className="flex gap-3">
               <button
