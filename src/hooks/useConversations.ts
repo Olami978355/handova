@@ -42,6 +42,24 @@ export const useConversations = () => {
               .eq('id', otherParticipantId)
               .single();
             if (profileData) otherProfile = profileData as Profile;
+            if (profileData && (profileData as any).role === 'agent') {
+              const { data: mem } = await supabase
+                .from('company_members')
+                .select('company_id')
+                .eq('member_id', otherParticipantId)
+                .eq('status', 'active')
+                .maybeSingle();
+              if (mem) {
+                const { data: co } = await supabase
+                  .from('companies')
+                  .select('name, verification_status')
+                  .eq('id', mem.company_id)
+                  .maybeSingle();
+                if (co && co.verification_status === 'verified') {
+                  (otherProfile as any).works_with = co.name;
+                }
+              }
+            }
           }
 
           const { count } = await supabase

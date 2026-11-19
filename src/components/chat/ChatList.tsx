@@ -187,12 +187,18 @@ export const ChatList: React.FC<ChatListProps> = ({ onSelect, selectedId }) => {
                         }`}>
                           {other?.full_name || 'User'}
                         </span>
-                        <VerifiedBadge status={other?.verification_status} size={12} />
+                        <VerifiedBadge status={other?.verification_status} size={12} variant={other?.role === 'company' ? 'business' : 'identity'} />
                       </span>
                       <span className="text-[10px] text-white/25 whitespace-nowrap ml-2 flex-shrink-0">
                         {formatRelativeTime(conv.last_message_at || conv.created_at)}
                       </span>
                     </div>
+                    {other && ['agent', 'landlord', 'company'].includes(other.role) && (
+                      <p className="text-[10px] text-white/35 mb-0.5 truncate">
+                        {other.role === 'landlord' ? 'Property owner' : other.role === 'company' ? 'Company' : 'Agent'}
+                        {(other as any).works_with ? ' · Works with ' + (other as any).works_with : ''}
+                      </p>
+                    )}
                     <p className="text-[10px] text-gold font-bold uppercase tracking-wider mb-0.5 truncate">
                       {prop?.title || 'Property'}
                     </p>

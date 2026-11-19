@@ -146,7 +146,13 @@ const chatWindowProps = {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-[14px] font-bold text-paper truncate flex items-center gap-1">
                     <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
-                    <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
+                    <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} variant={selectedConversation?.participants?.[0]?.role === 'company' ? 'business' : 'identity'} />
+                    {(() => {
+                      const p: any = selectedConversation?.participants?.[0];
+                      const r = p?.role === 'landlord' ? 'Property owner' : p?.role === 'company' ? 'Company' : p?.role === 'agent' ? 'Agent' : '';
+                      const w = p?.works_with ? ' · Works with ' + p.works_with : '';
+                      return r ? <span className="text-[10px] font-normal text-paper/40 truncate">{r + w}</span> : null;
+                    })()}
                   </h3>
                   <p className="text-[11px] text-gold font-medium truncate">
                     {selectedConversation?.properties?.title || 'Property'}
@@ -223,7 +229,13 @@ const chatWindowProps = {
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[14px] font-bold text-paper truncate flex items-center gap-1">
                       <Link to={selectedConversation?.participants?.[0]?.username ? `/u/${selectedConversation.participants[0].username}` : '#'} onClick={(e) => { if (!selectedConversation?.participants?.[0]?.username) e.preventDefault(); }} className="truncate hover:underline">{selectedConversation?.participants?.[0]?.full_name || 'Chat'}</Link>
-                      <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} />
+                      <VerifiedBadge status={selectedConversation?.participants?.[0]?.verification_status} size={13} variant={selectedConversation?.participants?.[0]?.role === 'company' ? 'business' : 'identity'} />
+                    {(() => {
+                      const p: any = selectedConversation?.participants?.[0];
+                      const r = p?.role === 'landlord' ? 'Property owner' : p?.role === 'company' ? 'Company' : p?.role === 'agent' ? 'Agent' : '';
+                      const w = p?.works_with ? ' · Works with ' + p.works_with : '';
+                      return r ? <span className="text-[10px] font-normal text-paper/40 truncate">{r + w}</span> : null;
+                    })()}
                     </h3>
                     <p className="text-[11px] text-gold font-medium truncate">
                       {selectedConversation?.properties?.title || 'Property'}
