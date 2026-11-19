@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ShieldCheck, MapPin, Phone, Home, Calendar, Star, Building2 } from 'lucide-react';
+import { ShieldCheck, MapPin, Phone, Home, Calendar, Star, Building2, Scale } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Property } from '../types';
 import PropertyCard from '../components/PropertyCard';
 import CompanyPublicPage from '../components/company/CompanyPublicPage';
+import { useAuth } from '../context/AuthContext';
+import { LawyerConsultationModal } from '../components/deal/LawyerConsultationModal';
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 interface PublicProfileData {
   id: string;
@@ -40,6 +42,9 @@ export default function PublicProfile() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [worksWith, setWorksWith] = useState<{ name: string; logo: string | null; username: string } | null>(null);
+  const { user } = useAuth();
+  const [lawyer, setLawyer] = useState<{ specialty: string; states_covered: string[]; default_fee: number | null; avg: number | null; count: number } | null>(null);
+  const [consultOpen, setConsultOpen] = useState(false);
   useEffect(() => {
     if (!username) return;
     (async () => {
@@ -84,6 +89,30 @@ export default function PublicProfile() {
         setReviews([]);
       }
 
+      setLawyer(null);
+      {
+        const { data: lv } = await supabase
+          .from('lawyer_verifications')
+          .select('specialty, states_covered, default_fee')
+          .eq('user_id', profileData.id)
+          .eq('status', 'approved')
+          .maybeSingle();
+        if (lv) {
+          const { data: rr } = await supabase
+            .from('lawyer_review_bookings')
+            .select('requester_rating')
+            .eq('lawyer_id', profileData.id)
+            .not('requester_rating', 'is', null);
+          const rs = (rr || []).map(r => r.requester_rating as number);
+          setLawyer({
+            specialty: lv.specialty,
+            states_covered: lv.states_covered || [],
+            default_fee: lv.default_fee ?? null,
+            avg: rs.length ? rs.reduce((s, n) => s + n, 0) / rs.length : null,
+            count: rs.length,
+          });
+        }
+      }
       setWorksWith(null);
       if (profileData.role !== 'company') {
         const { data: m } = await supabase
@@ -162,7 +191,7 @@ export default function PublicProfile() {
                 </span>
               )}
             </div>
-            <p className="text-[13px] text-white/40 capitalize mt-1">{profile.role}</p>
+            <p className="text-[13px] text-white/40 capitalize mt-1">{lawyer ? 'Lawyer' : profile.role}</p>
             {profile.username && (
               <p className="text-[12px] text-white/25 mt-0.5">@{profile.username}</p>
             )}
@@ -190,6 +219,59 @@ export default function PublicProfile() {
           </div>
         </div>
       </div>
+
+      {lawyer && (
+        <div className="bg-ink border border-white/6 rounded-2xl p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Scale className="w-4 h-4 text-gold" />
+            <h2 className="text-[15px] font-bold text-white">Legal practice</h2>
+            {lawyer.avg !== null && (
+              <span className="flex items-center gap-1 text-[11px] font-bold text-gold ml-auto">
+                <Star className="w-3 h-3 fill-gold" /> {lawyer.avg.toFixed(1)} ({lawyer.count})
+              </span>
+            )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3 bg-white/4 rounded-xl">
+              <p className="text-[11px] text-white/40">Practice areas</p>
+              <p className="text-[13px] font-semibold text-white mt-1">
+                {lawyer.specialty === 'property_title' ? 'Property and title' : lawyer.specialty === 'both' ? 'Tenancy, property and title' : 'Tenancy'}
+              </p>
+            </div>
+            <div className="p-3 bg-white/4 rounded-xl">
+              <p className="text-[11px] text-white/40">States covered</p>
+              <p className="text-[13px] font-semibold text-white mt-1">
+                {lawyer.states_covered.length > 0 ? lawyer.states_covered.join(', ') : 'Not stated'}
+              </p>
+            </div>
+            <div className="p-3 bg-white/4 rounded-xl">
+              <p className="text-[11px] text-white/40">Consultation fee</p>
+              <p className="text-[13px] font-semibold text-white mt-1">
+                {lawyer.default_fee !== null ? '₦' + Number(lawyer.default_fee).toLocaleString('en-NG') : 'Set at booking'}
+              </p>
+            </div>
+          </div>
+          <p className="text-[11px] text-white/35 mt-4 leading-relaxed">
+            Handova checked the Nigerian Bar Association credential for this lawyer. It does not review or guarantee any advice given.
+          </p>
+          {user && user.id !== profile.id && (
+            <button
+              onClick={() => setConsultOpen(true)}
+              className="w-full mt-4 py-2.5 bg-gold/10 border border-gold/20 rounded-lg text-[12px] font-bold text-gold hover:bg-gold/15 transition-colors"
+            >
+              Book a Consultation
+            </button>
+          )}
+          {consultOpen && (
+            <LawyerConsultationModal
+              lawyerId={profile.id}
+              lawyerName={profile.full_name || 'this lawyer'}
+              lawyerFee={lawyer.default_fee ?? 0}
+              onClose={() => setConsultOpen(false)}
+            />
+          )}
+        </div>
+      )}
 
       {reviews.length > 0 && (
         <div className="mb-6">
@@ -225,7 +307,7 @@ export default function PublicProfile() {
         </div>
       )}
 
-      <div>
+      <div className={lawyer && listings.length === 0 ? 'hidden' : ''}>
         <h2 className="text-[15px] font-bold text-white mb-4">
           {listings.length > 0 ? `${listings.length} Active Listing${listings.length !== 1 ? 's' : ''}` : 'Listings'}
         </h2>
