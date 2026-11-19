@@ -326,10 +326,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     const moveConversationPhrase = /\b(message me on|contact me on|reach me on|text me on|let'?s continue on|move this to|chat with me on)\b/;
 
     if (tenDigitSequence.test(text) && bankKeywords.test(text)) {
-      return { message: "Sharing bank account details outside Handova isn't covered by escrow protection.", type: 'bank_details' as const };
+      return { message: "Payments made outside Handova aren't covered by Handova's payment records, and Handova can't recover money it never received.", type: 'bank_details' as const };
     }
     if (offPlatformPhrase.test(text)) {
-      return { message: "Arranging payment outside Handova isn't covered by escrow protection.", type: 'off_platform_phrase' as const };
+      return { message: "Payments made outside Handova aren't covered by Handova's payment records, and Handova can't recover money it never received.", type: 'off_platform_phrase' as const };
     }
     if (messagingApp.test(text) && (phoneNumberPattern.test(text) || moveConversationPhrase.test(text))) {
       return { message: "Keeping the conversation on Handova protects both of you if something goes wrong.", type: 'messaging_app' as const };
