@@ -191,7 +191,7 @@ export default function PublicProfile() {
                 </span>
               )}
             </div>
-            <p className="text-[13px] text-white/40 capitalize mt-1">{lawyer ? 'Lawyer' : profile.role}</p>
+            <p className="text-[13px] text-white/40 capitalize mt-1">{lawyer ? 'Lawyer' : profile.role === 'landlord' ? 'Property owner' : profile.role}</p>
             {profile.username && (
               <p className="text-[12px] text-white/25 mt-0.5">@{profile.username}</p>
             )}
@@ -219,6 +219,16 @@ export default function PublicProfile() {
           </div>
         </div>
       </div>
+
+      {profile.role === 'landlord' && (
+        <div className="bg-ink border border-white/6 rounded-2xl p-4 mb-6">
+          <p className="text-[12px] text-white/45 leading-relaxed">
+            {isVerified
+              ? "Handova checked this person's identity. It does not verify ownership of any property."
+              : "Handova has not yet checked this person's identity. Ownership of any property is not verified."}
+          </p>
+        </div>
+      )}
 
       {lawyer && (
         <div className="bg-ink border border-white/6 rounded-2xl p-6 mb-6">
