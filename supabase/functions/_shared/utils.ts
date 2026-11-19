@@ -185,6 +185,19 @@ export const executeDealPayout = async (
       .from('deals').select('payout_company_id').eq('id', deal.id).single();
     deal = { ...deal, payout_company_id: routing?.payout_company_id ?? null };
   }
+  // Fail closed: a company listing must never fall back to the staff agent.
+  if (!deal.payout_company_id) {
+    const { data: prop } = await adminSupabase
+      .from('properties').select('company_id').eq('id', deal.property_id).maybeSingle();
+    if (prop?.company_id) {
+      await adminSupabase.from('deals').update({ transfer_status: 'failed' }).eq('id', deal.id);
+      await logDealAction(adminSupabase, deal.id, 'transfer_failed', actorId, {
+        reason: 'Company listing deal has no payout_company_id',
+        ...extraLogDetails,
+      });
+      return { transferInitiated: false, warning: 'This company listing deal has no company payout recipient set. No transfer was sent.' };
+    }
+  }
   const payoutRecipientId = payoutRecipientIdFor(deal);
   // Fee model v2: tenant pays Handova's 2% and the agreement fee on top, so nothing is
   // deducted from the recipient (payout_amount is computed by the database).
