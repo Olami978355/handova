@@ -152,7 +152,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           <p className="text-[13px] font-bold text-paper">Book an Inspection</p>
         </div>
         <p className="text-[12px] text-paper/40 mb-4 leading-relaxed">
-          Sign in to book a viewing or proceed to rent this property securely via escrow.
+          Sign in to book a viewing or proceed to rent this property through Handova.
         </p>
         <button
           onClick={() => navigate('/login')}
@@ -326,7 +326,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
             Already seen this property?
           </h4>
           <p className="text-[11px] text-paper/35 mb-3 leading-relaxed">
-            Skip the inspection and pay rent directly. Your money is still held in escrow and only released after you confirm move-in.
+            Skip the inspection and pay rent directly. Your payment still goes through Handova and is released after you confirm move-in, unless a dispute is open.
           </p>
 
           <div className="bg-ink border border-white/6 rounded-xl p-3 mb-3 space-y-1.5">
@@ -349,7 +349,7 @@ export const InspectionFeeDisplay: React.FC<InspectionFeeDisplayProps> = ({ prop
           <div className="flex items-start gap-2 mb-3 p-3 bg-gold/5 border border-gold/10 rounded-xl">
             <Info className="w-3.5 h-3.5 text-gold/50 flex-shrink-0 mt-0.5" />
             <p className="text-[11px] text-paper/35 mb-3 leading-relaxed">
-  Already viewed this property? Contact the owner via chat. They can send you a custom deal offer which you can accept and pay securely via escrow.
+  Already viewed this property? Contact the owner via chat. They can send you a custom deal offer which you can accept and pay through Handova.
 </p>
           </div>
 

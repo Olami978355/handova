@@ -202,7 +202,7 @@ export const Step5_Pricing: React.FC<StepProps> = ({ form }) => {
       <div className="flex items-start gap-3 p-4 bg-gold/8 border border-gold/15 rounded-xl">
         <Shield className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
         <p className="text-[12px] text-paper/55 leading-relaxed">
-          All payments for this listing are held in escrow by Handova and only released after the{' '}
+          All payments for this listing are processed through Handova and released after the{' '}
           {transactionType === 'rent' ? 'tenant confirms move-in' : 'buyer confirms document receipt'}.
           This protects both parties.
         </p>

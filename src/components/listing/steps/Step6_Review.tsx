@@ -163,9 +163,9 @@ export const Step6_Review: React.FC<StepProps> = ({ form }) => {
       <div className="flex items-start gap-3 p-4 bg-gold/8 border border-gold/20 rounded-xl">
         <Shield className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-[12px] font-bold text-gold mb-0.5">Escrow enabled</p>
+          <p className="text-[12px] font-bold text-gold mb-0.5">Handova payments enabled</p>
           <p className="text-[11px] text-paper/45 leading-relaxed">
-            By submitting this listing you agree to use the Handova escrow system for all transactions. You receive funds after move-in is confirmed.
+            By submitting this listing you agree to complete transactions through Handova. You receive funds after move-in is confirmed.
           </p>
         </div>
       </div>

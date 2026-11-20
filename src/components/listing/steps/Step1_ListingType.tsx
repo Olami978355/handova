@@ -197,10 +197,10 @@ export const Step1_ListingType: React.FC<StepProps> = ({ form }) => {
               'You are listing a property for rent. You will set the price period (yearly, monthly or nightly) in the next step.'
             }
             {listingType === 'house' && transactionType === 'sell' &&
-              'You are listing a property for sale. Buyers will go through the escrow process before funds are released to you.'
+              'You are listing a property for sale. Buyers will pay through Handova before funds are released to you.'
             }
             {listingType === 'land' && transactionType === 'sell' &&
-              'You are listing land for sale. You will need to upload your survey plan and title documents. Land deals use a document handover escrow flow.'
+              'You are listing land for sale. You will need to upload your survey plan and title documents. Land deals use a document handover flow.'
             }
             {listingType === 'land' && transactionType === 'rent' &&
               'You are listing land for lease. You will set the lease period and terms in the next step.'

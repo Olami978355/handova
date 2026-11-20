@@ -16,7 +16,7 @@ const SLIDES = [
   {
     image: '/marketing/sign-agreement.png',
     headline: 'Your money, held safely.',
-    text: 'Funds are secured in escrow the moment payment is made — released only when both sides confirm.',
+    text: 'Pay through Handova and follow every step of your deal. Payment is released after move-in is confirmed, unless a dispute is open.',
   },
   {
     image: '/marketing/funds-released.png',
