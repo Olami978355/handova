@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 export function CompanyInspectionFee() {
   const { user } = useAuth();
   const [fee, setFee] = useState('0');
+  const [savedFee, setSavedFee] = useState('0');
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -19,6 +20,7 @@ export function CompanyInspectionFee() {
       .then(({ data }) => {
         if (data) {
           setFee(String(data.inspection_fee ?? 0));
+          setSavedFee(String(data.inspection_fee ?? 0));
           setLoaded(true);
         }
       });
@@ -39,6 +41,7 @@ export function CompanyInspectionFee() {
     if (error) setMsg({ ok: false, text: error.message });
     else {
       setFee(String(n));
+      setSavedFee(String(n));
       setMsg({ ok: true, text: n === 0 ? 'Saved. Inspections on your listings are free.' : 'Saved. This fee now applies to all your listings.' });
     }
   };
@@ -63,7 +66,7 @@ export function CompanyInspectionFee() {
         />
         <button
           onClick={save}
-          disabled={saving}
+          disabled={saving || fee.trim() === '' || fee.trim() === savedFee}
           className="px-4 bg-gold text-black rounded-xl font-bold text-[13px] disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save'}
