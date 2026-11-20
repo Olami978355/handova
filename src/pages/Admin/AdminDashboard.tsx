@@ -24,10 +24,11 @@ import EscrowQueue from './EscrowQueue';
 import AdminLogs from './AdminLogs';
 import PropertyReports from './PropertyReports';
 import UserReports from './UserReports';
+import MessageHistory from './MessageHistory';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import { HandovaLogo } from '../../components/brand/HandovaMark';
 
-type AdminTab = 'overview' | 'users' | 'verifications' | 'lawyer-verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports' | 'user-reports' | 'analytics';
+type AdminTab = 'overview' | 'users' | 'verifications' | 'lawyer-verifications' | 'properties' | 'disputes' | 'fund-releases' | 'logs' | 'card-requests' | 'reports' | 'user-reports' | 'message-history' | 'analytics';
 
 const font = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
@@ -76,6 +77,7 @@ export default function AdminDashboard() {
     ...(ID_CARD_FEATURE_ENABLED ? [{ id: 'card-requests', label: 'ID Cards', icon: CreditCard, roles: ['admin', 'moderator'] }] : []),
     { id: 'reports', label: 'Reports', icon: AlertCircle, roles: ['admin', 'moderator'] },
     { id: 'user-reports', label: 'User Reports', icon: Flag, roles: ['admin', 'moderator'] },
+    { id: 'message-history', label: 'Message History', icon: Flag, roles: ['admin', 'moderator'] },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp, roles: ['admin', 'moderator'] },
     { id: 'logs', label: 'Logs', icon: History, roles: ['admin'] },
   ].filter(item => item.roles.includes(profile?.role || ''));
@@ -196,6 +198,7 @@ export default function AdminDashboard() {
               {activeTab === 'card-requests' && <CardRequestQueue />}
               {activeTab === 'reports' && <PropertyReports />}
               {activeTab === 'user-reports' && <UserReports />}
+              {activeTab === 'message-history' && <MessageHistory />}
               {activeTab === 'analytics' && <AnalyticsDashboard />}
             </motion.div>
           </AnimatePresence>

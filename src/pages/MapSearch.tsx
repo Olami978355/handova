@@ -70,7 +70,7 @@ const MapPropertyCard = ({ property, selected, onClick }: {
         </span>
         {property.escrow_verified && (
           <span className="flex items-center gap-0.5 text-[10px] font-bold text-gold">
-            <Shield className="w-2.5 h-2.5" /> Verified
+            <Shield className="w-2.5 h-2.5" /> Verified lister
           </span>
         )}
       </div>
