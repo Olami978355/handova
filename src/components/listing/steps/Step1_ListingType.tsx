@@ -1,7 +1,14 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ListingFormData } from '../../../hooks/useListingForm';
-import { Home, Map as LandIcon, Tag, Calendar } from 'lucide-react';
+import {
+  Home,
+  Map as LandIcon,
+  Tag,
+  Calendar,
+  Check,
+  ArrowUpRight,
+} from 'lucide-react';
 import { ListUnderSelector } from '../ListUnderSelector';
 
 interface StepProps {
@@ -17,195 +24,235 @@ export const Step1_ListingType: React.FC<StepProps> = ({ form }) => {
     {
       id: 'house',
       label: 'House / Property',
+      eyebrow: 'RESIDENTIAL & COMMERCIAL',
       icon: Home,
-      description: 'Apartments, flats, duplexes, bungalows, mansions',
+      description: 'Apartments, flats, duplexes, bungalows and commercial properties.',
     },
     {
       id: 'land',
       label: 'Land',
+      eyebrow: 'PLOTS & LAND PARCELS',
       icon: LandIcon,
-      description: 'Residential plots, commercial land, farmland',
+      description: 'Residential plots, commercial land and agricultural land.',
     },
-  ];
+  ] as const;
 
   const transactions = [
     {
       id: 'rent',
       label: 'For Rent',
       icon: Calendar,
-      description: 'Yearly, monthly or nightly lease',
+      description: 'Offer a property or land for lease.',
     },
     {
       id: 'sell',
       label: 'For Sale',
       icon: Tag,
-      description: 'Outright purchase or land sale',
+      description: 'Put a property or land up for purchase.',
     },
-  ];
+  ] as const;
+
+  const selectionMessage = () => {
+    if (listingType === 'house' && transactionType === 'rent') {
+      return 'You are listing a property for rent. You will choose the rental price and payment period in the pricing step.';
+    }
+
+    if (listingType === 'house' && transactionType === 'sell') {
+      return 'You are listing a property for sale. Add accurate property details and supporting information so buyers can assess it.';
+    }
+
+    if (listingType === 'land' && transactionType === 'sell') {
+      return 'You are listing land for sale. You will be able to provide its size, title information and survey documents in the following steps.';
+    }
+
+    if (listingType === 'land' && transactionType === 'rent') {
+      return 'You are listing land for lease. You will provide the lease details and terms in the following steps.';
+    }
+
+    return '';
+  };
 
   return (
     <div
-      className="space-y-8"
+      className="space-y-9"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       <ListUnderSelector form={form} />
 
-      {/* Header */}
-      <div className="text-center">
-        <div className="text-[11px] font-bold text-gold uppercase tracking-widest mb-2">
-          Step 1 of 6
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <span className="h-px w-7 bg-gold" />
+          <span className="text-[10px] font-bold tracking-[0.2em] text-gold uppercase">
+            Listing details · 01
+          </span>
         </div>
-        <h2 className="font-serif text-[24px] font-semibold text-paper tracking-tight mb-2">
-          What are you listing?
+
+        <h2 className="font-serif text-[30px] sm:text-[34px] leading-tight font-medium text-paper tracking-tight">
+          What would you like to list?
         </h2>
-        <p className="text-[13px] text-paper/45">
-          Choose the property type and whether you are renting or selling
+
+        <p className="max-w-lg text-[13px] leading-6 text-paper/50">
+          Start with the basics. Choose the type of asset and how you want to
+          offer it to the market.
         </p>
       </div>
 
-      {/* Property type */}
-      <div>
-        <p className="text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-3">
-          Property Type
-        </p>
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[11px] font-bold tracking-[0.16em] uppercase text-paper/65">
+            01 — Property type
+          </h3>
+          <span className="text-[11px] text-paper/30">Choose one</span>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {types.map((type) => {
             const active = listingType === type.id;
+            const Icon = type.icon;
+
             return (
               <button
                 key={type.id}
                 type="button"
-                onClick={() => setValue('listing_type', type.id as 'house' | 'land')}
-                className={`relative flex flex-col items-center text-center p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${
-                  active
-                    ? 'bg-ink border-gold/40 shadow-lg shadow-gold/5'
-                    : 'bg-white/4 border-white/8 hover:border-white/15 hover:bg-white/6'
-                }`}
-              >
-                {active && (
-                  <div className="absolute top-3 right-3 w-5 h-5 bg-gold rounded-full flex items-center justify-center">
-                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                      <path
-                        d="M1 4L3.5 6.5L9 1"
-                        stroke="#0B0D10"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                )}
-
-                <div
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all ${
-                    active
-                      ? 'bg-gold text-ink'
-                      : 'bg-white/8 text-paper/40'
-                  }`}
-                >
-                  <type.icon size={28} />
-                </div>
-
-                <h3
-                  className={`text-[15px] font-bold mb-1 transition-colors ${
-                    active ? 'text-paper' : 'text-paper/65'
-                  }`}
-                >
-                  {type.label}
-                </h3>
-                <p className="text-[12px] text-paper/35 leading-relaxed">
-                  {type.description}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="h-px bg-white/6" />
-
-      {/* Transaction type */}
-      <div>
-        <p className="text-[12px] font-semibold text-paper/40 uppercase tracking-wider mb-3">
-          Transaction Type
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {transactions.map((trans) => {
-            const active = transactionType === trans.id;
-            return (
-              <button
-                key={trans.id}
-                type="button"
+                aria-pressed={active}
                 onClick={() =>
-                  setValue('transaction_type', trans.id as 'rent' | 'sell')
+                  setValue('listing_type', type.id, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
                 }
-                className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
+                className={`group relative min-h-[178px] text-left p-5 sm:p-6 border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0D10] ${
                   active
-                    ? 'bg-ink border-gold/40'
-                    : 'bg-white/4 border-white/8 hover:border-white/15 hover:bg-white/6'
+                    ? 'border-gold/65 bg-gold/[0.07]'
+                    : 'border-white/10 bg-white/[0.025] hover:border-white/25 hover:bg-white/[0.045]'
                 }`}
               >
-                {active && (
-                  <div className="absolute top-3 right-3 w-4 h-4 bg-gold rounded-full flex items-center justify-center">
-                    <svg width="8" height="6" viewBox="0 0 10 8" fill="none">
-                      <path
-                        d="M1 4L3.5 6.5L9 1"
-                        stroke="#0B0D10"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                )}
-
-                <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-                    active
-                      ? 'bg-gold text-ink'
-                      : 'bg-white/8 text-paper/40'
-                  }`}
-                >
-                  <trans.icon size={22} />
-                </div>
-
-                <div className="text-left">
-                  <h4
-                    className={`text-[14px] font-bold transition-colors ${
-                      active ? 'text-paper' : 'text-paper/65'
+                <div className="flex items-start justify-between">
+                  <div
+                    className={`flex h-11 w-11 items-center justify-center transition-colors ${
+                      active
+                        ? 'bg-gold text-[#0B0D10]'
+                        : 'bg-white/[0.07] text-paper/65 group-hover:text-paper'
                     }`}
                   >
-                    {trans.label}
+                    <Icon size={21} strokeWidth={1.7} />
+                  </div>
+
+                  <div
+                    className={`flex h-5 w-5 items-center justify-center border transition-all ${
+                      active
+                        ? 'border-gold bg-gold text-[#0B0D10]'
+                        : 'border-white/20 text-transparent'
+                    }`}
+                  >
+                    {active && <Check size={13} strokeWidth={3} />}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <p className="mb-1 text-[9px] font-bold tracking-[0.15em] text-paper/35">
+                    {type.eyebrow}
+                  </p>
+                  <h4
+                    className={`text-[16px] font-semibold tracking-tight ${
+                      active ? 'text-paper' : 'text-paper/80'
+                    }`}
+                  >
+                    {type.label}
                   </h4>
-                  <p className="text-[12px] text-paper/35 mt-0.5">
-                    {trans.description}
+                  <p className="mt-2 max-w-[260px] text-[11px] leading-[1.7] text-paper/45">
+                    {type.description}
                   </p>
                 </div>
               </button>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* Info note */}
+      <div className="h-px bg-white/10" />
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[11px] font-bold tracking-[0.16em] uppercase text-paper/65">
+            02 — Transaction type
+          </h3>
+          <span className="text-[11px] text-paper/30">Choose one</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {transactions.map((transaction) => {
+            const active = transactionType === transaction.id;
+            const Icon = transaction.icon;
+
+            return (
+              <button
+                key={transaction.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() =>
+                  setValue('transaction_type', transaction.id, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                className={`group flex min-h-[88px] items-center gap-4 border p-4 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0D10] ${
+                  active
+                    ? 'border-gold/65 bg-gold/[0.07]'
+                    : 'border-white/10 bg-white/[0.025] hover:border-white/25 hover:bg-white/[0.045]'
+                }`}
+              >
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center transition-colors ${
+                    active
+                      ? 'bg-gold text-[#0B0D10]'
+                      : 'bg-white/[0.07] text-paper/60'
+                  }`}
+                >
+                  <Icon size={19} strokeWidth={1.7} />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <h4
+                    className={`text-[14px] font-semibold ${
+                      active ? 'text-paper' : 'text-paper/80'
+                    }`}
+                  >
+                    {transaction.label}
+                  </h4>
+                  <p className="mt-1 text-[11px] leading-5 text-paper/40">
+                    {transaction.description}
+                  </p>
+                </div>
+
+                <div
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center border ${
+                    active
+                      ? 'border-gold bg-gold text-[#0B0D10]'
+                      : 'border-white/20 text-transparent'
+                  }`}
+                >
+                  {active && <Check size={13} strokeWidth={3} />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
       {listingType && transactionType && (
-        <div className="flex items-start gap-3 p-4 bg-gold/8 border border-gold/15 rounded-xl">
-          <div className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0 mt-1.5" />
-          <p className="text-[12px] text-paper/55 leading-relaxed">
-            {listingType === 'house' && transactionType === 'rent' &&
-              'You are listing a property for rent. You will set the price period (yearly, monthly or nightly) in the next step.'
-            }
-            {listingType === 'house' && transactionType === 'sell' &&
-              'You are listing a property for sale. Buyers will go through the escrow process before funds are released to you.'
-            }
-            {listingType === 'land' && transactionType === 'sell' &&
-              'You are listing land for sale. You will need to upload your survey plan and title documents. Land deals use a document handover escrow flow.'
-            }
-            {listingType === 'land' && transactionType === 'rent' &&
-              'You are listing land for lease. You will set the lease period and terms in the next step.'
-            }
-          </p>
+        <div className="flex items-start gap-4 border-l-2 border-gold/70 bg-white/[0.035] px-5 py-4">
+          <div className="mt-0.5 text-gold">
+            <ArrowUpRight size={17} />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold">
+              Your selection
+            </p>
+            <p className="mt-1 text-[12px] leading-[1.8] text-paper/65">
+              {selectionMessage()}
+            </p>
+          </div>
         </div>
       )}
     </div>
