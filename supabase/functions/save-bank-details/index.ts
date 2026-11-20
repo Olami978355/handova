@@ -48,12 +48,15 @@ serve(async (req) => {
       if (!c) throw new Error('Company profile not found.');
       company = c;
 
-      const resolveRes = await fetch(
-        `https://api.paystack.co/bank/resolve?account_number=${encodeURIComponent(String(accountNumber))}&bank_code=${encodeURIComponent(String(bankCode))}`,
-        { headers: { Authorization: `Bearer ${paystackSecret}` } }
-      );
-      const resolved = await resolveRes.json();
+      const resolveUrl = `https://api.paystack.co/bank/resolve?account_number=${encodeURIComponent(String(accountNumber))}&bank_code=${encodeURIComponent(String(bankCode))}`;
+      const doResolve = async () => (await fetch(resolveUrl, { headers: { Authorization: `Bearer ${paystackSecret}` } })).json();
+      let resolved = await doResolve();
       if (!resolved.status || !resolved.data?.account_name) {
+        await new Promise((r) => setTimeout(r, 1500));
+        resolved = await doResolve();
+      }
+      if (!resolved.status || !resolved.data?.account_name) {
+        console.error('Paystack resolve failed:', JSON.stringify(resolved));
         throw new Error('Could not verify this account with the bank. Check the account number and bank.');
       }
       resolvedName = resolved.data.account_name;
