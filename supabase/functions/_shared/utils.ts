@@ -269,7 +269,7 @@ export const executeDealPayout = async (
       amount: Math.round(transferAmountNaira * 100),
       recipient: payoutProfile.paystack_recipient_code,
       reference: transferReference,
-      reason: `Rent Easy payout for deal ${deal.id}`,
+      reason: `Handova payout for deal ${deal.id}`,
     }),
   });
   const transferData = await transferRes.json();

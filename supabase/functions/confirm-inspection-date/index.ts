@@ -81,7 +81,7 @@ serve(async (req) => {
     if (booking.profiles?.email) {
       await sendEmail(
         booking.profiles.email,
-        'Inspection Confirmed - Rent Easy',
+        'Inspection Confirmed - Handova',
         'inspection_booked',
         {
           name: booking.profiles.full_name,

@@ -320,12 +320,12 @@ serve(async (req) => {
     );
 
     if (tenantProfile?.email) {
-      await sendEmail(tenantProfile.email, 'Payment Confirmed - Rent Easy', 'deal_update', {
+      await sendEmail(tenantProfile.email, 'Payment Confirmed - Handova', 'deal_update', {
         name: tenantProfile.full_name,
         propertyTitle: deal.properties.title,
         status: 'Payment Received',
         message: `Your payment of ₦${amountNaira.toLocaleString()} has been confirmed. The funds are now held in escrow.`,
-        link: `https://renteasy.ng/deals/${dealId}`,
+        link: `https://handova.ng/deals/${dealId}`,
       });
     }
 

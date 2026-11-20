@@ -32,13 +32,13 @@ const getTemplate = (template: string, data: Record<string, any>) => {
       <body>
         <div class="container">
           <div class="header">
-            <a href="https://handova.ng" class="logo">RentEasy</a>
+            <a href="https://handova.ng" class="logo">Handova</a>
           </div>
           <div class="content">
             ${content}
           </div>
           <div class="footer">
-            &copy; 2024 Rent Easy Nigeria. All rights reserved.<br>
+            &copy; 2026 Handova. All rights reserved.<br>
             Lagos, Nigeria
           </div>
         </div>
@@ -49,7 +49,7 @@ const getTemplate = (template: string, data: Record<string, any>) => {
   switch (template) {
     case 'welcome':
       return baseLayout(`
-        <h1>Welcome to Rent Easy, ${data.name}!</h1>
+        <h1>Welcome to Handova, ${data.name}!</h1>
         <p>We're excited to have you join Nigeria's most trusted real estate platform.</p>
         <p>Whether you're looking for a new home or listing a property, we've got you covered with our secure escrow system and verified listings.</p>
         <a href="${data.link}" class="button">Get Started</a>
@@ -105,8 +105,8 @@ const getTemplate = (template: string, data: Record<string, any>) => {
 
     default:
       return baseLayout(`
-        <h1>${data.title || 'Notification from Rent Easy'}</h1>
-        <p>${data.body || 'You have a new update on Rent Easy.'}</p>
+        <h1>${data.title || 'Notification from Handova'}</h1>
+        <p>${data.body || 'You have a new update on Handova.'}</p>
         ${data.link ? `<a href="${data.link}" class="button">View Details</a>` : ''}
       `);
   }
@@ -133,7 +133,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'RentEasy <notifications@renteasy.ng>',
+        from: 'Handova <notifications@handova.ng>',
         to: [to],
         subject: subject,
         html: html,
@@ -141,6 +141,7 @@ serve(async (req) => {
     })
 
     const result = await res.json()
+    if (!res.ok) console.error("Resend rejected email:", res.status, JSON.stringify(result))
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

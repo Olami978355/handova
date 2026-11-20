@@ -73,7 +73,7 @@ serve(async (req) => {
       if (booking.landlord?.email) {
         await sendEmail(
           booking.landlord.email,
-          'Tenant Interested - Rent Easy',
+          'Tenant Interested - Handova',
           'deal_update',
           {
             name: booking.landlord.full_name,
