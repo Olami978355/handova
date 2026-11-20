@@ -47,6 +47,7 @@ export default function CompanyVerification() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [declared, setDeclared] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -75,7 +76,7 @@ export default function CompanyVerification() {
 
   const upload = async (file: File, name: string): Promise<string> => {
     const ext = file.name.split('.').pop() || 'pdf';
-    const path = user!.id + '/' + name + '.' + ext;
+    const path = user!.id + '/' + name + '-' + Date.now() + '.' + ext;
     const { error: upErr } = await supabase.storage
       .from('verification-docs')
       .upload(path, file, { upsert: true });
@@ -84,7 +85,7 @@ export default function CompanyVerification() {
   };
 
   const submit = async () => {
-    if (!user || !certFile || !idFile) return;
+    if (!user || !certFile || !idFile || !declared) return;
     if (!CAC_PATTERN.test(normalised)) {
       setError('Enter a valid CAC number, such as RC1234567, BN1234567 or IT1234567.');
       return;
@@ -115,6 +116,7 @@ export default function CompanyVerification() {
           user_id: user.id,
           business_reg_url: certPath,
           nin_doc_url: idPath,
+          representative_declared_at: new Date().toISOString(),
           status: 'pending',
         });
       if (reqErr) throw reqErr;
@@ -149,7 +151,7 @@ export default function CompanyVerification() {
     );
   }
 
-  const ready = !!certFile && !!idFile && CAC_PATTERN.test(normalised);
+  const ready = !!certFile && !!idFile && declared && CAC_PATTERN.test(normalised);
 
   return (
     <div className="max-w-xl mx-auto px-5 py-10" style={font}>
@@ -227,6 +229,18 @@ export default function CompanyVerification() {
               file={idFile}
               onPick={f => { setIdFile(f); setError(null); }}
             />
+
+            <label className="flex items-start gap-2.5 p-3 bg-white/3 rounded-xl cursor-pointer">
+              <input
+                type="checkbox"
+                checked={declared}
+                onChange={e => { setDeclared(e.target.checked); setError(null); }}
+                className="mt-0.5 flex-shrink-0"
+              />
+              <span className="text-[12px] text-white/60 leading-relaxed">
+                I am a director or authorised representative of this company, and I am allowed to manage its Handova account.
+              </span>
+            </label>
 
             <div className="flex items-start gap-2.5 p-3 bg-white/3 rounded-xl">
               <Lock className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
