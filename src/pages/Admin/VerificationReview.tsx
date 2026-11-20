@@ -9,6 +9,7 @@ interface VerificationRequestRow {
   user_id: string;
   nin_doc_url: string | null;
   business_reg_url: string | null;
+  representative_declared_at?: string | null;
   lasrera_id: string | null;
   lasrera_doc_url: string | null;
   status: string;
@@ -203,6 +204,16 @@ export default function VerificationReview() {
             <div className="p-3 bg-white/3 rounded-xl">
               <p className="text-[10px] font-bold text-paper/30 uppercase tracking-wider mb-1">{req.profiles?.role === 'company' ? 'CAC / RC number' : 'NIN'}</p>
               <p className="text-[13px] font-mono text-paper">{req.profiles?.role === 'company' ? (req.company?.cac_number || 'Not provided') : (req.profiles_private?.nin || 'Not provided')}</p>
+              {req.profiles?.role === 'company' && (
+                <p className="text-[11px] font-bold text-gold mt-2">Company verification</p>
+              )}
+              {req.profiles?.role === 'company' && (
+                <p className="text-[11px] text-paper/50 mt-1">
+                  {req.representative_declared_at
+                    ? 'Representative declared on ' + new Date(req.representative_declared_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : 'No representative declaration on file (older submission)'}
+                </p>
+              )}
               {req.profiles?.role === 'company' && (
                 <p className="text-[11px] text-paper/40 mt-2 leading-relaxed">
                   Company name: {req.company?.name}. Check that it matches the certificate,
