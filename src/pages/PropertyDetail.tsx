@@ -115,7 +115,7 @@ const ShareCard = React.forwardRef<HTMLDivElement, { property: Property; owner: 
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: '36px', fontWeight: '900', color: '#ffffff', margin: '0 0 4px' }}>
-                Rent<span style={{ color: '#D4AF37' }}>Easy</span>
+                Hand<span style={{ color: '#D4AF37' }}>ova</span>
               </p>
               <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
                 {window.location.host}/property/{property.id.slice(0, 8)}
@@ -163,7 +163,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
         scale: 1, useCORS: true, allowTaint: true, backgroundColor: '#0B0D10',
       });
       const link = document.createElement('a');
-      link.download = `renteasy-${property.id.slice(0, 8)}.png`;
+      link.download = `handova-${property.id.slice(0, 8)}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       trackShare('image_card');
@@ -193,7 +193,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
   const handleDownloadQR = () => {
     if (!qrDataUrl) return;
     const link = document.createElement('a');
-    link.download = `renteasy-qr-${property.id.slice(0, 8)}.png`;
+    link.download = `handova-qr-${property.id.slice(0, 8)}.png`;
     link.href = qrDataUrl;
     link.click();
   };
@@ -508,7 +508,7 @@ export default function PropertyDetail() {
         <meta name="twitter:image" content={property.images?.[0] || `${window.location.origin}/og-image.png`} />
       </Helmet>
 
-      <div className="min-h-screen bg-ink page-with-tabs" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="property-detail-page min-h-screen bg-ink page-with-tabs" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
         {/* ── Sticky top bar ── */}
         <div className="sticky top-16 z-40 bg-ink/90 backdrop-blur-xl border-b border-white/5">
@@ -554,7 +554,7 @@ export default function PropertyDetail() {
           {/* ── Media gallery ── */}
           <div className="mb-6">
             <div
-              className="relative aspect-[16/9] lg:aspect-[21/9] bg-ink rounded-2xl overflow-hidden cursor-pointer group"
+              className="property-detail-gallery relative aspect-[16/9] lg:aspect-[21/9] bg-ink rounded-2xl overflow-hidden cursor-pointer group"
               onClick={() => currentMedia?.type === 'image' && setLightboxOpen(true)}
             >
               {currentMedia?.type === 'image' ? (
