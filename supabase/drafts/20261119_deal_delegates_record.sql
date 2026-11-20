@@ -1,0 +1,7 @@
+-- Record of the live public.deal_delegates table (captured from production; not a migration).
+-- id uuid pk default gen_random_uuid()
+-- deal_id uuid, principal_id uuid, delegate_id uuid
+-- can_sign boolean default false, can_pay boolean default false, can_confirm_movein boolean default false
+-- status text default 'pending'   (pending | accepted | declined | revoked)
+-- created_at timestamptz default now(), responded_at timestamptz
+-- Constraints, indexes and policies were not captured here. A unique (deal_id, principal_id, delegate_id) exists per the invite function.
