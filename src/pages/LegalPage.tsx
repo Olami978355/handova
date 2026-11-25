@@ -33,7 +33,7 @@ const sections = [
       },
       {
         heading: '6. Platform Fees',
-        body: `Handova charges a 2% platform fee on all escrow transactions. This fee is deducted from the total amount before funds are disbursed. Agent commission (typically 10%) is agreed upon between the agent and property owner and is separate from the platform fee. Inspection fees are non-refundable except as outlined in our Refund Policy.`
+        body: `Handova charges a 2% platform fee on all escrow transactions. This fee is deducted from the total amount before funds are disbursed. Agent commission (typically 10%) is agreed upon between the agent and property owner and is separate from the platform fee. Inspection fees are non-refundable once payment is completed. Tenants should confirm property details, inspection requirements, date, time and availability with the agent or landlord before paying.`
       },
       {
         heading: '7. Prohibited Activities',
@@ -104,20 +104,20 @@ const sections = [
     lastUpdated: 'January 1, 2025',
     content: [
       {
-        heading: '1. Inspection Fee Refunds',
-        body: `Inspection fees are partially refundable based on the outcome of your inspection visit. The following refund schedule applies:`
+        heading: '1. Inspection Fee Policy',
+        body: `Inspection fees are non-refundable once payment is completed. Before paying, tenants should confirm the property details, inspection requirements, date, time and availability directly with the agent or landlord.`
       },
       {
-        heading: 'Cancel Before the Inspection Date',
-        body: `You can cancel your booking and receive a full refund of your inspection fee any time before the scheduled inspection date.`
+        heading: 'Before Payment',
+        body: `You may choose not to proceed with an inspection before making payment. Confirm all arrangements with the agent or landlord before paying.`
       },
       {
-        heading: 'Automatic Release on the Inspection Date',
-        body: `Once the scheduled inspection date arrives, the fee is automatically released to the agent or landlord. This cannot be reversed through a refund request.`
+        heading: 'After Payment',
+        body: `Once payment is completed, the inspection fee is non-refundable, including in cases of cancellation, missed appointments, the agent or landlord failing to attend, or changes in property availability.`
       },
       {
-        heading: 'Disputes After the Inspection Date',
-        body: `If the inspection did not happen as agreed, or the property was significantly misrepresented, you may raise a dispute for a moderator to review. A refund is only issued if the dispute is resolved in your favour.`
+        heading: 'Reporting a Concern',
+        body: `You may report misleading listings or concerns about an agent or landlord to Handova for review. Reporting a concern does not create an entitlement to an inspection fee refund.`
       },
       {
         heading: '2. Escrow Payment Refunds',

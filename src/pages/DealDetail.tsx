@@ -332,11 +332,11 @@ export default function DealDetail() {
   ];
 
   return (
-    <div className="min-h-screen bg-ink pb-24" style={font}>
+    <div className="min-h-screen w-full min-w-0 bg-ink pb-24" style={font}>
 
       {/* Top bar */}
       <div className="sticky top-16 z-40 bg-ink/90 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+        <div className="w-full min-w-0 max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-[13px] font-semibold text-paper/40 hover:text-paper transition-colors"
@@ -349,11 +349,11 @@ export default function DealDetail() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-5 py-6 space-y-5">
+      <div className="w-full min-w-0 max-w-6xl mx-auto px-5 py-7 space-y-6">
 
         {/* Header card */}
-        <div className="bg-slate/20 border border-white/6 rounded-2xl p-5 lg:p-6">
-          <div className="flex items-center gap-4 mb-5">
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#191e25] via-[#14181e] to-[#101318] border border-white/[0.08] rounded-2xl p-5 sm:p-6 lg:p-7 shadow-xl">
+          <div className="flex items-center gap-4 mb-7">
             <div className="w-12 h-12 bg-gold/15 rounded-xl flex items-center justify-center">
               <Shield className="w-6 h-6 text-gold" />
             </div>
@@ -401,13 +401,13 @@ export default function DealDetail() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 min-w-0">
 
           {/* Left: Actions */}
-          <div className="lg:col-span-2 space-y-5">
+          <div className="lg:col-span-2 min-w-0 space-y-5">
 
             {/* Property summary */}
-            <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
+            <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl p-5 sm:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <Home className="w-5 h-5 text-gold" />
@@ -734,7 +734,7 @@ if (!allowedTypes.includes(file.type)) { showToast('Please upload a PDF or image
 
               {/* STEP 3: Tenant pays into escrow */}
               {deal.status === 'pending_payment' && (isTenant || canPayAsDelegate) && (
-                <div className="p-5 bg-gold/6 border border-gold/15 rounded-xl">
+                <div className="p-5 sm:p-6 bg-gradient-to-br from-[#242015] to-[#171711] border border-gold/20 rounded-2xl shadow-lg shadow-black/10">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-9 h-9 bg-gold/15 rounded-xl flex items-center justify-center flex-shrink-0">
                       <CreditCard className="w-4 h-4 text-gold" />

@@ -649,7 +649,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
       className="mt-0.5 h-4 w-4 accent-[#9A7624] flex-shrink-0"
     />
     <span className="text-xs font-semibold text-gray-800 leading-relaxed">
-      I have read and understood that this inspection fee is non-refundable in all circumstances.
+      I understand that the inspection fee is non-refundable once payment is completed.
     </span>
   </label>
 </div>
@@ -786,7 +786,7 @@ const Modal: React.FC<{
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-x-3 bottom-3 sm:inset-0 sm:m-auto w-auto sm:w-full sm:max-w-lg h-fit max-h-[90vh] bg-white z-[110] overflow-hidden shadow-2xl"
+          className="fixed inset-x-3 bottom-3 sm:inset-0 sm:m-auto w-auto sm:w-full sm:max-w-xl h-fit max-h-[90vh] bg-white z-[110] overflow-hidden shadow-2xl"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">

@@ -45,17 +45,17 @@ const StatCard = ({
   onClick?: () => void;
 }) => (
   <motion.div
-    initial={{ opacity: 0, y: 16 }}
+    initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     onClick={onClick}
-    className={`bg-slate/20 border border-white/6 rounded-2xl p-5 flex flex-col justify-between aspect-square hover:border-white/12 transition-all ${onClick ? 'cursor-pointer' : ''}`}
+    className={`min-w-0 bg-[#14181e] border border-white/[0.07] rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4 min-h-[132px] hover:border-gold/25 transition-colors ${onClick ? "cursor-pointer" : ""}`}
   >
-    <div className="w-10 h-10 rounded-xl bg-gold/12 flex items-center justify-center">
-      <Icon className="w-5 h-5 text-gold" />
+    <div className="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center">
+      <Icon className="w-4 h-4 text-gold" />
     </div>
-    <div>
-      <div className="text-[28px] font-black text-paper leading-none mb-1 tabular-nums">{value}</div>
-      <div className="text-[11px] text-paper/40 font-medium uppercase tracking-wider">{label}</div>
+    <div className="min-w-0">
+      <div className="text-[26px] sm:text-[28px] font-bold text-paper leading-none tabular-nums">{value}</div>
+      <div className="text-[11px] text-paper/40 font-medium mt-2">{label}</div>
     </div>
   </motion.div>
 );
@@ -69,18 +69,17 @@ const ActionTile = ({
 }) => (
   <button
     onClick={onClick}
-    className="bg-slate/20 border border-white/6 rounded-2xl p-5 flex flex-col justify-between aspect-square hover:border-gold/25 transition-all text-left"
+    className="w-full min-w-0 bg-[#14181e] border border-white/[0.07] rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4 min-h-[132px] hover:border-gold/25 transition-colors text-left"
   >
-    <div className="w-10 h-10 rounded-xl bg-gold/12 flex items-center justify-center">
-      <Icon className="w-5 h-5 text-gold" />
-    </div>
     <div className="flex items-center justify-between">
-      <span className="text-[13px] font-bold text-paper">{label}</span>
+      <div className="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center">
+        <Icon className="w-4 h-4 text-gold" />
+      </div>
       <ArrowRight className="w-4 h-4 text-paper/30" />
     </div>
+    <span className="text-[12px] sm:text-[13px] font-semibold text-paper">{label}</span>
   </button>
 );
-
 // Two-state badge system: gold = successfully completed, danger = a real
 // problem, everything in between is calm neutral gray (in progress, nothing
 // wrong yet). Matches the pattern already used for delegate status.
@@ -151,7 +150,7 @@ const EmptyState = ({
 
 const DashboardSkeleton = () => (
   <div className="space-y-6">
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 min-w-0">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="bg-slate/20 rounded-2xl aspect-square animate-pulse" />
       ))}
@@ -202,8 +201,8 @@ const LandlordBookingCard = ({
   };
 
   return (
-    <div className="p-4 border border-gold/20 bg-gold/4 rounded-xl space-y-3">
-      <div className="flex items-start gap-3">
+    <div className="p-3 sm:p-3.5 border border-white/[0.07] bg-[#151a20] rounded-xl space-y-2.5 hover:border-gold/20 transition-colors">
+      <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center text-gold font-bold text-[13px] flex-shrink-0 overflow-hidden">
           {booking.profiles?.avatar_url ? (
             <img src={booking.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -248,7 +247,7 @@ const LandlordBookingCard = ({
           {!showForm ? (
             <button
               onClick={() => setShowForm(true)}
-              className="w-full bg-gold text-ink py-2.5 rounded-xl font-bold text-[13px] hover:bg-gold-dark transition-colors"
+              className="w-full sm:w-auto sm:px-5 bg-gold text-ink py-2 sm:py-2.5 rounded-lg font-bold text-[12px] hover:bg-gold-dark transition-colors"
             >
               Confirm Inspection Date
             </button>
@@ -322,6 +321,7 @@ export default function Dashboard() {
   const [showAllProperties, setShowAllProperties] = useState(false);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [showAllDeals, setShowAllDeals] = useState(false);
+  const [showAllInspectionBookings, setShowAllInspectionBookings] = useState(false);
   const [bookings, setBookings] = useState<InspectionBooking[]>([]);
   const [savedProperties, setSavedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -377,7 +377,6 @@ export default function Dashboard() {
             .select('*, properties(id, title, images, address, state, lga)')
             .eq('tenant_id', user.id)
             .order('created_at', { ascending: false })
-            .limit(10);
           if (err) console.error('Deals error:', err.message);
           else setDeals(data || []);
         } catch (e) {
@@ -390,7 +389,6 @@ export default function Dashboard() {
             .select('*, properties(id, title, images, address, state, lga)')
             .eq('tenant_id', user.id)
             .order('created_at', { ascending: false })
-            .limit(10);
           if (err) console.error('Bookings error:', err.message);
           else setBookings(data || []);
         } catch (e) {
@@ -432,17 +430,9 @@ export default function Dashboard() {
                 .from('inspection_bookings')
                 .select('*, properties(id, title, images)')
                 .in('property_id', propIds)
-                .in('status', [
-                  'payment_confirmed',
-                  'inspection_scheduled',
-                  'inspection_done',
-                  'tenant_interested',
-                ])
-                .order('created_at', { ascending: false })
-                .limit(20);
-
-              if (bookingsErr) {
-                console.error('Bookings error:', bookingsErr.message);
+                .order('created_at', { ascending: false });
+                if (bookingsErr) {
+                console.error("Bookings error:", bookingsErr.message);
               } else {
                 const tenantIds = [
                   ...new Set((bookingsData || []).map(b => b.tenant_id).filter(Boolean))
@@ -569,7 +559,7 @@ export default function Dashboard() {
 
   return (
     <div
-      className="min-h-screen bg-ink page-with-tabs"
+      className="min-h-screen w-full min-w-0 bg-ink page-with-tabs"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* Header */}
@@ -577,15 +567,16 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-5 lg:px-8 pt-8 pb-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gold rounded-2xl overflow-hidden flex items-center justify-center text-ink text-[18px] font-black flex-shrink-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gold rounded-2xl overflow-hidden flex items-center justify-center text-ink text-[18px] font-black flex-shrink-0">
                 {profile?.avatar_url
                   ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   : (profile?.full_name || 'U').charAt(0).toUpperCase()
                 }
               </div>
               <div>
+                <p className="text-[11px] text-paper/40 font-medium mb-1">Your Handova workspace</p>
                 <h1 className="font-serif text-[24px] font-semibold text-paper tracking-tight leading-tight">
-                  Hello, {firstName}
+                  Welcome back, {firstName}
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-[12px] text-paper/45 capitalize font-medium">
@@ -632,7 +623,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-5 lg:px-8 py-6">
+      <div className="w-full min-w-0 max-w-7xl mx-auto px-5 lg:px-8 py-6">
         {loading ? <DashboardSkeleton /> : (
           <div className="space-y-6">
             <PendingInspectionDelegateInvites />
@@ -718,17 +709,17 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
+              <div className="lg:col-span-2 min-w-0 space-y-6">
 
                 {/* Landlord: Inspection Requests */}
                 {isLandlordOrAgent && (
-                  <div className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                  <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]">
                       <div>
                         <h2 className="text-[15px] font-bold text-paper">Inspection Requests</h2>
                         <p className="text-[11px] text-paper/35 mt-0.5">
-                          Tenants who paid to view your properties
+                          New paid requests awaiting your confirmation
                         </p>
                       </div>
                       {newBookings > 0 && (
@@ -737,15 +728,50 @@ export default function Dashboard() {
                         </span>
                       )}
                     </div>
-                    {bookings.length === 0 ? (
-                      <EmptyState
-                        icon={Calendar}
-                        title="No inspection requests yet"
-                        desc="When tenants pay inspection fees for your properties they will appear here."
-                      />
+
+                    {newBookings > 0 ? (
+                      <div className="max-h-[430px] overflow-y-auto p-3 sm:p-4 space-y-2.5">
+                        {bookings.filter(booking => booking.status === 'payment_confirmed').map(booking => (
+                          <LandlordBookingCard
+                            key={booking.id}
+                            booking={
+                              booking as InspectionBooking & {
+                                profiles?: { full_name: string; avatar_url?: string };
+                              }
+                            }
+                            onConfirm={handleBookingConfirmed}
+                          />
+                        ))}
+                      </div>
                     ) : (
-                      <div className="p-4 space-y-3">
-                        {bookings.map(booking => (
+                      <div className="px-5 py-5">
+                        <p className="text-[13px] font-semibold text-paper">
+                          No new requests awaiting confirmation
+                        </p>
+                        <p className="text-[11px] text-paper/35 mt-1">
+                          New paid inspection requests will appear here.
+                        </p>
+                      </div>
+                    )}
+
+                    {bookings.length > 0 && (
+                      <div className="px-4 py-3 border-t border-white/5">
+                        <button
+                          onClick={() => setShowAllInspectionBookings(!showAllInspectionBookings)}
+                          className="w-full flex items-center justify-center gap-2 py-2 text-[12px] font-semibold text-gold hover:text-gold-dark transition-colors"
+                        >
+                          {showAllInspectionBookings ? 'Hide booking history' : `View all inspection bookings (${bookings.length})`}
+                          <ArrowRight className={`w-3.5 h-3.5 transition-transform ${showAllInspectionBookings ? 'rotate-90' : ''}`} />
+                        </button>
+                      </div>
+                    )}
+
+                    {showAllInspectionBookings && bookings.length > 0 && (
+                      <div className="border-t border-white/5 max-h-[430px] overflow-y-auto p-3 sm:p-4 space-y-2.5">
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-paper/35 px-1">
+                          All inspection bookings
+                        </p>
+                        {bookings.filter(booking => booking.status !== 'payment_confirmed').map(booking => (
                           <LandlordBookingCard
                             key={booking.id}
                             booking={
@@ -763,14 +789,17 @@ export default function Dashboard() {
 
                 {/* Tenant: My Inspection Bookings */}
                 {isTenant && (
-                  <div className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                  <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]">
                       <div>
                         <h2 className="text-[15px] font-bold text-paper">My Inspection Bookings</h2>
-                        <p className="text-[11px] text-paper/35 mt-0.5">Properties you have booked to view</p>
+                        <p className="text-[11px] text-paper/35 mt-0.5">
+                          Your property inspection activity
+                        </p>
                       </div>
                       <Calendar className="w-4 h-4 text-gold" />
                     </div>
+
                     {bookings.length === 0 ? (
                       <EmptyState
                         icon={Calendar}
@@ -780,99 +809,121 @@ export default function Dashboard() {
                         actionLabel="Browse properties"
                       />
                     ) : (
-                      <div className="divide-y divide-white/4">
-                        {bookings.map(booking => (
-                          <div key={booking.id} className="px-5 py-4">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden flex-shrink-0">
-                                {booking.properties?.images?.[0] ? (
-                                  <img
-                                    src={booking.properties.images[0]}
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center">
-                                    <Home className="w-5 h-5 text-paper/15" />
+                      <>
+                        <div className="px-5 py-4 flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-[22px] font-bold text-paper tabular-nums">
+                              {bookings.length}
+                            </p>
+                            <p className="text-[11px] text-paper/40">
+                              {bookings.length === 1 ? 'Inspection booking' : 'Inspection bookings'}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setShowAllInspectionBookings(!showAllInspectionBookings)}
+                            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gold/10 text-gold text-[12px] font-semibold hover:bg-gold/15 transition-colors"
+                          >
+                            {showAllInspectionBookings ? 'Hide history' : 'View all bookings'}
+                            <ArrowRight className={`w-3.5 h-3.5 transition-transform ${showAllInspectionBookings ? 'rotate-90' : ''}`} />
+                          </button>
+                        </div>
+
+                        {showAllInspectionBookings && (
+                          <div className="border-t border-white/5 divide-y divide-white/4">
+                            {bookings.map(booking => (
+                              <div key={booking.id} className="px-4 py-3">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div className="w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.06]">
+                                    {booking.properties?.images?.[0] ? (
+                                      <img
+                                        src={booking.properties.images[0]}
+                                        alt=""
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <Home className="w-5 h-5 text-paper/15" />
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-semibold text-paper truncate">
-                                  {booking.properties?.title || 'Property'}
-                                </p>
-                                <p className="text-[11px] text-paper/35">
-                                  {booking.properties?.lga}, {booking.properties?.state}
-                                </p>
-                              </div>
-                              <div className="text-right flex-shrink-0">
-                                <p className="text-[12px] font-black text-gold tabular-nums">
-                                  {formatNaira(booking.inspection_fee)}
-                                </p>
-                                <p className="text-[10px] text-paper/25">paid</p>
-                              </div>
-                            </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[13px] font-semibold text-paper truncate">
+                                      {booking.properties?.title || 'Property'}
+                                    </p>
+                                    <p className="text-[11px] text-paper/35">
+                                      {booking.properties?.lga}, {booking.properties?.state}
+                                    </p>
+                                  </div>
+                                  <div className="text-right flex-shrink-0">
+                                    <p className="text-[12px] font-black text-gold tabular-nums">
+                                      {formatNaira(booking.inspection_fee)}
+                                    </p>
+                                    <p className="text-[10px] text-paper/25">paid</p>
+                                  </div>
+                                </div>
 
-                            <div className="flex items-center justify-between">
-                              <BookingBadge status={booking.status} />
-                              <span className="text-[11px] text-paper/30">
-                                {timeAgo(booking.created_at)}
-                              </span>
-                            </div>
-                            <InspectionDelegateInvite bookingId={booking.id} isTenant={isTenant} />
-
-                            {booking.confirmed_date && (
-                              <div className="flex items-center gap-2 mt-2 p-2.5 bg-gold/8 border border-gold/15 rounded-xl">
-                                <CheckCircle className="w-3.5 h-3.5 text-gold" />
-                                <span className="text-[11px] font-semibold text-gold">
-                                  Visit confirmed:{' '}
-                                  {new Date(booking.confirmed_date).toLocaleDateString('en-NG', {
-                                    weekday: 'short', day: 'numeric', month: 'short',
-                                  })}
-                                  {booking.confirmed_time && ` \u00b7 ${booking.confirmed_time}`}
-                                </span>
-                              </div>
-                            )}
-
-                            {booking.status === 'inspection_done' && (
-                              <div className="mt-2 p-3 bg-gold/6 border border-gold/15 rounded-xl">
-                                <p className="text-[11px] text-gold font-semibold mb-1">
-                                  Did you like the property?
-                                </p>
-                                <p className="text-[10px] text-paper/35">
-                                  Contact the landlord or agent to proceed. They can send you a deal offer in chat.
-                                </p>
-                              </div>
-                            )}
-
-                            {booking.status === 'escrow_started' && (
-                              <Link
-                                to="/dashboard"
-                                className="mt-2 flex items-center justify-center gap-2 py-2.5 bg-gold text-ink rounded-xl font-bold text-[12px] hover:bg-gold-dark transition-colors"
-                              >
-                                Complete your deal <ArrowRight className="w-3.5 h-3.5" />
-                              </Link>
-                            )}
-
-                            {(booking.status === 'tenant_declined' || booking.status === 'refunded') &&
-                              booking.refund_amount && (
-                                <div className="mt-2 flex items-center gap-2 p-2.5 bg-white/4 border border-white/6 rounded-xl">
-                                  <CheckCircle className="w-3.5 h-3.5 text-gold" />
-                                  <span className="text-[11px] text-paper/45">
-                                    Refund of {formatNaira(booking.refund_amount)} processed
+                                <div className="flex items-center justify-between">
+                                  <BookingBadge status={booking.status} />
+                                  <span className="text-[11px] text-paper/30">
+                                    {timeAgo(booking.created_at)}
                                   </span>
                                 </div>
-                              )}
+
+                                <InspectionDelegateInvite bookingId={booking.id} isTenant={isTenant} />
+
+                                {booking.confirmed_date && (
+                                  <div className="flex items-center gap-2 mt-2 p-2.5 bg-gold/8 border border-gold/15 rounded-xl">
+                                    <CheckCircle className="w-3.5 h-3.5 text-gold" />
+                                    <span className="text-[11px] font-semibold text-gold">
+                                      Visit confirmed:{' '}
+                                      {new Date(booking.confirmed_date).toLocaleDateString('en-NG', {
+                                        weekday: 'short', day: 'numeric', month: 'short',
+                                      })}
+                                      {booking.confirmed_time && ` · ${booking.confirmed_time}`}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {booking.status === 'inspection_done' && (
+                                  <div className="mt-2 p-3 bg-gold/6 border border-gold/15 rounded-xl">
+                                    <p className="text-[11px] text-gold font-semibold mb-1">
+                                      Did you like the property?
+                                    </p>
+                                    <p className="text-[10px] text-paper/35">
+                                      Contact the landlord or agent to proceed. They can send you a deal offer in chat.
+                                    </p>
+                                  </div>
+                                )}
+
+                                {booking.status === 'escrow_started' && (
+                                  <Link
+                                    to="/dashboard"
+                                    className="mt-2 flex items-center justify-center gap-2 py-2.5 bg-gold text-ink rounded-xl font-bold text-[12px] hover:bg-gold-dark transition-colors"
+                                  >
+                                    Complete your deal <ArrowRight className="w-3.5 h-3.5" />
+                                  </Link>
+                                )}
+
+                                {(booking.status === 'tenant_declined' || booking.status === 'refunded') &&
+                                  booking.refund_amount && (
+                                    <div className="mt-2 flex items-center gap-2 p-2.5 bg-white/4 border border-white/6 rounded-xl">
+                                      <CheckCircle className="w-3.5 h-3.5 text-gold" />
+                                      <span className="text-[11px] text-paper/45">
+                                        Refund of {formatNaira(booking.refund_amount)} processed
+                                      </span>
+                                    </div>
+                                  )}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
-
                 {/* Tenant: Saved Properties */}
                 {isTenant && (
-                  <div className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
+                  <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl overflow-hidden">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
                       <div>
                         <h2 className="text-[15px] font-bold text-paper">Saved Properties</h2>
@@ -926,14 +977,17 @@ export default function Dashboard() {
                 )}
 
                 {/* Escrow Deals */}
-                <div id="deals-section" className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
+                <div id="deals-section" className="bg-[#14181e] border border-white/[0.07] rounded-2xl overflow-hidden shadow-sm min-w-0">
                   <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
                     <div>
                       <h2 className="text-[15px] font-bold text-paper">Escrow Deals</h2>
-                      <p className="text-[11px] text-paper/35 mt-0.5">Active and completed transactions</p>
+                      <p className="text-[11px] text-paper/35 mt-0.5">
+                        Your active transactions and deal history
+                      </p>
                     </div>
                     <Shield className="w-4 h-4 text-gold" />
                   </div>
+
                   {deals.length === 0 ? (
                     <EmptyState
                       icon={CreditCard}
@@ -947,69 +1001,112 @@ export default function Dashboard() {
                       actionLabel={isTenant ? 'Browse properties' : undefined}
                     />
                   ) : (
-                    <div className="divide-y divide-white/4">
-                      {(showAllDeals ? deals : deals.slice(0, 5)).map(deal => (
-                        <Link
-                          key={deal.id}
-                          to={`/deals/${deal.id}`}
-                          className="flex items-center gap-4 px-5 py-4 hover:bg-white/2 transition-colors group"
-                        >
-                          <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden flex-shrink-0">
-                            {deal.properties?.images?.[0] ? (
-                              <img
-                                src={deal.properties.images[0]}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
+                    <>
+                      {(() => {
+                        const activeDeals = deals.filter(
+                          deal => !["funds_released", "cancelled", "refunded"].includes(deal.status)
+                        );
+                        const visibleDeals = showAllDeals ? deals : activeDeals.slice(0, 3);
+
+                        return (
+                          <>
+                            {visibleDeals.length > 0 ? (
+                              <div className="max-h-[430px] overflow-y-auto divide-y divide-white/4">
+                                  {visibleDeals.map(deal => (
+                                  <Link
+                                    key={deal.id}
+                                    to={`/deals/${deal.id}`}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.035] transition-colors group min-w-0"
+                                  >
+                                    <div className="w-11 h-11 bg-white/5 rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.06]">
+                                      {deal.properties?.images?.[0] ? (
+                                        <img
+                                          src={deal.properties.images[0]}
+                                          alt=""
+                                          className="w-full h-full object-cover"
+                                        />
+                                      ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                          <Home className="w-5 h-5 text-paper/15" />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[13px] font-semibold text-paper truncate">
+                                        {deal.properties?.title || 'Property'}
+                                      </p>
+                                      <div className="flex items-center gap-2 mt-1">
+                                        <DealBadge status={deal.status} />
+                                        <span className="text-[12px] text-gold font-medium tabular-nums">
+                                          {formatNaira(deal.amount)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      <span className="text-[11px] text-paper/30">
+                                        {timeAgo(deal.created_at)}
+                                      </span>
+                                      <ArrowRight className="w-4 h-4 text-paper/20 group-hover:text-gold group-hover:translate-x-0.5 transition-all" />
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Home className="w-5 h-5 text-paper/15" />
+                              <div className="px-5 py-5">
+                                <p className="text-[13px] font-semibold text-paper">
+                                  No active escrow deals
+                                </p>
+                                <p className="text-[11px] text-paper/35 mt-1">
+                                  Your completed and past transactions are available in your deal history.
+                                </p>
                               </div>
                             )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-semibold text-paper truncate">
-                              {deal.properties?.title || 'Property'}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <DealBadge status={deal.status} />
-                              <span className="text-[12px] text-gold font-medium tabular-nums">
-                                {formatNaira(deal.amount)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-[11px] text-paper/30">
-                              {timeAgo(deal.created_at)}
-                            </span>
-                            <ArrowRight className="w-4 h-4 text-paper/20 group-hover:text-gold group-hover:translate-x-0.5 transition-all" />
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
+
+                            {deals.length > 0 && (
+                              <div className="px-4 py-3 border-t border-white/5">
+                                <button
+                                  onClick={() => setShowAllDeals(!showAllDeals)}
+                                  className="w-full flex items-center justify-center gap-2 py-2 text-[12px] font-semibold text-gold hover:text-gold-dark transition-colors"
+                                >
+                                  {showAllDeals ? 'Show active deals only' : `View all escrow deals (${deals.length})`}
+                                  <ArrowRight className={`w-3.5 h-3.5 transition-transform ${showAllDeals ? 'rotate-90' : ''}`} />
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </>
                   )}
                 </div>
-
                 {/* Landlord: My Listings */}
                 {isLandlordOrAgent && properties.length > 0 && (
-                  <div className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
+                  <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl overflow-hidden">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-                      <h2 className="text-[15px] font-bold text-paper">My Listings</h2>
+                      <div>
+                        <h2 className="text-[15px] font-bold text-paper">My Listings</h2>
+                        <p className="text-[11px] text-paper/35 mt-0.5">
+                          Properties you manage
+                        </p>
+                      </div>
                       <Link
                         to="/add-property"
-                        className="flex items-center gap-1 text-[12px] font-semibold text-gold hover:text-gold-dark transition-colors"
+                        className="flex items-center gap-1.5 text-[12px] font-semibold text-gold hover:text-gold-dark transition-colors"
                       >
-                        <Plus className="w-3 h-3" /> Add new
+                        <Plus className="w-3.5 h-3.5" /> Add property
                       </Link>
                     </div>
-                    <div className="divide-y divide-white/4">
+
+                    <div className="max-h-[430px] overflow-y-auto divide-y divide-white/5">
                       {(showAllProperties ? properties : properties.slice(0, 5)).map(property => (
-                        <Link
+                        <div
                           key={property.id}
-                          to={`/property/${property.id}`}
-                          className="flex items-center gap-4 px-5 py-4 hover:bg-white/2 transition-colors"
+                          className="flex items-center gap-3 px-4 sm:px-5 py-3.5 hover:bg-white/[0.02] transition-colors"
                         >
-                          <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden flex-shrink-0">
+                          <Link
+                            to={`/property/${property.id}`}
+                            className="w-14 h-14 bg-white/5 rounded-xl overflow-hidden flex-shrink-0 border border-white/5"
+                          >
                             {property.images?.[0] ? (
                               <img
                                 src={property.images[0]}
@@ -1018,68 +1115,93 @@ export default function Dashboard() {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <Home className="w-5 h-5 text-paper/15" />
+                                <Home className="w-5 h-5 text-paper/20" />
                               </div>
                             )}
-                          </div>
+                          </Link>
+
                           <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-semibold text-paper truncate">
+                            <Link
+                              to={`/property/${property.id}`}
+                              className="block text-[13px] font-semibold text-paper truncate hover:text-gold transition-colors"
+                            >
                               {property.title}
-                            </p>
-                            <div className="flex items-center gap-1 mt-0.5">
-                              <MapPin className="w-3 h-3 text-paper/25" />
-                              <span className="text-[11px] text-paper/35 truncate">
+                            </Link>
+                            <div className="flex items-center gap-1 mt-1">
+                              <MapPin className="w-3 h-3 text-paper/30 flex-shrink-0" />
+                              <span className="text-[11px] text-paper/40 truncate">
                                 {property.lga}, {property.state}
                               </span>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {property.agent_id === user?.id && property.owner_id !== user?.id && (
-                              <span className="text-[9px] font-bold px-2 py-1 rounded-lg bg-white/6 text-paper/50">
-                                Managing
+                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                              <span className={`text-[10px] font-semibold ${
+                                property.is_delisted
+                                  ? 'text-paper/35'
+                                  : property.is_rented
+                                  ? 'text-paper/45'
+                                  : property.status === 'active'
+                                  ? 'text-gold'
+                                  : property.status === 'pending_review'
+                                  ? 'text-paper/50'
+                                  : 'text-danger'
+                              }`}>
+                                {property.is_delisted
+                                  ? 'Hidden'
+                                  : property.is_rented
+                                  ? 'Rented / Sold'
+                                  : property.status === 'active'
+                                  ? 'Listed'
+                                  : property.status === 'pending_review'
+                                  ? 'Under review'
+                                  : property.status.replace(/_/g, ' ')}
                               </span>
-                            )}
-                            <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
-                              property.is_rented
-                                ? 'bg-white/8 text-paper/40'
-                                : property.status === 'active'
-                                ? 'bg-gold/10 text-gold'
-                                : property.status === 'pending_review'
-                                ? 'bg-white/6 text-paper/50'
-                                : 'bg-danger/10 text-danger'
-                            }`}>
-                              {property.is_rented ? 'rented/sold' : property.status.replace(/_/g, ' ')}
-                            </span>
+
+                              {property.agent_id === user?.id && property.owner_id !== user?.id && (
+                                <span className="text-[10px] text-paper/35 border-l border-white/10 pl-2">
+                                  Managing
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 flex-shrink-0">
                             <button
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/edit-property/${property.id}`); }}
+                              type="button"
+                              onClick={() => navigate(`/edit-property/${property.id}`)}
                               title="Edit listing"
+                              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
                             >
-                              <Pencil className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
+                              <Pencil className="w-4 h-4 text-paper/40 hover:text-paper transition-colors" />
                             </button>
                             <button
-                              onClick={(e) => { e.stopPropagation(); setDelistTarget(property); }}
+                              type="button"
+                              onClick={() => setDelistTarget(property)}
                               title={property.is_delisted ? 'Re-list' : 'Delist'}
+                              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
                             >
-                              {property.is_delisted
-                                ? <Megaphone className="w-4 h-4 text-gold hover:text-gold-dark transition-colors" />
-                                : <Ban className="w-4 h-4 text-paper/20 hover:text-paper/60 transition-colors" />
-                              }
+                              {property.is_delisted ? (
+                                <Megaphone className="w-4 h-4 text-gold" />
+                              ) : (
+                                <Ban className="w-4 h-4 text-paper/40 hover:text-paper transition-colors" />
+                              )}
                             </button>
                           </div>
-                        </Link>
+                        </div>
                       ))}
                     </div>
+
                     {properties.length > 5 && (
                       <button
                         onClick={() => setShowAllProperties(v => !v)}
-                        className="w-full py-3 text-[12px] font-semibold text-gold hover:text-gold-dark transition-colors border-t border-white/5"
+                        className="w-full py-3 text-[12px] font-semibold text-gold hover:bg-white/[0.025] transition-colors border-t border-white/5"
                       >
-                        {showAllProperties ? 'Show less' : `Show all ${properties.length} listings`}
+                        {showAllProperties
+                          ? 'Show less'
+                          : `View all ${properties.length} listings`}
                       </button>
                     )}
                   </div>
                 )}
-
                 {delistTarget && (
                   <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-5">
                     <div className="bg-slate/20 border border-white/10 rounded-2xl p-6 w-full max-w-sm">
@@ -1149,11 +1271,17 @@ export default function Dashboard() {
               </div>
 
               {/* Sidebar */}
-              <div className="space-y-4">
-                <div className="bg-slate/20 border border-white/6 rounded-2xl p-5">
-                  <h3 className="text-[13px] font-bold text-paper/50 uppercase tracking-wider mb-4">
-                    Quick Actions
-                  </h3>
+              <div className="min-w-0 space-y-4">
+                <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-[14px] font-bold text-paper">Quick Actions</h3>
+                      <p className="text-[11px] text-paper/35 mt-1">Shortcuts to your workspace</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-xl bg-gold/10 flex items-center justify-center">
+                      <Plus className="w-4 h-4 text-gold" />
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     {isTenant ? (
                       <>
@@ -1174,13 +1302,12 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
-
                 <DelegateFeatureCard />
                 <LawyerFeatureCard />
 
                 {(profile?.agent_id || profile?.landlord_id) && (
-                  <div className="bg-slate/20 border border-gold/15 rounded-2xl p-5">
-                    <div className="text-[10px] font-bold text-gold uppercase tracking-widest mb-3">
+                  <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl p-5">
+                    <div className="text-[10px] font-bold text-paper/35 uppercase tracking-widest mb-3">
                       Platform ID
                     </div>
                     <div className="font-mono text-[13px] font-bold text-paper break-all">
@@ -1190,7 +1317,7 @@ export default function Dashboard() {
                   </div>
                 )}
 
-                <div className="bg-slate/20 border border-white/6 rounded-2xl overflow-hidden">
+                <div className="bg-[#14181e] border border-white/[0.07] rounded-2xl overflow-hidden">
                   <div className="p-5">
                     <div className="text-[10px] font-bold text-paper/35 uppercase tracking-widest mb-3">
                       Know Your Rights

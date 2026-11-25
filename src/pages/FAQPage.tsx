@@ -39,11 +39,11 @@ const faqs = [
       },
       {
         q: 'Can I get my inspection fee back?',
-        a: "You can cancel and get a full refund any time before the scheduled inspection date. Once that date arrives, the fee is automatically released to the agent or landlord and can't be reversed through a refund request. If the inspection didn't happen as agreed or the property was significantly misrepresented, you can raise a dispute for a moderator to review — a refund is only issued if the dispute is upheld."
+        a: 'Inspection fees are non-refundable once payment is completed. Before paying, confirm the property details, inspection requirements, date, time and availability directly with the agent or landlord. Please only pay when you are satisfied with the arrangements.'
       },
       {
         q: 'What if the property looks nothing like the photos?',
-        a: 'This is covered under our misrepresentation policy. If the property is significantly different from the listing — different location, smaller size, missing features, or in poor condition — you are entitled to a 100% refund of your inspection fee and can report the listing for removal.'
+        a: 'Contact the agent or landlord to clarify any differences before paying the inspection fee. Once payment is completed, the fee is non-refundable. You can still report misleading listings to Handova for review.'
       },
     ]
   },

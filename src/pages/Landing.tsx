@@ -664,7 +664,7 @@ export default function Landing() {
             <HowStep
               num="02" icon={CheckCircle} delay={0.1}
               title="Book Inspection"
-              desc="Pay a small inspection fee to secure your viewing slot. Cancel anytime before the visit for a full refund."
+              desc="Choose a preferred viewing time, confirm the arrangements with the agent or landlord, and pay the disclosed inspection fee to proceed."
             />
             <HowStep
               num="03" icon={FileText} delay={0.2}
