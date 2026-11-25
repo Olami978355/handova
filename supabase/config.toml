@@ -14,3 +14,6 @@ verify_jwt = false
 # must be off here as well.
 [functions.paystack-transfer-webhook]
 verify_jwt = false
+
+[functions.dispatch-notification]
+verify_jwt = false

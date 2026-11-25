@@ -52,7 +52,6 @@ serve(async (req) => {
       .from('inspection_bookings')
       .update({ 
         status: 'inspection_scheduled',
-        release_at: new Date(scheduledFor.getTime() + 24 * 60 * 60 * 1000).toISOString(),
         confirmed_date: confirmedDate,
         confirmed_time: confirmedTime,
         updated_at: new Date().toISOString() 

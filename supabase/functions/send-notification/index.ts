@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts'
-import { corsHeaders, sendEmail } from '../_shared/utils.ts'
 
 const json = (payload: unknown, status = 200) =>
   new Response(JSON.stringify(payload), {
@@ -9,7 +8,6 @@ const json = (payload: unknown, status = 200) =>
   })
 
 // Chat is push + in-app only, never email.
-const NO_EMAIL_TYPES = new Set(['new_message'])
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -61,47 +59,6 @@ serve(async (req) => {
       .insert(notifications)
       .select()
     if (error) throw error
-
-    // Push (service key, so the push function can stay locked down)
-    try {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')
-      for (const uid of targetUserIds) {
-        await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${serviceKey}`,
-          },
-          body: JSON.stringify({ user_id: uid, title, body, url: link }),
-        })
-      }
-    } catch (pushErr) {
-      console.error('Failed to trigger push notifications (non-fatal):', pushErr)
-    }
-
-    // Email, except for types that are push/in-app only
-    if (!NO_EMAIL_TYPES.has(type)) {
-      try {
-        const { data: profiles } = await supabaseClient
-          .from('profiles')
-          .select('id, email, full_name')
-          .in('id', targetUserIds)
-        if (profiles) {
-          for (const p of profiles) {
-            if (p.email) {
-              await sendEmail(p.email, title, 'notification', {
-                full_name: p.full_name,
-                title,
-                body,
-                link,
-              })
-            }
-          }
-        }
-      } catch (emailErr) {
-        console.error('Failed to send notification emails (non-fatal):', emailErr)
-      }
-    }
 
     return json({ success: true, data })
   } catch (error) {

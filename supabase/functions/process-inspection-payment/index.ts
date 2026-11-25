@@ -1,7 +1,42 @@
+
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
 import { corsHeaders } from '../_shared/utils.ts';
-import { crypto } from 'https://deno.land/std@0.168.0/crypto/mod.ts';
+
+async function verifyPaystackSignature(
+  rawBody: string,
+  signature: string | null,
+  secret: string
+): Promise<boolean> {
+  if (!signature) return false;
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-512' },
+    false,
+    ['sign']
+  );
+
+  const hash = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    new TextEncoder().encode(rawBody)
+  );
+
+  const expected = Array.from(new Uint8Array(hash))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+
+  if (expected.length !== signature.length) return false;
+
+  let difference = 0;
+  for (let i = 0; i < expected.length; i++) {
+    difference |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
+  }
+
+  return difference === 0;
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -9,114 +44,140 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createAdminClient();
-    const body = await req.json();
-    const signature = req.headers.get('x-paystack-signature');
-
-    // BUG FIX 3: Helper for Kobo conversion (not needed here as we read from Paystack)
-    // const toKobo = (naira: number) => Math.round(naira * 100);
-
-    // Verify Paystack signature
     const secret = Deno.env.get('PAYSTACK_SECRET_KEY');
     if (!secret) throw new Error('PAYSTACK_SECRET_KEY not set');
 
-    // Paystack signature verification (HMAC SHA512)
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(secret),
-      { name: 'HMAC', hash: 'SHA-512' },
-      false,
-      ['sign']
-    );
-    const signatureBuffer = await crypto.subtle.sign(
-      'HMAC',
-      key,
-      encoder.encode(JSON.stringify(body))
-    );
-    const hashArray = Array.from(new Uint8Array(signatureBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    // Verify the original request bytes, not reconstructed JSON.
+    const rawBody = await req.text();
+    const signature = req.headers.get('x-paystack-signature');
 
-    if (hashHex !== signature) {
-      return new Response(JSON.stringify({ error: 'Invalid signature' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 401,
-      });
+    if (!(await verifyPaystackSignature(rawBody, signature, secret))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid Paystack signature' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      );
     }
 
-    if (body.event === 'charge.success') {
-      const reference = body.data.reference;
+    const body = JSON.parse(rawBody);
 
-      // Fetch booking
-      const { data: booking, error: bookingError } = await supabase
-        .from('inspection_bookings')
-        .select('*, properties(*)')
-        .eq('paystack_reference', reference)
-        .single();
-
-      if (bookingError || !booking) {
-        throw new Error(`Booking not found for reference: ${reference}`);
-      }
-
-      // BUG FIX 1: Idempotency check
-      if (booking.status === 'payment_confirmed') {
-        return new Response(JSON.stringify({ success: true, message: 'Already processed' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        });
-      }
-
-      // Update booking status
-      const { error: updateError } = await supabase
-        .from('inspection_bookings')
-        .update({ 
-          status: 'payment_confirmed', 
-          transfer_status: 'awaiting_release',
-          updated_at: new Date().toISOString() 
-        })
-        .eq('id', booking.id);
-
-      if (updateError) throw updateError;
-
-      // Fee is held by Handova, not paid out yet. It releases automatically
-      // once the agreed inspection date passes (see release-inspection-fees),
-      // giving cancellations/disputes raised before that date a clean path
-      // with no clawback ever needed.
-
-      // Notify landlord/agent
-      const parties = [booking.landlord_id];
-      if (booking.agent_id) parties.push(booking.agent_id);
-
-      await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getServiceRoleKey()}`,
-        },
-        body: JSON.stringify({
-          user_ids: parties,
-          title: 'New Inspection Booking',
-          body: `A tenant has paid for an inspection of ${booking.properties.title}. Please confirm the date.`,
-          link: `/dashboard`,
-          type: 'inspection_requested',
-        }),
-      });
-
-      return new Response(JSON.stringify({ success: true }), {
+    if (body.event !== 'charge.success') {
+      return new Response(JSON.stringify({ message: 'Event ignored' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       });
     }
 
-    return new Response(JSON.stringify({ message: 'Event ignored' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
+    const transaction = body.data;
+
+    if (
+      !transaction?.reference ||
+      transaction.status !== 'success' ||
+      transaction.currency !== 'NGN'
+    ) {
+      throw new Error('Invalid or unsuccessful inspection payment.');
+    }
+
+    const supabase = createAdminClient();
+
+    const { data: booking, error: bookingError } = await supabase
+      .from('inspection_bookings')
+      .select('id, inspection_fee, paystack_reference, status, properties(title)')
+      .eq('paystack_reference', transaction.reference)
+      .single();
+
+    if (bookingError || !booking) {
+      throw new Error('No inspection booking found for this payment reference.');
+    }
+
+    // Verify the actual amount received against the booking fee.
+    const expectedAmount = Math.round(Number(booking.inspection_fee) * 100);
+
+    if (
+      !Number.isFinite(expectedAmount) ||
+      expectedAmount <= 0 ||
+      Number(transaction.amount) !== expectedAmount
+    ) {
+      throw new Error('Paystack payment amount does not match the inspection fee.');
+    }
+
+    // This database function creates the wallet credit and ledger entry
+    // exactly once, even if Paystack sends the webhook more than once.
+    // Do not skip this when booking.status is already payment_confirmed.
+    const { data: walletResult, error: walletError } = await supabase.rpc(
+      'credit_inspection_fee_wallet',
+      { p_booking_id: booking.id }
+    );
+
+    if (walletError) {
+      console.error('Inspection wallet credit failed:', walletError);
+      throw new Error('Payment verified, but wallet credit could not be completed. Webhook retry required.');
+    }
+
+    const { error: updateError } = await supabase
+      .from('inspection_bookings')
+      .update({
+        status: 'payment_confirmed',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', booking.id);
+
+    if (updateError) throw updateError;
+
+    // Notify the landlord and assigned agent after the wallet credit succeeds.
+    const { data: bookingParties, error: partiesError } = await supabase
+      .from('inspection_bookings')
+      .select('landlord_id, agent_id')
+      .eq('id', booking.id)
+      .single();
+
+    if (partiesError) throw partiesError;
+
+    const parties = [bookingParties.landlord_id];
+
+    if (bookingParties.agent_id) {
+      parties.push(bookingParties.agent_id);
+    }
+
+    await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getServiceRoleKey()}`,
+      },
+      body: JSON.stringify({
+        user_ids: parties,
+        title: 'New Inspection Booking',
+        body: `A tenant has paid for an inspection of ${booking.properties?.title || 'your property'}. Please confirm the inspection date.`,
+        link: '/dashboard',
+        type: 'inspection_requested',
+      }),
     });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Inspection payment processed.',
+        wallet: walletResult,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
   } catch (error) {
-    console.error('Webhook error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    });
+    console.error('Inspection payment webhook error:', error);
+
+    return new Response(
+      JSON.stringify({
+        error: error instanceof Error ? error.message : 'Unexpected payment processing error.',
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    );
   }
 });
