@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import webpush from 'npm:web-push@3.6.7';
-import { createAdminClient } from '../_shared/supabase.ts';
+import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
 import { corsHeaders } from '../_shared/utils.ts';
 
 serve(async (req) => {
@@ -9,6 +9,13 @@ serve(async (req) => {
   }
 
   try {
+    const callerToken = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+    if (callerToken !== getServiceRoleKey()) {
+      return new Response(JSON.stringify({ error: 'Not allowed' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 403,
+      });
+    }
     const { user_id, title, body, url } = await req.json();
 
     if (!user_id || !title || !body) {
