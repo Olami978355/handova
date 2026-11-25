@@ -3,8 +3,15 @@ import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
 import { corsHeaders } from '../_shared/utils.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response('ok', { headers: corsHeaders });
+  }
+
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  const allowedKeys = [Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", getServiceRoleKey()].filter(Boolean);
+  if (bearerToken.length === 0 || allowedKeys.includes(bearerToken) === false) {
+    return new Response(JSON.stringify({ error: "Not allowed" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
   try {

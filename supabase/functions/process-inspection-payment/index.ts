@@ -84,7 +84,7 @@ serve(async (req) => {
 
     const { data: booking, error: bookingError } = await supabase
       .from('inspection_bookings')
-      .select('id, inspection_fee, paystack_reference, status, properties(title)')
+      .select('id, inspection_fee, paystack_reference, status, wallet_credit_version, properties(title)')
       .eq('paystack_reference', transaction.reference)
       .single();
 
@@ -101,6 +101,16 @@ serve(async (req) => {
       Number(transaction.amount) !== expectedAmount
     ) {
       throw new Error('Paystack payment amount does not match the inspection fee.');
+    }
+
+    if (booking.wallet_credit_version !== 'instant_wallet_v1') {
+      return new Response(
+        JSON.stringify({ success: true, message: 'Legacy booking; wallet credit skipped.' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
     }
 
     // This database function creates the wallet credit and ledger entry

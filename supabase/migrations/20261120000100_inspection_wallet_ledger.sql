@@ -2,6 +2,10 @@
 -- HANDOVA: INSPECTION FEE WALLET FOUNDATION
 -- ============================================================
 
+-- Mark only newly created bookings for instant wallet credit.
+ALTER TABLE public.inspection_bookings
+  ADD COLUMN IF NOT EXISTS wallet_credit_version text;
+
 -- Wallet accounts belong to agents, companies or landlords.
 -- Balances are stored in kobo to avoid floating-point errors.
 
@@ -73,6 +77,7 @@ BEGIN
     ib.id,
     ib.inspection_fee,
     ib.paystack_reference,
+    ib.wallet_credit_version,
     ib.agent_id,
     ib.landlord_id,
     p.company_id
@@ -83,6 +88,10 @@ BEGIN
 
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Inspection booking not found';
+  END IF;
+
+  IF v_booking.wallet_credit_version IS DISTINCT FROM 'instant_wallet_v1' THEN
+    RAISE EXCEPTION 'Booking is not eligible for instant wallet credit';
   END IF;
 
   IF v_booking.paystack_reference IS NULL

@@ -17,3 +17,12 @@ verify_jwt = false
 
 [functions.dispatch-notification]
 verify_jwt = false
+
+[functions.release-inspection-fees]
+verify_jwt = false
+
+[functions.refund-expired-lawyer-bookings]
+verify_jwt = false
+
+[functions.auto-expire-decisions]
+verify_jwt = false

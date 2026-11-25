@@ -20,7 +20,6 @@ import { useInspectionBooking } from '../../hooks/useInspectionBooking';
 import { Property, InspectionBooking } from '../../types';
 import { getInspectionFee, formatFee } from '../../utils/inspectionFee';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
 import { PaystackButton } from '../payment/PaystackButton';
 
 interface BookInspectionModalProps {
@@ -79,6 +78,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
     useState<InspectionBooking | null>(null);
   const [checkingBooking, setCheckingBooking] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [nonRefundableAcknowledged, setNonRefundableAcknowledged] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [startingChat, setStartingChat] = useState(false);
 
@@ -122,6 +122,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
       setPreferredTime('');
       setError(null);
       setProcessingPayment(false);
+      setNonRefundableAcknowledged(false);
       paymentProcessedRef.current = false;
     }
   }, [isOpen]);
@@ -298,21 +299,6 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
         reference
       );
 
-      supabase.functions.invoke('process-inspection-payment', {
-        body: {
-          event: 'charge.success',
-          data: {
-            reference,
-            metadata: {
-              property_id: property.id,
-              tenant_id: user?.id,
-              type: 'inspection_payment',
-            },
-          },
-        },
-      }).catch((err) => {
-        console.warn('Inspection payment notification failed:', err);
-      });
 
       setStep(4);
     } catch (err: unknown) {
@@ -638,14 +624,35 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 border border-gray-200 p-4 mb-5">
-                  <ShieldCheck className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    By proceeding, you acknowledge that the inspection fee is
-                    non-refundable once payment is completed. Your preferred
-                    date and time still require confirmation from the {contactRole}.
-                  </p>
-                </div>
+                <div className="border border-amber-200 bg-amber-50 p-4 mb-5">
+  <div className="flex items-start gap-3 mb-3">
+    <ShieldCheck className="w-4 h-4 text-amber-700 mt-0.5 flex-shrink-0" />
+    <div>
+      <p className="text-xs font-semibold text-gray-900 mb-1">
+        Inspection fee is strictly non-refundable
+      </p>
+      <p className="text-xs text-gray-700 leading-relaxed">
+        Once paid, the inspection fee will not be refunded under any circumstances,
+        including cancellation, a missed appointment, the agent or landlord
+        failing to attend, or the property being unavailable. Handova does not
+        refund inspection fees. Confirm the inspection date, time, property
+        details and availability with the {contactRole} before paying. Your
+        preferred date and time still require confirmation.
+      </p>
+    </div>
+  </div>
+  <label className="flex items-start gap-3 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={nonRefundableAcknowledged}
+      onChange={(event) => setNonRefundableAcknowledged(event.target.checked)}
+      className="mt-0.5 h-4 w-4 accent-[#9A7624] flex-shrink-0"
+    />
+    <span className="text-xs font-semibold text-gray-800 leading-relaxed">
+      I have read and understood that this inspection fee is non-refundable in all circumstances.
+    </span>
+  </label>
+</div>
 
                 {error && (
                   <div className="flex items-start gap-2 p-3.5 bg-red-50 border border-red-200 mb-5">
@@ -677,6 +684,7 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                         reference={`INSP_${property.id.slice(0, 8)}_${Date.now()}`}
                         label={`Pay ${feeLabel}`}
                         className="flex-[2]"
+                        disabled={!nonRefundableAcknowledged}
                         onSuccess={(reference) => handlePaymentSuccess(reference)}
                         onClose={() =>
                           setError(
