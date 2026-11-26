@@ -10,13 +10,13 @@ export const PushPermissionBanner: React.FC = () => {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    const wasDismissed = sessionStorage.getItem('push-banner-dismissed');
+    let wasDismissed = false; try { wasDismissed = Number(localStorage.getItem('push-banner-snooze-until') || 0) > Date.now(); } catch { /* storage unavailable */ }
     if (wasDismissed) setDismissed(true);
   }, []);
 
   const handleDismiss = () => {
     setDismissed(true);
-    sessionStorage.setItem('push-banner-dismissed', 'true');
+    try { localStorage.setItem('push-banner-snooze-until', String(Date.now() + 7 * 24 * 60 * 60 * 1000)); } catch { /* storage unavailable */ }
   };
 
   const handleEnable = async () => {

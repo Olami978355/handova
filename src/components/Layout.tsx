@@ -29,7 +29,6 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-ink" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <OfflineBanner />
       {showNav && <Navbar />}
-      <PushPermissionBanner />
       <ChangelogBanner />
       <main className={`flex-grow ${showNav ? 'pt-16' : ''} ${showBottomTabs ? 'page-with-tabs' : ''}`}>
         <ErrorBoundary key={location.pathname}>
@@ -37,6 +36,7 @@ export default function Layout() {
         </ErrorBoundary>
       </main>
       {showBottomTabs && <BottomTabBar role={profile?.role} />}
+      <PushPermissionBanner />
     </div>
   );
 }

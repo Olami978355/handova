@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, MessageSquare, User, LayoutDashboard, Plus } from 'lucide-react';
+import { useConversationsContext } from '../context/ConversationsContext';
 
 interface BottomTabBarProps {
   role?: string;
@@ -9,6 +10,7 @@ interface BottomTabBarProps {
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({ role }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { totalUnreadCount } = useConversationsContext();
 
   const isLister = role === 'landlord' || role === 'agent' || role === 'company';
 
@@ -47,7 +49,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ role }) => {
             onClick={() => navigate(tab.path)}
             className="flex-1 flex flex-col items-center gap-1 pt-1"
           >
-            <tab.icon className={`w-5 h-5 transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`} />
+            <span className="relative"><tab.icon className={`w-5 h-5 transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`} />{tab.id === 'messages' && totalUnreadCount > 0 && (<span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-gold text-ink text-[9px] font-bold flex items-center justify-center">{totalUnreadCount > 9 ? '9+' : totalUnreadCount}</span>)}</span>
             <span className={`text-[10px] font-semibold transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`}>
               {tab.label}
             </span>
@@ -71,7 +73,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ role }) => {
             onClick={() => navigate(tab.path)}
             className="flex-1 flex flex-col items-center gap-1 pt-1"
           >
-            <tab.icon className={`w-5 h-5 transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`} />
+            <span className="relative"><tab.icon className={`w-5 h-5 transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`} />{tab.id === 'messages' && totalUnreadCount > 0 && (<span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-gold text-ink text-[9px] font-bold flex items-center justify-center">{totalUnreadCount > 9 ? '9+' : totalUnreadCount}</span>)}</span>
             <span className={`text-[10px] font-semibold transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`}>
               {tab.label}
             </span>
@@ -89,7 +91,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ role }) => {
           onClick={() => navigate(tab.path)}
           className="flex-1 flex flex-col items-center gap-1 pt-1"
         >
-          <tab.icon className={`w-5 h-5 transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`} />
+          <span className="relative"><tab.icon className={`w-5 h-5 transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`} />{tab.id === 'messages' && totalUnreadCount > 0 && (<span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-gold text-ink text-[9px] font-bold flex items-center justify-center">{totalUnreadCount > 9 ? '9+' : totalUnreadCount}</span>)}</span>
           <span className={`text-[10px] font-semibold transition-colors ${isActive(tab.path) ? 'text-gold' : 'text-paper/30'}`}>
             {tab.label}
           </span>
