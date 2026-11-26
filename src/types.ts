@@ -10,6 +10,8 @@ export interface Profile {
   email: string;
   phone?: string;
   phone_public?: boolean;
+  notify_email?: boolean;
+  notify_push?: boolean;
   avatar_url?: string;
   role: UserRole;
   verification_status: VerificationStatus;

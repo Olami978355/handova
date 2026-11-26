@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   User, Shield, Mail, Phone, Camera,
@@ -15,12 +15,13 @@ import { ChangePasswordSection } from '../components/profile/ChangePasswordSecti
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
-type Tab = 'profile' | 'security' | 'payments';
+type Tab = 'profile' | 'security' | 'payments' | 'notifications';
 
 const tabs: { id: Tab; icon: React.ElementType; label: string }[] = [
   { id: 'profile', icon: User, label: 'Profile Info' },
   { id: 'security', icon: Lock, label: 'Security' },
   { id: 'payments', icon: CreditCard, label: 'Payments & Payouts' },
+  { id: 'notifications', icon: Bell, label: 'Notifications' },
 ];
 
 export default function Profile() {
@@ -34,6 +35,27 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('profile');
+  const [notifyEmail, setNotifyEmail] = useState(profile?.notify_email !== false);
+  const [notifyPush, setNotifyPush] = useState(profile?.notify_push !== false);
+  const [notificationSaving, setNotificationSaving] = useState(false);
+  const [notificationFeedback, setNotificationFeedback] = useState('');
+  useEffect(() => {
+    setNotifyEmail(profile?.notify_email !== false);
+    setNotifyPush(profile?.notify_push !== false);
+  }, [profile?.notify_email, profile?.notify_push]);
+  const saveNotificationPreferences = async () => {
+    setNotificationSaving(true);
+    setNotificationFeedback('');
+    try {
+      const result = await updateProfile({ notify_email: notifyEmail, notify_push: notifyPush });
+      if (!result.success) throw new Error(result.error?.message || 'Unable to save preferences');
+      setNotificationFeedback('Your notification preferences have been saved.');
+    } catch (err) {
+      setNotificationFeedback(err instanceof Error ? err.message : 'Unable to save preferences.');
+    } finally {
+      setNotificationSaving(false);
+    }
+  };
 
   const [formData, setFormData] = useState({
     fullName: profile?.full_name || '',
@@ -527,6 +549,25 @@ export default function Profile() {
                         </button>
                       </div>
                     </form>
+                  </motion.div>
+                )}
+
+                {activeTab === 'notifications' && (
+                  <motion.div key="notifications" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+                    <h2 className="text-[16px] font-bold text-paper mb-2">Notification Preferences</h2>
+                    <p className="text-[12px] text-paper/45 mb-6">Choose how Handova keeps you informed. In-app notifications always remain active.</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-white/8 bg-white/[0.025]">
+                        <div><p className="text-[13px] font-semibold text-paper">Email notifications</p><p className="text-[11px] text-paper/40 mt-1">Receive eligible updates and account activity by email.</p></div>
+                        <button type="button" role="switch" aria-checked={notifyEmail} onClick={() => setNotifyEmail(value => !value)} className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${notifyEmail ? "bg-gold" : "bg-white/15"}`}><span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${notifyEmail ? "translate-x-6" : "translate-x-1"}`} /></button>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-white/8 bg-white/[0.025]">
+                        <div><p className="text-[13px] font-semibold text-paper">Browser push notifications</p><p className="text-[11px] text-paper/40 mt-1">Receive alerts when Handova is not open. Browser permission may also be required.</p></div>
+                        <button type="button" role="switch" aria-checked={notifyPush} onClick={() => setNotifyPush(value => !value)} className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${notifyPush ? "bg-gold" : "bg-white/15"}`}><span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${notifyPush ? "translate-x-6" : "translate-x-1"}`} /></button>
+                      </div>
+                    </div>
+                    {notificationFeedback && <p className="text-[12px] text-gold mt-4">{notificationFeedback}</p>}
+                    <div className="mt-6 flex justify-end"><button type="button" onClick={saveNotificationPreferences} disabled={notificationSaving} className="px-5 py-3 rounded-xl bg-gold text-ink text-[13px] font-bold hover:bg-gold-dark transition-colors disabled:opacity-50">{notificationSaving ? 'Saving...' : 'Save Preferences'}</button></div>
                   </motion.div>
                 )}
 

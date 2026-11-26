@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts'
+import { corsHeaders } from '../_shared/utils.ts'
 
 const json = (payload: unknown, status = 200) =>
   new Response(JSON.stringify(payload), {

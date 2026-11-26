@@ -66,8 +66,13 @@ export const useNotifications = () => {
         (payload) => {
           if (!mountedRef.current) return;
           const newNotif = payload.new as Notification;
-          setNotifications(prev => [newNotif, ...prev]);
-          setUnreadCount(prev => prev + 1);
+          setNotifications(prev => {
+            if (prev.some(n => n.id === newNotif.id)) return prev;
+            return [newNotif, ...prev];
+          });
+          if (!newNotif.read) {
+            setUnreadCount(prev => prev + 1);
+          }
         }
       )
       .on(

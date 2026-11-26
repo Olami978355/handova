@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar, CheckCircle, ShieldCheck, ShieldX, Home,
-  XCircle, DollarSign, MessageCircle, Info, Bell, Check
+  XCircle, DollarSign, MessageCircle, Info, Bell, Check, ArrowRight
 } from 'lucide-react';
 import { Notification } from '../../types';
 import { formatRelativeTime } from '../../utils/format';
@@ -23,125 +23,112 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   onClose,
 }) => {
   const navigate = useNavigate();
+  const unreadCount = notifications.filter((notification) => !notification.read).length;
 
   const getIcon = (type: Notification['type']) => {
     switch (type) {
       case 'inspection_requested':
       case 'inspection_booked':
-        return <Calendar className="text-gold" size={16} />;
+        return <Calendar className="text-gold" size={17} />;
       case 'inspection_confirmed':
-        return <CheckCircle className="text-gold" size={16} />;
+        return <CheckCircle className="text-emerald-400" size={17} />;
       case 'verification_approved':
-        return <ShieldCheck className="text-gold" size={16} />;
+        return <ShieldCheck className="text-emerald-400" size={17} />;
       case 'verification_rejected':
-        return <ShieldX className="text-danger" size={16} />;
+        return <ShieldX className="text-red-400" size={17} />;
       case 'listing_approved':
-        return <Home className="text-gold" size={16} />;
+        return <Home className="text-emerald-400" size={17} />;
       case 'listing_rejected':
-        return <XCircle className="text-danger" size={16} />;
+        return <XCircle className="text-red-400" size={17} />;
       case 'deal_state_change':
       case 'custom_deal_offer':
-        return <DollarSign className="text-gold" size={16} />;
-      case 'new_message':
-        return <MessageCircle className="text-gold" size={16} />;
       case 'refund_processed':
-        return <CheckCircle className="text-gold" size={16} />;
+        return <DollarSign className="text-gold" size={17} />;
+      case 'new_message':
+        return <MessageCircle className="text-sky-400" size={17} />;
       default:
-        return <Info className="text-white/30" size={16} />;
+        return <Info className="text-white/40" size={17} />;
     }
   };
 
-  const handleClick = async (notif: Notification) => {
-    // Mark as read immediately on click
-    if (!notif.read) {
-      await markAsRead(notif.id);
-    }
-    if (notif.link) {
-      navigate(notif.link);
-    }
+  const handleClick = async (notification: Notification) => {
+    if (!notification.read) await markAsRead(notification.id);
     onClose();
+    if (notification.link) navigate(notification.link);
+    else navigate('/notifications');
   };
-
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <div
-      className="bg-ink border border-white/8 rounded-2xl overflow-hidden flex flex-col shadow-2xl"
-      style={{ maxHeight: 480, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+      className="flex max-h-[min( min(75vh,560px),560px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#101216] shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      {/* Header */}
-      <div className="px-5 py-3.5 border-b border-white/6 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-[13px] font-bold text-white">Notifications</span>
-          {unreadCount > 0 && (
-            <span className="text-[10px] font-black text-black bg-gold px-2 py-0.5 rounded-full">
-              {unreadCount} new
-            </span>
-          )}
+      <div className="flex flex-shrink-0 items-center justify-between border-b border-white/[0.07] px-5 py-4">
+        <div>
+          <h3 className="text-[14px] font-bold text-white">Notifications</h3>
+          <p className="mt-0.5 text-[10px] text-white/35">
+            {unreadCount > 0 ? `${unreadCount} unread in this list` : 'You’re all caught up'}
+          </p>
         </div>
         {unreadCount > 0 && (
           <button
-            onClick={markAllAsRead}
-            className="flex items-center gap-1 text-[11px] font-semibold text-gold/60 hover:text-gold transition-colors"
+            type="button"
+            onClick={() => void markAllAsRead()}
+            className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[10px] font-semibold text-gold/80 transition-colors hover:bg-gold/10 hover:text-gold"
           >
-            <Check size={12} />
+            <Check size={13} />
             Mark all read
           </button>
         )}
       </div>
 
-      {/* Body */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-            <p className="text-[12px] text-white/30">Loading...</p>
+          <div className="flex flex-col items-center gap-3 py-12">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+            <p className="text-[11px] text-white/35">Loading notifications</p>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-            <div className="w-12 h-12 bg-white/4 rounded-2xl flex items-center justify-center mb-3">
-              <Bell className="w-5 h-5 text-white/20" />
+          <div className="flex flex-col items-center px-6 py-12 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.03]">
+              <Bell className="h-5 w-5 text-white/25" />
             </div>
-            <p className="text-[13px] font-semibold text-white/40 mb-1">
-              No notifications yet
-            </p>
-            <p className="text-[11px] text-white/20">
-              We'll alert you when something happens.
+            <p className="text-[13px] font-semibold text-white/65">Nothing to see yet</p>
+            <p className="mt-1 max-w-[220px] text-[11px] leading-relaxed text-white/35">
+              Updates about your properties, inspections and transactions will appear here.
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-white/4">
-            {notifications.map(notif => (
+          <div className="divide-y divide-white/[0.05]">
+            {notifications.map((notification) => (
               <button
-                key={notif.id}
-                onClick={() => handleClick(notif)}
-                className={`w-full px-5 py-3.5 flex items-start gap-3 text-left hover:bg-white/4 transition-colors relative ${
-                  !notif.read ? 'bg-gold/8' : ''
+                type="button"
+                key={notification.id}
+                onClick={() => void handleClick(notification)}
+                className={`relative flex w-full items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.04] ${
+                  !notification.read ? 'bg-gold/[0.045]' : ''
                 }`}
               >
-                <div className="w-8 h-8 bg-white/5 border border-white/8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                  {getIcon(notif.type)}
+                <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.035]">
+                  {getIcon(notification.type)}
                 </div>
-                <div className="flex-1 min-w-0 pr-3">
-                  <div className="flex items-start justify-between gap-2 mb-0.5">
+                <div className="min-w-0 flex-1 pr-1">
+                  <div className="flex items-start justify-between gap-3">
                     <p className={`text-[12px] leading-snug ${
-                      !notif.read
-                        ? 'font-bold text-white'
-                        : 'font-medium text-white/55'
+                      notification.read ? 'font-medium text-white/65' : 'font-bold text-white'
                     }`}>
-                      {notif.title}
+                      {notification.title}
                     </p>
-                    <span className="text-[10px] text-white/25 whitespace-nowrap flex-shrink-0">
-                      {formatRelativeTime(notif.created_at)}
+                    <span className="flex-shrink-0 whitespace-nowrap pt-0.5 text-[9px] text-white/30">
+                      {formatRelativeTime(notification.created_at)}
                     </span>
                   </div>
-                  <p className="text-[11px] text-white/35 leading-relaxed">
-                    {notif.body}
+                  <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-white/40">
+                    {notification.body}
                   </p>
                 </div>
-                {/* Unread dot */}
-                {!notif.read && (
-                  <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0" />
+                {!notification.read && (
+                  <span className="absolute right-3 top-5 h-1.5 w-1.5 rounded-full bg-gold" />
                 )}
               </button>
             ))}
@@ -149,13 +136,17 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         )}
       </div>
 
-      {/* Footer */}
-      <div className="px-5 py-3 border-t border-white/5 flex-shrink-0">
+      <div className="flex-shrink-0 border-t border-white/[0.07] p-3">
         <button
-          onClick={onClose}
-          className="w-full text-[11px] font-semibold text-white/25 hover:text-white/50 transition-colors text-center"
+          type="button"
+          onClick={() => {
+            onClose();
+            navigate('/notifications');
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-white/[0.04] px-4 py-3 text-[11px] font-bold text-white/65 transition-colors hover:bg-gold/10 hover:text-gold"
         >
-          Close
+          View all notifications
+          <ArrowRight size={13} />
         </button>
       </div>
     </div>
