@@ -49,6 +49,8 @@ export function useInspectionBooking() {
         .select('*')
         .eq('property_id', propertyId)
         .eq('tenant_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) throw error;
@@ -109,151 +111,24 @@ export function useInspectionBooking() {
     }
   };
 
-  /**
-   * Step 2 — Called after Paystack payment succeeds
-   * Updates status to payment_confirmed and sends notifications
-   */
-  const confirmBookingPayment = async (
-    bookingId: string,
-    paystackReference: string
-  ) => {
-    if (!user) throw new Error('Not authenticated');
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Update booking status to payment_confirmed
-      const { data: booking, error: updateError } = await supabase
-        .from('inspection_bookings')
-        .update({
-          status: 'payment_confirmed',
-          paystack_reference: paystackReference,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', bookingId)
-        .select('*, properties(id, title, owner_id)')
-        .single();
-
-      if (updateError) throw updateError;
-
-      // Notify landlord
-      if (booking?.properties?.owner_id) {
-        await supabase.from('notifications').insert({
-          user_id: booking.properties.owner_id,
-          title: 'New Inspection Booking!',
-          body: `A tenant has paid the inspection fee for ${booking.properties.title} and wants to schedule a visit.`,
-          type: 'inspection_booked',
-          link: '/dashboard',
-        });
-      }
-
-      // Notify tenant confirmation
-      await supabase.from('notifications').insert({
-        user_id: user.id,
-        title: 'Inspection Booked Successfully!',
-        body: `Your inspection booking for ${booking?.properties?.title} is confirmed. The landlord will confirm the date shortly.`,
-        type: 'inspection_confirmed',
-        link: '/dashboard',
-      });
-
-      return booking as InspectionBooking;
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to confirm booking payment';
-      setError(msg);
-      throw err;
-    } finally {
-      setLoading(false);
+  /** Verify inspection payment through the trusted server function. */
+  const verifyInspectionPayment = async (bookingId: string, reference: string) => {
+    if (!(await requireValidSession())) {
+      throw new Error('Your session has expired. Please sign in again.');
     }
-  };
-
-  /**
-   * Combined: create booking then immediately confirm payment
-   * Use this when Paystack completes successfully
-   */
-  const createAndConfirmBooking = async (
-    property: Property,
-    preferredDate: string,
-    preferredTime: string,
-    inspectionFee: number,
-    paystackReference: string
-  ) => {
-    if (!user) throw new Error('You must be logged in to book an inspection.');
 
     setLoading(true);
     setError(null);
-
     try {
-      // Check if booking already exists for this reference
-      // (handles Paystack callback firing twice)
-      const { data: existing } = await supabase
-        .from('inspection_bookings')
-        .select('*')
-        .eq('paystack_reference', paystackReference)
-        .maybeSingle();
-
-      if (existing) {
-        // Already created — just confirm payment status
-        if (existing.status === 'pending_payment') {
-          return await confirmBookingPayment(existing.id, paystackReference);
-        }
-        return existing as InspectionBooking;
-      }
-
-      // Create new booking directly as payment_confirmed
-      // since payment has already succeeded at this point
-      const { data, error } = await supabase
-        .from('inspection_bookings')
-        .insert({
-          property_id: property.id,
-          tenant_id: user.id,
-          landlord_id: property.owner_id,
-          agent_id: property.agent_id || null,
-          inspection_fee: inspectionFee,
-          paystack_reference: paystackReference,
-          preferred_date: preferredDate,
-          preferred_time: preferredTime,
-          status: 'payment_confirmed',
-        })
-        .select('*, properties(id, title, owner_id)')
-        .single();
-
-      if (error) {
-        if (error.code === '23505') {
-          // Race condition — booking already exists
-          const { data: race } = await supabase
-            .from('inspection_bookings')
-            .select('*')
-            .eq('paystack_reference', paystackReference)
-            .single();
-          return race as InspectionBooking;
-        }
-        throw error;
-      }
-
-      // Notify landlord
-      if (data?.properties?.owner_id) {
-        await supabase.from('notifications').insert({
-          user_id: data.properties.owner_id,
-          title: 'New Inspection Booking!',
-          body: `A tenant has paid the inspection fee for ${data.properties.title} and wants to schedule a visit.`,
-          type: 'inspection_booked',
-          link: '/dashboard',
-        });
-      }
-
-      // Notify tenant
-      await supabase.from('notifications').insert({
-        user_id: user.id,
-        title: 'Inspection Booked Successfully!',
-        body: `Your inspection booking for ${data?.properties?.title} is confirmed. The landlord will confirm the date shortly.`,
-        type: 'inspection_confirmed',
-        link: '/dashboard',
-      });
-
-      return data as InspectionBooking;
+      const { data, error } = await supabase.functions.invoke(
+        'verify-inspection-payment',
+        { body: { bookingId, reference } }
+      );
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to create booking';
+      const msg = err instanceof Error ? err.message : 'Payment verification failed';
       setError(msg);
       throw err;
     } finally {
@@ -402,8 +277,7 @@ export function useInspectionBooking() {
     fetchMyBookings,
     checkExistingBooking,
     createBooking,
-    confirmBookingPayment,
-    createAndConfirmBooking,
+    verifyInspectionPayment,
     submitDecision,
     raiseDispute,
   };

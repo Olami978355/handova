@@ -47,18 +47,27 @@ serve(async (req) => {
       throw new Error('You are not authorized to confirm this inspection.');
     }
 
-    // Update booking status
-    const { error: updateError } = await supabase
+    if (booking.status !== 'payment_confirmed') {
+      throw new Error('Only payment-confirmed bookings can be scheduled.');
+    }
+
+    // Schedule only if the booking is still payment-confirmed.
+    const { data: updatedRows, error: updateError } = await supabase
       .from('inspection_bookings')
-      .update({ 
+      .update({
         status: 'inspection_scheduled',
         confirmed_date: confirmedDate,
         confirmed_time: confirmedTime,
-        updated_at: new Date().toISOString() 
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', bookingId);
+      .eq('id', bookingId)
+      .eq('status', 'payment_confirmed')
+      .select('id');
 
     if (updateError) throw updateError;
+    if (!updatedRows?.length) {
+      throw new Error('Booking status changed. Refresh and try again.');
+    }
 
     // Notify tenant
     await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {

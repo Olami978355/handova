@@ -67,7 +67,8 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
 
   const {
     checkExistingBooking,
-    createAndConfirmBooking,
+    createBooking,
+    verifyInspectionPayment,
     createFreeBooking,
   } = useInspectionBooking();
 
@@ -100,6 +101,11 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
         .then((booking) => {
           if (active) {
             setExistingBooking(booking);
+            if (booking?.status === 'pending_payment') {
+              setPreferredDate(booking.preferred_date || '');
+              setPreferredTime(booking.preferred_time || '');
+              setStep(3);
+            }
             setCheckingBooking(false);
           }
         })
@@ -261,6 +267,46 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
     }
   };
 
+  const handlePreparePayment = async () => {
+    if (processingPayment) return;
+
+    if (inspectionFee <= 0) {
+      setStep(3);
+      return;
+    }
+
+    setProcessingPayment(true);
+    setError(null);
+    try {
+      if (existingBooking?.status === 'pending_payment') {
+        if (!existingBooking.paystack_reference) {
+          throw new Error('Your pending booking has no payment reference. Please contact support.');
+        }
+        setStep(3);
+        return;
+      }
+
+      const reference = `INSP_${property.id.slice(0, 8)}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const booking = await createBooking(
+        property,
+        preferredDate,
+        preferredTime,
+        inspectionFee,
+        reference
+      );
+      setExistingBooking(booking);
+      setStep(3);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not prepare your inspection booking. Please try again.'
+      );
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+
   const handleFreeBooking = async () => {
     if (paymentProcessedRef.current) return;
 
@@ -286,20 +332,20 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
   const handlePaymentSuccess = async (reference: string) => {
     if (paymentProcessedRef.current) return;
 
+    if (
+      !existingBooking?.id ||
+      reference !== existingBooking.paystack_reference
+    ) {
+      setError('This payment does not match your pending inspection booking. Please contact support.');
+      return;
+    }
+
     paymentProcessedRef.current = true;
     setProcessingPayment(true);
     setError(null);
 
     try {
-      await createAndConfirmBooking(
-        property,
-        preferredDate,
-        preferredTime,
-        inspectionFee,
-        reference
-      );
-
-
+      await verifyInspectionPayment(existingBooking.id, reference);
       setStep(4);
     } catch (err: unknown) {
       paymentProcessedRef.current = false;
@@ -536,8 +582,8 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                     Back
                   </button>
                   <button
-                    onClick={() => setStep(3)}
-                    disabled={!preferredDate || !preferredTime}
+                    onClick={handlePreparePayment}
+                    disabled={!preferredDate || !preferredTime || processingPayment}
                     className="flex-[2] bg-[#0B0D10] text-white py-3.5 text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Review booking
@@ -681,14 +727,17 @@ export const BookInspectionModal: React.FC<BookInspectionModalProps> = ({
                       <PaystackButton
                         amount={inspectionFee}
                         email={user?.email || ''}
-                        reference={`INSP_${property.id.slice(0, 8)}_${Date.now()}`}
+                        reference={existingBooking?.paystack_reference || ''}
                         label={`Pay ${feeLabel}`}
                         className="flex-[2]"
-                        disabled={!nonRefundableAcknowledged}
+                        disabled={
+                          !nonRefundableAcknowledged ||
+                          !existingBooking?.paystack_reference
+                        }
                         onSuccess={(reference) => handlePaymentSuccess(reference)}
                         onClose={() =>
                           setError(
-                            'Payment was cancelled. Your inspection booking has not been completed.'
+                            'Payment was cancelled. Your booking is saved; you can return and retry payment.'
                           )
                         }
                       />

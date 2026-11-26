@@ -113,9 +113,41 @@ serve(async (req) => {
       );
     }
 
-    // This database function creates the wallet credit and ledger entry
-    // exactly once, even if Paystack sends the webhook more than once.
-    // Do not skip this when booking.status is already payment_confirmed.
+    // Confirm the booking before crediting the wallet.
+    let transitionedByThisRequest = false;
+
+    if (booking.status === 'pending_payment') {
+      const { data: updatedRows, error: updateError } = await supabase
+        .from('inspection_bookings')
+        .update({
+          status: 'payment_confirmed',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', booking.id)
+        .eq('status', 'pending_payment')
+        .eq('paystack_reference', transaction.reference)
+        .select('id');
+
+      if (updateError) throw updateError;
+      transitionedByThisRequest = !!updatedRows?.length;
+
+      if (!transitionedByThisRequest) {
+        const { data: latestBooking, error: latestError } = await supabase
+          .from('inspection_bookings')
+          .select('status, paystack_reference')
+          .eq('id', booking.id)
+          .single();
+
+        if (latestError || latestBooking?.status !== 'payment_confirmed' ||
+            latestBooking?.paystack_reference !== transaction.reference) {
+          throw new Error('Booking is no longer eligible for payment confirmation.');
+        }
+      }
+    } else if (booking.status !== 'payment_confirmed') {
+      throw new Error('Booking is not awaiting payment confirmation.');
+    }
+
+    // Idempotent RPC: safe when webhook and direct verification race.
     const { data: walletResult, error: walletError } = await supabase.rpc(
       'credit_inspection_fee_wallet',
       { p_booking_id: booking.id }
@@ -126,45 +158,32 @@ serve(async (req) => {
       throw new Error('Payment verified, but wallet credit could not be completed. Webhook retry required.');
     }
 
-    const { error: updateError } = await supabase
-      .from('inspection_bookings')
-      .update({
-        status: 'payment_confirmed',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', booking.id);
+    if (transitionedByThisRequest) {
+      const { data: bookingParties, error: partiesError } = await supabase
+        .from('inspection_bookings')
+        .select('landlord_id, agent_id')
+        .eq('id', booking.id)
+        .single();
 
-    if (updateError) throw updateError;
+      if (partiesError) throw partiesError;
+      const parties = [bookingParties.landlord_id];
+      if (bookingParties.agent_id) parties.push(bookingParties.agent_id);
 
-    // Notify the landlord and assigned agent after the wallet credit succeeds.
-    const { data: bookingParties, error: partiesError } = await supabase
-      .from('inspection_bookings')
-      .select('landlord_id, agent_id')
-      .eq('id', booking.id)
-      .single();
-
-    if (partiesError) throw partiesError;
-
-    const parties = [bookingParties.landlord_id];
-
-    if (bookingParties.agent_id) {
-      parties.push(bookingParties.agent_id);
+      await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getServiceRoleKey()}`,
+        },
+        body: JSON.stringify({
+          user_ids: parties,
+          title: 'New Inspection Booking',
+          body: `A tenant has paid for an inspection of ${booking.properties?.title || 'your property'}. Please confirm the inspection date.`,
+          link: '/dashboard',
+          type: 'inspection_requested',
+        }),
+      });
     }
-
-    await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getServiceRoleKey()}`,
-      },
-      body: JSON.stringify({
-        user_ids: parties,
-        title: 'New Inspection Booking',
-        body: `A tenant has paid for an inspection of ${booking.properties?.title || 'your property'}. Please confirm the inspection date.`,
-        link: '/dashboard',
-        type: 'inspection_requested',
-      }),
-    });
 
     return new Response(
       JSON.stringify({
