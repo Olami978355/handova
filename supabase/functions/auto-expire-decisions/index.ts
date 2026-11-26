@@ -3,6 +3,10 @@ import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
 import { corsHeaders } from '../_shared/utils.ts';
 
 serve(async (req) => {
+  const cronSecret = Deno.env.get('CRON_SECRET')
+  if (!cronSecret || req.headers.get('x-cron-secret') !== cronSecret) {
+    return new Response(JSON.stringify({ error: 'Not allowed' }), { status: 403, headers: { 'Content-Type': 'application/json' } })
+  }
   if (req.method === "OPTIONS") {
     return new Response('ok', { headers: corsHeaders });
   }
