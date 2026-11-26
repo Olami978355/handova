@@ -64,3 +64,4 @@ temp/
 *.backup
 *.before-dashboard-history
 *.pre-payment-security-backup
+*.notification-backup
