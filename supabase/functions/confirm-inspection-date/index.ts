@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts';
-import { corsHeaders, sendEmail } from '../_shared/utils.ts';
+import { corsHeaders } from '../_shared/utils.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -84,22 +84,6 @@ serve(async (req) => {
         type: 'inspection_confirmed',
       }),
     });
-
-    // Send Email to Tenant
-    if (booking.profiles?.email) {
-      await sendEmail(
-        booking.profiles.email,
-        'Inspection Confirmed - Handova',
-        'inspection_booked',
-        {
-          name: booking.profiles.full_name,
-          propertyTitle: booking.properties.title,
-          date: confirmedDate,
-          time: confirmedTime,
-          link: `https://handova.ng/dashboard`
-        }
-      );
-    }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

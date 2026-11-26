@@ -14,6 +14,7 @@ import { CompanyInspectionFee } from '../components/profile/CompanyInspectionFee
 import { ChangePasswordSection } from '../components/profile/ChangePasswordSection';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 
 type Tab = 'profile' | 'security' | 'payments' | 'notifications';
 
@@ -26,6 +27,7 @@ const tabs: { id: Tab; icon: React.ElementType; label: string }[] = [
 
 export default function Profile() {
   const { user, profile, signOut, updateProfile } = useAuth();
+  const { supported: pushSupported, subscribed: pushSubscribed, loading: pushLoading, permission: pushPermission, requestPermission } = usePushNotifications();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
@@ -45,13 +47,19 @@ export default function Profile() {
   }, [profile?.notify_email, profile?.notify_push]);
   const saveNotificationPreferences = async () => {
     setNotificationSaving(true);
-    setNotificationFeedback('');
+    setNotificationFeedback("");
     try {
+      if (notifyPush && !pushSubscribed) {
+        if (!pushSupported) throw new Error("Browser push notifications are not supported in this browser.");
+        if (pushPermission === "denied") throw new Error("Notifications are blocked in your browser settings. Allow them for Handova, then try again.");
+        const subscription = await requestPermission();
+        if (!subscription.success) throw new Error("Could not enable browser notifications. Check your browser permission and try again.");
+      }
       const result = await updateProfile({ notify_email: notifyEmail, notify_push: notifyPush });
-      if (!result.success) throw new Error(result.error?.message || 'Unable to save preferences');
-      setNotificationFeedback('Your notification preferences have been saved.');
+      if (!result.success) throw new Error(result.error?.message || "Unable to save preferences");
+      setNotificationFeedback("Your notification preferences have been saved.");
     } catch (err) {
-      setNotificationFeedback(err instanceof Error ? err.message : 'Unable to save preferences.');
+      setNotificationFeedback(err instanceof Error ? err.message : "Unable to save preferences.");
     } finally {
       setNotificationSaving(false);
     }
@@ -555,7 +563,7 @@ export default function Profile() {
                 {activeTab === 'notifications' && (
                   <motion.div key="notifications" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
                     <h2 className="text-[16px] font-bold text-paper mb-2">Notification Preferences</h2>
-                    <p className="text-[12px] text-paper/45 mb-6">Choose how Handova keeps you informed. In-app notifications always remain active.</p>
+                    <p className="text-[12px] text-paper/45 mb-6">Choose how Handova keeps you informed. In-app alerts always remain active; critical transaction alerts are always sent by email and push.</p>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-white/8 bg-white/[0.025]">
                         <div><p className="text-[13px] font-semibold text-paper">Email notifications</p><p className="text-[11px] text-paper/40 mt-1">Receive eligible updates and account activity by email.</p></div>
@@ -567,7 +575,7 @@ export default function Profile() {
                       </div>
                     </div>
                     {notificationFeedback && <p className="text-[12px] text-gold mt-4">{notificationFeedback}</p>}
-                    <div className="mt-6 flex justify-end"><button type="button" onClick={saveNotificationPreferences} disabled={notificationSaving} className="px-5 py-3 rounded-xl bg-gold text-ink text-[13px] font-bold hover:bg-gold-dark transition-colors disabled:opacity-50">{notificationSaving ? 'Saving...' : 'Save Preferences'}</button></div>
+                    <div className="mt-6 flex justify-end"><button type="button" onClick={saveNotificationPreferences} disabled={notificationSaving || pushLoading} className="px-5 py-3 rounded-xl bg-gold text-ink text-[13px] font-bold hover:bg-gold-dark transition-colors disabled:opacity-50">{notificationSaving ? 'Saving...' : 'Save Preferences'}</button></div>
                   </motion.div>
                 )}
 

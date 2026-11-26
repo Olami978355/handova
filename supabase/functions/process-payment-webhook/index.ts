@@ -99,8 +99,56 @@ async function handleRefundEvent(body: any, supabase: ReturnType<typeof createAd
     .maybeSingle();
 
   if (!deal) {
-    // Not a deal payment (for example an inspection or lawyer-booking refund).
-    return jsonResponse({ message: 'No deal for this refund reference' });
+    const { data: booking, error: bookingError } = await supabase
+      .from('lawyer_review_bookings')
+      .select('id, deal_id, requested_by, status')
+      .eq('paystack_reference', reference)
+      .maybeSingle();
+
+    if (bookingError) throw bookingError;
+    if (!booking) {
+      return jsonResponse({ message: 'No matching deal or lawyer booking for this refund reference' });
+    }
+
+    if (body.event === 'refund.processed') {
+      if (booking.status === 'refunded') {
+        return jsonResponse({ message: 'Lawyer refund already processed' });
+      }
+
+      const { error: updateError } = await supabase
+        .from('lawyer_review_bookings')
+        .update({ status: 'refunded', updated_at: new Date().toISOString() })
+        .eq('id', booking.id)
+        .neq('status', 'refunded');
+
+      if (updateError) throw updateError;
+
+      const { error: notificationError } = await supabase.from('notifications').insert({
+        user_id: booking.requested_by,
+        title: 'Lawyer Review Refund Processed',
+        body: 'Paystack has processed your lawyer review fee refund. It may take up to 10 business days to appear in your account.',
+        type: 'refund_processed',
+        link: '/deals/' + booking.deal_id,
+      });
+
+      if (notificationError) throw notificationError;
+      return jsonResponse({ success: true, refund: 'lawyer_review' });
+    }
+
+    if (body.event === 'refund.failed' || body.event === 'refund.needs-attention') {
+      const { error: notificationError } = await supabase.from('notifications').insert({
+        user_id: booking.requested_by,
+        title: 'Lawyer Review Refund Needs Attention',
+        body: 'Paystack could not complete your lawyer review fee refund yet. Handova is checking the issue.',
+        type: 'refund_attention',
+        link: '/deals/' + booking.deal_id,
+      });
+
+      if (notificationError) throw notificationError;
+      return jsonResponse({ success: true, refund: 'lawyer_review', attention: true });
+    }
+
+    return jsonResponse({ message: 'Lawyer-review refund event noted' });
   }
 
   const now = new Date().toISOString();
@@ -113,7 +161,7 @@ async function handleRefundEvent(body: any, supabase: ReturnType<typeof createAd
       .update({
         refund_status: 'completed',
         refund_failure_reason: null,
-        status: deal.status === 'cancelled' ? 'refunded' : deal.status,
+        status: ['cancelled', 'disputed'].includes(deal.status) ? 'refunded' : deal.status,
         updated_at: now,
       })
       .eq('id', deal.id)
@@ -126,10 +174,10 @@ async function handleRefundEvent(body: any, supabase: ReturnType<typeof createAd
     await notifyDealParties(
       supabase,
       deal,
-      'Refund Processed',
-      `The refund for ${deal.properties?.title ?? 'your deal'} has been processed. It can take up to 10 business days to reach the bank account.`,
+      "Refund Processed",
+      "The refund for " + (deal.properties?.title ?? "your deal") + " has been processed. It can take up to 10 business days to reach the bank account.",
       `/deals/${deal.id}`,
-      'deal_state_change'
+      "refund_processed"
     );
     return jsonResponse({ success: true });
   }
@@ -156,10 +204,10 @@ async function handleRefundEvent(body: any, supabase: ReturnType<typeof createAd
     await notifyDealParties(
       supabase,
       deal,
-      'Refund Needs Attention',
-      `The refund for ${deal.properties?.title ?? 'your deal'} could not be completed yet. Our team is looking into it.`,
+      "Refund Needs Attention",
+      "The refund for " + (deal.properties?.title ?? "your deal") + " could not be completed yet. Our team is looking into it.",
       `/deals/${deal.id}`,
-      'deal_state_change'
+      "refund_attention"
     );
     return jsonResponse({ success: true });
   }

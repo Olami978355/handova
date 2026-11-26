@@ -77,21 +77,21 @@ serve(async (req) => {
         await supabase.from('notifications').insert([
           {
             user_id: booking.requested_by,
-            title: 'Lawyer Review Refunded',
-            body: 'The lawyer did not respond in time. Their review fee has been refunded to you.',
+            title: 'Lawyer Review Refund Requested',
+            body: 'The lawyer did not respond in time. Your refund has been requested from Paystack and will be confirmed once processed.',
             type: 'lawyer_review_expired',
             link: `/deals/${booking.deal_id}`,
           },
           {
             user_id: booking.lawyer_id,
             title: 'Missed Review Deadline',
-            body: 'A lawyer review request expired because no verdict was submitted in time. The fee was refunded to the requester.',
+            body: 'A lawyer review request expired because no verdict was submitted in time. A refund has been requested from Paystack for the requester.',
             type: 'lawyer_review_expired',
             link: `/deals/${booking.deal_id}`,
           },
         ]);
 
-        results.push({ id: booking.id, status: 'refunded' });
+        results.push({ id: booking.id, status: 'refund_requested' });
       } catch (err) {
         console.error(`Failed to expire lawyer review booking ${booking.id}:`, err);
       }
