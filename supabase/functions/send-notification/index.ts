@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createAdminClient, getServiceRoleKey } from '../_shared/supabase.ts'
+import { createAdminClient, getServiceRoleKey } from "../_shared/supabase.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7"
 import { corsHeaders } from '../_shared/utils.ts'
 
 const json = (payload: unknown, status = 200) =>
@@ -8,14 +9,27 @@ const json = (payload: unknown, status = 200) =>
     status,
   })
 
-// Chat is push + in-app only, never email.
+// Chat notifications are in-app + push, never email.
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
+
   try {
     const supabaseClient = createAdminClient()
+    const authClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: {
+            Authorization: req.headers.get('Authorization') ?? '',
+          },
+        },
+        auth: { persistSession: false, autoRefreshToken: false },
+      },
+    )
     const token = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '')
     if (!token) return json({ error: 'Authorization required' }, 401)
 
@@ -23,26 +37,44 @@ serve(async (req) => {
     let { title, body } = input
     const { user_id, user_ids, link, type } = input
     const targetUserIds: string[] = user_ids || (user_id ? [user_id] : [])
+
     if (targetUserIds.length === 0) {
       return json({ error: 'No user_id or user_ids provided' }, 400)
     }
 
     const serviceKey = getServiceRoleKey()
-    if (token !== serviceKey) {
-      // Browser callers: chat notifications only, between two participants of the conversation.
-      const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
-      if (authError || !user) return json({ error: 'Authentication failed' }, 401)
 
-      const m = typeof link === 'string' ? link.match(/^\/messages\?id=([0-9a-fA-F-]{36})$/) : null
+    if (token !== serviceKey) {
+      const { data: { user }, error: authError } = await authClient.auth.getUser(token)
+      if (authError || user == null) {
+        console.error('SEND_NOTIFICATION_AUTH_FAILED', {
+          message: authError?.message,
+          status: authError?.status,
+          hasUser: user != null,
+          hasToken: token.length > 0,
+        });
+        return json({ error: 'Authentication failed' }, 401);
+      }
+      const m = typeof link === 'string'
+        ? link.match(/^\/messages\?id=([0-9a-fA-F-]{36})$/)
+        : null
+
       if (type !== 'new_message' || targetUserIds.length !== 1 || !m) {
         return json({ error: 'Not allowed' }, 403)
       }
+
       const { data: conv } = await supabaseClient
-        .from('conversations').select('participant_ids').eq('id', m[1]).single()
+        .from('conversations')
+        .select('participant_ids')
+        .eq('id', m[1])
+        .single()
+
       const ids: string[] = conv?.participant_ids || []
+
       if (!ids.includes(user.id) || !ids.includes(targetUserIds[0]) || targetUserIds[0] === user.id) {
         return json({ error: 'Not allowed' }, 403)
       }
+
       title = 'New Message'
       body = String(body ?? '').slice(0, 100)
     }
@@ -55,14 +87,67 @@ serve(async (req) => {
       type,
       read: false,
     }))
+
     const { data, error } = await supabaseClient
       .from('notifications')
       .insert(notifications)
       .select()
+
     if (error) throw error
 
-    return json({ success: true, data })
+    // Send background Web Push for chat messages.
+    // Push failure must never undo the in-app notification.
+    const pushResults = []
+
+    if (type === 'new_message') {
+      for (const uid of targetUserIds) {
+        try {
+          const response = await fetch(
+            `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-push-notification`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${serviceKey}`,
+              },
+              body: JSON.stringify({
+                user_id: uid,
+                title: title || 'New Message',
+                body: body || 'You have received a new message',
+                url: link || '/messages',
+              }),
+            },
+          )
+
+          const result = await response.json().catch(() => ({}))
+
+          if (!response.ok) {
+            console.error('Chat push endpoint failed:', response.status, result)
+          }
+
+          pushResults.push({
+            user_id: uid,
+            success: response.ok && result.success === true,
+            result,
+          })
+        } catch (pushError) {
+          console.error('Chat push delivery failed:', pushError)
+          pushResults.push({
+            user_id: uid,
+            success: false,
+            error: (pushError as Error).message,
+          })
+        }
+      }
+    }
+
+    return json({
+      success: true,
+      data,
+      push: pushResults,
+    })
   } catch (error) {
+    console.error('send-notification error:', error)
     return json({ error: (error as Error).message }, 500)
   }
 })

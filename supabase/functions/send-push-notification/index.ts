@@ -30,7 +30,8 @@ serve(async (req) => {
       throw new Error('VAPID keys not configured');
     }
 
-    webpush.setVapidDetails(vapidEmail, vapidPublicKey, vapidPrivateKey);
+    const vapidSubject = vapidEmail.startsWith('mailto:') ? vapidEmail : `mailto:${vapidEmail}`;
+    webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
 
     const adminSupabase = createAdminClient();
 
@@ -63,7 +64,13 @@ serve(async (req) => {
         if (err.statusCode === 404 || err.statusCode === 410) {
           await adminSupabase.from('push_subscriptions').delete().eq('id', sub.id);
         }
-        console.error('Push send failed for subscription:', sub.id, err.message);
+        console.error('PUSH_PROVIDER_ERROR', {
+          subscription_id: sub.id,
+          statusCode: err.statusCode ?? null,
+          message: err.message ?? String(err),
+          body: err.body ?? null,
+          headers: err.headers ?? null,
+        });
       }
     }
 
