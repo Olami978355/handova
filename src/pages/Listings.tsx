@@ -522,7 +522,7 @@ export default function Listings() {
             {/* Loading */}
             {view === 'list' ? (
             loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
             ) : error ? (
@@ -552,7 +552,7 @@ export default function Listings() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {properties.map(property => (
                   <PropertyCard key={property.id} property={property} offer={(property as Property & { active_offer?: PropertyOffer | null }).active_offer} compareMode={compareMode} isComparing={compareIds.includes(property.id)} onToggleCompare={toggleCompare} />
                 ))}
