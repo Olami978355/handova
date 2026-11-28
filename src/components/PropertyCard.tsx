@@ -257,71 +257,74 @@ export default function PropertyCard({
           </span>
         </div>
 
-        <div className="flex items-end justify-between gap-3 border-t border-white/[0.09] pt-4">
-          {/* Price */}
-          <div className="min-w-0">
-            <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.16em] text-white/35">
-              {isRent ? 'Rental price' : 'Asking price'}
-            </span>
+        <div className="border-t border-white/[0.09] pt-4">
+          <div className="flex items-center justify-between gap-3">
+            {/* Price */}
+            <div className="min-w-0 flex-1">
+              <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.16em] text-white/35">
+                {isRent ? 'Rental price' : 'Asking price'}
+              </span>
 
-            {offer?.offer_type === 'price_reduction' && offer.offer_price != null ? (
-              <>
-                <span className="mb-1 inline-flex rounded-sm bg-gold/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-gold">Special offer</span>
-                <div className="flex flex-wrap items-baseline gap-1.5">
-                  <span className="text-[19px] font-semibold tracking-[-0.04em] text-gold tabular-nums sm:text-[21px]">
-                    {formatNaira(Number(offer.offer_price))}
-                  </span>
-                  <span className="text-[10px] text-white/35 line-through">{formatNaira(property.price)}</span>
-                  {property.price_period && periodLabel[property.price_period] && (
-                    <span className="text-[10px] font-medium text-white/40">{periodLabel[property.price_period]}</span>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                {offer && <span className="mb-1 inline-flex rounded-sm bg-gold/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-gold">Special offer</span>}
-                <div className="flex flex-wrap items-baseline gap-1">
-                  <span className="text-[19px] font-semibold tracking-[-0.04em] text-white tabular-nums sm:text-[21px]">
-                    {formatNaira(property.price)}
-                  </span>
-                  {property.price_period && periodLabel[property.price_period] && (
-                    <span className="text-[10px] font-medium text-white/40">{periodLabel[property.price_period]}</span>
-                  )}
-                </div>
-              </>
-            )}
+              {offer?.offer_type === 'price_reduction' && offer.offer_price != null ? (
+                <>
+                  <span className="mb-1 inline-flex rounded-sm bg-gold/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-gold">Special offer</span>
+                  <div className="flex flex-wrap items-baseline gap-1.5">
+                    <span className="text-[19px] font-semibold tracking-[-0.04em] text-gold tabular-nums sm:text-[21px]">
+                      {formatNaira(Number(offer.offer_price))}
+                    </span>
+                    <span className="text-[10px] text-white/35 line-through">{formatNaira(property.price)}</span>
+                    {property.price_period && periodLabel[property.price_period] && (
+                      <span className="text-[10px] font-medium text-white/40">{periodLabel[property.price_period]}</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {offer && <span className="mb-1 inline-flex rounded-sm bg-gold/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-gold">Special offer</span>}
+                  <div className="flex flex-wrap items-baseline gap-1">
+                    <span className="text-[19px] font-semibold tracking-[-0.04em] text-white tabular-nums sm:text-[21px]">
+                      {formatNaira(property.price)}
+                    </span>
+                    {property.price_period && periodLabel[property.price_period] && (
+                      <span className="text-[10px] font-medium text-white/40">{periodLabel[property.price_period]}</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-white/10 text-white/55 transition-all group-hover:border-gold group-hover:bg-gold group-hover:text-ink">
+              <ArrowUpRight className="h-4 w-4" />
+            </span>
           </div>
 
           {/* Property specifications */}
-          <div className="flex flex-shrink-0 items-center gap-3 pb-0.5 text-[11px] text-white/50">
-            {property.listing_type === 'house' ? (
-              <>
-                {property.bedrooms && (
-                  <span className="flex items-center gap-1.5">
-                    <Bed className="h-3.5 w-3.5 text-white/35" />
-                    {property.bedrooms}
-                  </span>
-                )}
-
-                {property.bathrooms && (
-                  <span className="flex items-center gap-1.5">
-                    <Bath className="h-3.5 w-3.5 text-white/35" />
-                    {property.bathrooms}
-                  </span>
-                )}
-              </>
-            ) : (
-              property.land_size_value && (
+          {(property.listing_type === 'house'
+            ? !!(property.bedrooms || property.bathrooms)
+            : !!property.land_size_value) && (
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/[0.06] pt-3 text-[11px] text-white/50">
+              {property.listing_type === 'house' ? (
+                <>
+                  {property.bedrooms != null && property.bedrooms > 0 && (
+                    <span className="flex items-center gap-1.5">
+                      <Bed className="h-3.5 w-3.5 text-white/35" />
+                      {property.bedrooms} beds
+                    </span>
+                  )}
+                  {property.bathrooms != null && property.bathrooms > 0 && (
+                    <span className="flex items-center gap-1.5">
+                      <Bath className="h-3.5 w-3.5 text-white/35" />
+                      {property.bathrooms} baths
+                    </span>
+                  )}
+                </>
+              ) : (
                 <span className="whitespace-nowrap">
                   {property.land_size_value} {property.land_size_unit}
                 </span>
-              )
-            )}
-
-            <span className="ml-1 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-white/45 transition-all group-hover:border-gold/50 group-hover:bg-gold group-hover:text-ink">
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </span>
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Link>
