@@ -15,7 +15,7 @@ export const listingSchema = z.object({
   title: z.string().min(10, 'Title must be at least 10 characters'),
   category: z.string().min(1, 'Please select a category'),
   description: z.string().min(20, 'Description must be at least 20 characters'),
-  min_rental_duration: z.string().optional(),
+  min_rental_duration: z.string().nullish(),
   house_rules: z.string().max(500, 'House rules must be under 500 characters').optional(),
   
   // House specific
@@ -38,15 +38,15 @@ export const listingSchema = z.object({
   // Step 4
   images: z.array(z.string()).min(3, 'At least 3 photos are required'),
   videos: z.array(z.string()).optional(),
-  survey_plan_url: z.string().optional(),
+  survey_plan_url: z.string().nullish(),
   
   // Step 5
   price: z.number().min(1000, 'Price must be at least ₦1,000'),
-  caution_fee: z.number().min(0).optional(),
+  caution_fee: z.number().min(0).nullish(),
   price_period: z.enum(['yearly', 'monthly', 'nightly', 'outright']).optional(),
 
   // Set when an agent lists under a company they belong to
-  company_id: z.string().optional(),
+  company_id: z.string().nullish(),
 });
 
 export type ListingFormData = z.infer<typeof listingSchema>;
