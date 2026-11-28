@@ -133,6 +133,7 @@ ShareCard.displayName = 'ShareCard';
 const SharePanel = ({ property, owner, onClose }: { property: Property; owner: Profile | null; onClose: () => void }) => {
   const [copied, setCopied] = useState(false);
   const [generatingCard, setGeneratingCard] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [generatingQR, setGeneratingQR] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const shareCardRef = useRef<HTMLDivElement>(null);
@@ -140,7 +141,7 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
   const propertyUrl = `${window.location.origin}/property/${property.id}`;
   const priceStr = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(property.price);
   const periodStr = property.price_period && property.price_period !== 'outright' ? `/${property.price_period}` : '';
-  const whatsappText = encodeURIComponent(`🏠 *${property.title}*\n📍 ${property.lga}, ${property.state}\n💰 ${priceStr}${periodStr}\n✓ Escrow Protected · ✓ Verified\n\nBook inspection:\n${propertyUrl}\n\n_Listed on Handova — Nigeria's trusted real estate platform_`);
+  const whatsappText = encodeURIComponent(`${property.title.toUpperCase()}\n${property.lga}, ${property.state}\n${priceStr}${periodStr}\n\nEscrow-protected transaction · Verified listing\n\nView property details and arrange an inspection:\n${propertyUrl}\n\nListed on Handova`);
   const twitterText = encodeURIComponent(`${property.title} in ${property.lga}, ${property.state}\n${priceStr}${periodStr} · Escrow Protected\nBook inspection 👇\n${propertyUrl}\n#LagosRealEstate #Handova`);
 
   const trackShare = async (platform: string) => {
@@ -157,19 +158,42 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
   };
 
   const handleDownloadCard = async () => {
-    if (!shareCardRef.current) return;
+    if (!shareCardRef.current) {
+      setDownloadError('The property card is not ready. Please close and reopen the share panel.');
+      return;
+    }
+
     setGeneratingCard(true);
+    setDownloadError(null);
     try {
       const canvas = await html2canvas(shareCardRef.current, {
-        scale: 1, useCORS: true, allowTaint: true, backgroundColor: '#0B0D10',
+        scale: 1,
+        useCORS: true,
+        allowTaint: false,
+        imageTimeout: 15000,
+        backgroundColor: '#0B0D10',
+        logging: false,
       });
+
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((result) => {
+          if (result) resolve(result);
+          else reject(new Error('The browser could not export the property card as an image.'));
+        }, 'image/png');
+      });
+
+      const objectUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = `handova-${property.id.slice(0, 8)}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = objectUrl;
+      document.body.appendChild(link);
       link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
       trackShare('image_card');
     } catch (err) {
       console.error('Failed to generate card:', err);
+      setDownloadError('Could not create the property image. Please try again; the listing photo may not allow image export.');
     } finally {
       setGeneratingCard(false);
     }
@@ -292,6 +316,11 @@ const SharePanel = ({ property, owner, onClose }: { property: Property; owner: P
               <p className="text-[10px] text-paper/30 text-center">Print-ready QR code</p>
             </button>
           </div>
+          {downloadError && (
+            <p role="alert" className="text-[11px] leading-relaxed text-red-400">
+              {downloadError}
+            </p>
+          )}
         </div>
       </motion.div>
     </>
