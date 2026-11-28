@@ -130,18 +130,18 @@ body {
 \n
 
 /* =========================================================
-   HANDOVA — PROPERTY DETAIL EDITORIAL EXPERIENCE
+   HANDOVA — PROPERTY DETAIL DARK EDITORIAL EXPERIENCE
    ========================================================= */
 
 .property-detail-page {
-  background: #f4f1e9 !important;
-  color: #17191d;
+  background: #0B0D10 !important;
+  color: #E8E7E2;
   min-height: 100vh;
 }
 
 .property-detail-page > .sticky {
-  background: rgba(244, 241, 233, 0.96) !important;
-  border-color: rgba(20, 24, 29, 0.10) !important;
+  background: rgba(11, 13, 16, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(18px);
 }
 
@@ -160,7 +160,7 @@ body {
   font-weight: 500 !important;
   line-height: 1.08 !important;
   letter-spacing: -0.035em !important;
-  color: #17191d !important;
+  color: #F2F0E9 !important;
 }
 
 .property-detail-page h3 {
@@ -168,42 +168,42 @@ body {
   font-size: 21px !important;
   font-weight: 500 !important;
   letter-spacing: -0.015em;
-  color: #202329;
+  color: #E8E7E2;
 }
 
 .property-detail-page .bg-ink.border {
-  background: #fffefa !important;
-  border: 1px solid #e7e2d8 !important;
-  border-radius: 5px !important;
-  box-shadow: 0 8px 30px rgba(30, 27, 20, 0.035);
+  background: #171A20 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.20);
 }
 
 .property-detail-page .bg-ink.border [class*="text-paper/"] {
-  color: #77766f !important;
+  color: #A7ABB4 !important;
 }
 
 .property-detail-page .bg-ink.border [class~="text-paper"] {
-  color: #292d32 !important;
+  color: #E8E7E2 !important;
 }
 
 .property-detail-page .bg-ink.border [class*="border-white/"] {
-  border-color: #e9e5dc !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .property-detail-page .bg-ink.border [class*="bg-white/"] {
-  background: #f5f2eb !important;
+  background: rgba(255, 255, 255, 0.045) !important;
 }
 
 .property-detail-page .bg-white\/4,
 .property-detail-page .bg-white\/5 {
-  background: #fffefa !important;
-  border-color: #e7e2d8 !important;
+  background: #171A20 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .property-detail-page .property-detail-gallery {
-  border-radius: 5px !important;
-  background: #17191d;
-  box-shadow: 0 18px 45px rgba(20, 20, 20, 0.12);
+  border-radius: 16px !important;
+  background: #111419;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.30);
 }
 
 .property-detail-page .property-detail-gallery img {
@@ -215,15 +215,15 @@ body {
 }
 
 .property-detail-page .text-gold {
-  color: #a47e1c !important;
+  color: #D4AF37 !important;
 }
 
 .property-detail-page .bg-gold {
-  background-color: #d4af37 !important;
+  background-color: #D4AF37 !important;
 }
 
 .property-detail-page .text-danger {
-  color: #c93b40 !important;
+  color: #E5484D !important;
 }
 
 .property-detail-page button {
@@ -233,40 +233,40 @@ body {
 
 .property-detail-page .bg-gold.text-paper,
 .property-detail-page .bg-gold.text-black {
-  color: #17191d !important;
+  color: #0B0D10 !important;
 }
 
 .property-detail-page .bg-gold:hover {
-  background-color: #c39d2e !important;
+  background-color: #B8952E !important;
 }
 
 .property-detail-page .rounded-2xl {
-  border-radius: 5px;
+  border-radius: 16px;
 }
 
 .property-detail-page .rounded-xl {
-  border-radius: 4px;
+  border-radius: 12px;
 }
 
 .property-detail-page .bg-ink.border-gold\/25 {
-  background: #f9f5e9 !important;
-  border-color: #dfd1a9 !important;
+  background: rgba(212, 175, 55, 0.075) !important;
+  border-color: rgba(212, 175, 55, 0.24) !important;
 }
 
 .property-detail-page .bg-ink.border-gold\/25 [class*="text-paper"] {
-  color: #4e493b !important;
+  color: #D8D0B9 !important;
 }
 
 .property-detail-page .bg-ink.border-gold\/25 .text-gold {
-  color: #98751d !important;
+  color: #D4AF37 !important;
 }
 
-.property-detail-page .grid.grid-cols-1.lg\\:grid-cols-3 {
+.property-detail-page [class~="grid-cols-1"][class~="lg:grid-cols-3"] {
   align-items: start;
 }
 
 @media (min-width: 1024px) {
-  .property-detail-page .lg\\:col-span-2 {
+  .property-detail-page [class~="lg:col-span-2"] {
     padding-right: 12px;
   }
 }
