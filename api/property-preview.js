@@ -73,7 +73,7 @@ export default async function handler(req, res) {
       return res.status(404).send("<!doctype html><html><head><title>Property unavailable | Handova</title></head><body>This property is no longer available.</body></html>");
     }
 
-    const origin = "https://hamdova.ng";
+    const origin = "https://handova.ng";
     const propertyUrl = `${origin}/property/${encodeURIComponent(id)}`;
 
     const title = `${property.title} | Handova`;
