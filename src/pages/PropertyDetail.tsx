@@ -317,16 +317,41 @@ export default function PropertyDetail() {
     new_period: string | null;
     changed_at: string;
   }[]>([]);
+  const [priceHistoryError, setPriceHistoryError] = useState<string | null>(null);
   const [showPriceHistory, setShowPriceHistory] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-    supabase
-      .from('property_price_history')
-      .select('old_price, new_price, old_period, new_period, changed_at')
-      .eq('property_id', id)
-      .order('changed_at', { ascending: false })
-      .then(({ data }) => setPriceHistory(data || []));
+
+    let cancelled = false;
+
+    const loadPriceHistory = async () => {
+      setPriceHistoryError(null);
+
+      const { data, error } = await supabase
+        .from('property_price_history')
+        .select('old_price, new_price, old_period, new_period, changed_at')
+        .eq('property_id', id)
+        .order('changed_at', { ascending: false });
+
+      if (cancelled) return;
+
+      if (error) {
+        console.error('Failed to load property price history:', error);
+        setPriceHistoryError(error.message);
+        setPriceHistory([]);
+        return;
+      }
+
+      setPriceHistoryError(null);
+      setPriceHistory(data ?? []);
+    };
+
+    void loadPriceHistory();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -695,7 +720,11 @@ export default function PropertyDetail() {
                         <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-paper/40">
                           Price history
                         </p>
-                        {priceHistory.length === 0 ? (
+                        {priceHistoryError ? (
+                          <p className="text-[11px] leading-relaxed text-red-400">
+                            Unable to load price history right now. Please try again later.
+                          </p>
+                        ) : priceHistory.length === 0 ? (
                           <p className="text-[11px] leading-relaxed text-paper/35">
                             No price changes have been recorded for this property yet.
                           </p>
