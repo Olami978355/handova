@@ -1,1 +1,22 @@
-{"rewrites":[{"source":"(.*)","destination":"/index.html"}]}
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/property/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": {
+            "re": "(?i)(facebookexternalhit|facebot|whatsapp|telegrambot|twitterbot|linkedinbot|discordbot|slackbot|skypeuripreview|pinterest|applebot)"
+          }
+        }
+      ],
+      "destination": "/api/property-preview?id=:id"
+    },
+    {
+      "source": "(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
