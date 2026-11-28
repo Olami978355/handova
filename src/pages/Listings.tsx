@@ -289,53 +289,57 @@ export default function Listings() {
             )}
           </div>
 
-          {/* Quick filter pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <FilterBtn label="All" active={!hasActiveFilters} onClick={clearFilters} />
-            <FilterBtn label="For Rent" active={transaction === 'rent'} onClick={() => setTransaction(transaction === 'rent' ? 'all' : 'rent')} />
-            <FilterBtn label="For Sale" active={transaction === 'sell'} onClick={() => setTransaction(transaction === 'sell' ? 'all' : 'sell')} />
-            <FilterBtn label="Houses" active={type === 'house'} onClick={() => setType(type === 'house' ? 'all' : 'house')} />
-            <FilterBtn label="Land" active={type === 'land'} onClick={() => setType(type === 'land' ? 'all' : 'land')} />
-            <FilterBtn label="✓ Verified" active={verifiedOnly} onClick={() => setVerifiedOnly(!verifiedOnly)} />
+          {/* Quick filters and actions */}
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            {/* Quick filter pills */}
+            <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <FilterBtn label="All" active={!hasActiveFilters} onClick={clearFilters} />
+              <FilterBtn label="For Rent" active={transaction === 'rent'} onClick={() => setTransaction(transaction === 'rent' ? 'all' : 'rent')} />
+              <FilterBtn label="For Sale" active={transaction === 'sell'} onClick={() => setTransaction(transaction === 'sell' ? 'all' : 'sell')} />
+              <FilterBtn label="Houses" active={type === 'house'} onClick={() => setType(type === 'house' ? 'all' : 'house')} />
+              <FilterBtn label="Land" active={type === 'land'} onClick={() => setType(type === 'land' ? 'all' : 'land')} />
+              <FilterBtn label="✓ Verified" active={verifiedOnly} onClick={() => setVerifiedOnly(!verifiedOnly)} />
+            </div>
 
-            <div className="w-px h-5 bg-white/10 flex-shrink-0 mx-1" />
-
-            <button
-              onClick={() => setShowFilters(true)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 hover:text-paper transition-all whitespace-nowrap flex-shrink-0"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              More filters
-              {hasActiveFilters && (
-                <span className="w-1.5 h-1.5 rounded-full bg-gold" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setView(view === 'list' ? 'map' : 'list')}
-              className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 hover:text-paper transition-all whitespace-nowrap flex-shrink-0"
-            >
-              {view === 'list' ? <MapIcon className="w-3.5 h-3.5" /> : <Home className="w-3.5 h-3.5" />}
-              {view === 'list' ? 'Map View' : 'List View'}
-            </button>
-            {user && (
+            {/* Actions */}
+            <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-nowrap lg:shrink-0">
               <button
-                onClick={() => setSaveSearchOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/8 rounded-xl text-[13px] font-semibold text-paper/55 hover:bg-white/8 hover:text-paper transition-all whitespace-nowrap flex-shrink-0"
+                onClick={() => setShowFilters(true)}
+                className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-[12px] font-semibold text-paper/65 transition-all hover:bg-white/8 hover:text-paper"
               >
-                <BookmarkPlus className="w-3.5 h-3.5" />
-                Save search
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                More filters
+                {hasActiveFilters && <span className="h-1.5 w-1.5 rounded-full bg-gold" />}
               </button>
-            )}
-            <button
-              onClick={() => { setCompareMode(!compareMode); setCompareIds([]); }}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
-                compareMode ? 'bg-gold text-ink' : 'bg-white/5 border border-white/8 text-paper/55 hover:bg-white/8 hover:text-paper'
-              }`}
-            >
-              <Scale className="w-3.5 h-3.5" />
-              {compareMode ? 'Cancel compare' : 'Compare'}
-            </button>
+
+              <button
+                onClick={() => setView(view === 'list' ? 'map' : 'list')}
+                className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-[12px] font-semibold text-paper/65 transition-all hover:bg-white/8 hover:text-paper"
+              >
+                {view === 'list' ? <MapIcon className="h-3.5 w-3.5" /> : <Home className="h-3.5 w-3.5" />}
+                {view === 'list' ? 'Map View' : 'List View'}
+              </button>
+
+              {user && (
+                <button
+                  onClick={() => setSaveSearchOpen(true)}
+                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-white/8 bg-white/5 px-3 py-2.5 text-[12px] font-semibold text-paper/65 transition-all hover:bg-white/8 hover:text-paper"
+                >
+                  <BookmarkPlus className="h-3.5 w-3.5" />
+                  Save search
+                </button>
+              )}
+
+              <button
+                onClick={() => { setCompareMode(!compareMode); setCompareIds([]); }}
+                className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-[12px] font-semibold transition-all ${
+                  compareMode ? 'bg-gold text-ink' : 'border border-white/8 bg-white/5 text-paper/65 hover:bg-white/8 hover:text-paper'
+                }`}
+              >
+                <Scale className="h-3.5 w-3.5" />
+                {compareMode ? 'Cancel compare' : 'Compare'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
