@@ -929,7 +929,7 @@ export default function Dashboard() {
                         <h2 className="text-[15px] font-bold text-paper">Saved Properties</h2>
                         <p className="text-[11px] text-paper/35 mt-0.5">Properties you hearted</p>
                       </div>
-                      <Heart className="w-4 h-4 text-gold" />
+                      <Heart className="w-4 h-4 text-paper/70" />
                     </div>
                     {savedProperties.length === 0 ? (
                       <EmptyState
@@ -964,7 +964,7 @@ export default function Dashboard() {
                               <p className="text-[11px] font-bold text-paper truncate">
                                 {property.title}
                               </p>
-                              <p className="text-[12px] font-black text-gold mt-0.5 tabular-nums">
+                              <p className="text-[12px] font-black text-paper mt-0.5 tabular-nums">
                                 {formatNaira(property.price)}
                                 {property.price_period === 'yearly' && '/yr'}
                               </p>
