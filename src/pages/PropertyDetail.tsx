@@ -17,6 +17,7 @@ import { Property, Profile } from '../types';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { ChatButton } from '../components/chat/ChatButton';
 import { InspectionFeeDisplay } from '../components/inspection/InspectionFeeDisplay';
+import PropertyOfferPanel from '../components/property/PropertyOfferPanel';
 
 const formatNaira = (amount: number) =>
   new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount);
@@ -754,6 +755,8 @@ export default function PropertyDetail() {
                   </div>
                 </div>
               </div>
+
+              <PropertyOfferPanel property={property} />
 
               {/* Quick stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

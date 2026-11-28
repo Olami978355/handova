@@ -60,6 +60,22 @@ export type PropertyStatus =
   | 'inactive'
   | 'flagged';
 
+export interface PropertyOffer {
+  id: string;
+  property_id: string;
+  offer_type: 'price_reduction' | 'rent_incentive' | 'flexible_payment';
+  headline: string;
+  description: string | null;
+  reference_price: number | null;
+  offer_price: number | null;
+  payment_terms: string | null;
+  starts_at: string;
+  expires_at: string | null;
+  status: 'active' | 'withdrawn' | 'expired';
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Property {
   id: string;
   owner_id: string;

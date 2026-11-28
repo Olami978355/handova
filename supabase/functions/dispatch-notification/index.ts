@@ -10,6 +10,13 @@ const CRITICAL_TRANSACTION_TYPES = new Set([
   'custom_deal_offer',
   'refund_processed',
   'refund_attention',
+  'lawyer_review_submitted',
+  'lawyer_review_expired',
+  'lawyer_verification_approved',
+  'lawyer_verification_rejected',
+  'verification_approved',
+  'verification_rejected',
+  'security_alert',
 ])
 
 const EMAIL_TYPES = new Set([

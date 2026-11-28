@@ -95,56 +95,9 @@ serve(async (req) => {
 
     if (error) throw error
 
-    // Send background Web Push for chat messages.
-    // Push failure must never undo the in-app notification.
-    const pushResults = []
-
-    if (type === 'new_message') {
-      for (const uid of targetUserIds) {
-        try {
-          const response = await fetch(
-            `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-push-notification`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${serviceKey}`,
-              },
-              body: JSON.stringify({
-                user_id: uid,
-                title: title || 'New Message',
-                body: body || 'You have received a new message',
-                url: link || '/messages',
-              }),
-            },
-          )
-
-          const result = await response.json().catch(() => ({}))
-
-          if (!response.ok) {
-            console.error('Chat push endpoint failed:', response.status, result)
-          }
-
-          pushResults.push({
-            user_id: uid,
-            success: response.ok && result.success === true,
-            result,
-          })
-        } catch (pushError) {
-          console.error('Chat push delivery failed:', pushError)
-          pushResults.push({
-            user_id: uid,
-            success: false,
-            error: (pushError as Error).message,
-          })
-        }
-      }
-    }
-
     return json({
       success: true,
       data,
-      push: pushResults,
     })
   } catch (error) {
     console.error('send-notification error:', error)

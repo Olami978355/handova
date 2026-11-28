@@ -13,7 +13,7 @@ import {
   Check,
   ArrowUpRight,
 } from 'lucide-react';
-import { Property } from '../types';
+import { Property, PropertyOffer } from '../types';
 import { formatNaira } from '../utils/format';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -28,6 +28,7 @@ const periodLabel: Record<string, string> = {
 
 interface PropertyCardProps {
   property: Property;
+  offer?: PropertyOffer | null;
   showOwnerBadge?: boolean;
   onSaveChange?: (saved: boolean) => void;
   compareMode?: boolean;
@@ -37,6 +38,7 @@ interface PropertyCardProps {
 
 export default function PropertyCard({
   property,
+  offer = null,
   showOwnerBadge = true,
   onSaveChange,
   compareMode = false,
@@ -262,17 +264,32 @@ export default function PropertyCard({
               {isRent ? 'Rental price' : 'Asking price'}
             </span>
 
-            <div className="flex flex-wrap items-baseline gap-1">
-              <span className="text-[19px] font-semibold tracking-[-0.04em] text-white tabular-nums sm:text-[21px]">
-                {formatNaira(property.price)}
-              </span>
-
-              {property.price_period && periodLabel[property.price_period] && (
-                <span className="text-[10px] font-medium text-white/40">
-                  {periodLabel[property.price_period]}
-                </span>
-              )}
-            </div>
+            {offer?.offer_type === 'price_reduction' && offer.offer_price != null ? (
+              <>
+                <span className="mb-1 inline-flex rounded-sm bg-gold/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-gold">Special offer</span>
+                <div className="flex flex-wrap items-baseline gap-1.5">
+                  <span className="text-[19px] font-semibold tracking-[-0.04em] text-gold tabular-nums sm:text-[21px]">
+                    {formatNaira(Number(offer.offer_price))}
+                  </span>
+                  <span className="text-[10px] text-white/35 line-through">{formatNaira(property.price)}</span>
+                  {property.price_period && periodLabel[property.price_period] && (
+                    <span className="text-[10px] font-medium text-white/40">{periodLabel[property.price_period]}</span>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                {offer && <span className="mb-1 inline-flex rounded-sm bg-gold/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-gold">Special offer</span>}
+                <div className="flex flex-wrap items-baseline gap-1">
+                  <span className="text-[19px] font-semibold tracking-[-0.04em] text-white tabular-nums sm:text-[21px]">
+                    {formatNaira(property.price)}
+                  </span>
+                  {property.price_period && periodLabel[property.price_period] && (
+                    <span className="text-[10px] font-medium text-white/40">{periodLabel[property.price_period]}</span>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Property specifications */}

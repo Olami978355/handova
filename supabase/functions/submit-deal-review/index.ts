@@ -78,7 +78,7 @@ serve(async (req) => {
       title: 'New Review Received',
       body: `You received a ${rating}-star review on a completed deal.`,
       link: reviewerProfile?.username ? `/u/${reviewerProfile.username}` : `/deals/${dealId}`,
-      type: 'deal_state_change',
+      type: 'deal_review_received',
     });
 
     return new Response(JSON.stringify({ success: true, review }), {

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
-import { Property, PropertyType, TransactionType } from '../types';
+import { Property, PropertyOffer, PropertyType, TransactionType } from '../types';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import PropertyCard from '../components/PropertyCard';
 import { CompareModal } from '../components/CompareModal';
@@ -154,7 +154,26 @@ export default function Listings() {
         owner_role: ownerMap[p.owner_id]?.role,
         owner_verification_status: ownerMap[p.owner_id]?.verification_status,
       }));
-      setProperties(enriched);
+
+      const propertyIds = rows.map(p => p.id);
+      let offerMap: Record<string, PropertyOffer> = {};
+      if (propertyIds.length > 0) {
+        const { data: offers, error: offersError } = await supabase
+          .from('property_offers')
+          .select('id, property_id, offer_type, headline, description, reference_price, offer_price, payment_terms, starts_at, expires_at, status, created_at, updated_at')
+          .in('property_id', propertyIds)
+          .eq('status', 'active')
+          .lte('starts_at', new Date().toISOString())
+          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
+
+        if (offersError) {
+          console.warn('Property offers are not available yet:', offersError.message);
+        } else if (offers) {
+          offerMap = Object.fromEntries(offers.map(offer => [offer.property_id, offer as PropertyOffer]));
+        }
+      }
+
+      setProperties(enriched.map(p => ({ ...p, active_offer: offerMap[p.id] ?? null })));
       setTotalCount(count || 0);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to load properties';
@@ -225,9 +244,17 @@ export default function Listings() {
       {/* ── Search header ── */}
       <div className="bg-slate/25 border-b border-white/5 pt-8 pb-6 px-5">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-[22px] font-black text-paper tracking-tight mb-5">
-            Find your property
-          </h1>
+          <div className="mb-5">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-gold/75">
+              Handova · Discover
+            </p>
+            <h1 className="mb-2 text-[26px] font-bold tracking-[-0.04em] text-paper sm:text-[30px]">
+              Find a place to call yours
+            </h1>
+            <p className="max-w-2xl text-[13px] leading-relaxed text-paper/45">
+              Explore properties for rent and sale, and find the right place for your next move.
+            </p>
+          </div>
 
           {/* Search input */}
           <div className="relative mb-4">
@@ -251,7 +278,7 @@ export default function Listings() {
 
           {/* Quick filter pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <FilterBtn label="All" active={type === 'all' && transaction === 'all' && !verifiedOnly} onClick={clearFilters} />
+            <FilterBtn label="All" active={!hasActiveFilters} onClick={clearFilters} />
             <FilterBtn label="For Rent" active={transaction === 'rent'} onClick={() => setTransaction(transaction === 'rent' ? 'all' : 'rent')} />
             <FilterBtn label="For Sale" active={transaction === 'sell'} onClick={() => setTransaction(transaction === 'sell' ? 'all' : 'sell')} />
             <FilterBtn label="Houses" active={type === 'house'} onClick={() => setType(type === 'house' ? 'all' : 'house')} />
@@ -434,23 +461,28 @@ export default function Listings() {
 
           {/* ── Properties grid ── */}
           <div className="flex-1 min-w-0">
-            {/* Results count */}
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-[13px] text-paper/45">
-                {loading ? 'Searching...' : (
-                  <>
-                    <span className="text-paper font-semibold">{totalCount}</span>
-                    {' '}propert{totalCount === 1 ? 'y' : 'ies'} found
-                    {state && <span className="text-paper/30"> in {state}</span>}
-                  </>
-                )}
-              </p>
+            {/* Results toolbar */}
+            <div className="mb-5 flex min-h-[44px] items-center justify-between gap-3 border-b border-white/[0.07] pb-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-paper/30">
+                  Property listings
+                </p>
+                <p className="mt-1 text-[13px] text-paper/55">
+                  {loading ? 'Searching properties...' : (
+                    <>
+                      <span className="font-semibold text-paper">{totalCount}</span>
+                      {' '}propert{totalCount === 1 ? 'y' : 'ies'} found
+                      {state && <span className="text-paper/35"> in {state}</span>}
+                    </>
+                  )}
+                </p>
+              </div>
               {hasActiveFilters && !loading && (
                 <button
                   onClick={clearFilters}
-                  className="text-[12px] text-paper/35 hover:text-gold transition-colors flex items-center gap-1"
+                  className="flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-medium text-paper/45 transition-colors hover:border-gold/30 hover:text-gold"
                 >
-                  <X className="w-3 h-3" /> Clear filters
+                  <X className="h-3 w-3" /> Clear filters
                 </button>
               )}
             </div>
@@ -490,7 +522,7 @@ export default function Listings() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {properties.map(property => (
-                  <PropertyCard key={property.id} property={property} compareMode={compareMode} isComparing={compareIds.includes(property.id)} onToggleCompare={toggleCompare} />
+                  <PropertyCard key={property.id} property={property} offer={(property as Property & { active_offer?: PropertyOffer | null }).active_offer} compareMode={compareMode} isComparing={compareIds.includes(property.id)} onToggleCompare={toggleCompare} />
                 ))}
               </div>
             )
