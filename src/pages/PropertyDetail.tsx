@@ -310,14 +310,20 @@ export default function PropertyDetail() {
     status: string;
     username: string | null;
   } | null>(null);
-  const [priceHistory, setPriceHistory] = useState<{ old_price: number; new_price: number; changed_at: string }[]>([]);
+  const [priceHistory, setPriceHistory] = useState<{
+    old_price: number;
+    new_price: number;
+    old_period: string | null;
+    new_period: string | null;
+    changed_at: string;
+  }[]>([]);
   const [showPriceHistory, setShowPriceHistory] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     supabase
       .from('property_price_history')
-      .select('old_price, new_price, changed_at')
+      .select('old_price, new_price, old_period, new_period, changed_at')
       .eq('property_id', id)
       .order('changed_at', { ascending: false })
       .then(({ data }) => setPriceHistory(data || []));
@@ -678,22 +684,42 @@ export default function PropertyDetail() {
                         + {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format((property as any).caution_fee)} caution/security deposit
                       </div>
                     )}
-                    {priceHistory.length > 0 && (
-                      <button
-                        onClick={() => setShowPriceHistory(!showPriceHistory)}
-                        className="text-[11px] text-paper/30 hover:text-paper/55 underline mt-1 transition-colors"
-                      >
-                        Price history
-                      </button>
-                    )}
-                    {showPriceHistory && priceHistory.length > 0 && (
-                      <div className="mt-2 space-y-1 text-right">
-                        {priceHistory.map((h, i) => (
-                          <div key={i} className="text-[11px] text-paper/35">
-                            {formatNaira(h.old_price)} {'\u2192'} {formatNaira(h.new_price)}
-                            <span className="text-paper/20"> · {new Date(h.changed_at).toLocaleDateString()}</span>
+                    <button
+                      onClick={() => setShowPriceHistory(!showPriceHistory)}
+                      className="mt-2 text-[11px] text-gold/75 hover:text-gold underline underline-offset-2 transition-colors"
+                    >
+                      {showPriceHistory ? 'Hide price history' : 'View price history'}
+                    </button>
+                    {showPriceHistory && (
+                      <div className="mt-3 w-full min-w-[220px] rounded-xl border border-white/[0.08] bg-white/[0.025] p-3 text-left">
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-paper/40">
+                          Price history
+                        </p>
+                        {priceHistory.length === 0 ? (
+                          <p className="text-[11px] leading-relaxed text-paper/35">
+                            No price changes have been recorded for this property yet.
+                          </p>
+                        ) : (
+                          <div className="space-y-3">
+                            {priceHistory.map((h, i) => (
+                              <div key={`${h.changed_at}-${i}`} className="border-b border-white/[0.06] pb-2 last:border-0 last:pb-0">
+                                <p className="text-[12px] font-semibold text-paper/75">
+                                  {formatNaira(h.old_price)} {'\u2192'} {formatNaira(h.new_price)}
+                                </p>
+                                {(h.old_period || h.new_period) && (
+                                  <p className="mt-1 text-[10px] text-paper/35">
+                                    {h.old_period ? (periodLabel[h.old_period as keyof typeof periodLabel] || h.old_period) : '—'}
+                                    {' → '}
+                                    {h.new_period ? (periodLabel[h.new_period as keyof typeof periodLabel] || h.new_period) : '—'}
+                                  </p>
+                                )}
+                                <p className="mt-1 text-[10px] text-paper/25">
+                                  {new Date(h.changed_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        )}
                       </div>
                     )}
                   </div>

@@ -16,14 +16,33 @@ serve(async (req) => {
 
     const { data: property, error: propError } = await adminSupabase
       .from('properties')
-      .select('owner_id, agent_id, price, deleted_at')
+      .select('owner_id, agent_id, company_id, price, deleted_at')
       .eq('id', propertyId)
       .single();
     if (propError || !property) throw new Error('Property not found');
     if (property.deleted_at) throw new Error('Cannot edit a deleted listing.');
 
-    if (property.owner_id !== user.id && property.agent_id !== user.id) {
-      throw new Error('Only the landlord or agent who listed this property can edit it.');
+    const isOwner = property.owner_id === user.id;
+    const isAssignedAgent = property.agent_id === user.id;
+
+    if (!isOwner && !isAssignedAgent) {
+      throw new Error('Only the property owner or assigned agent can edit this listing.');
+    }
+
+    // Company agents must retain active membership to edit company listings.
+    if (property.company_id && !isOwner && isAssignedAgent) {
+      const { data: membership, error: membershipError } = await adminSupabase
+        .from('company_members')
+        .select('id')
+        .eq('company_id', property.company_id)
+        .eq('member_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (membershipError) throw membershipError;
+      if (!membership) {
+        throw new Error('Your active membership in this company is required to edit this listing.');
+      }
     }
 
     const allowedFields = [
@@ -37,28 +56,22 @@ serve(async (req) => {
       if (field in data) updatePayload[field] = data[field];
     }
 
-    const priceChanged = typeof data.price === 'number' && data.price !== property.price;
-
-    const { error: updateError } = await adminSupabase
-      .from('properties')
-      .update(updatePayload)
-      .eq('id', propertyId);
+    const { data: priceChanged, error: updateError } = await adminSupabase.rpc(
+      'update_property_with_price_history',
+      {
+        p_property_id: propertyId,
+        p_data: updatePayload,
+        p_changed_by: user.id,
+      },
+    );
     if (updateError) throw updateError;
-
-    if (priceChanged) {
-      await adminSupabase.from('property_price_history').insert({
-        property_id: propertyId,
-        old_price: property.price,
-        new_price: data.price,
-        changed_by: user.id,
-      });
-    }
 
     return new Response(JSON.stringify({ success: true, priceChanged }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200,
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
     });
   }
