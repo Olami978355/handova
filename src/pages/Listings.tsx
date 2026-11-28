@@ -77,6 +77,12 @@ export default function Listings() {
 
   // ── Filter state ──
   const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [sort, setSort] = useState(() => {
+    const value = searchParams.get('sort');
+    return value === 'price_asc' || value === 'price_desc'
+      ? value
+      : 'newest';
+  });
   const [state, setState] = useState(searchParams.get('state') || '');
   const [type, setType] = useState<PropertyType | 'all'>(
     (searchParams.get('type') as PropertyType) || 'all'
@@ -131,8 +137,14 @@ export default function Listings() {
         );
       }
 
+      const sortColumn = sort === 'price_asc' || sort === 'price_desc'
+        ? 'price'
+        : 'created_at';
+      const ascending = sort === 'price_asc';
+
       const { data, error: fetchError, count } = await query
-        .order('created_at', { ascending: false })
+        .order(sortColumn, { ascending, nullsFirst: false })
+        .order('id', { ascending: true })
         .limit(50);
 
       if (fetchError) throw fetchError;
@@ -181,7 +193,7 @@ export default function Listings() {
     } finally {
       setLoading(false);
     }
-  }, [type, transaction, state, verifiedOnly, minPrice, maxPrice, bedrooms, search]);
+  }, [type, transaction, state, verifiedOnly, minPrice, maxPrice, bedrooms, search, sort]);
 
   // ── Debounce search ──
   useEffect(() => {
@@ -191,6 +203,7 @@ export default function Listings() {
       // Sync URL
       const params = new URLSearchParams();
       if (search) params.set('q', search);
+      if (sort !== 'newest') params.set('sort', sort);
       if (state) params.set('state', state);
       if (type !== 'all') params.set('type', type);
       if (transaction !== 'all') params.set('transaction', transaction);
@@ -203,7 +216,7 @@ export default function Listings() {
     return () => {
       if (searchTimeout.current) clearTimeout(searchTimeout.current);
     };
-  }, [fetchProperties]);
+  }, [fetchProperties, search, state, type, transaction, minPrice, maxPrice, verifiedOnly, bedrooms, sort, setSearchParams]);
 
   const handleSaveSearch = async () => {
     if (!user || !searchName.trim()) return;
@@ -477,6 +490,20 @@ export default function Listings() {
                   )}
                 </p>
               </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <label htmlFor="discover-sort" className="hidden sm:block text-[11px] text-paper/35">
+                  Sort
+                </label>
+                <select
+                  id="discover-sort"
+                  value={sort}
+                  onChange={e => setSort(e.target.value)}
+                  className="max-w-[155px] rounded-lg border border-white/10 bg-[#111419] px-3 py-2 text-[11px] font-semibold text-paper/70 outline-none transition-colors focus:border-gold"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="price_asc">Price: low to high</option>
+                  <option value="price_desc">Price: high to low</option>
+                </select>
               {hasActiveFilters && !loading && (
                 <button
                   onClick={clearFilters}
@@ -485,6 +512,7 @@ export default function Listings() {
                   <X className="h-3 w-3" /> Clear filters
                 </button>
               )}
+              </div>
             </div>
 
             {/* Loading */}
